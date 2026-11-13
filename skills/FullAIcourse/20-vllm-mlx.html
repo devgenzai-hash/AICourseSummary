@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vLLM & MLX — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 5</a> <span>›</span> vLLM & MLX</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>vLLM & MLX</h1>
+                <p>vLLM: the production-grade inference engine for NVIDIA GPUs. MLX: Apple's framework for running models blazing fast on Mac. Two sides of the same coin — high-performance local inference.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>vLLM = a professional commercial kitchen.</strong> Optimized to handle hundreds of orders simultaneously with maximum efficiency. Used by restaurants (companies) serving many customers.</p>
+                <p><strong>MLX = a home kitchen designed by Apple.</strong> Beautiful, efficient, optimized specifically for your Mac hardware. Does fewer orders but each one is fast and effortless on Apple Silicon.</p>
+            </div>
+
+            <h2 id="vllm">vLLM: Production Inference Engine</h2>
+
+            <h3>Why vLLM?</h3>
+            <ul>
+                <li><strong>2-4x faster</strong> than naive HuggingFace inference</li>
+                <li><strong>PagedAttention</strong> — serves 2-4x more concurrent users</li>
+                <li><strong>Continuous batching</strong> — no wasted GPU cycles</li>
+                <li><strong>OpenAI-compatible API</strong> — drop-in replacement</li>
+                <li><strong>Used by</strong>: Anyscale, Databricks, many startups</li>
+            </ul>
+
+            <h3>Quick Start:</h3>
+            <pre><code><span class="token-comment"># pip install vllm</span>
+
+<span class="token-comment"># Start vLLM server (one command)</span>
+<span class="token-comment"># vllm serve meta-llama/Llama-3.1-8B-Instruct --port 8000</span>
+
+<span class="token-comment"># With quantization:</span>
+<span class="token-comment"># vllm serve meta-llama/Llama-3.1-8B-Instruct \</span>
+<span class="token-comment">#   --quantization awq \</span>
+<span class="token-comment">#   --max-model-len 8192 \</span>
+<span class="token-comment">#   --gpu-memory-utilization 0.9 \</span>
+<span class="token-comment">#   --port 8000</span></code></pre>
+
+            <h3>Using vLLM from Python:</h3>
+            <pre><code><span class="token-comment"># Method 1: Offline batch inference (no server needed)</span>
+<span class="token-keyword">from</span> vllm <span class="token-keyword">import</span> LLM, SamplingParams
+
+<span class="token-comment"># Load model</span>
+llm = LLM(
+    model=<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    tensor_parallel_size=<span class="token-number">1</span>,  <span class="token-comment"># Number of GPUs</span>
+    gpu_memory_utilization=<span class="token-number">0.9</span>,
+    max_model_len=<span class="token-number">8192</span>,
+)
+
+<span class="token-comment"># Batch inference (processes all at once efficiently)</span>
+prompts = [
+    <span class="token-string">"Explain Python decorators in 2 sentences."</span>,
+    <span class="token-string">"What is a REST API?"</span>,
+    <span class="token-string">"Write a SQL query to find duplicate emails."</span>,
+    <span class="token-string">"Explain Docker vs Kubernetes."</span>,
+]
+
+sampling_params = SamplingParams(
+    temperature=<span class="token-number">0.7</span>,
+    max_tokens=<span class="token-number">200</span>,
+    top_p=<span class="token-number">0.9</span>,
+)
+
+outputs = llm.generate(prompts, sampling_params)
+
+<span class="token-keyword">for</span> output <span class="token-keyword">in</span> outputs:
+    <span class="token-builtin">print</span>(<span class="token-string">f"Prompt: {output.prompt[:50]}..."</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"Response: {output.outputs[0].text}\n"</span>)</code></pre>
+
+            <h3>vLLM as OpenAI-compatible Server:</h3>
+            <pre><code><span class="token-comment"># After starting: vllm serve meta-llama/Llama-3.1-8B-Instruct</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI(
+    base_url=<span class="token-string">"http://localhost:8000/v1"</span>,
+    api_key=<span class="token-string">"token-abc123"</span>,  <span class="token-comment"># Required but any value works</span>
+)
+
+<span class="token-comment"># Same code as OpenAI — just different base_url!</span>
+response = client.chat.completions.create(
+    model=<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    messages=[
+        {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a helpful assistant."</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"What are the SOLID principles?"</span>},
+    ],
+    temperature=<span class="token-number">0.7</span>,
+    max_tokens=<span class="token-number">500</span>,
+    stream=<span class="token-keyword">True</span>,
+)
+
+<span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> response:
+    <span class="token-keyword">if</span> chunk.choices[<span class="token-number">0</span>].delta.content:
+        <span class="token-builtin">print</span>(chunk.choices[<span class="token-number">0</span>].delta.content, end=<span class="token-string">""</span>)</code></pre>
+
+            <h3>Advanced vLLM Configuration:</h3>
+            <pre><code><span class="token-comment"># Production vLLM deployment</span>
+<span class="token-keyword">from</span> vllm <span class="token-keyword">import</span> LLM, SamplingParams
+<span class="token-keyword">from</span> vllm.engine.arg_utils <span class="token-keyword">import</span> AsyncEngineArgs
+
+<span class="token-comment"># Multi-GPU with tensor parallelism</span>
+llm = LLM(
+    model=<span class="token-string">"meta-llama/Llama-3.1-70B-Instruct"</span>,
+    tensor_parallel_size=<span class="token-number">4</span>,      <span class="token-comment"># Split across 4 GPUs</span>
+    gpu_memory_utilization=<span class="token-number">0.95</span>,  <span class="token-comment"># Use 95% of VRAM</span>
+    max_model_len=<span class="token-number">32768</span>,         <span class="token-comment"># Max context length</span>
+    enable_prefix_caching=<span class="token-keyword">True</span>,  <span class="token-comment"># Cache common prefixes</span>
+    dtype=<span class="token-string">"auto"</span>,                 <span class="token-comment"># Auto-detect best dtype</span>
+)
+
+<span class="token-comment"># Serving with Docker (production):</span>
+<span class="token-comment"># docker run --runtime nvidia --gpus all \</span>
+<span class="token-comment">#   -v ~/.cache/huggingface:/root/.cache/huggingface \</span>
+<span class="token-comment">#   -p 8000:8000 \</span>
+<span class="token-comment">#   vllm/vllm-openai:latest \</span>
+<span class="token-comment">#   --model meta-llama/Llama-3.1-8B-Instruct \</span>
+<span class="token-comment">#   --gpu-memory-utilization 0.9</span></code></pre>
+
+            <h2 id="mlx">MLX: Apple Silicon Inference</h2>
+
+            <h3>Why MLX?</h3>
+            <ul>
+                <li><strong>Optimized for Apple Silicon</strong> — Uses unified memory architecture (up to 192GB!)</li>
+                <li><strong>NumPy-like API</strong> — Familiar for Python developers</li>
+                <li><strong>Lazy evaluation</strong> — Only computes what's needed</li>
+                <li><strong>Run 70B models on a MacBook</strong> — With M3/M4 Max 128GB</li>
+            </ul>
+
+            <pre><code><span class="token-comment"># pip install mlx-lm</span>
+<span class="token-keyword">from</span> mlx_lm <span class="token-keyword">import</span> load, generate
+
+<span class="token-comment"># Load a model (automatically downloads from HuggingFace)</span>
+model, tokenizer = load(<span class="token-string">"mlx-community/Llama-3.1-8B-Instruct-4bit"</span>)
+
+<span class="token-comment"># Generate text</span>
+prompt = <span class="token-string">"Explain machine learning to a 5-year-old:"</span>
+response = generate(
+    model, 
+    tokenizer, 
+    prompt=prompt,
+    max_tokens=<span class="token-number">200</span>,
+    temp=<span class="token-number">0.7</span>,
+)
+<span class="token-builtin">print</span>(response)</code></pre>
+
+            <h3>MLX Chat with Streaming:</h3>
+            <pre><code><span class="token-comment"># Interactive chat with MLX</span>
+<span class="token-keyword">from</span> mlx_lm <span class="token-keyword">import</span> load, stream_generate
+<span class="token-keyword">from</span> mlx_lm.utils <span class="token-keyword">import</span> apply_chat_template
+
+model, tokenizer = load(<span class="token-string">"mlx-community/Qwen2.5-7B-Instruct-4bit"</span>)
+
+messages = [
+    {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a helpful coding assistant."</span>},
+    {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Write a Python decorator for caching"</span>},
+]
+
+<span class="token-comment"># Apply chat template</span>
+prompt = apply_chat_template(tokenizer, messages)
+
+<span class="token-comment"># Stream tokens</span>
+<span class="token-keyword">for</span> token <span class="token-keyword">in</span> stream_generate(model, tokenizer, prompt, max_tokens=<span class="token-number">500</span>):
+    <span class="token-builtin">print</span>(token, end=<span class="token-string">""</span>, flush=<span class="token-keyword">True</span>)</code></pre>
+
+            <h3>MLX Fine-Tuning (LoRA on Mac!):</h3>
+            <pre><code><span class="token-comment"># Yes, you can fine-tune on a Mac with MLX!</span>
+<span class="token-comment"># pip install mlx-lm</span>
+
+<span class="token-comment"># Command-line fine-tuning:</span>
+<span class="token-comment"># mlx_lm.lora \</span>
+<span class="token-comment">#   --model mlx-community/Llama-3.1-8B-Instruct-4bit \</span>
+<span class="token-comment">#   --data ./training-data \</span>
+<span class="token-comment">#   --train \</span>
+<span class="token-comment">#   --batch-size 4 \</span>
+<span class="token-comment">#   --lora-layers 16 \</span>
+<span class="token-comment">#   --iters 1000</span>
+
+<span class="token-comment"># Training data format (JSONL):</span>
+<span class="token-comment"># {"text": "### Instruction: ...\n### Response: ..."}</span>
+
+<span class="token-comment"># After training, fuse the adapter:</span>
+<span class="token-comment"># mlx_lm.fuse --model mlx-community/Llama-3.1-8B-Instruct-4bit --adapter-path ./adapters</span></code></pre>
+
+            <h3>MLX Server (OpenAI-compatible):</h3>
+            <pre><code><span class="token-comment"># Run MLX as an OpenAI-compatible server</span>
+<span class="token-comment"># pip install mlx-lm[server]</span>
+<span class="token-comment"># mlx_lm.server --model mlx-community/Llama-3.1-8B-Instruct-4bit --port 8080</span>
+
+<span class="token-comment"># Then use with OpenAI client:</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI(base_url=<span class="token-string">"http://localhost:8080/v1"</span>, api_key=<span class="token-string">"mlx"</span>)
+response = client.chat.completions.create(
+    model=<span class="token-string">"mlx-community/Llama-3.1-8B-Instruct-4bit"</span>,
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Hello!"</span>}]
+)
+<span class="token-builtin">print</span>(response.choices[<span class="token-number">0</span>].message.content)</code></pre>
+
+            <div class="comparison-table">
+                <h3>vLLM vs Ollama vs MLX vs TGI:</h3>
+                <table>
+                    <thead><tr><th>Feature</th><th>vLLM</th><th>Ollama</th><th>MLX</th><th>TGI</th></tr></thead>
+                    <tbody>
+                        <tr><td>Hardware</td><td>NVIDIA GPU</td><td>Any (CPU/GPU)</td><td>Apple Silicon</td><td>NVIDIA GPU</td></tr>
+                        <tr><td>Best for</td><td>Production serving</td><td>Local development</td><td>Mac inference/training</td><td>HuggingFace deployment</td></tr>
+                        <tr><td>Throughput</td><td>Highest</td><td>Medium</td><td>High (on Mac)</td><td>High</td></tr>
+                        <tr><td>Concurrency</td><td>Excellent (100+)</td><td>Limited (~5)</td><td>Single user</td><td>Good (50+)</td></tr>
+                        <tr><td>Model format</td><td>HF / GPTQ / AWQ</td><td>GGUF</td><td>MLX format</td><td>HF / GPTQ</td></tr>
+                        <tr><td>Fine-tuning</td><td>No</td><td>No</td><td>Yes (LoRA)</td><td>No</td></tr>
+                        <tr><td>Ease of use</td><td>Medium</td><td>Easiest</td><td>Easy (Mac only)</td><td>Medium</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>vLLM is the #1 production inference engine</strong> — Used by most companies serving open-source models.</li>
+                    <li><strong>TGI (Text Generation Inference)</strong> — HuggingFace's engine, used on Inference Endpoints.</li>
+                    <li><strong>MLX is growing fast on Mac</strong> — Apple investing heavily. Great for indie developers on Mac.</li>
+                    <li><strong>OpenAI-compatible API everywhere</strong> — All engines expose the same API. Write code once, deploy anywhere.</li>
+                    <li><strong>vLLM + Docker = production deployment</strong> — Standard pattern for self-hosted LLM inference.</li>
+                    <li><strong>Tensor parallelism with vLLM</strong> — Split model across GPUs for lower latency on large models.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>vLLM</strong> = production-grade GPU inference with continuous batching and PagedAttention</li>
+                    <li><strong>MLX</strong> = Apple Silicon inference and fine-tuning (LoRA on Mac!)</li>
+                    <li>Both expose OpenAI-compatible APIs</li>
+                    <li>Use vLLM for <strong>serving many users on NVIDIA GPUs</strong></li>
+                    <li>Use MLX for <strong>local development and training on Mac</strong></li>
+                    <li>Use Ollama for <strong>quick prototyping on any hardware</strong></li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Using vLLM on Mac</strong> — vLLM requires NVIDIA GPUs. Use MLX or Ollama on Mac.</li>
+                    <li><strong>Not setting gpu_memory_utilization</strong> — Default 0.9 is good. Set lower if running other GPU tasks.</li>
+                    <li><strong>Ignoring tensor_parallel_size</strong> — If you have 4 GPUs, set tensor_parallel_size=4 for faster inference.</li>
+                    <li><strong>Using HF models directly with MLX</strong> — Convert to MLX format first. Use mlx-community models.</li>
+                    <li><strong>Running vLLM without Docker in production</strong> — Docker provides isolation, reproducibility, easy scaling.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: High-Performance Inference</h4>
+                <ol>
+                    <li><strong>If NVIDIA GPU:</strong> Install vLLM and serve a model. Compare speed vs Ollama on the same prompts.</li>
+                    <li><strong>If Mac:</strong> Install mlx-lm and run a model. Try streaming generation.</li>
+                    <li>Write a Python client that works with ALL engines (OpenAI/Ollama/vLLM/MLX) via OpenAI-compatible API</li>
+                    <li>Benchmark: Send 10 concurrent requests to vLLM vs Ollama. Measure total throughput.</li>
+                    <li><strong>Mac bonus:</strong> Fine-tune a small model with MLX LoRA on your own data</li>
+                    <li><strong>GPU bonus:</strong> Set up vLLM with tensor parallelism across multiple GPUs</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="19-llamacpp-ollama.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">llama.cpp & Ollama</span>
+                </a>
+                <a href="21-huggingface-ecosystem.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">HuggingFace Ecosystem</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

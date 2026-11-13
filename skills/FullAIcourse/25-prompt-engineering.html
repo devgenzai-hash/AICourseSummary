@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Engineering — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 7</a> <span>›</span> Prompt Engineering</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Prompt Engineering</h1>
+                <p>The difference between a mediocre AI output and an amazing one is usually the prompt. Master the art and science of telling AI exactly what you want — and getting it consistently.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Prompt engineering = giving directions to a taxi driver.</strong> "Take me somewhere nice" gets unpredictable results. "Take me to the Italian restaurant on 5th Street, the one with the red awning, via Main Street to avoid traffic" gets exactly what you want.</p>
+                <p><strong>System prompt = the job description.</strong> It tells the AI WHO it is, HOW to behave, and WHAT rules to follow — before the user even asks anything.</p>
+            </div>
+
+            <h2 id="framework">The Prompt Framework: CRAFT</h2>
+
+            <table>
+                <thead><tr><th>Letter</th><th>Element</th><th>What It Does</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>C</strong></td><td>Context</td><td>Background information</td><td>"You are a senior Python developer at a fintech company"</td></tr>
+                    <tr><td><strong>R</strong></td><td>Role</td><td>Who the AI should be</td><td>"Act as a code reviewer"</td></tr>
+                    <tr><td><strong>A</strong></td><td>Action</td><td>What to do</td><td>"Review this code for bugs and security issues"</td></tr>
+                    <tr><td><strong>F</strong></td><td>Format</td><td>Output structure</td><td>"Return JSON with fields: issue, severity, fix"</td></tr>
+                    <tr><td><strong>T</strong></td><td>Tone/Constraints</td><td>Boundaries and style</td><td>"Be concise. Max 3 issues. No false positives."</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="techniques">Key Techniques</h2>
+
+            <h3>1. Few-Shot Prompting:</h3>
+            <pre><code><span class="token-comment"># Show examples of what you want</span>
+system_prompt = <span class="token-string">"""Classify customer messages into categories.
+
+Examples:
+- "My order hasn't arrived" → shipping
+- "I want my money back" → refund
+- "The product broke after 2 days" → quality
+- "How do I change my password?" → account
+
+Respond with ONLY the category name."""</span>
+
+<span class="token-comment"># The model now follows the pattern!</span>
+<span class="token-comment"># Input: "I can't log into my account"</span>
+<span class="token-comment"># Output: "account"</span></code></pre>
+
+            <h3>2. Chain-of-Thought (CoT):</h3>
+            <pre><code><span class="token-comment"># Make the model think step by step</span>
+prompt = <span class="token-string">"""Solve this problem step by step:
+
+A store has 3 shirts at $25 each and 2 pants at $40 each.
+There's a 20% discount on the total.
+How much does it cost?
+
+Think through this step by step before giving the final answer."""</span>
+
+<span class="token-comment"># Much better than: "What's the cost?" (often gets wrong answer)</span>
+<span class="token-comment"># CoT forces the model to show its work, reducing errors.</span></code></pre>
+
+            <h3>3. System Prompt Engineering:</h3>
+            <pre><code><span class="token-comment"># Production-grade system prompt</span>
+SYSTEM_PROMPT = <span class="token-string">"""You are an AI coding assistant for a Python web development team.
+
+## Your Capabilities
+- Write Python, JavaScript, SQL, and Shell scripts
+- Debug code and suggest fixes
+- Explain complex concepts simply
+- Review code for security issues
+
+## Rules
+1. Always use Python 3.11+ syntax
+2. Follow PEP 8 style
+3. Include type hints in all function signatures
+4. Add brief docstrings to functions
+5. Never use deprecated libraries
+
+## Output Format
+- For code: wrap in ```python blocks
+- For explanations: use bullet points
+- For debugging: show the bug, explain why, provide the fix
+
+## Constraints
+- Never execute code or access external systems
+- If unsure, say "I'm not sure" rather than guessing
+- Keep responses under 500 words unless asked for more
+- If the question is unrelated to coding, politely redirect"""</span></code></pre>
+
+            <h3>4. Structured Output Prompting:</h3>
+            <pre><code><span class="token-comment"># Force specific JSON output</span>
+prompt = <span class="token-string">"""Analyze this code and return a JSON object with exactly this structure:
+
+{
+    "has_bugs": true/false,
+    "bugs": [
+        {
+            "line": <line_number>,
+            "issue": "<description>",
+            "severity": "low" | "medium" | "high" | "critical",
+            "fix": "<suggested fix>"
+        }
+    ],
+    "overall_quality": 1-10
+}
+
+Code to analyze:
+```python
+def divide(a, b):
+    return a / b
+```
+
+Return ONLY valid JSON, no other text."""</span></code></pre>
+
+            <h3>5. Prompt Chaining:</h3>
+            <pre><code><span class="token-comment"># Break complex tasks into steps, each with its own prompt</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">chain_prompts</span>(user_request: str) -> str:
+    <span class="token-string">"""Multi-step reasoning with prompt chaining."""</span>
+    
+    <span class="token-comment"># Step 1: Understand the request</span>
+    understanding = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"""Analyze this request and identify:
+1. What is the user asking for?
+2. What are the key requirements?
+3. What approach should we take?
+
+Request: {user_request}"""</span>}],
+    ).choices[<span class="token-number">0</span>].message.content
+    
+    <span class="token-comment"># Step 2: Generate solution based on analysis</span>
+    solution = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"""Based on this analysis:
+{understanding}
+
+Now write the actual code/solution. Be production-ready."""</span>}],
+    ).choices[<span class="token-number">0</span>].message.content
+    
+    <span class="token-comment"># Step 3: Review and refine</span>
+    final = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"""Review this solution for bugs, edge cases, and improvements:
+{solution}
+
+Provide the final, corrected version."""</span>}],
+    ).choices[<span class="token-number">0</span>].message.content
+    
+    <span class="token-keyword">return</span> final
+
+result = chain_prompts(<span class="token-string">"Build a rate limiter for a FastAPI endpoint"</span>)
+<span class="token-builtin">print</span>(result)</code></pre>
+
+            <h2 id="templates">Production Prompt Templates</h2>
+
+            <pre><code><span class="token-comment"># Reusable prompt templates with variables</span>
+<span class="token-keyword">from</span> string <span class="token-keyword">import</span> Template
+
+PROMPT_TEMPLATES = {
+    <span class="token-string">"code_review"</span>: Template(<span class="token-string">"""Review this $language code.
+Focus on: $focus_areas
+Severity threshold: report only $min_severity and above.
+Code:
+```$language
+$code
+```
+Return findings as a numbered list."""</span>),
+
+    <span class="token-string">"explain"</span>: Template(<span class="token-string">"""Explain $topic to someone with $experience_level experience.
+Use $analogy_style analogies.
+Keep it under $max_words words.
+Include one practical example."""</span>),
+
+    <span class="token-string">"convert"</span>: Template(<span class="token-string">"""Convert this $source_format to $target_format.
+Preserve all information. Handle edge cases.
+Input:
+$input_data"""</span>),
+}
+
+<span class="token-comment"># Usage</span>
+prompt = PROMPT_TEMPLATES[<span class="token-string">"code_review"</span>].substitute(
+    language=<span class="token-string">"python"</span>,
+    focus_areas=<span class="token-string">"security, performance"</span>,
+    min_severity=<span class="token-string">"medium"</span>,
+    code=<span class="token-string">"def login(user, pwd): return db.query(f'SELECT * FROM users WHERE name={user}')"</span>,
+)
+<span class="token-builtin">print</span>(prompt)</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>System prompts are your most valuable IP</strong> — Companies spend months refining system prompts. Treat them like code.</li>
+                    <li><strong>Version control your prompts</strong> — Track changes like code. A/B test different versions.</li>
+                    <li><strong>Temperature for different tasks</strong> — 0.0-0.3 for factual/code, 0.5-0.7 for creative, 0.8-1.0 for brainstorming.</li>
+                    <li><strong>Few-shot > zero-shot</strong> — Always provide 2-3 examples when possible. Dramatically improves consistency.</li>
+                    <li><strong>Structured output is mandatory for pipelines</strong> — Use JSON mode or outlines for any automated processing.</li>
+                    <li><strong>Chain-of-thought for complex reasoning</strong> — "Think step by step" improves math/logic accuracy by 30-50%.</li>
+                    <li><strong>Prompt injection defense</strong> — Always sanitize user input. Never put untrusted text directly in system prompts.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>CRAFT framework</strong>: Context, Role, Action, Format, Tone</li>
+                    <li><strong>Few-shot</strong>: Show examples of desired input/output</li>
+                    <li><strong>Chain-of-thought</strong>: "Think step by step" for complex reasoning</li>
+                    <li><strong>Structured output</strong>: Force JSON/specific format for automation</li>
+                    <li><strong>Prompt chaining</strong>: Break complex tasks into sequential prompts</li>
+                    <li>Version control, test, and iterate on prompts like code</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Vague prompts</strong> — "Make this better" → specify WHAT aspect to improve and HOW.</li>
+                    <li><strong>Too long system prompts</strong> — Over 2000 tokens in system prompt wastes context. Be concise.</li>
+                    <li><strong>No output format specification</strong> — If you don't tell the model the format, it'll choose randomly.</li>
+                    <li><strong>Prompt injection vulnerabilities</strong> — Never put user input directly into system prompts without sanitization.</li>
+                    <li><strong>Not testing with edge cases</strong> — Test prompts with adversarial inputs, empty inputs, very long inputs.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Master Prompting</h4>
+                <ol>
+                    <li>Write a system prompt for a "SQL query generator" that takes natural language and outputs SQL</li>
+                    <li>Create a few-shot prompt for sentiment analysis (positive/negative/neutral)</li>
+                    <li>Use chain-of-thought to solve: "If a train travels at 60mph for 2.5 hours, then 80mph for 1.5 hours..."</li>
+                    <li>Build a prompt chain: analyze → plan → implement → review</li>
+                    <li>Create a template library with at least 5 reusable prompt templates</li>
+                    <li><strong>Bonus:</strong> Test your prompts against prompt injection attacks and add defenses</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="24-ai-memory-systems.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">AI Memory Systems</span>
+                </a>
+                <a href="26-tool-function-calling.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Tool & Function Calling</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

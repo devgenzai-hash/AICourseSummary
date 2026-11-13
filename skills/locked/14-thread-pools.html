@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Pools - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Thread Pools</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Thread Pools</h1>
+                <p class="subtitle">Instead of creating a new thread for every task (expensive!), keep a pool of reusable worker threads ready to go. The backbone of every web server.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-pattern">Pattern</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">A Taxi Stand</div>
+                <p>A <strong>thread pool</strong> is like a taxi stand at an airport:</p>
+<ul><li>There are 10 taxis waiting (worker threads in the pool)</li>
+<li>Passengers arrive (tasks/requests) and take the next available taxi</li>
+<li>When the ride is done, the taxi returns to the stand (thread returns to pool)</li>
+<li>If all 10 are busy, passengers wait in line (task queue)</li></ul>
+<p>You don't build a new taxi for every passenger — that would be absurd. Same with threads.</p>
+            </div>
+
+
+            <h2>Why Thread Pools?</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Approach</th><th>Cost</th><th>Problem</th></tr></thead>
+                <tbody>
+                    <tr><td>New thread per task</td><td>~1ms + 1MB stack per thread</td><td>10K requests = 10GB RAM + OS overwhelmed</td></tr>
+                    <tr><td>Thread pool (fixed)</td><td>Threads created once, reused</td><td>Bounded resources, predictable performance</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Python ThreadPoolExecutor</h2>
+<pre><code><span class="token-keyword">from</span> concurrent.futures <span class="token-keyword">import</span> ThreadPoolExecutor, as_completed
+<span class="token-keyword">import</span> time
+
+<span class="token-keyword">def</span> <span class="token-function">fetch_url</span>(url):
+    time.sleep(<span class="token-number">1</span>)  <span class="token-comment"># Simulate network I/O</span>
+    <span class="token-keyword">return</span> <span class="token-string">f"Response from {url}"</span>
+
+urls = [<span class="token-string">f"https://api.example.com/page/{i}"</span> <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">20</span>)]
+
+<span class="token-comment"># Without pool: 20 seconds (sequential)</span>
+<span class="token-comment"># With pool of 5: 4 seconds (5 concurrent)</span>
+<span class="token-keyword">with</span> ThreadPoolExecutor(max_workers=<span class="token-number">5</span>) <span class="token-keyword">as</span> executor:
+    futures = {executor.submit(fetch_url, url): url <span class="token-keyword">for</span> url <span class="token-keyword">in</span> urls}
+    <span class="token-keyword">for</span> future <span class="token-keyword">in</span> as_completed(futures):
+        url = futures[future]
+        result = future.result()
+        print(<span class="token-string">f"{url}: {result}"</span>)
+
+<span class="token-comment"># Using map() for simpler cases</span>
+<span class="token-keyword">with</span> ThreadPoolExecutor(max_workers=<span class="token-number">10</span>) <span class="token-keyword">as</span> executor:
+    results = list(executor.map(fetch_url, urls))
+    print(<span class="token-string">f"Got {len(results)} results"</span>)</code></pre>
+
+            <h2>Pool Sizing: How Many Threads?</h2>
+            <div class="callout callout-info">
+                <div class="callout-title">The Golden Rules</div>
+                <p><strong>CPU-bound work:</strong> threads = number of CPU cores<br>
+                <strong>I/O-bound work:</strong> threads = cores * (1 + wait_time/compute_time)<br>
+                Example: 4 cores, I/O takes 10x longer than compute → 4 * (1 + 10) = 44 threads</p>
+            </div>
+
+<pre><code><span class="token-keyword">import</span> os, multiprocessing
+
+<span class="token-comment"># CPU-bound: use ProcessPoolExecutor with core count</span>
+<span class="token-keyword">from</span> concurrent.futures <span class="token-keyword">import</span> ProcessPoolExecutor
+cpu_count = os.cpu_count()  <span class="token-comment"># e.g., 8</span>
+
+<span class="token-keyword">with</span> ProcessPoolExecutor(max_workers=cpu_count) <span class="token-keyword">as</span> executor:
+    results = list(executor.map(heavy_computation, data))
+
+<span class="token-comment"># I/O-bound: use ThreadPoolExecutor with higher count</span>
+<span class="token-keyword">with</span> ThreadPoolExecutor(max_workers=cpu_count * <span class="token-number">10</span>) <span class="token-keyword">as</span> executor:
+    results = list(executor.map(fetch_url, urls))</code></pre>
+
+            <h2>Custom Thread Pool Implementation</h2>
+<pre><code><span class="token-keyword">import</span> threading
+<span class="token-keyword">from</span> queue <span class="token-keyword">import</span> Queue
+
+<span class="token-keyword">class</span> <span class="token-class">SimpleThreadPool</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, num_workers):
+        self.task_queue = Queue()
+        self.workers = []
+        <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(num_workers):
+            t = threading.Thread(target=self._worker, daemon=<span class="token-keyword">True</span>)
+            t.start()
+            self.workers.append(t)
+
+    <span class="token-keyword">def</span> <span class="token-function">_worker</span>(self):
+        <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+            task = self.task_queue.get()
+            <span class="token-keyword">if</span> task <span class="token-keyword">is</span> <span class="token-keyword">None</span>: <span class="token-keyword">break</span>
+            func, args = task
+            <span class="token-keyword">try</span>:
+                func(*args)
+            <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+                print(<span class="token-string">f"Task error: {e}"</span>)
+            <span class="token-keyword">finally</span>:
+                self.task_queue.task_done()
+
+    <span class="token-keyword">def</span> <span class="token-function">submit</span>(self, func, *args):
+        self.task_queue.put((func, args))
+
+    <span class="token-keyword">def</span> <span class="token-function">shutdown</span>(self):
+        <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> self.workers:
+            self.task_queue.put(<span class="token-keyword">None</span>)
+        <span class="token-keyword">for</span> t <span class="token-keyword">in</span> self.workers:
+            t.join()</code></pre>
+
+            <div class="industry-box">
+                <h4>Industry Usage</h4>
+                <ul>
+                    <li><strong>Nginx</strong> — Worker process pool (not threads, but same concept)</li>
+                    <li><strong>Java Tomcat</strong> — Default 200-thread pool for handling HTTP requests</li>
+                    <li><strong>Node.js libuv</strong> — 4-thread pool for file I/O operations</li>
+                    <li><strong>PostgreSQL</strong> — Connection pool (pgbouncer) limits concurrent connections</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>Thread pools reuse a fixed number of threads instead of creating new ones per task</li>
+<li>Avoids thread creation overhead (1ms + 1MB per thread)</li>
+<li>CPU-bound: pool size = number of cores</li>
+<li>I/O-bound: pool size = cores * (1 + wait/compute ratio)</li>
+<li>Python: ThreadPoolExecutor for I/O, ProcessPoolExecutor for CPU</li>
+<li>All web servers, databases, and network services use thread/process pools</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">THREAD POOL:
+    Task Queue: [T1] [T2] [T3] [T4] [T5] [T6] ...
+                  ↓    ↓    ↓
+    Workers:   [W1]  [W2]  [W3]  [W4]  (idle)
+                 ↓    ↓     ↓
+              running running running
+
+    W1 finishes → picks up T4 from queue
+    W2 finishes → picks up T5 from queue
+
+SIZING:
+    CPU-bound: workers = cores (more = context switch overhead)
+    I/O-bound: workers = cores * (1 + IO_time/CPU_time)</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Too many threads</strong> — 1000 threads for CPU-bound work = massive context switching overhead.</li>
+<li><strong>Too few threads</strong> — 2 threads for I/O-bound work with 100ms latency = most time spent waiting.</li>
+<li><strong>Not handling exceptions</strong> — Unhandled exception in a pool thread kills that worker silently.</li>
+<li><strong>Using ThreadPool for CPU-bound in Python</strong> — GIL means no parallelism. Use ProcessPoolExecutor.</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Build a custom thread pool (queue + worker threads). Submit 100 tasks.</li>
+<li>Benchmark ThreadPoolExecutor with 1, 4, 16, 64 workers fetching 100 URLs.</li>
+<li>Show that ProcessPoolExecutor is faster for CPU-bound work (compute Fibonacci).</li>
+<li>Implement graceful shutdown: finish current tasks, reject new ones, then stop.</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="13-false-sharing.html" class="prev">False Sharing</a>
+                <a href="15-futures-promises-async.html" class="next">Futures & Async</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

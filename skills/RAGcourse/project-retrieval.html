@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone: Retrieval Engine - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/16 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Capstone: Retrieval Engine
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>P4: Retrieval Engine</h1>
+                <p class="subtitle">Hybrid retrieval with BM25 + vector search, RRF fusion, Cohere Rerank v3, source confidence scoring, and conversation-aware query rewriting. Sub-200ms at 10M docs.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-code">Full Code</span>
+                    <span class="tag tag-production">Production</span>
+                </div>
+            </div>
+
+            <!-- ===== QUERY UNDERSTANDING ===== -->
+            <h2>1. Query Understanding & Rewriting</h2>
+            <p>Before retrieval, we analyze the query: expand abbreviations, resolve pronouns from conversation history, and add contextual terms.</p>
+
+<pre><code><span class="token-comment"># src/retrieval/query_engine.py</span>
+
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Optional
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> src.config <span class="token-keyword">import</span> settings
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">ConversationTurn</span>:
+    role: <span class="token-builtin">str</span>       <span class="token-comment"># "user" or "assistant"</span>
+    content: <span class="token-builtin">str</span>
+
+<span class="token-keyword">class</span> <span class="token-class">QueryRewriter</span>:
+    <span class="token-string">"""
+    Rewrites user queries for optimal retrieval:
+    1. Resolves pronouns from conversation history
+    2. Expands abbreviations and acronyms
+    3. Generates sub-queries for complex questions
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.client = OpenAI(api_key=settings.openai_api_key)
+    
+    <span class="token-keyword">def</span> <span class="token-function">rewrite</span>(
+        self,
+        query: <span class="token-builtin">str</span>,
+        conversation: Optional[List[ConversationTurn]] = <span class="token-keyword">None</span>
+    ) -> List[<span class="token-builtin">str</span>]:
+        <span class="token-string">"""
+        Rewrite a query into one or more retrieval-optimized queries.
+        
+        Examples:
+          "What about their pricing?" + history about AWS 
+          → ["What is AWS pricing for EC2 instances?"]
+          
+          "Compare the two approaches mentioned above"
+          → ["approach A details", "approach B details", "comparison A vs B"]
+        """</span>
+        <span class="token-keyword">if not</span> conversation:
+            <span class="token-keyword">return</span> [query]
+        
+        <span class="token-comment"># Build conversation context</span>
+        history = <span class="token-string">"\n"</span>.join(
+            [<span class="token-string">f"{t.role}: {t.content}"</span> <span class="token-keyword">for</span> t <span class="token-keyword">in</span> conversation[-<span class="token-number">5</span>:]]
+        )
+        
+        response = self.client.chat.completions.create(
+            model=<span class="token-string">"gpt-4o-mini"</span>,  <span class="token-comment"># Fast + cheap for rewriting</span>
+            messages=[
+                {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"""You are a search query optimizer. 
+Given a conversation and a new user query:
+1. Resolve all pronouns (it, they, this, that) to specific entities
+2. Make the query self-contained (no context needed)
+3. If the query is complex, split into 2-3 sub-queries
+4. Return JSON: {"queries": ["query1", "query2"]}
+Return ONLY the JSON, nothing else."""</span>},
+                {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"Conversation:\n{history}\n\nNew query: {query}"</span>}
+            ],
+            temperature=<span class="token-number">0</span>,
+            response_format={<span class="token-string">"type"</span>: <span class="token-string">"json_object"</span>}
+        )
+        
+        <span class="token-keyword">import</span> json
+        result = json.loads(response.choices[<span class="token-number">0</span>].message.content)
+        <span class="token-keyword">return</span> result.get(<span class="token-string">"queries"</span>, [query])</code></pre>
+
+            <!-- ===== HYBRID RETRIEVAL ===== -->
+            <h2>2. Hybrid Retrieval (Vector + BM25)</h2>
+
+<pre><code><span class="token-comment"># src/retrieval/hybrid_search.py</span>
+
+<span class="token-keyword">from</span> qdrant_client <span class="token-keyword">import</span> QdrantClient
+<span class="token-keyword">from</span> qdrant_client.models <span class="token-keyword">import</span> SearchParams, Filter, FieldCondition, MatchValue
+<span class="token-keyword">from</span> elasticsearch <span class="token-keyword">import</span> Elasticsearch
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict, Optional
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+<span class="token-keyword">from</span> src.config <span class="token-keyword">import</span> settings
+<span class="token-keyword">from</span> src.ingestion.embedder <span class="token-keyword">import</span> EmbeddingGenerator
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">RetrievedChunk</span>:
+    <span class="token-string">"""A retrieved chunk with scores from both retrieval paths."""</span>
+    chunk_id: <span class="token-builtin">str</span>
+    content: <span class="token-builtin">str</span>
+    source_type: <span class="token-builtin">str</span>
+    metadata: Dict
+    vector_score: <span class="token-builtin">float</span> = <span class="token-number">0.0</span>
+    bm25_score: <span class="token-builtin">float</span> = <span class="token-number">0.0</span>
+    rrf_score: <span class="token-builtin">float</span> = <span class="token-number">0.0</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HybridSearch</span>:
+    <span class="token-string">"""
+    Dual-path retrieval:
+    - Path A: Vector search via Qdrant (semantic similarity)
+    - Path B: BM25 via Elasticsearch (keyword matching)
+    - Fusion: Reciprocal Rank Fusion (RRF)
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.qdrant = QdrantClient(url=settings.qdrant_url)
+        self.es = Elasticsearch(settings.elasticsearch_url)
+        self.embedder = EmbeddingGenerator()
+        self.collection = <span class="token-string">"enterprise_rag"</span>
+        self.es_index = <span class="token-string">"enterprise_rag"</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">search</span>(
+        self,
+        query: <span class="token-builtin">str</span>,
+        top_k: <span class="token-builtin">int</span> = <span class="token-number">20</span>,
+        source_filter: Optional[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>
+    ) -> List[RetrievedChunk]:
+        <span class="token-string">"""
+        Execute hybrid search: vector + BM25 → RRF fusion.
+        
+        Args:
+            query: Search query
+            top_k: Number of results to return
+            source_filter: Optional filter by source type (e.g., "pdf", "email")
+        """</span>
+        <span class="token-comment"># Path A: Vector search</span>
+        vector_results = self._vector_search(query, top_k * <span class="token-number">2</span>, source_filter)
+        
+        <span class="token-comment"># Path B: BM25 search</span>
+        bm25_results = self._bm25_search(query, top_k * <span class="token-number">2</span>, source_filter)
+        
+        <span class="token-comment"># Fuse results with RRF</span>
+        fused = self._rrf_fusion(vector_results, bm25_results, k=<span class="token-number">60</span>)
+        
+        <span class="token-keyword">return</span> fused[:top_k]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_vector_search</span>(
+        self, query: <span class="token-builtin">str</span>, top_k: <span class="token-builtin">int</span>, source_filter: Optional[<span class="token-builtin">str</span>]
+    ) -> List[RetrievedChunk]:
+        <span class="token-string">"""Search Qdrant for semantically similar chunks."""</span>
+        query_embedding = self.embedder.embed_query(query)
+        
+        <span class="token-comment"># Build optional filter</span>
+        qdrant_filter = <span class="token-keyword">None</span>
+        <span class="token-keyword">if</span> source_filter:
+            qdrant_filter = Filter(
+                must=[FieldCondition(
+                    key=<span class="token-string">"source_type"</span>,
+                    match=MatchValue(value=source_filter)
+                )]
+            )
+        
+        results = self.qdrant.search(
+            collection_name=self.collection,
+            query_vector=query_embedding.tolist(),
+            limit=top_k,
+            query_filter=qdrant_filter,
+            search_params=SearchParams(
+                hnsw_ef=<span class="token-number">128</span>,   <span class="token-comment"># Search-time accuracy (higher = slower but better)</span>
+                exact=<span class="token-keyword">False</span>    <span class="token-comment"># Use HNSW (not brute force)</span>
+            )
+        )
+        
+        <span class="token-keyword">return</span> [
+            RetrievedChunk(
+                chunk_id=hit.payload[<span class="token-string">"chunk_id"</span>],
+                content=hit.payload[<span class="token-string">"content"</span>],
+                source_type=hit.payload[<span class="token-string">"source_type"</span>],
+                metadata=hit.payload.get(<span class="token-string">"metadata"</span>, {}),
+                vector_score=hit.score
+            )
+            <span class="token-keyword">for</span> hit <span class="token-keyword">in</span> results
+        ]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_bm25_search</span>(
+        self, query: <span class="token-builtin">str</span>, top_k: <span class="token-builtin">int</span>, source_filter: Optional[<span class="token-builtin">str</span>]
+    ) -> List[RetrievedChunk]:
+        <span class="token-string">"""Search Elasticsearch for keyword-matching chunks."""</span>
+        es_query = {
+            <span class="token-string">"bool"</span>: {
+                <span class="token-string">"must"</span>: [{
+                    <span class="token-string">"multi_match"</span>: {
+                        <span class="token-string">"query"</span>: query,
+                        <span class="token-string">"fields"</span>: [<span class="token-string">"content^2"</span>, <span class="token-string">"title^1.5"</span>],
+                        <span class="token-string">"type"</span>: <span class="token-string">"best_fields"</span>,
+                        <span class="token-string">"fuzziness"</span>: <span class="token-string">"AUTO"</span>
+                    }
+                }]
+            }
+        }
+        
+        <span class="token-keyword">if</span> source_filter:
+            es_query[<span class="token-string">"bool"</span>][<span class="token-string">"filter"</span>] = [{
+                <span class="token-string">"term"</span>: {<span class="token-string">"source_type"</span>: source_filter}
+            }]
+        
+        response = self.es.search(
+            index=self.es_index,
+            query=es_query,
+            size=top_k
+        )
+        
+        <span class="token-keyword">return</span> [
+            RetrievedChunk(
+                chunk_id=hit[<span class="token-string">"_source"</span>][<span class="token-string">"chunk_id"</span>],
+                content=hit[<span class="token-string">"_source"</span>][<span class="token-string">"content"</span>],
+                source_type=hit[<span class="token-string">"_source"</span>][<span class="token-string">"source_type"</span>],
+                metadata=hit[<span class="token-string">"_source"</span>].get(<span class="token-string">"metadata"</span>, {}),
+                bm25_score=hit[<span class="token-string">"_score"</span>]
+            )
+            <span class="token-keyword">for</span> hit <span class="token-keyword">in</span> response[<span class="token-string">"hits"</span>][<span class="token-string">"hits"</span>]
+        ]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_rrf_fusion</span>(
+        self,
+        vector_results: List[RetrievedChunk],
+        bm25_results: List[RetrievedChunk],
+        k: <span class="token-builtin">int</span> = <span class="token-number">60</span>
+    ) -> List[RetrievedChunk]:
+        <span class="token-string">"""
+        Reciprocal Rank Fusion (RRF).
+        
+        Formula: RRF(d) = Σ 1/(k + rank_i(d))
+        
+        k=60 is the standard constant (from the original paper).
+        """</span>
+        scores = {}  <span class="token-comment"># chunk_id → {rrf_score, chunk}</span>
+        
+        <span class="token-comment"># Score vector results by rank</span>
+        <span class="token-keyword">for</span> rank, chunk <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(vector_results):
+            <span class="token-keyword">if</span> chunk.chunk_id <span class="token-keyword">not in</span> scores:
+                scores[chunk.chunk_id] = {<span class="token-string">"chunk"</span>: chunk, <span class="token-string">"score"</span>: <span class="token-number">0.0</span>}
+            scores[chunk.chunk_id][<span class="token-string">"score"</span>] += <span class="token-number">1.0</span> / (k + rank + <span class="token-number">1</span>)
+        
+        <span class="token-comment"># Score BM25 results by rank</span>
+        <span class="token-keyword">for</span> rank, chunk <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(bm25_results):
+            <span class="token-keyword">if</span> chunk.chunk_id <span class="token-keyword">not in</span> scores:
+                scores[chunk.chunk_id] = {<span class="token-string">"chunk"</span>: chunk, <span class="token-string">"score"</span>: <span class="token-number">0.0</span>}
+            scores[chunk.chunk_id][<span class="token-string">"score"</span>] += <span class="token-number">1.0</span> / (k + rank + <span class="token-number">1</span>)
+        
+        <span class="token-comment"># Sort by RRF score</span>
+        ranked = sorted(scores.values(), key=<span class="token-keyword">lambda</span> x: x[<span class="token-string">"score"</span>], reverse=<span class="token-keyword">True</span>)
+        
+        <span class="token-comment"># Assign RRF scores</span>
+        result = []
+        <span class="token-keyword">for</span> item <span class="token-keyword">in</span> ranked:
+            chunk = item[<span class="token-string">"chunk"</span>]
+            chunk.rrf_score = item[<span class="token-string">"score"</span>]
+            result.append(chunk)
+        
+        <span class="token-keyword">return</span> result</code></pre>
+
+            <!-- ===== RERANKER ===== -->
+            <h2>3. Reranking (Cohere Rerank v3)</h2>
+
+<pre><code><span class="token-comment"># src/retrieval/reranker.py</span>
+
+<span class="token-keyword">import</span> cohere
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> src.config <span class="token-keyword">import</span> settings
+
+<span class="token-keyword">class</span> <span class="token-class">CohereReranker</span>:
+    <span class="token-string">"""
+    Cross-encoder reranking with Cohere Rerank v3.
+    
+    Why Cohere Rerank:
+    - Cross-encoder architecture (much more accurate than bi-encoder)
+    - Handles up to 4096 tokens per document
+    - Returns calibrated relevance scores (0-1)
+    - 10ms per document (fast enough for real-time)
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.client = cohere.Client(settings.cohere_api_key)
+        self.model = <span class="token-string">"rerank-english-v3.0"</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">rerank</span>(
+        self,
+        query: <span class="token-builtin">str</span>,
+        chunks: List,
+        top_k: <span class="token-builtin">int</span> = <span class="token-number">10</span>
+    ) -> List:
+        <span class="token-string">"""
+        Rerank chunks using Cohere cross-encoder.
+        
+        Input: 20-40 chunks from hybrid search
+        Output: Top 10 most relevant, with confidence scores
+        """</span>
+        <span class="token-keyword">if not</span> chunks:
+            <span class="token-keyword">return</span> []
+        
+        <span class="token-comment"># Extract texts for reranking</span>
+        documents = [chunk.content <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> chunks]
+        
+        <span class="token-comment"># Call Cohere Rerank</span>
+        response = self.client.rerank(
+            model=self.model,
+            query=query,
+            documents=documents,
+            top_n=top_k,
+            return_documents=<span class="token-keyword">False</span>
+        )
+        
+        <span class="token-comment"># Map back to our chunk objects</span>
+        reranked = []
+        <span class="token-keyword">for</span> result <span class="token-keyword">in</span> response.results:
+            chunk = chunks[result.index]
+            chunk.metadata[<span class="token-string">"rerank_score"</span>] = result.relevance_score
+            reranked.append(chunk)
+        
+        <span class="token-keyword">return</span> reranked</code></pre>
+
+            <!-- ===== SOURCE CONFIDENCE ===== -->
+            <h2>4. Source Confidence Scoring</h2>
+
+<pre><code><span class="token-comment"># src/retrieval/confidence.py</span>
+
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime, timedelta
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">ConfidenceScore</span>:
+    <span class="token-string">"""Multi-dimensional confidence score for a retrieved chunk."""</span>
+    freshness: <span class="token-builtin">float</span>     <span class="token-comment"># 0-1: how recent is the source</span>
+    authority: <span class="token-builtin">float</span>     <span class="token-comment"># 0-1: how trusted is the source type</span>
+    consistency: <span class="token-builtin">float</span>   <span class="token-comment"># 0-1: does it agree with other chunks</span>
+    relevance: <span class="token-builtin">float</span>     <span class="token-comment"># 0-1: reranker score</span>
+    overall: <span class="token-builtin">float</span> = <span class="token-number">0.0</span> <span class="token-comment"># Weighted combination</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">compute_overall</span>(self):
+        self.overall = (
+            self.freshness * <span class="token-number">0.15</span> +
+            self.authority * <span class="token-number">0.25</span> +
+            self.consistency * <span class="token-number">0.25</span> +
+            self.relevance * <span class="token-number">0.35</span>
+        )
+        <span class="token-keyword">return</span> self.overall
+
+<span class="token-keyword">class</span> <span class="token-class">ConfidenceScorer</span>:
+    <span class="token-string">"""
+    Score confidence of each retrieved chunk along 4 dimensions.
+    Used to decide: which chunks to trust, which to discard,
+    and whether we have enough evidence to answer.
+    """</span>
+    
+    <span class="token-comment"># Authority weights by source type (enterprise-calibrated)</span>
+    SOURCE_AUTHORITY = {
+        <span class="token-string">"pdf"</span>: <span class="token-number">0.9</span>,       <span class="token-comment"># Official documents</span>
+        <span class="token-string">"docx"</span>: <span class="token-number">0.85</span>,     <span class="token-comment"># Internal documents</span>
+        <span class="token-string">"database"</span>: <span class="token-number">0.95</span>, <span class="token-comment"># Structured data = high trust</span>
+        <span class="token-string">"web"</span>: <span class="token-number">0.6</span>,       <span class="token-comment"># External web (varies)</span>
+        <span class="token-string">"email"</span>: <span class="token-number">0.7</span>,     <span class="token-comment"># Conversations (informal)</span>
+        <span class="token-string">"slack"</span>: <span class="token-number">0.5</span>,     <span class="token-comment"># Very informal, may be outdated</span>
+        <span class="token-string">"code"</span>: <span class="token-number">0.85</span>,     <span class="token-comment"># Code is factual</span>
+        <span class="token-string">"ocr"</span>: <span class="token-number">0.65</span>,      <span class="token-comment"># OCR accuracy may vary</span>
+        <span class="token-string">"bill"</span>: <span class="token-number">0.95</span>,     <span class="token-comment"># Financial docs = high trust</span>
+    }
+    
+    <span class="token-keyword">def</span> <span class="token-function">score_chunks</span>(self, chunks: List, query: <span class="token-builtin">str</span>) -> List[Dict]:
+        <span class="token-string">"""
+        Score each chunk on 4 dimensions and compute overall confidence.
+        """</span>
+        scored = []
+        
+        <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> chunks:
+            confidence = ConfidenceScore(
+                freshness=self._score_freshness(chunk),
+                authority=self._score_authority(chunk),
+                consistency=self._score_consistency(chunk, chunks),
+                relevance=chunk.metadata.get(<span class="token-string">"rerank_score"</span>, <span class="token-number">0.5</span>)
+            )
+            confidence.compute_overall()
+            
+            scored.append({
+                <span class="token-string">"chunk"</span>: chunk,
+                <span class="token-string">"confidence"</span>: confidence
+            })
+        
+        <span class="token-comment"># Sort by overall confidence</span>
+        scored.sort(key=<span class="token-keyword">lambda</span> x: x[<span class="token-string">"confidence"</span>].overall, reverse=<span class="token-keyword">True</span>)
+        <span class="token-keyword">return</span> scored
+    
+    <span class="token-keyword">def</span> <span class="token-function">_score_freshness</span>(self, chunk) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""Score based on document age. Newer = higher."""</span>
+        created = chunk.metadata.get(<span class="token-string">"created_at"</span>)
+        <span class="token-keyword">if not</span> created:
+            <span class="token-keyword">return</span> <span class="token-number">0.5</span>  <span class="token-comment"># Unknown age</span>
+        
+        <span class="token-keyword">if</span> <span class="token-builtin">isinstance</span>(created, <span class="token-builtin">str</span>):
+            created = datetime.fromisoformat(created)
+        
+        age_days = (datetime.now() - created).days
+        
+        <span class="token-keyword">if</span> age_days < <span class="token-number">7</span>:     <span class="token-keyword">return</span> <span class="token-number">1.0</span>
+        <span class="token-keyword">elif</span> age_days < <span class="token-number">30</span>:  <span class="token-keyword">return</span> <span class="token-number">0.9</span>
+        <span class="token-keyword">elif</span> age_days < <span class="token-number">90</span>:  <span class="token-keyword">return</span> <span class="token-number">0.75</span>
+        <span class="token-keyword">elif</span> age_days < <span class="token-number">365</span>: <span class="token-keyword">return</span> <span class="token-number">0.5</span>
+        <span class="token-keyword">else</span>:               <span class="token-keyword">return</span> <span class="token-number">0.3</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">_score_authority</span>(self, chunk) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""Score based on source type trustworthiness."""</span>
+        <span class="token-keyword">return</span> self.SOURCE_AUTHORITY.get(chunk.source_type, <span class="token-number">0.5</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_score_consistency</span>(self, chunk, all_chunks: List) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""
+        Score based on agreement with other retrieved chunks.
+        If multiple sources say the same thing → high consistency.
+        """</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(all_chunks) < <span class="token-number">2</span>:
+            <span class="token-keyword">return</span> <span class="token-number">0.5</span>
+        
+        <span class="token-comment"># Simple heuristic: count overlapping key terms</span>
+        chunk_terms = <span class="token-builtin">set</span>(chunk.content.lower().split())
+        overlap_scores = []
+        
+        <span class="token-keyword">for</span> other <span class="token-keyword">in</span> all_chunks:
+            <span class="token-keyword">if</span> other.chunk_id == chunk.chunk_id:
+                <span class="token-keyword">continue</span>
+            other_terms = <span class="token-builtin">set</span>(other.content.lower().split())
+            overlap = <span class="token-builtin">len</span>(chunk_terms & other_terms) / max(<span class="token-builtin">len</span>(chunk_terms), <span class="token-number">1</span>)
+            overlap_scores.append(overlap)
+        
+        <span class="token-keyword">return</span> min(<span class="token-builtin">sum</span>(overlap_scores) / max(<span class="token-builtin">len</span>(overlap_scores), <span class="token-number">1</span>), <span class="token-number">1.0</span>)</code></pre>
+
+            <!-- ===== FULL RETRIEVER ===== -->
+            <h2>5. Complete Retrieval Pipeline</h2>
+
+<pre><code><span class="token-comment"># src/retrieval/retriever.py</span>
+
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Optional, Dict
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> .query_engine <span class="token-keyword">import</span> QueryRewriter, ConversationTurn
+<span class="token-keyword">from</span> .hybrid_search <span class="token-keyword">import</span> HybridSearch, RetrievedChunk
+<span class="token-keyword">from</span> .reranker <span class="token-keyword">import</span> CohereReranker
+<span class="token-keyword">from</span> .confidence <span class="token-keyword">import</span> ConfidenceScorer
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">RetrievalResult</span>:
+    <span class="token-string">"""Final retrieval output sent to the generation stage."""</span>
+    chunks: List[Dict]           <span class="token-comment"># Chunks with confidence scores</span>
+    queries_used: List[<span class="token-builtin">str</span>]     <span class="token-comment"># Rewritten queries</span>
+    avg_confidence: <span class="token-builtin">float</span>       <span class="token-comment"># Mean confidence across top chunks</span>
+    has_sufficient_evidence: <span class="token-builtin">bool</span>  <span class="token-comment"># Can we answer reliably?</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HybridRetriever</span>:
+    <span class="token-string">"""
+    Full retrieval pipeline:
+    
+    Query → Rewrite → Hybrid Search → Rerank → Confidence Score → Filter
+    
+    Returns scored chunks ready for generation.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.rewriter = QueryRewriter()
+        self.searcher = HybridSearch()
+        self.reranker = CohereReranker()
+        self.scorer = ConfidenceScorer()
+        
+        <span class="token-comment"># Thresholds</span>
+        self.min_confidence = <span class="token-number">0.4</span>     <span class="token-comment"># Drop chunks below this</span>
+        self.evidence_threshold = <span class="token-number">0.6</span> <span class="token-comment"># Min avg confidence to answer</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">retrieve</span>(
+        self,
+        query: <span class="token-builtin">str</span>,
+        conversation: Optional[List[ConversationTurn]] = <span class="token-keyword">None</span>,
+        source_filter: Optional[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>,
+        top_k: <span class="token-builtin">int</span> = <span class="token-number">10</span>
+    ) -> RetrievalResult:
+        <span class="token-string">"""
+        Execute the full retrieval pipeline.
+        
+        Args:
+            query: User's question
+            conversation: Previous turns (for pronoun resolution)
+            source_filter: Optional source type filter
+            top_k: Number of final chunks to return
+        
+        Returns:
+            RetrievalResult with scored chunks and confidence metrics
+        """</span>
+        <span class="token-comment"># Step 1: Rewrite query (resolve pronouns, expand)</span>
+        rewritten_queries = self.rewriter.rewrite(query, conversation)
+        
+        <span class="token-comment"># Step 2: Hybrid search for each sub-query</span>
+        all_chunks = []
+        <span class="token-keyword">for</span> q <span class="token-keyword">in</span> rewritten_queries:
+            results = self.searcher.search(q, top_k=<span class="token-number">20</span>, source_filter=source_filter)
+            all_chunks.extend(results)
+        
+        <span class="token-comment"># Deduplicate (same chunk may appear for multiple sub-queries)</span>
+        seen_ids = <span class="token-builtin">set</span>()
+        unique_chunks = []
+        <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> all_chunks:
+            <span class="token-keyword">if</span> chunk.chunk_id <span class="token-keyword">not in</span> seen_ids:
+                seen_ids.add(chunk.chunk_id)
+                unique_chunks.append(chunk)
+        
+        <span class="token-comment"># Step 3: Rerank top candidates</span>
+        reranked = self.reranker.rerank(query, unique_chunks[:<span class="token-number">30</span>], top_k=top_k)
+        
+        <span class="token-comment"># Step 4: Score confidence</span>
+        scored = self.scorer.score_chunks(reranked, query)
+        
+        <span class="token-comment"># Step 5: Filter low-confidence chunks</span>
+        filtered = [
+            s <span class="token-keyword">for</span> s <span class="token-keyword">in</span> scored
+            <span class="token-keyword">if</span> s[<span class="token-string">"confidence"</span>].overall >= self.min_confidence
+        ]
+        
+        <span class="token-comment"># Compute overall evidence quality</span>
+        avg_conf = (
+            sum(s[<span class="token-string">"confidence"</span>].overall <span class="token-keyword">for</span> s <span class="token-keyword">in</span> filtered) / <span class="token-builtin">len</span>(filtered)
+            <span class="token-keyword">if</span> filtered <span class="token-keyword">else</span> <span class="token-number">0.0</span>
+        )
+        
+        <span class="token-keyword">return</span> RetrievalResult(
+            chunks=filtered,
+            queries_used=rewritten_queries,
+            avg_confidence=avg_conf,
+            has_sufficient_evidence=avg_conf >= self.evidence_threshold <span class="token-keyword">and</span> <span class="token-builtin">len</span>(filtered) >= <span class="token-number">2</span>
+        )</code></pre>
+
+            <!-- ===== PERFORMANCE ===== -->
+            <h2>Performance Characteristics</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Latency</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Query rewriting (GPT-4o-mini)</td>
+                        <td>~80ms</td>
+                        <td>Only needed with conversation context</td>
+                    </tr>
+                    <tr>
+                        <td>Query embedding (BGE-M3)</td>
+                        <td>~15ms</td>
+                        <td>Single query encoding</td>
+                    </tr>
+                    <tr>
+                        <td>Qdrant vector search</td>
+                        <td>~20ms</td>
+                        <td>HNSW with INT8 quantization</td>
+                    </tr>
+                    <tr>
+                        <td>Elasticsearch BM25</td>
+                        <td>~15ms</td>
+                        <td>3-shard index, cached filters</td>
+                    </tr>
+                    <tr>
+                        <td>RRF fusion</td>
+                        <td>&lt;1ms</td>
+                        <td>In-memory rank combination</td>
+                    </tr>
+                    <tr>
+                        <td>Cohere Rerank (20 docs)</td>
+                        <td>~60ms</td>
+                        <td>Cross-encoder, API call</td>
+                    </tr>
+                    <tr>
+                        <td>Confidence scoring</td>
+                        <td>&lt;5ms</td>
+                        <td>In-memory computation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total (cold)</strong></td>
+                        <td><strong>~195ms</strong></td>
+                        <td>All stages, no cache</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total (warm, no rewrite)</strong></td>
+                        <td><strong>~115ms</strong></td>
+                        <td>Skip rewriting, warmed connections</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ Key Design Decisions</div>
+                <ul>
+                    <li><strong>RRF over linear combination</strong> — rank-based fusion is more robust than score normalization</li>
+                    <li><strong>Cohere over self-hosted cross-encoder</strong> — 10x lower latency vs running on CPU, consistent quality</li>
+                    <li><strong>Confidence scoring BEFORE generation</strong> — we can refuse to answer BEFORE wasting an LLM call</li>
+                    <li><strong>Multi-query for complex questions</strong> — decomposes "Compare X and Y" into parallel retrievals</li>
+                </ul>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="project-ingestion.html" class="prev">Ingestion Pipeline</a>
+                <a href="project-generation.html" class="next">Generation & Safety</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

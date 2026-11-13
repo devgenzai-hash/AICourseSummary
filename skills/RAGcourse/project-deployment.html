@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone: Deployment & Ops - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/16 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Capstone: Deployment &amp; Ops
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>P6: Deployment & Operations</h1>
+                <p class="subtitle">FastAPI serving, Redis semantic cache, OpenTelemetry tracing, Prometheus metrics, RAGAS evaluation, production Dockerfile, and Docker Compose orchestration.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-code">Full Code</span>
+                    <span class="tag tag-production">Production</span>
+                </div>
+            </div>
+
+            <!-- ===== FASTAPI APP ===== -->
+            <h2>1. FastAPI Application</h2>
+
+<pre><code><span class="token-comment"># src/api/app.py</span>
+
+<span class="token-keyword">from</span> fastapi <span class="token-keyword">import</span> FastAPI, HTTPException
+<span class="token-keyword">from</span> pydantic <span class="token-keyword">import</span> BaseModel, Field
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional, List
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">import</span> time
+
+<span class="token-keyword">from</span> src.generation.rag_pipeline <span class="token-keyword">import</span> RAGPipeline
+<span class="token-keyword">from</span> src.ingestion.pipeline <span class="token-keyword">import</span> IngestionPipeline
+<span class="token-keyword">from</span> src.api.cache <span class="token-keyword">import</span> SemanticCache
+<span class="token-keyword">from</span> src.api.tracing <span class="token-keyword">import</span> setup_tracing, trace_span
+<span class="token-keyword">from</span> src.api.metrics <span class="token-keyword">import</span> metrics
+
+app = FastAPI(
+    title=<span class="token-string">"Enterprise RAG API"</span>,
+    version=<span class="token-string">"1.0.0"</span>,
+    description=<span class="token-string">"Zero-hallucination RAG pipeline for 10M+ documents"</span>
+)
+
+<span class="token-comment"># Initialize components</span>
+rag_pipeline = RAGPipeline()
+ingestion_pipeline = IngestionPipeline()
+cache = SemanticCache()
+
+<span class="token-comment"># Setup OpenTelemetry tracing</span>
+setup_tracing(app)
+
+<span class="token-comment"># ===== Request/Response Models =====</span>
+
+<span class="token-keyword">class</span> <span class="token-class">QueryRequest</span>(BaseModel):
+    question: <span class="token-builtin">str</span> = Field(..., min_length=<span class="token-number">3</span>, max_length=<span class="token-number">2000</span>)
+    conversation: Optional[List[dict]] = <span class="token-keyword">None</span>
+    source_filter: Optional[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>
+    skip_cache: <span class="token-builtin">bool</span> = <span class="token-keyword">False</span>
+
+<span class="token-keyword">class</span> <span class="token-class">QueryResponse</span>(BaseModel):
+    answer: <span class="token-builtin">str</span>
+    citations: List[dict]
+    confidence: <span class="token-builtin">float</span>
+    decision: <span class="token-builtin">str</span>
+    sources: List[dict]
+    trace_id: <span class="token-builtin">str</span>
+    latency_ms: <span class="token-builtin">float</span>
+    cached: <span class="token-builtin">bool</span> = <span class="token-keyword">False</span>
+
+<span class="token-keyword">class</span> <span class="token-class">IngestRequest</span>(BaseModel):
+    directory: <span class="token-builtin">str</span> = Field(..., description=<span class="token-string">"Path to documents directory"</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">IngestResponse</span>(BaseModel):
+    documents_parsed: <span class="token-builtin">int</span>
+    documents_unique: <span class="token-builtin">int</span>
+    duplicates_removed: <span class="token-builtin">int</span>
+    chunks_created: <span class="token-builtin">int</span>
+    embeddings_generated: <span class="token-builtin">int</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HealthResponse</span>(BaseModel):
+    status: <span class="token-builtin">str</span>
+    version: <span class="token-builtin">str</span>
+    qdrant: <span class="token-builtin">str</span>
+    elasticsearch: <span class="token-builtin">str</span>
+    redis: <span class="token-builtin">str</span>
+    uptime_seconds: <span class="token-builtin">float</span>
+
+<span class="token-comment"># Track startup time</span>
+START_TIME = time.time()
+
+<span class="token-comment"># ===== API Endpoints =====</span>
+
+<span class="token-decorator">@app.post</span>(<span class="token-string">"/query"</span>, response_model=QueryResponse)
+<span class="token-keyword">async def</span> <span class="token-function">query</span>(request: QueryRequest):
+    <span class="token-string">"""
+    Query the RAG pipeline.
+    Returns an answer with citations, confidence, and trace ID.
+    """</span>
+    start = time.time()
+    metrics.query_count.inc()
+    
+    <span class="token-keyword">with</span> trace_span(<span class="token-string">"rag_query"</span>) <span class="token-keyword">as</span> span:
+        span.set_attribute(<span class="token-string">"query.text"</span>, request.question)
+        span.set_attribute(<span class="token-string">"query.source_filter"</span>, request.source_filter <span class="token-keyword">or</span> <span class="token-string">"none"</span>)
+        
+        <span class="token-comment"># Check cache first</span>
+        <span class="token-keyword">if not</span> request.skip_cache:
+            cached_response = cache.get(request.question)
+            <span class="token-keyword">if</span> cached_response:
+                metrics.cache_hits.inc()
+                span.set_attribute(<span class="token-string">"cache.hit"</span>, <span class="token-keyword">True</span>)
+                cached_response[<span class="token-string">"cached"</span>] = <span class="token-keyword">True</span>
+                cached_response[<span class="token-string">"latency_ms"</span>] = (time.time() - start) * <span class="token-number">1000</span>
+                <span class="token-keyword">return</span> QueryResponse(**cached_response)
+        
+        <span class="token-comment"># Execute full pipeline</span>
+        result = rag_pipeline.query(
+            question=request.question,
+            conversation=request.conversation,
+            source_filter=request.source_filter
+        )
+        
+        latency = (time.time() - start) * <span class="token-number">1000</span>
+        metrics.query_latency.observe(latency)
+        span.set_attribute(<span class="token-string">"query.latency_ms"</span>, latency)
+        span.set_attribute(<span class="token-string">"query.decision"</span>, result.decision)
+        
+        response = QueryResponse(
+            answer=result.answer,
+            citations=result.citations,
+            confidence=result.confidence,
+            decision=result.decision,
+            sources=result.sources,
+            trace_id=result.trace_id,
+            latency_ms=latency,
+            cached=<span class="token-keyword">False</span>
+        )
+        
+        <span class="token-comment"># Cache the response</span>
+        cache.set(request.question, response.model_dump())
+        
+        <span class="token-keyword">return</span> response
+
+<span class="token-decorator">@app.post</span>(<span class="token-string">"/ingest"</span>, response_model=IngestResponse)
+<span class="token-keyword">async def</span> <span class="token-function">ingest</span>(request: IngestRequest):
+    <span class="token-string">"""Ingest documents from a directory into the RAG pipeline."""</span>
+    <span class="token-keyword">with</span> trace_span(<span class="token-string">"ingest"</span>) <span class="token-keyword">as</span> span:
+        span.set_attribute(<span class="token-string">"ingest.directory"</span>, request.directory)
+        
+        stats = ingestion_pipeline.ingest_directory(request.directory)
+        metrics.docs_ingested.inc(stats[<span class="token-string">"documents_unique"</span>])
+        
+        <span class="token-keyword">return</span> IngestResponse(**stats)
+
+<span class="token-decorator">@app.get</span>(<span class="token-string">"/health"</span>, response_model=HealthResponse)
+<span class="token-keyword">async def</span> <span class="token-function">health</span>():
+    <span class="token-string">"""Health check: verify all dependencies are reachable."""</span>
+    <span class="token-keyword">return</span> HealthResponse(
+        status=<span class="token-string">"healthy"</span>,
+        version=<span class="token-string">"1.0.0"</span>,
+        qdrant=_check_qdrant(),
+        elasticsearch=_check_elasticsearch(),
+        redis=_check_redis(),
+        uptime_seconds=time.time() - START_TIME
+    )
+
+<span class="token-decorator">@app.get</span>(<span class="token-string">"/trace/{trace_id}"</span>)
+<span class="token-keyword">async def</span> <span class="token-function">get_trace</span>(trace_id: <span class="token-builtin">str</span>):
+    <span class="token-string">"""Get the full trace for a query (links to Jaeger UI)."""</span>
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"trace_id"</span>: trace_id,
+        <span class="token-string">"jaeger_url"</span>: <span class="token-string">f"http://localhost:16686/trace/{trace_id}"</span>
+    }
+
+<span class="token-keyword">def</span> <span class="token-function">_check_qdrant</span>() -> <span class="token-builtin">str</span>:
+    <span class="token-keyword">try</span>:
+        <span class="token-keyword">from</span> qdrant_client <span class="token-keyword">import</span> QdrantClient
+        client = QdrantClient(url=<span class="token-string">"http://qdrant:6333"</span>)
+        client.get_collections()
+        <span class="token-keyword">return</span> <span class="token-string">"connected"</span>
+    <span class="token-keyword">except</span>:
+        <span class="token-keyword">return</span> <span class="token-string">"disconnected"</span>
+
+<span class="token-keyword">def</span> <span class="token-function">_check_elasticsearch</span>() -> <span class="token-builtin">str</span>:
+    <span class="token-keyword">try</span>:
+        <span class="token-keyword">from</span> elasticsearch <span class="token-keyword">import</span> Elasticsearch
+        es = Elasticsearch(<span class="token-string">"http://elasticsearch:9200"</span>)
+        es.info()
+        <span class="token-keyword">return</span> <span class="token-string">"connected"</span>
+    <span class="token-keyword">except</span>:
+        <span class="token-keyword">return</span> <span class="token-string">"disconnected"</span>
+
+<span class="token-keyword">def</span> <span class="token-function">_check_redis</span>() -> <span class="token-builtin">str</span>:
+    <span class="token-keyword">try</span>:
+        <span class="token-keyword">import</span> redis
+        r = redis.Redis(host=<span class="token-string">"redis"</span>, port=<span class="token-number">6379</span>)
+        r.ping()
+        <span class="token-keyword">return</span> <span class="token-string">"connected"</span>
+    <span class="token-keyword">except</span>:
+        <span class="token-keyword">return</span> <span class="token-string">"disconnected"</span></code></pre>
+
+            <!-- ===== SEMANTIC CACHE ===== -->
+            <h2>2. Redis Semantic Cache</h2>
+
+<pre><code><span class="token-comment"># src/api/cache.py</span>
+
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+<span class="token-keyword">import</span> redis
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional
+<span class="token-keyword">from</span> src.ingestion.embedder <span class="token-keyword">import</span> EmbeddingGenerator
+<span class="token-keyword">from</span> src.config <span class="token-keyword">import</span> settings
+
+<span class="token-keyword">class</span> <span class="token-class">SemanticCache</span>:
+    <span class="token-string">"""
+    Two-layer cache using Redis:
+    
+    Layer 1: Exact match (SHA256 hash of normalized query)
+    Layer 2: Semantic match (cosine similarity of query embeddings)
+    
+    TTL: 1 hour for exact, 30 min for semantic (less confident match)
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.redis = redis.Redis(
+            host=settings.redis_host,
+            port=settings.redis_port,
+            decode_responses=<span class="token-keyword">True</span>
+        )
+        self.embedder = EmbeddingGenerator()
+        self.similarity_threshold = <span class="token-number">0.95</span>  <span class="token-comment"># Very high threshold for cache hits</span>
+        self.exact_ttl = <span class="token-number">3600</span>       <span class="token-comment"># 1 hour</span>
+        self.semantic_ttl = <span class="token-number">1800</span>    <span class="token-comment"># 30 minutes</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, query: <span class="token-builtin">str</span>) -> Optional[dict]:
+        <span class="token-string">"""Try to get a cached response. Exact match first, then semantic."""</span>
+        <span class="token-comment"># Layer 1: Exact match</span>
+        query_hash = self._hash_query(query)
+        cached = self.redis.get(<span class="token-string">f"exact:{query_hash}"</span>)
+        <span class="token-keyword">if</span> cached:
+            <span class="token-keyword">return</span> json.loads(cached)
+        
+        <span class="token-comment"># Layer 2: Semantic match</span>
+        query_embedding = self.embedder.embed_query(query)
+        
+        <span class="token-comment"># Check against recent query embeddings</span>
+        semantic_keys = self.redis.keys(<span class="token-string">"semantic:*"</span>)
+        <span class="token-keyword">for</span> key <span class="token-keyword">in</span> semantic_keys[:<span class="token-number">100</span>]:  <span class="token-comment"># Limit to 100 comparisons</span>
+            stored = self.redis.hgetall(key)
+            <span class="token-keyword">if not</span> stored:
+                <span class="token-keyword">continue</span>
+            
+            stored_embedding = np.frombuffer(
+                bytes.fromhex(stored[<span class="token-string">"embedding"</span>]), dtype=np.float32
+            )
+            
+            <span class="token-comment"># Cosine similarity</span>
+            similarity = np.dot(query_embedding, stored_embedding)
+            
+            <span class="token-keyword">if</span> similarity >= self.similarity_threshold:
+                <span class="token-keyword">return</span> json.loads(stored[<span class="token-string">"response"</span>])
+        
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">set</span>(self, query: <span class="token-builtin">str</span>, response: dict):
+        <span class="token-string">"""Cache a response for both exact and semantic retrieval."""</span>
+        query_hash = self._hash_query(query)
+        response_json = json.dumps(response, default=<span class="token-builtin">str</span>)
+        
+        <span class="token-comment"># Layer 1: Exact match cache</span>
+        self.redis.setex(<span class="token-string">f"exact:{query_hash}"</span>, self.exact_ttl, response_json)
+        
+        <span class="token-comment"># Layer 2: Semantic cache (store embedding + response)</span>
+        query_embedding = self.embedder.embed_query(query)
+        self.redis.hset(<span class="token-string">f"semantic:{query_hash}"</span>, mapping={
+            <span class="token-string">"embedding"</span>: query_embedding.astype(np.float32).tobytes().hex(),
+            <span class="token-string">"response"</span>: response_json,
+            <span class="token-string">"query"</span>: query
+        })
+        self.redis.expire(<span class="token-string">f"semantic:{query_hash}"</span>, self.semantic_ttl)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_hash_query</span>(self, query: <span class="token-builtin">str</span>) -> <span class="token-builtin">str</span>:
+        <span class="token-string">"""Normalize and hash a query for exact matching."""</span>
+        normalized = query.lower().strip()
+        <span class="token-keyword">return</span> hashlib.sha256(normalized.encode()).hexdigest()[:<span class="token-number">16</span>]</code></pre>
+
+            <!-- ===== TRACING ===== -->
+            <h2>3. OpenTelemetry Tracing</h2>
+
+<pre><code><span class="token-comment"># src/api/tracing.py</span>
+
+<span class="token-keyword">from</span> opentelemetry <span class="token-keyword">import</span> trace
+<span class="token-keyword">from</span> opentelemetry.sdk.trace <span class="token-keyword">import</span> TracerProvider
+<span class="token-keyword">from</span> opentelemetry.sdk.trace.export <span class="token-keyword">import</span> BatchSpanProcessor
+<span class="token-keyword">from</span> opentelemetry.exporter.jaeger.thrift <span class="token-keyword">import</span> JaegerExporter
+<span class="token-keyword">from</span> opentelemetry.instrumentation.fastapi <span class="token-keyword">import</span> FastAPIInstrumentor
+<span class="token-keyword">from</span> opentelemetry.instrumentation.httpx <span class="token-keyword">import</span> HTTPXClientInstrumentor
+<span class="token-keyword">from</span> contextlib <span class="token-keyword">import</span> contextmanager
+<span class="token-keyword">from</span> src.config <span class="token-keyword">import</span> settings
+
+<span class="token-keyword">def</span> <span class="token-function">setup_tracing</span>(app):
+    <span class="token-string">"""Configure OpenTelemetry with Jaeger exporter."""</span>
+    
+    <span class="token-comment"># Create tracer provider</span>
+    provider = TracerProvider()
+    
+    <span class="token-comment"># Jaeger exporter (sends traces to Jaeger)</span>
+    jaeger_exporter = JaegerExporter(
+        agent_host_name=settings.jaeger_host,
+        agent_port=settings.jaeger_port,
+    )
+    
+    <span class="token-comment"># Batch processor (buffers spans for efficiency)</span>
+    provider.add_span_processor(
+        BatchSpanProcessor(jaeger_exporter)
+    )
+    
+    <span class="token-comment"># Set as global provider</span>
+    trace.set_tracer_provider(provider)
+    
+    <span class="token-comment"># Auto-instrument FastAPI (creates spans for all endpoints)</span>
+    FastAPIInstrumentor.instrument_app(app)
+    
+    <span class="token-comment"># Auto-instrument HTTP clients (OpenAI, Cohere calls)</span>
+    HTTPXClientInstrumentor().instrument()
+
+<span class="token-decorator">@contextmanager</span>
+<span class="token-keyword">def</span> <span class="token-function">trace_span</span>(name: <span class="token-builtin">str</span>):
+    <span class="token-string">"""Create a tracing span for a pipeline stage."""</span>
+    tracer = trace.get_tracer(<span class="token-string">"enterprise-rag"</span>)
+    <span class="token-keyword">with</span> tracer.start_as_current_span(name) <span class="token-keyword">as</span> span:
+        <span class="token-keyword">yield</span> span</code></pre>
+
+            <!-- ===== METRICS ===== -->
+            <h2>4. Prometheus Metrics</h2>
+
+<pre><code><span class="token-comment"># src/api/metrics.py</span>
+
+<span class="token-keyword">from</span> prometheus_client <span class="token-keyword">import</span> Counter, Histogram, Gauge, generate_latest
+<span class="token-keyword">from</span> fastapi <span class="token-keyword">import</span> Response
+
+<span class="token-keyword">class</span> <span class="token-class">RAGMetrics</span>:
+    <span class="token-string">"""Prometheus metrics for RAG pipeline monitoring."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        <span class="token-comment"># Request metrics</span>
+        self.query_count = Counter(
+            <span class="token-string">"rag_queries_total"</span>,
+            <span class="token-string">"Total number of RAG queries"</span>
+        )
+        self.query_latency = Histogram(
+            <span class="token-string">"rag_query_latency_ms"</span>,
+            <span class="token-string">"Query latency in milliseconds"</span>,
+            buckets=[<span class="token-number">50</span>, <span class="token-number">100</span>, <span class="token-number">200</span>, <span class="token-number">500</span>, <span class="token-number">1000</span>, <span class="token-number">2000</span>, <span class="token-number">5000</span>]
+        )
+        
+        <span class="token-comment"># Cache metrics</span>
+        self.cache_hits = Counter(
+            <span class="token-string">"rag_cache_hits_total"</span>,
+            <span class="token-string">"Number of cache hits"</span>
+        )
+        
+        <span class="token-comment"># Decision metrics</span>
+        self.decisions = Counter(
+            <span class="token-string">"rag_decisions_total"</span>,
+            <span class="token-string">"Response decisions by type"</span>,
+            [<span class="token-string">"decision"</span>]
+        )
+        
+        <span class="token-comment"># Hallucination metrics</span>
+        self.hallucinations_detected = Counter(
+            <span class="token-string">"rag_hallucinations_total"</span>,
+            <span class="token-string">"Number of hallucinations detected"</span>
+        )
+        
+        <span class="token-comment"># Ingestion metrics</span>
+        self.docs_ingested = Counter(
+            <span class="token-string">"rag_docs_ingested_total"</span>,
+            <span class="token-string">"Total documents ingested"</span>
+        )
+        
+        <span class="token-comment"># Collection size</span>
+        self.collection_size = Gauge(
+            <span class="token-string">"rag_collection_size"</span>,
+            <span class="token-string">"Number of chunks in vector store"</span>
+        )
+
+metrics = RAGMetrics()
+
+<span class="token-comment"># Endpoint for Prometheus scraping</span>
+<span class="token-keyword">async def</span> <span class="token-function">metrics_endpoint</span>():
+    <span class="token-keyword">return</span> Response(
+        content=generate_latest(),
+        media_type=<span class="token-string">"text/plain"</span>
+    )</code></pre>
+
+            <!-- ===== RAGAS EVAL ===== -->
+            <h2>5. RAGAS Evaluation Pipeline</h2>
+
+<pre><code><span class="token-comment"># src/evaluation/ragas_eval.py</span>
+
+<span class="token-keyword">from</span> ragas <span class="token-keyword">import</span> evaluate
+<span class="token-keyword">from</span> ragas.metrics <span class="token-keyword">import</span> (
+    faithfulness,
+    answer_relevancy,
+    context_precision,
+    context_recall
+)
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> Dataset
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict
+<span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+
+<span class="token-keyword">class</span> <span class="token-class">RAGASEvaluator</span>:
+    <span class="token-string">"""
+    Continuous evaluation using RAGAS framework.
+    
+    Metrics:
+    - Faithfulness: Are answers grounded in context? (anti-hallucination)
+    - Answer Relevancy: Do answers address the question?
+    - Context Precision: Are retrieved contexts relevant?
+    - Context Recall: Did we find all relevant contexts?
+    
+    Run daily on a test set + weekly on adversarial queries.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">evaluate_batch</span>(self, test_cases: List[Dict]) -> Dict:
+        <span class="token-string">"""
+        Evaluate a batch of test cases.
+        
+        Each test case: {
+            "question": str,
+            "answer": str (generated),
+            "contexts": List[str] (retrieved chunks),
+            "ground_truth": str (expected answer)
+        }
+        """</span>
+        dataset = Dataset.from_dict({
+            <span class="token-string">"question"</span>: [t[<span class="token-string">"question"</span>] <span class="token-keyword">for</span> t <span class="token-keyword">in</span> test_cases],
+            <span class="token-string">"answer"</span>: [t[<span class="token-string">"answer"</span>] <span class="token-keyword">for</span> t <span class="token-keyword">in</span> test_cases],
+            <span class="token-string">"contexts"</span>: [t[<span class="token-string">"contexts"</span>] <span class="token-keyword">for</span> t <span class="token-keyword">in</span> test_cases],
+            <span class="token-string">"ground_truth"</span>: [t[<span class="token-string">"ground_truth"</span>] <span class="token-keyword">for</span> t <span class="token-keyword">in</span> test_cases],
+        })
+        
+        <span class="token-comment"># Run RAGAS evaluation</span>
+        results = evaluate(
+            dataset,
+            metrics=[
+                faithfulness,
+                answer_relevancy,
+                context_precision,
+                context_recall
+            ]
+        )
+        
+        <span class="token-comment"># Format results</span>
+        report = {
+            <span class="token-string">"timestamp"</span>: datetime.now().isoformat(),
+            <span class="token-string">"num_cases"</span>: <span class="token-builtin">len</span>(test_cases),
+            <span class="token-string">"scores"</span>: {
+                <span class="token-string">"faithfulness"</span>: <span class="token-builtin">float</span>(results[<span class="token-string">"faithfulness"</span>]),
+                <span class="token-string">"answer_relevancy"</span>: <span class="token-builtin">float</span>(results[<span class="token-string">"answer_relevancy"</span>]),
+                <span class="token-string">"context_precision"</span>: <span class="token-builtin">float</span>(results[<span class="token-string">"context_precision"</span>]),
+                <span class="token-string">"context_recall"</span>: <span class="token-builtin">float</span>(results[<span class="token-string">"context_recall"</span>])
+            },
+            <span class="token-string">"pass"</span>: all(v >= <span class="token-number">0.8</span> <span class="token-keyword">for</span> v <span class="token-keyword">in</span> results.values())
+        }
+        
+        <span class="token-comment"># Save report</span>
+        <span class="token-keyword">with</span> <span class="token-builtin">open</span>(<span class="token-string">f"evals/report_{datetime.now().strftime('%Y%m%d')}.json"</span>, <span class="token-string">"w"</span>) <span class="token-keyword">as</span> f:
+            json.dump(report, f, indent=<span class="token-number">2</span>)
+        
+        <span class="token-keyword">return</span> report</code></pre>
+
+            <!-- ===== DOCKERFILE ===== -->
+            <h2>6. Production Dockerfile (Multi-Stage)</h2>
+
+<pre><code><span class="token-comment"># Dockerfile</span>
+
+<span class="token-comment"># Stage 1: Build dependencies</span>
+FROM python:3.11-slim AS builder
+
+WORKDIR /app
+
+<span class="token-comment"># Install system dependencies for building</span>
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+<span class="token-comment"># Stage 2: Production image</span>
+FROM python:3.11-slim AS production
+
+WORKDIR /app
+
+<span class="token-comment"># Install runtime dependencies only</span>
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+<span class="token-comment"># Copy installed packages from builder</span>
+COPY --from=builder /install /usr/local
+
+<span class="token-comment"># Copy application code</span>
+COPY src/ ./src/
+COPY config.py .
+
+<span class="token-comment"># Create non-root user</span>
+RUN useradd -m -r appuser && chown -R appuser:appuser /app
+USER appuser
+
+<span class="token-comment"># Health check</span>
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+<span class="token-comment"># Run with uvicorn</span>
+EXPOSE 8000
+CMD ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]</code></pre>
+
+            <!-- ===== DOCKER COMPOSE ===== -->
+            <h2>7. Docker Compose (Full Stack)</h2>
+
+<pre><code><span class="token-comment"># docker-compose.yml</span>
+
+version: "3.9"
+
+services:
+  <span class="token-comment"># === RAG API Service ===</span>
+  rag-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - COHERE_API_KEY=${COHERE_API_KEY}
+      - QDRANT_URL=http://qdrant:6333
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JAEGER_HOST=jaeger
+      - JAEGER_PORT=6831
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    restart: unless-stopped
+
+  <span class="token-comment"># === Qdrant Vector Database ===</span>
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  <span class="token-comment"># === Elasticsearch (BM25) ===</span>
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  <span class="token-comment"># === Redis (Cache + Semantic Cache) ===</span>
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 1gb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  <span class="token-comment"># === Jaeger (Distributed Tracing) ===</span>
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    ports:
+      - "16686:16686"  <span class="token-comment"># UI</span>
+      - "6831:6831/udp"  <span class="token-comment"># Agent (compact thrift)</span>
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  <span class="token-comment"># === Prometheus (Metrics) ===</span>
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+
+volumes:
+  qdrant_data:
+  es_data:
+  redis_data:
+  prometheus_data:</code></pre>
+
+            <!-- ===== PROMETHEUS CONFIG ===== -->
+            <h2>8. Prometheus Configuration</h2>
+
+<pre><code><span class="token-comment"># prometheus.yml</span>
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: "rag-api"
+    static_configs:
+      - targets: ["rag-api:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []</code></pre>
+
+            <h2>9. Alert Rules</h2>
+
+<pre><code><span class="token-comment"># alerts.yml</span>
+
+groups:
+  - name: rag_alerts
+    rules:
+      <span class="token-comment"># High latency alert</span>
+      - alert: HighQueryLatency
+        expr: histogram_quantile(0.95, rag_query_latency_ms) > 2000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "RAG query P95 latency > 2s"
+      
+      <span class="token-comment"># Hallucination rate alert</span>
+      - alert: HighHallucinationRate
+        expr: rate(rag_hallucinations_total[1h]) / rate(rag_queries_total[1h]) > 0.05
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Hallucination rate > 5%"
+      
+      <span class="token-comment"># Low faithfulness score</span>
+      - alert: LowFaithfulness
+        expr: rag_ragas_faithfulness < 0.8
+        for: 30m
+        labels:
+          severity: critical
+        annotations:
+          summary: "RAGAS faithfulness score dropped below 0.8"
+      
+      <span class="token-comment"># Service health</span>
+      - alert: ServiceDown
+        expr: up{job="rag-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "RAG API is down"</code></pre>
+
+            <!-- ===== RUNNING ===== -->
+            <h2>10. Running the Complete System</h2>
+
+<pre><code><span class="token-comment"># 1. Clone and configure</span>
+git clone https://github.com/your-org/enterprise-rag.git
+cd enterprise-rag
+cp .env.example .env
+<span class="token-comment"># Edit .env with your API keys</span>
+
+<span class="token-comment"># 2. Start all services</span>
+docker compose up -d
+
+<span class="token-comment"># 3. Wait for health check</span>
+curl http://localhost:8000/health
+<span class="token-comment"># → {"status": "healthy", "qdrant": "connected", ...}</span>
+
+<span class="token-comment"># 4. Ingest documents</span>
+curl -X POST http://localhost:8000/ingest \
+  -H "Content-Type: application/json" \
+  -d '{"directory": "/data/documents"}'
+<span class="token-comment"># → {"documents_parsed": 10000, "chunks_created": 48500, ...}</span>
+
+<span class="token-comment"># 5. Query the system</span>
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What is our refund policy for enterprise customers?"}'
+<span class="token-comment"># → {"answer": "...", "citations": [...], "confidence": 0.89, ...}</span>
+
+<span class="token-comment"># 6. View traces</span>
+open http://localhost:16686  <span class="token-comment"># Jaeger UI</span>
+
+<span class="token-comment"># 7. View metrics</span>
+open http://localhost:9090   <span class="token-comment"># Prometheus UI</span>
+
+<span class="token-comment"># 8. Run evaluation</span>
+python -m src.evaluation.ragas_eval</code></pre>
+
+            <!-- ===== DEPLOYMENT CHECKLIST ===== -->
+            <h2>Production Deployment Checklist</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Task</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Security</td>
+                        <td>API keys in environment variables (never in code)</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Security</td>
+                        <td>Non-root container user</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Security</td>
+                        <td>Input validation (Pydantic models)</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>Redis semantic cache (sub-5ms for cached queries)</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>INT8 quantization for vectors (4x memory reduction)</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>Batch embedding with GPU</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Reliability</td>
+                        <td>Health checks on all services</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Reliability</td>
+                        <td>Graceful fallback (5-level decision engine)</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Reliability</td>
+                        <td>Retry logic on hallucination</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Observability</td>
+                        <td>Distributed tracing (OpenTelemetry → Jaeger)</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Observability</td>
+                        <td>Prometheus metrics + alerting</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Observability</td>
+                        <td>RAGAS continuous evaluation</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Quality</td>
+                        <td>NLI hallucination detection (DeBERTa-v3)</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Quality</td>
+                        <td>Source confidence scoring (4 dimensions)</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Scale</td>
+                        <td>10M document capacity (Qdrant sharding + ES)</td>
+                        <td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-success">
+                <div class="callout-title">🎉 Congratulations!</div>
+                <p>You've built a complete, production-ready RAG pipeline that handles 9 document types, uses hybrid retrieval with reranking, generates cited responses with hallucination detection, and runs with full observability. This is a state-of-the-art enterprise system.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="project-generation.html" class="prev">Generation & Safety</a>
+                <a href="index.html" class="next">Back to Course Home</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

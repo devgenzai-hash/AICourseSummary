@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Types for LLMs — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 2</a> <span>›</span> Dataset Types</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Dataset Types for LLM Training</h1>
+                <p>Data is the fuel of AI. This chapter explains every type of dataset used to train, fine-tune, and align language models — from raw web crawls to carefully crafted preference pairs.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Pre-training data = reading the entire internet.</strong> Like a student reading millions of books, articles, and websites to build general knowledge.</p>
+                <p><strong>Instruction data = homework assignments with answers.</strong> "Here's the question, here's how a good student answers it."</p>
+                <p><strong>Preference data = graded essays.</strong> "This answer got an A, this answer got a C — learn the difference."</p>
+            </div>
+
+            <h2 id="overview">The Three Stages of Data</h2>
+
+            <table>
+                <thead><tr><th>Stage</th><th>Data Type</th><th>Volume</th><th>Purpose</th><th>Who Does It</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Pre-training</strong></td><td>Raw text (web, books, code)</td><td>1-15 trillion tokens</td><td>General knowledge</td><td>Meta, Google, etc.</td></tr>
+                    <tr><td><strong>Supervised Fine-tuning (SFT)</strong></td><td>Instruction-response pairs</td><td>10K-1M examples</td><td>Follow instructions</td><td>You (or companies)</td></tr>
+                    <tr><td><strong>Preference Alignment</strong></td><td>Chosen vs rejected pairs</td><td>10K-100K examples</td><td>Be helpful, safe, honest</td><td>You (or companies)</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="pretraining-data">1. Pre-training Data</h2>
+
+            <p>This is the massive corpus used to train a model from scratch. You'll never create this yourself, but understanding it helps you understand model behavior.</p>
+
+            <h3>Common Pre-training Datasets:</h3>
+            <table>
+                <thead><tr><th>Dataset</th><th>Size</th><th>Content</th><th>Used By</th></tr></thead>
+                <tbody>
+                    <tr><td>Common Crawl</td><td>~250B pages</td><td>Web pages (noisy)</td><td>Most open models</td></tr>
+                    <tr><td>The Pile</td><td>800GB</td><td>Curated web + books + code</td><td>EleutherAI models</td></tr>
+                    <tr><td>RedPajama v2</td><td>30T tokens</td><td>Web, books, papers, code</td><td>Llama-like training</td></tr>
+                    <tr><td>FineWeb</td><td>15T tokens</td><td>Cleaned web data</td><td>HuggingFace models</td></tr>
+                    <tr><td>StarCoder data</td><td>783GB</td><td>GitHub code (83 languages)</td><td>Code models</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="sft-data">2. Supervised Fine-tuning (SFT) Data</h2>
+
+            <p>This is the dataset format YOU'll use most. It teaches the model to follow instructions and produce helpful answers.</p>
+
+            <h3>SFT Data Formats:</h3>
+
+            <h4>ChatML Format (Industry Standard):</h4>
+            <pre><code><span class="token-comment"># Each example is a multi-turn conversation</span>
+{
+    <span class="token-string">"messages"</span>: [
+        {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a helpful Python tutor."</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"How do I read a file in Python?"</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Here's how to read a file:\n\n```python\nwith open('file.txt', 'r') as f:\n    content = f.read()\nprint(content)\n```\n\nThe `with` statement ensures the file is properly closed after reading."</span>}
+    ]
+}</code></pre>
+
+            <h4>Alpaca Format (Simple, Popular):</h4>
+            <pre><code>{
+    <span class="token-string">"instruction"</span>: <span class="token-string">"Summarize the following text in one sentence."</span>,
+    <span class="token-string">"input"</span>: <span class="token-string">"Machine learning is a subset of artificial intelligence that enables systems to learn from data..."</span>,
+    <span class="token-string">"output"</span>: <span class="token-string">"Machine learning is an AI approach where systems learn patterns from data rather than being explicitly programmed."</span>
+}</code></pre>
+
+            <h4>Completion Format (Simplest):</h4>
+            <pre><code>{
+    <span class="token-string">"text"</span>: <span class="token-string">"### Instruction:\nExplain photosynthesis.\n\n### Response:\nPhotosynthesis is the process by which plants convert sunlight..."</span>
+}</code></pre>
+
+            <h3>Popular SFT Datasets:</h3>
+            <table>
+                <thead><tr><th>Dataset</th><th>Size</th><th>Quality</th><th>Best For</th></tr></thead>
+                <tbody>
+                    <tr><td>OpenHermes 2.5</td><td>1M examples</td><td>High</td><td>General instruction following</td></tr>
+                    <tr><td>SlimOrca</td><td>518K</td><td>High</td><td>Reasoning + conversation</td></tr>
+                    <tr><td>Capybara</td><td>16K</td><td>Very high</td><td>Multi-turn dialogue</td></tr>
+                    <tr><td>Code Alpaca</td><td>20K</td><td>Medium</td><td>Code generation</td></tr>
+                    <tr><td>Medical Meadow</td><td>160K</td><td>High</td><td>Medical Q&A</td></tr>
+                    <tr><td>Your custom data</td><td>1K-50K</td><td>Depends</td><td>Your specific domain</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="preference-data">3. Preference/Alignment Data</h2>
+
+            <p>Used for DPO, RLHF, and other alignment methods. Each example shows the model which response is better.</p>
+
+            <pre><code><span class="token-comment"># DPO dataset format — "chosen" is better than "rejected"</span>
+{
+    <span class="token-string">"prompt"</span>: <span class="token-string">"How do I lose weight?"</span>,
+    <span class="token-string">"chosen"</span>: <span class="token-string">"A healthy approach to weight loss involves: 1) Creating a modest calorie deficit (300-500 cal/day), 2) Regular exercise combining cardio and strength training, 3) Getting 7-9 hours of sleep. Consult a doctor before making major changes."</span>,
+    <span class="token-string">"rejected"</span>: <span class="token-string">"Just stop eating lol. Or try this one weird trick..."</span>
+}</code></pre>
+
+            <h3>Popular Preference Datasets:</h3>
+            <table>
+                <thead><tr><th>Dataset</th><th>Size</th><th>Source</th></tr></thead>
+                <tbody>
+                    <tr><td>UltraFeedback</td><td>64K</td><td>GPT-4 judged responses</td></tr>
+                    <tr><td>HH-RLHF</td><td>170K</td><td>Anthropic human feedback</td></tr>
+                    <tr><td>Nectar</td><td>183K</td><td>7 models ranked by GPT-4</td></tr>
+                    <tr><td>Orca DPO Pairs</td><td>13K</td><td>GPT-4 vs GPT-3.5 answers</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="code">Production Code</h2>
+
+            <h3>Loading & Inspecting Datasets from HuggingFace</h3>
+            <pre><code><span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> load_dataset
+
+<span class="token-comment"># Load a popular SFT dataset</span>
+dataset = load_dataset(<span class="token-string">"teknium/OpenHermes-2.5"</span>, split=<span class="token-string">"train"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Total examples: {len(dataset):,}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Columns: {dataset.column_names}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"\nFirst example:"</span>)
+<span class="token-builtin">print</span>(dataset[<span class="token-number">0</span>])
+
+<span class="token-comment"># Load a preference dataset</span>
+dpo_data = load_dataset(<span class="token-string">"argilla/ultrafeedback-binarized-preferences"</span>, split=<span class="token-string">"train"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"\nDPO dataset size: {len(dpo_data):,}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Columns: {dpo_data.column_names}"</span>)
+
+<span class="token-comment"># Filter dataset by topic</span>
+code_examples = dataset.filter(<span class="token-keyword">lambda</span> x: <span class="token-string">"python"</span> <span class="token-keyword">in</span> str(x.get(<span class="token-string">"conversations"</span>, <span class="token-string">""</span>)).lower())
+<span class="token-builtin">print</span>(<span class="token-string">f"Python-related examples: {len(code_examples):,}"</span>)</code></pre>
+
+            <h3>Creating Your Own SFT Dataset</h3>
+            <pre><code><span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> Dataset
+
+<span class="token-comment"># Method 1: From a list of conversations (ChatML format)</span>
+my_data = [
+    {
+        <span class="token-string">"messages"</span>: [
+            {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a customer support agent for TechCo."</span>},
+            {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"My laptop won't turn on"</span>},
+            {<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: <span class="token-string">"I'm sorry to hear that! Let's troubleshoot:\n\n1. Is the laptop plugged in? Check the power indicator light.\n2. Try holding the power button for 15 seconds.\n3. Remove the battery (if removable) and plug in directly.\n\nLet me know what happens with step 1."</span>}
+        ]
+    },
+    {
+        <span class="token-string">"messages"</span>: [
+            {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a customer support agent for TechCo."</span>},
+            {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"How do I return a product?"</span>},
+            {<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You can return any product within 30 days of purchase:\n\n1. Go to techco.com/returns\n2. Enter your order number\n3. Print the shipping label\n4. Drop off at any UPS location\n\nRefunds process within 5-7 business days."</span>}
+        ]
+    }
+]
+
+<span class="token-comment"># Save as JSONL (industry standard format)</span>
+<span class="token-keyword">with</span> <span class="token-builtin">open</span>(<span class="token-string">"my_dataset.jsonl"</span>, <span class="token-string">"w"</span>) <span class="token-keyword">as</span> f:
+    <span class="token-keyword">for</span> example <span class="token-keyword">in</span> my_data:
+        f.write(json.dumps(example) + <span class="token-string">"\n"</span>)
+
+<span class="token-comment"># Convert to HuggingFace Dataset</span>
+hf_dataset = Dataset.from_list(my_data)
+<span class="token-builtin">print</span>(hf_dataset)
+
+<span class="token-comment"># Push to HuggingFace Hub (optional)</span>
+<span class="token-comment"># hf_dataset.push_to_hub("your-username/my-support-dataset")</span></code></pre>
+
+            <h3>Dataset Quality Analysis</h3>
+            <pre><code><span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> load_dataset
+<span class="token-keyword">import</span> statistics
+
+<span class="token-keyword">def</span> <span class="token-function">analyze_dataset</span>(dataset_name: str, split: str = <span class="token-string">"train"</span>):
+    <span class="token-string">"""Comprehensive dataset quality check."""</span>
+    ds = load_dataset(dataset_name, split=split)
+
+    <span class="token-builtin">print</span>(<span class="token-string">f"📊 Dataset: {dataset_name}"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"   Total examples: {len(ds):,}"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"   Columns: {ds.column_names}"</span>)
+
+    <span class="token-comment"># Analyze text lengths</span>
+    <span class="token-keyword">if</span> <span class="token-string">"messages"</span> <span class="token-keyword">in</span> ds.column_names:
+        lengths = [<span class="token-builtin">sum</span>(<span class="token-builtin">len</span>(m[<span class="token-string">"content"</span>]) <span class="token-keyword">for</span> m <span class="token-keyword">in</span> ex[<span class="token-string">"messages"</span>]) <span class="token-keyword">for</span> ex <span class="token-keyword">in</span> ds]
+    <span class="token-keyword">elif</span> <span class="token-string">"text"</span> <span class="token-keyword">in</span> ds.column_names:
+        lengths = [<span class="token-builtin">len</span>(ex[<span class="token-string">"text"</span>]) <span class="token-keyword">for</span> ex <span class="token-keyword">in</span> ds]
+    <span class="token-keyword">else</span>:
+        lengths = [<span class="token-builtin">len</span>(str(ex)) <span class="token-keyword">for</span> ex <span class="token-keyword">in</span> ds]
+
+    <span class="token-builtin">print</span>(<span class="token-string">f"   Avg length: {statistics.mean(lengths):,.0f} chars"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"   Median length: {statistics.median(lengths):,.0f} chars"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"   Min/Max: {min(lengths):,} / {max(lengths):,} chars"</span>)
+
+    <span class="token-comment"># Check for duplicates</span>
+    <span class="token-keyword">if</span> <span class="token-string">"text"</span> <span class="token-keyword">in</span> ds.column_names:
+        unique = <span class="token-builtin">len</span>(<span class="token-builtin">set</span>(ds[<span class="token-string">"text"</span>]))
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Unique examples: {unique:,} ({unique/len(ds)*100:.1f}%)"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Duplicates: {len(ds) - unique:,}"</span>)
+
+    <span class="token-keyword">return</span> ds
+
+<span class="token-comment"># Analyze popular datasets</span>
+analyze_dataset(<span class="token-string">"tatsu-lab/alpaca"</span>)</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Quality > Quantity</strong> — 5,000 excellent examples beat 500,000 mediocre ones. Microsoft's Phi models proved this.</li>
+                    <li><strong>JSONL format</strong> — Industry standard for dataset files. One JSON object per line.</li>
+                    <li><strong>ChatML format</strong> — Standard for conversational data (system/user/assistant roles). Used by OpenAI, TRL, Axolotl.</li>
+                    <li><strong>HuggingFace Hub</strong> — Standard platform for sharing datasets. Use <code>datasets</code> library to load.</li>
+                    <li><strong>Deduplication is mandatory</strong> — Duplicate examples cause memorization, not learning.</li>
+                    <li><strong>Diverse data</strong> — Mix topics, difficulty levels, and response styles for robust models.</li>
+                    <li><strong>1,000-10,000 examples</strong> — Sweet spot for fine-tuning. More isn't always better.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Pre-training data</strong> = trillions of tokens from the internet (you won't create this)</li>
+                    <li><strong>SFT data</strong> = instruction-response pairs in ChatML or Alpaca format (YOUR main focus)</li>
+                    <li><strong>Preference data</strong> = chosen/rejected pairs for alignment (DPO/RLHF)</li>
+                    <li>Quality matters far more than quantity for fine-tuning</li>
+                    <li>Use JSONL format, ChatML structure, push to HuggingFace Hub</li>
+                    <li>Always deduplicate and analyze your data before training</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    Pre-training: "Read the internet" → General knowledge<br>
+                    SFT: "Here's how to answer questions" → Instruction following<br>
+                    Preference: "This answer is better than that one" → Quality & safety
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Using raw, uncleaned data</strong> — Garbage in = garbage out. Clean your data thoroughly.</li>
+                    <li><strong>Too much data of low quality</strong> — 1,000 curated examples > 100,000 noisy ones.</li>
+                    <li><strong>Wrong format</strong> — If your trainer expects ChatML but you give it Alpaca format, training will silently fail.</li>
+                    <li><strong>No system prompts</strong> — Without a system message, the model won't learn consistent persona/behavior.</li>
+                    <li><strong>Imbalanced topics</strong> — 90% code + 10% writing = model forgets how to write well.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Create Your First Dataset</h4>
+                <ol>
+                    <li>Pick a domain you know well (cooking, fitness, coding, etc.)</li>
+                    <li>Write 20 instruction-response pairs in ChatML format</li>
+                    <li>Save as <code>my_dataset.jsonl</code></li>
+                    <li>Load it with <code>Dataset.from_json("my_dataset.jsonl")</code></li>
+                    <li>Run the quality analysis function above on your data</li>
+                    <li>Load OpenHermes 2.5 and explore 10 random examples — observe the quality bar</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="06-open-vs-closed-models.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Open vs Closed Models</span>
+                </a>
+                <a href="08-synthetic-data.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Synthetic Data</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

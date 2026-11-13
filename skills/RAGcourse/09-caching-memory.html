@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caching & Memory Layer - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Caching &amp; Memory
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 9: Caching &amp; Memory Layer</h1>
+                <p class="subtitle">Cache high-frequency queries and retrieval paths to slash latency and improve output consistency.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-code">Code</span>
+                    <span class="tag tag-scale">10M Scale</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: Speed Dial on Your Phone</div>
+                <p>You call your mom every day. Do you type her full phone number each time? No — you use <strong>speed dial</strong> or favorites. The phone remembers the number so you don't have to look it up again.</p>
+                <p>Similarly, if 50 employees ask "What's the vacation policy?" every week, why would your RAG system search through 10 million documents each time? It should <strong>remember the answer from the first time</strong> and serve it instantly for the next 49 people.</p>
+                <p><strong>Caching = speed dial for your RAG system.</strong> Remember common answers so you don't repeat expensive work.</p>
+            </div>
+
+            <!-- ===== WHAT IS IT ===== -->
+            <h2>What Is Caching in RAG?</h2>
+            <p>Caching means storing the results of expensive operations so you can reuse them quickly next time. In a RAG pipeline, there are multiple things you can cache:</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Cache Layer</th>
+                        <th>What It Stores</th>
+                        <th>Saves Time On</th>
+                        <th>Typical Savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Query embedding cache</strong></td>
+                        <td>Embeddings for previously seen queries</td>
+                        <td>Embedding API call (~100ms)</td>
+                        <td>~100ms per cached query</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Retrieval cache</strong></td>
+                        <td>Retrieved chunk sets for previous queries</td>
+                        <td>Full retrieval pipeline (~200-500ms)</td>
+                        <td>~300ms per cached query</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Answer cache</strong></td>
+                        <td>Complete generated answers</td>
+                        <td>LLM generation (~1-5 seconds)</td>
+                        <td>~2-3 seconds per cached query</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Semantic cache</strong></td>
+                        <td>Answers for semantically similar (not exact) queries</td>
+                        <td>Everything above</td>
+                        <td>~3 seconds + broader hit rate</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== EXACT CACHE ===== -->
+            <h2>1. Exact Query Cache</h2>
+            <p><strong>Simplest approach:</strong> If someone asks the exact same question that's been asked before, return the cached answer.</p>
+
+<pre><code><span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime, timedelta
+
+<span class="token-keyword">class</span> <span class="token-class">ExactQueryCache</span>:
+    <span class="token-string">"""
+    Cache exact query → answer pairs.
+    Fast but only hits on identical queries.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, redis_client, ttl_hours: <span class="token-builtin">int</span> = <span class="token-number">24</span>):
+        self.redis = redis_client
+        self.ttl = timedelta(hours=ttl_hours)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_cache_key</span>(self, query: <span class="token-builtin">str</span>) -> <span class="token-builtin">str</span>:
+        <span class="token-string">"""Create a consistent cache key from a query."""</span>
+        <span class="token-comment"># Normalize: lowercase, strip whitespace, remove punctuation</span>
+        normalized = query.lower().strip()
+        <span class="token-keyword">return</span> <span class="token-string">f"rag:exact:{hashlib.sha256(normalized.encode()).hexdigest()}"</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, query: <span class="token-builtin">str</span>) -> Dict <span class="token-keyword">or</span> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Check if we have a cached answer for this exact query."""</span>
+        key = self._cache_key(query)
+        cached = self.redis.get(key)
+        
+        <span class="token-keyword">if</span> cached:
+            result = json.loads(cached)
+            result[<span class="token-string">"cache_hit"</span>] = <span class="token-keyword">True</span>
+            <span class="token-keyword">return</span> result
+        
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">set</span>(self, query: <span class="token-builtin">str</span>, result: Dict):
+        <span class="token-string">"""Store a result in cache."""</span>
+        key = self._cache_key(query)
+        result[<span class="token-string">"cached_at"</span>] = datetime.now().isoformat()
+        self.redis.setex(
+            key, 
+            <span class="token-builtin">int</span>(self.ttl.total_seconds()), 
+            json.dumps(result)
+        )
+    
+    <span class="token-keyword">def</span> <span class="token-function">invalidate_for_document</span>(self, doc_id: <span class="token-builtin">str</span>):
+        <span class="token-string">"""
+        When a document is updated, invalidate all cached 
+        answers that cited it.
+        """</span>
+        <span class="token-comment"># Find all cache entries that reference this document</span>
+        affected_keys = self.redis.smembers(<span class="token-string">f"rag:doc_refs:{doc_id}"</span>)
+        <span class="token-keyword">for</span> key <span class="token-keyword">in</span> affected_keys:
+            self.redis.delete(key)</code></pre>
+
+            <!-- ===== SEMANTIC CACHE ===== -->
+            <h2>2. Semantic Cache (The Smart Approach)</h2>
+            <p><strong>Problem with exact cache:</strong> "What's the vacation policy?" and "How many vacation days do we get?" are the same question with different words. Exact cache misses this.</p>
+            <p><strong>Semantic cache:</strong> If a new query is <em>semantically similar enough</em> to a previously answered query, serve the cached answer.</p>
+
+<pre><code><span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+
+<span class="token-keyword">class</span> <span class="token-class">SemanticCache</span>:
+    <span class="token-string">"""
+    Cache that matches semantically similar queries.
+    
+    "What's the vacation policy?" → cached answer
+    "How many days off do employees get?" → SAME cached answer (similar meaning)
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, embedding_model, similarity_threshold: <span class="token-builtin">float</span> = <span class="token-number">0.92</span>):
+        self.embedder = embedding_model
+        self.threshold = similarity_threshold
+        self.cache_entries = []  <span class="token-comment"># List of (embedding, query, result)</span>
+        self.cache_embeddings = <span class="token-keyword">None</span>  <span class="token-comment"># Numpy array for fast similarity</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, query: <span class="token-builtin">str</span>) -> Dict <span class="token-keyword">or</span> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Find a cached answer for a semantically similar query."""</span>
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> self.cache_entries:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        
+        <span class="token-comment"># Embed the incoming query</span>
+        query_embedding = self.embedder.embed(query)
+        
+        <span class="token-comment"># Compare against all cached query embeddings</span>
+        similarities = np.dot(self.cache_embeddings, query_embedding) / (
+            np.linalg.norm(self.cache_embeddings, axis=<span class="token-number">1</span>) * 
+            np.linalg.norm(query_embedding)
+        )
+        
+        <span class="token-comment"># Find the most similar cached query</span>
+        best_idx = np.argmax(similarities)
+        best_similarity = similarities[best_idx]
+        
+        <span class="token-keyword">if</span> best_similarity >= self.threshold:
+            cached_entry = self.cache_entries[best_idx]
+            result = cached_entry[<span class="token-string">"result"</span>].copy()
+            result[<span class="token-string">"cache_hit"</span>] = <span class="token-keyword">True</span>
+            result[<span class="token-string">"cache_similarity"</span>] = <span class="token-builtin">float</span>(best_similarity)
+            result[<span class="token-string">"original_query"</span>] = cached_entry[<span class="token-string">"query"</span>]
+            <span class="token-keyword">return</span> result
+        
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">set</span>(self, query: <span class="token-builtin">str</span>, result: Dict):
+        <span class="token-string">"""Add a new entry to the semantic cache."""</span>
+        embedding = self.embedder.embed(query)
+        
+        self.cache_entries.append({
+            <span class="token-string">"query"</span>: query,
+            <span class="token-string">"embedding"</span>: embedding,
+            <span class="token-string">"result"</span>: result,
+            <span class="token-string">"created_at"</span>: datetime.now()
+        })
+        
+        <span class="token-comment"># Rebuild the embedding matrix</span>
+        self.cache_embeddings = np.array(
+            [e[<span class="token-string">"embedding"</span>] <span class="token-keyword">for</span> e <span class="token-keyword">in</span> self.cache_entries]
+        )</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Semantic Cache Pitfall</div>
+                <p><strong>Threshold too low (0.8):</strong> "What's the vacation policy?" might match "What's the termination policy?" — similar structure, completely different answer! This causes WRONG cached answers to be served.</p>
+                <p><strong>Threshold too high (0.98):</strong> Only nearly identical queries hit cache. Very few cache hits — low value.</p>
+                <p><strong>Sweet spot:</strong> 0.90-0.95 for most domains. Always log cache hits for manual review.</p>
+            </div>
+
+            <!-- ===== MEMORY LAYER ===== -->
+            <h2>3. Conversation Memory</h2>
+            <p><strong>Memory</strong> is different from caching. Cache stores previous Q&A pairs. Memory stores conversation context so follow-up questions work.</p>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">ConversationMemory</span>:
+    <span class="token-string">"""
+    Short-term memory for multi-turn conversations.
+    Allows follow-up questions to reference previous context.
+    
+    User: "What's the vacation policy?"
+    AI: "Employees get 20 days..."
+    User: "What about for remote workers?" ← needs memory of context
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, max_turns: <span class="token-builtin">int</span> = <span class="token-number">10</span>):
+        self.conversations = {}  <span class="token-comment"># session_id → history</span>
+        self.max_turns = max_turns
+    
+    <span class="token-keyword">def</span> <span class="token-function">add_turn</span>(self, session_id: <span class="token-builtin">str</span>, query: <span class="token-builtin">str</span>, answer: <span class="token-builtin">str</span>, chunks_used: List):
+        <span class="token-string">"""Record a conversation turn."""</span>
+        <span class="token-keyword">if</span> session_id <span class="token-keyword">not in</span> self.conversations:
+            self.conversations[session_id] = []
+        
+        self.conversations[session_id].append({
+            <span class="token-string">"query"</span>: query,
+            <span class="token-string">"answer"</span>: answer,
+            <span class="token-string">"chunks"</span>: chunks_used,
+            <span class="token-string">"timestamp"</span>: datetime.now()
+        })
+        
+        <span class="token-comment"># Keep only last N turns to prevent context overflow</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(self.conversations[session_id]) > self.max_turns:
+            self.conversations[session_id] = \
+                self.conversations[session_id][-self.max_turns:]
+    
+    <span class="token-keyword">def</span> <span class="token-function">get_context</span>(self, session_id: <span class="token-builtin">str</span>) -> <span class="token-builtin">str</span>:
+        <span class="token-string">"""Get conversation history formatted for the LLM prompt."""</span>
+        history = self.conversations.get(session_id, [])
+        
+        <span class="token-keyword">if not</span> history:
+            <span class="token-keyword">return</span> <span class="token-string">""</span>
+        
+        formatted = <span class="token-string">"Previous conversation:\n"</span>
+        <span class="token-keyword">for</span> turn <span class="token-keyword">in</span> history[-<span class="token-number">5</span>:]:  <span class="token-comment"># Last 5 turns</span>
+            formatted += <span class="token-string">f"User: {turn['query']}\nAssistant: {turn['answer']}\n\n"</span>
+        
+        <span class="token-keyword">return</span> formatted
+    
+    <span class="token-keyword">def</span> <span class="token-function">rewrite_query</span>(self, session_id: <span class="token-builtin">str</span>, current_query: <span class="token-builtin">str</span>, llm) -> <span class="token-builtin">str</span>:
+        <span class="token-string">"""
+        Rewrite a follow-up query to be self-contained.
+        
+        "What about for remote workers?" 
+        → "What is the vacation policy for remote workers?"
+        """</span>
+        context = self.get_context(session_id)
+        
+        <span class="token-keyword">if not</span> context:
+            <span class="token-keyword">return</span> current_query
+        
+        rewrite_prompt = <span class="token-string">f"""Given this conversation history:
+{context}
+
+The user now asks: "{current_query}"
+
+Rewrite this as a standalone question that doesn't need 
+the conversation history to understand. Only output the 
+rewritten question, nothing else.
+
+Standalone question:"""</span>
+        
+        <span class="token-keyword">return</span> llm.generate(rewrite_prompt).strip()</code></pre>
+
+            <!-- ===== CACHE INVALIDATION ===== -->
+            <h2>4. Cache Invalidation (The Hard Problem)</h2>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">🚨 "There are only two hard things in computer science: cache invalidation and naming things."</div>
+                <p>If a document gets updated but your cache still serves the old answer, users get <strong>stale (wrong) information</strong>. Cache invalidation is critical.</p>
+            </div>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">SmartCacheManager</span>:
+    <span class="token-string">"""
+    Cache manager with intelligent invalidation.
+    Invalidates cached answers when source documents change.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, exact_cache, semantic_cache):
+        self.exact = exact_cache
+        self.semantic = semantic_cache
+        <span class="token-comment"># Track which docs are referenced by which cache entries</span>
+        self.doc_to_cache_map = {}  <span class="token-comment"># doc_id → set of cache keys</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">on_document_updated</span>(self, doc_id: <span class="token-builtin">str</span>):
+        <span class="token-string">"""
+        Called when a document is updated in the index.
+        Invalidates all cached answers that used this document.
+        """</span>
+        affected_keys = self.doc_to_cache_map.get(doc_id, <span class="token-builtin">set</span>())
+        
+        <span class="token-keyword">for</span> cache_key <span class="token-keyword">in</span> affected_keys:
+            self.exact.delete(cache_key)
+            self.semantic.delete(cache_key)
+        
+        <span class="token-comment"># Clear the mapping</span>
+        self.doc_to_cache_map[doc_id] = <span class="token-builtin">set</span>()
+        
+        print(<span class="token-string">f"Invalidated {len(affected_keys)} cache entries for doc {doc_id}"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">on_answer_generated</span>(self, query: <span class="token-builtin">str</span>, result: Dict, source_doc_ids: List[<span class="token-builtin">str</span>]):
+        <span class="token-string">"""Track which documents are used by cached answers."""</span>
+        cache_key = self.exact._cache_key(query)
+        
+        <span class="token-comment"># Map each source doc to this cache entry</span>
+        <span class="token-keyword">for</span> doc_id <span class="token-keyword">in</span> source_doc_ids:
+            <span class="token-keyword">if</span> doc_id <span class="token-keyword">not in</span> self.doc_to_cache_map:
+                self.doc_to_cache_map[doc_id] = <span class="token-builtin">set</span>()
+            self.doc_to_cache_map[doc_id].add(cache_key)
+        
+        <span class="token-comment"># Store in caches</span>
+        self.exact.set(query, result)
+        self.semantic.set(query, result)</code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Documents Scale</div>
+                <ul>
+                    <li><strong>Cache hit rates:</strong> Enterprise RAG typically sees 30-60% cache hit rate. This means 30-60% of queries are answered in &lt;50ms instead of 2-5 seconds.</li>
+                    <li><strong>Cost savings:</strong> Each LLM call costs $0.01-0.10. At 10K queries/day, 50% cache hit saves $50-500/day in LLM costs alone.</li>
+                    <li><strong>Consistency bonus:</strong> Cached answers are identical every time — no variance from LLM non-determinism.</li>
+                    <li><strong>Cache size planning:</strong> With semantic cache at 10K unique queries, ~40MB of embeddings + ~200MB of cached answers = easily fits in Redis.</li>
+                    <li><strong>TTL strategy:</strong> Fast-changing docs (Slack) → 1hr TTL. Stable docs (policies) → 24-72hr TTL.</li>
+                </ul>
+            </div>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>GPTCache</strong> — Open-source semantic cache library for LLM applications</li>
+                    <li><strong>Redis + vector search</strong> — Redis 7+ supports vector similarity for semantic caching</li>
+                    <li><strong>Cloudflare AI Gateway</strong> — Automatic caching layer for LLM API calls</li>
+                    <li><strong>Enterprise pattern:</strong> Multi-tier: L1 (exact, in-memory) → L2 (semantic, Redis) → L3 (full pipeline)</li>
+                    <li><strong>Smart invalidation:</strong> Document change events (webhooks) trigger targeted cache purges</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>Caching avoids repeating expensive retrieval + generation for common queries</li>
+                    <li>Three cache layers: exact (fast, limited), semantic (smart, broader), answer (complete)</li>
+                    <li>Semantic cache uses embedding similarity to match rephrased questions to existing answers</li>
+                    <li>Cache invalidation is critical — stale cache = wrong answers served confidently</li>
+                    <li>Conversation memory enables multi-turn interactions with query rewriting</li>
+                    <li>At enterprise scale: 30-60% cache hit rate, saving seconds of latency and significant cost</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+Query arrives: "What's the vacation policy?"
+
+Step 1: Check exact cache → Miss ❌
+Step 2: Check semantic cache → Hit! ✅
+  (Similar to previously answered "How many days off do we get?")
+  Similarity: 0.94 > threshold 0.92
+Step 3: Return cached answer (50ms total)
+
+vs. Without cache:
+  Embed query (100ms) → Search (200ms) → Rerank (200ms) → 
+  Generate (2000ms) → Verify (200ms) = 2700ms total
+
+Speedup: 54x faster with cache hit
+Cost: $0.00 vs $0.05 per query
+                </div>
+                <p><strong>Think of it as:</strong> A receptionist who remembers frequent visitors. "Oh, you're here for the vacation form? I already have it ready — saved you a trip to the filing cabinet."</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>No TTL (expiration):</strong> Cache entries without expiration serve stale data forever. Always set TTLs.</li>
+                    <li><strong>No invalidation:</strong> When documents update, old cached answers become WRONG. Connect document updates to cache purges.</li>
+                    <li><strong>Semantic threshold too low:</strong> Serving the answer for "vacation policy" when the user asks "termination policy" — similar embedding, completely wrong answer.</li>
+                    <li><strong>Caching errors:</strong> If a query fails or triggers fallback, don't cache that failure. Only cache confident, verified answers.</li>
+                    <li><strong>No cache metrics:</strong> Track hit rate, miss rate, and staleness. A cache nobody hits is wasted infrastructure.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Two-Layer Cache</h3>
+                <ol>
+                    <li>Implement an exact query cache using a Python dictionary (simulating Redis)</li>
+                    <li>Implement a semantic cache using cosine similarity on embeddings</li>
+                    <li>Create 10 cached Q&A pairs</li>
+                    <li>Test with: 3 exact matches, 3 semantic matches, 4 cache misses</li>
+                    <li>Implement TTL-based expiration (entries expire after N seconds)</li>
+                    <li>Implement document-change invalidation: when doc X updates, purge related cache entries</li>
+                    <li>Measure and report: hit rate, avg latency saved, memory used</li>
+                    <li><strong>Bonus:</strong> Implement query rewriting for multi-turn conversations</li>
+                </ol>
+                <p><strong>Success criteria:</strong> Exact matches hit instantly, semantic matches work for rephrased queries (threshold 0.92), and cache invalidation correctly purges entries when a source document changes.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="08-continuous-evals.html" class="prev">Continuous Evals</a>
+                <a href="10-observability.html" class="next">Observability</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

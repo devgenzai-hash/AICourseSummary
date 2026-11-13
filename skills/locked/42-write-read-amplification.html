@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write/Read Amplification - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Database Engineering &rarr; Write/Read Amplification</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Advanced</span>
+                <span class="tag">Database</span>
+                <span class="tag">Concept</span>
+            </div>
+            <h1>Write/Read Amplification</h1>
+            <p class="hero-subtitle">Understanding the hidden cost multipliers in storage engines &mdash; why writing 1 byte of logical data can trigger 10&ndash;100 bytes of physical I/O, and how to tune the trade-off between read speed, write speed, and space usage.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Imagine you&rsquo;re <strong>moving into a new house</strong> with an extremely organized closet system. To store <strong>1 new box</strong>, you must first rearrange 10 existing boxes so everything stays perfectly sorted &mdash; that&rsquo;s <strong>write amplification</strong>. Your closet is easy to search (grab any item instantly), but every new addition costs disproportionate effort. Alternatively, you could just toss boxes into the garage unsorted (fast writes), but finding something later means digging through 10 piles &mdash; that&rsquo;s <strong>read amplification</strong>. You can&rsquo;t avoid both penalties simultaneously; you must choose which cost to pay.</p>
+        </div>
+
+        <h2>What is Write Amplification?</h2>
+        <p>Write Amplification Factor (WAF) is the ratio of <strong>actual physical bytes written</strong> to the <strong>logical bytes the application intended to write</strong>:</p>
+        <ul>
+            <li><strong>WAF = Physical Writes / Logical Writes</strong></li>
+            <li>WAF of 1.0 means no amplification &mdash; ideal but rarely achievable</li>
+            <li>LSM-Trees typically have WAF of 10&ndash;30x due to compaction</li>
+            <li>B-Trees have WAF of 2&ndash;5x due to page splits and WAL logging</li>
+            <li>SSDs add another layer &mdash; erasing a 256KB block to rewrite 4KB is 64x amplification</li>
+        </ul>
+
+        <h2>Read Amplification</h2>
+        <p>Read amplification measures how many <strong>physical reads</strong> are needed to satisfy one logical read:</p>
+        <ul>
+            <li>B-Tree: 1 read per level (typically 3&ndash;4 for billions of rows)</li>
+            <li>LSM-Tree: must check each level &mdash; MemTable + L0 + L1 + &hellip; + Ln</li>
+            <li>Bloom filters reduce LSM read amplification by skipping levels that don&rsquo;t contain the key</li>
+            <li>Worst case for LSM without bloom filters: check all levels (10+ reads per lookup)</li>
+        </ul>
+
+        <h2>Space Amplification</h2>
+        <p>Space amplification is the ratio of <strong>actual disk space used</strong> to the <strong>logical data size</strong>:</p>
+        <ul>
+            <li>B-Tree: pages are ~50&ndash;70% full on average (due to splits and fragmentation)</li>
+            <li>LSM-Tree: duplicate keys exist across levels until compaction merges them</li>
+            <li>Space amp is worst during compaction (temporarily 2x the data)</li>
+        </ul>
+
+        <h2>The RUM Conjecture</h2>
+        <p>The RUM Conjecture states that an access method can optimize for at most <strong>two</strong> of three costs &mdash; you always pay a penalty on the third:</p>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Optimized For</th>
+                        <th>Penalty</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Read + Update</strong></td>
+                        <td>High Memory/Space</td>
+                        <td>B-Tree with many indexes (fast reads, fast updates, but large footprint)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read + Memory</strong></td>
+                        <td>Slow Updates</td>
+                        <td>Sorted arrays (compact, fast binary search, but O(n) inserts)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Update + Memory</strong></td>
+                        <td>Slow Reads</td>
+                        <td>LSM-Tree (fast writes, compact after compaction, but multi-level reads)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>LSM-Tree Compaction &amp; Write Amplification</h2>
+        <p>LSM-Trees buffer writes in memory (MemTable), then flush sorted runs to disk. Compaction merges overlapping runs to maintain read performance &mdash; but each merge <strong>rewrites data that hasn&rsquo;t logically changed</strong>:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Leveled Compaction (LCS)</th>
+                        <th>Size-Tiered (STCS)</th>
+                        <th>Universal/FIFO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Write Amplification</strong></td>
+                        <td>High (10&ndash;30x)</td>
+                        <td>Low (2&ndash;5x)</td>
+                        <td>Lowest (1&ndash;2x)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read Amplification</strong></td>
+                        <td>Low (1 file per level)</td>
+                        <td>High (multiple files per level)</td>
+                        <td>Highest</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Space Amplification</strong></td>
+                        <td>Low (~10% overhead)</td>
+                        <td>High (up to 2x during compaction)</td>
+                        <td>Low</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Best For</strong></td>
+                        <td>Read-heavy, limited disk</td>
+                        <td>Write-heavy workloads</td>
+                        <td>Time-series, TTL data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Used By</strong></td>
+                        <td>RocksDB (default), LevelDB</td>
+                        <td>Cassandra (default)</td>
+                        <td>RocksDB FIFO mode</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>B-Tree Page Splits</h2>
+        <p>B-Tree write amplification comes from <strong>page splits</strong> and the Write-Ahead Log (WAL):</p>
+        <ul>
+            <li>Inserting into a full page requires splitting it into two half-full pages</li>
+            <li>The parent node must be updated with the new child pointer</li>
+            <li>WAL must log the entire page for crash recovery (8KB page for a 100-byte insert)</li>
+            <li>Random insertions cause more splits than sequential insertions</li>
+        </ul>
+
+        <h2>SSD Write Amplification</h2>
+        <p>SSDs add a hardware layer of write amplification because flash memory cannot overwrite in place:</p>
+        <ul>
+            <li>Flash erases in large blocks (128&ndash;512KB) but writes in small pages (4&ndash;16KB)</li>
+            <li>Modifying 4KB requires: read entire block &rarr; erase block &rarr; rewrite block</li>
+            <li>TRIM command tells SSD which blocks are no longer used, reducing garbage collection overhead</li>
+            <li>Wear leveling distributes writes evenly to prevent premature cell death</li>
+            <li>Total WAF = Software WAF &times; Hardware WAF (compounds multiplicatively)</li>
+        </ul>
+
+        <h2>LSM-Tree Compaction Simulation</h2>
+        <pre><code><span class="token-keyword">import</span> math
+
+<span class="token-keyword">class</span> <span class="token-class">LSMTreeSimulator</span>:
+    <span class="token-string">"""Simulates LSM-Tree compaction to demonstrate write amplification.
+
+    Models leveled compaction where each level is T times larger
+    than the previous. Data flows L0 → L1 → L2 → ... → Ln.
+    Each compaction rewrites data, amplifying total physical writes.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, size_ratio: int = <span class="token-number">10</span>, memtable_size_mb: int = <span class="token-number">64</span>):
+        self.size_ratio = size_ratio      <span class="token-comment"># T: level size multiplier</span>
+        self.memtable_size = memtable_size_mb
+        self.levels = []                  <span class="token-comment"># (current_size_mb, capacity_mb)</span>
+        self.logical_writes_mb = <span class="token-number">0</span>
+        self.physical_writes_mb = <span class="token-number">0</span>
+        self.compaction_count = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_level_capacity</span>(self, level: int) -> int:
+        <span class="token-string">"""Level i capacity = memtable_size * T^(i+1)."""</span>
+        <span class="token-keyword">return</span> self.memtable_size * (self.size_ratio ** (level + <span class="token-number">1</span>))
+
+    <span class="token-keyword">def</span> <span class="token-function">flush_memtable</span>(self):
+        <span class="token-string">"""Flush memtable to L0, triggering cascading compactions."""</span>
+        flush_size = self.memtable_size
+        self.logical_writes_mb += flush_size
+        self.physical_writes_mb += flush_size  <span class="token-comment"># Initial flush write</span>
+
+        <span class="token-comment"># Ensure L0 exists</span>
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> self.levels:
+            cap = self._level_capacity(<span class="token-number">0</span>)
+            self.levels.append([flush_size, cap])
+            <span class="token-keyword">return</span>
+
+        <span class="token-comment"># Add to L0</span>
+        self.levels[<span class="token-number">0</span>][<span class="token-number">0</span>] += flush_size
+
+        <span class="token-comment"># Cascade compactions if level overflows</span>
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(len(self.levels)):
+            <span class="token-keyword">if</span> self.levels[i][<span class="token-number">0</span>] > self.levels[i][<span class="token-number">1</span>]:
+                overflow = self.levels[i][<span class="token-number">0</span>] - self.levels[i][<span class="token-number">1</span>]
+                self.levels[i][<span class="token-number">0</span>] = self.levels[i][<span class="token-number">1</span>]
+
+                <span class="token-comment"># Merge into next level (rewrite both)</span>
+                merge_cost = self.levels[i][<span class="token-number">1</span>] + overflow
+                self.physical_writes_mb += merge_cost
+                self.compaction_count += <span class="token-number">1</span>
+
+                <span class="token-keyword">if</span> i + <span class="token-number">1</span> >= len(self.levels):
+                    cap = self._level_capacity(i + <span class="token-number">1</span>)
+                    self.levels.append([overflow, cap])
+                <span class="token-keyword">else</span>:
+                    self.levels[i + <span class="token-number">1</span>][<span class="token-number">0</span>] += overflow
+
+    <span class="token-keyword">def</span> <span class="token-function">get_write_amplification</span>(self) -> float:
+        <span class="token-keyword">if</span> self.logical_writes_mb == <span class="token-number">0</span>:
+            <span class="token-keyword">return</span> <span class="token-number">0</span>
+        <span class="token-keyword">return</span> self.physical_writes_mb / self.logical_writes_mb
+
+    <span class="token-keyword">def</span> <span class="token-function">simulate</span>(self, num_flushes: int):
+        <span class="token-string">"""Run simulation for N memtable flushes."""</span>
+        <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(num_flushes):
+            self.flush_memtable()
+
+        print(f<span class="token-string">"=== LSM-Tree Write Amplification ==="</span>)
+        print(f<span class="token-string">"Size ratio (T): {self.size_ratio}"</span>)
+        print(f<span class="token-string">"Memtable size: {self.memtable_size} MB"</span>)
+        print(f<span class="token-string">"Flushes: {num_flushes}"</span>)
+        print(f<span class="token-string">"Logical writes: {self.logical_writes_mb:,} MB"</span>)
+        print(f<span class="token-string">"Physical writes: {self.physical_writes_mb:,} MB"</span>)
+        print(f<span class="token-string">"Write Amplification Factor: {self.get_write_amplification():.1f}x"</span>)
+        print(f<span class="token-string">"Compactions triggered: {self.compaction_count}"</span>)
+        print(f<span class="token-string">"Number of levels: {len(self.levels)}"</span>)
+        <span class="token-keyword">for</span> i, (size, cap) <span class="token-keyword">in</span> enumerate(self.levels):
+            print(f<span class="token-string">"  L{i}: {size:,} / {cap:,} MB"</span>)
+
+
+<span class="token-comment"># --- B-Tree Page Split Simulation ---</span>
+
+<span class="token-keyword">class</span> <span class="token-class">BTreePageSplitSim</span>:
+    <span class="token-string">"""Simulates B-Tree page splits to measure write amplification.
+
+    Each page holds a fixed number of keys. Inserting into a full
+    page triggers a split: one page becomes two, parent updated.
+    WAL logs entire pages for crash safety.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, page_size_kb: int = <span class="token-number">8</span>, keys_per_page: int = <span class="token-number">200</span>):
+        self.page_size_kb = page_size_kb
+        self.keys_per_page = keys_per_page
+        self.pages = [<span class="token-number">0</span>]  <span class="token-comment"># keys in each page</span>
+        self.total_splits = <span class="token-number">0</span>
+        self.logical_writes_kb = <span class="token-number">0</span>
+        self.physical_writes_kb = <span class="token-number">0</span>
+        self.key_size_bytes = <span class="token-number">40</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">insert</span>(self, n_keys: int):
+        <span class="token-string">"""Insert n keys, tracking page splits and WAL writes."""</span>
+        <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(n_keys):
+            self.logical_writes_kb += self.key_size_bytes / <span class="token-number">1024</span>
+
+            <span class="token-comment"># Find page with space (simplified: random page)</span>
+            <span class="token-keyword">import</span> random
+            page_idx = random.randint(<span class="token-number">0</span>, len(self.pages) - <span class="token-number">1</span>)
+
+            <span class="token-keyword">if</span> self.pages[page_idx] >= self.keys_per_page:
+                <span class="token-comment"># Page split: write 2 new pages + update parent</span>
+                half = self.pages[page_idx] // <span class="token-number">2</span>
+                self.pages[page_idx] = half
+                self.pages.append(half + <span class="token-number">1</span>)
+                self.total_splits += <span class="token-number">1</span>
+                <span class="token-comment"># Physical: 2 pages written + parent page + WAL</span>
+                self.physical_writes_kb += self.page_size_kb * <span class="token-number">3</span>
+            <span class="token-keyword">else</span>:
+                self.pages[page_idx] += <span class="token-number">1</span>
+                <span class="token-comment"># Physical: dirty page + WAL entry</span>
+                self.physical_writes_kb += self.page_size_kb * <span class="token-number">2</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">report</span>(self):
+        waf = self.physical_writes_kb / max(self.logical_writes_kb, <span class="token-number">1</span>)
+        print(f<span class="token-string">"\n=== B-Tree Write Amplification ==="</span>)
+        print(f<span class="token-string">"Page size: {self.page_size_kb} KB"</span>)
+        print(f<span class="token-string">"Total pages: {len(self.pages)}"</span>)
+        print(f<span class="token-string">"Page splits: {self.total_splits}"</span>)
+        print(f<span class="token-string">"Logical writes: {self.logical_writes_kb:.0f} KB"</span>)
+        print(f<span class="token-string">"Physical writes: {self.physical_writes_kb:,.0f} KB"</span>)
+        print(f<span class="token-string">"Write Amplification Factor: {waf:.1f}x"</span>)
+
+
+<span class="token-keyword">if</span> __name__ == <span class="token-string">"__main__"</span>:
+    <span class="token-comment"># LSM-Tree simulation</span>
+    lsm = LSMTreeSimulator(size_ratio=<span class="token-number">10</span>, memtable_size_mb=<span class="token-number">64</span>)
+    lsm.simulate(num_flushes=<span class="token-number">100</span>)
+
+    <span class="token-comment"># B-Tree simulation</span>
+    btree = BTreePageSplitSim()
+    btree.insert(n_keys=<span class="token-number">50000</span>)
+    btree.report()</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>RocksDB Tuning:</strong> Level compaction (default) gives WAF of ~10&times;T where T is the size ratio. Universal compaction reduces WAF to ~2x but increases space amplification. Facebook tunes RocksDB with <code>level_compaction_dynamic_level_bytes=true</code> and carefully sets <code>max_bytes_for_level_base</code> to minimize amplification for their SSD fleet.</p>
+            <p><strong>Cassandra Compaction:</strong> STCS (Size-Tiered) is write-optimized with low WAF but high space amp (needs 50% free disk for compaction). LCS (Leveled) trades higher WAF for predictable read latency and lower space amp. TWCS (Time-Window) is ideal for time-series &mdash; no rewrite of old windows.</p>
+            <p><strong>SSD Wear:</strong> Enterprise SSDs report WAF via SMART attributes. A database WAF of 20x on an SSD with hardware WAF of 3x means effective WAF of 60x. This directly impacts SSD lifespan (rated in total bytes written / TBW). Overprovisioning (leaving 10&ndash;20% unpartitioned) helps the SSD controller reduce garbage collection amplification.</p>
+            <p><strong>LevelDB:</strong> Original LSM implementation by Google. Fixed leveled compaction with size ratio 10. Each level is 10x the previous. Theoretical WAF = T &times; (num_levels - 1). For 5 levels with T=10, worst-case WAF = 40x. RocksDB improved on this with concurrent compaction and sub-compaction.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Write amplification (WAF) = physical writes / logical writes &mdash; the hidden tax on every write</li>
+                <li>LSM-Trees trade high write amplification (compaction) for fast sequential write throughput</li>
+                <li>B-Trees have moderate WAF from page splits and WAL, but lower read amplification</li>
+                <li>The RUM Conjecture: optimize Read, Update, or Memory &mdash; you always sacrifice one</li>
+                <li>SSD WAF compounds with software WAF &mdash; total amplification can exceed 50x</li>
+                <li>Choosing compaction strategy (leveled vs size-tiered) is the most impactful tuning decision</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of amplification as a tax. Every storage engine imposes taxes on reads, writes, and space. You choose which taxes to pay. LSM-Trees pay heavy write taxes for cheap read/space. B-Trees balance the load. The RUM conjecture guarantees you can never avoid all taxes simultaneously.</p>
+            <div class="model-visual">
+                <pre>
+  THE RUM TRIANGLE (pick any 2 to optimize):
+
+            Read-Optimal
+               /\
+              /  \
+             /    \
+            / B-Tree\
+           /  (R+U)  \
+          /____________\
+  Update-Optimal --- Memory-Optimal
+    (LSM-Tree)       (Sorted Array)
+      (U+M)             (R+M)
+
+  LSM-TREE WRITE AMPLIFICATION:
+
+  App writes 1 MB logically:
+  ┌─────┐   flush    ┌─────┐  compact   ┌─────┐  compact   ┌──────┐
+  │ Mem │ ────────→  │ L0  │ ────────→  │ L1  │ ────────→  │  L2  │
+  │Table│   1 MB     │64 MB│  +64 MB    │640MB│  +640 MB   │6.4 GB│
+  └─────┘            └─────┘            └─────┘            └──────┘
+                      write              write               write
+
+  Total physical writes for 1 MB logical:
+  1 + 1 + 10 + 10 = ~22 MB  →  WAF ≈ 22x
+
+  B-TREE PAGE SPLIT:
+  ┌────────────────────┐    INSERT key=50
+  │ [10|20|30|40|60|70]│    Page FULL!
+  └────────────────────┘
+           │ SPLIT
+           ▼
+  ┌──────────┐  ┌──────────┐
+  │[10|20|30]│  │[50|60|70]│  + push 40 to parent
+  └──────────┘  └──────────┘
+  Wrote: 2 pages + parent + WAL = 4× page_size
+  For a 100-byte key → 32KB physical = WAF ~320x per split
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Ignoring compaction during capacity planning:</strong> Teams provision disk for logical data size but forget that compaction temporarily needs 2x space (STCS) or 10% overhead (LCS). Running out of disk during compaction causes write stalls or data loss. Always reserve 50% free space for STCS or 20% for LCS.</li>
+                <li><strong>Using leveled compaction for write-heavy workloads:</strong> Leveled compaction rewrites data 10&ndash;30x. For ingestion pipelines (IoT, logs), this kills throughput and wears SSDs prematurely. Switch to size-tiered or FIFO compaction for append-heavy patterns where read latency is less critical.</li>
+                <li><strong>Not accounting for SSD WAF in lifetime calculations:</strong> If your database has WAF=20 and the SSD has WAF=3, you&rsquo;re writing 60x the logical data. A 1TB SSD rated for 1000 TBW will last only 1000/(daily_write_GB &times; 60) days. Monitor SMART attributes and adjust compaction aggressiveness accordingly.</li>
+                <li><strong>Benchmarking only throughput, not amplification:</strong> A system may show high write throughput initially, but compaction debt accumulates. When compaction catches up, latency spikes and throughput crashes. Always measure sustained throughput over hours, not burst performance over minutes.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Measure RocksDB WAF:</strong> Use the LSMTreeSimulator with different size ratios (T=4, T=10, T=20). Plot WAF vs size ratio. Verify that theoretical WAF &asymp; T &times; (num_levels - 1) and identify the optimal T for a workload writing 100 GB/day on a 500 TBW SSD.</li>
+                <li><strong>Compare compaction strategies:</strong> Extend the simulator to model size-tiered compaction (merge files of similar size). Compare WAF, read amp (files to check per read), and space amp between leveled and size-tiered for 1000 flushes.</li>
+                <li><strong>SSD lifetime calculator:</strong> Build a tool that takes: logical write rate (GB/day), database WAF, SSD WAF, and SSD TBW rating. Calculate expected SSD lifespan in years. Add overprovisioning as a parameter that reduces SSD WAF by 20%.</li>
+                <li><strong>B-Tree split analysis:</strong> Insert 1M keys in sequential order vs random order into the BTreePageSplitSim. Compare total splits and WAF. Explain why sequential inserts have lower WAF (hint: only the rightmost page splits).</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="41-indexing-internals.html" class="prev">&larr; Indexing Internals</a>
+            <a href="43-composite-index.html" class="next">Composite Index &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

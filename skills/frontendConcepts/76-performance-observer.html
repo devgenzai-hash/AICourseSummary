@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PerformanceObserver API - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li class="active"><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (INP)</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> PerformanceObserver API
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>PerformanceObserver API</h1>
+                <p class="subtitle">The unified browser API for non-intrusively subscribing to performance entries — from paint timings to long tasks to resource loads — without polling the performance timeline.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-performance">Performance</span>
+                    <span class="tag tag-api">Web API</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📡 Analogy: Event-Driven Monitoring vs Polling</div>
+                <p>Before PerformanceObserver, measuring performance was like checking your mailbox every 5 minutes. PerformanceObserver is like getting a push notification the moment mail arrives — no wasted trips, no missed deliveries, and you can filter to only get notifications about packages (not junk mail).</p>
+            </div>
+
+            <h2>The Problem: Why Not Just Use performance.getEntries()?</h2>
+<pre><code><span class="token-comment">// OLD WAY: Polling — wasteful, misses entries, races with buffer limits</span>
+setInterval(() =&gt; {
+    <span class="token-keyword">const</span> entries = performance.getEntriesByType(<span class="token-string">'resource'</span>);
+    <span class="token-comment">// Problem 1: Returns ALL entries ever (growing array)</span>
+    <span class="token-comment">// Problem 2: Buffer has a limit (150 resources default) — overflow = lost data</span>
+    <span class="token-comment">// Problem 3: No way to know which entries are new since last check</span>
+    <span class="token-comment">// Problem 4: Polling itself costs CPU time</span>
+    processNewEntries(entries);
+}, 1000);
+
+<span class="token-comment">// NEW WAY: PerformanceObserver — push-based, efficient, no overflow risk</span>
+<span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> PerformanceObserver((list, obs) =&gt; {
+    <span class="token-comment">// Called with ONLY new entries since last callback</span>
+    <span class="token-comment">// No duplicates, no polling, fires asynchronously in idle time</span>
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+        processEntry(entry);
+    }
+});
+observer.observe({ type: <span class="token-string">'resource'</span>, buffered: <span class="token-keyword">true</span> });
+</code></pre>
+
+            <h2>How It Works Internally</h2>
+
+            <h3>The Performance Timeline Architecture</h3>
+<pre><code><span class="token-comment">// The browser maintains a "Performance Timeline" — a stream of entries</span>
+<span class="token-comment">// Each entry has: name, entryType, startTime, duration</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// ┌─────────────────────────────────────────────────────────┐</span>
+<span class="token-comment">// │           Browser Performance Timeline                   │</span>
+<span class="token-comment">// │                                                         │</span>
+<span class="token-comment">// │  Entry Types:                                           │</span>
+<span class="token-comment">// │  ┌──────────┐ ┌────────┐ ┌──────────┐ ┌─────────────┐  │</span>
+<span class="token-comment">// │  │navigation│ │resource│ │  paint   │ │  longtask   │  │</span>
+<span class="token-comment">// │  └──────────┘ └────────┘ └──────────┘ └─────────────┘  │</span>
+<span class="token-comment">// │  ┌──────────┐ ┌────────┐ ┌──────────┐ ┌─────────────┐  │</span>
+<span class="token-comment">// │  │  mark    │ │measure │ │  event   │ │layout-shift │  │</span>
+<span class="token-comment">// │  └──────────┘ └────────┘ └──────────┘ └─────────────┘  │</span>
+<span class="token-comment">// │  ┌──────────────────────┐ ┌──────────────────────────┐  │</span>
+<span class="token-comment">// │  │largest-contentful-...│ │first-input              │  │</span>
+<span class="token-comment">// │  └──────────────────────┘ └──────────────────────────┘  │</span>
+<span class="token-comment">// │                                                         │</span>
+<span class="token-comment">// │  Observers subscribe to specific types                  │</span>
+<span class="token-comment">// │  Entries are DISPATCHED to matching observers            │</span>
+<span class="token-comment">// └─────────────────────────────────────────────────────────┘</span>
+</code></pre>
+
+            <h3>Observer Lifecycle and Buffered Mode</h3>
+<pre><code><span class="token-comment">// The 'buffered' option is CRITICAL for late-loading analytics scripts</span>
+
+<span class="token-comment">// Scenario: Your analytics script loads 3 seconds after page start</span>
+<span class="token-comment">// Without buffered: you miss LCP, FCP, navigation timing — all fired earlier</span>
+<span class="token-comment">// With buffered: observer immediately receives ALL past entries of that type</span>
+
+<span class="token-keyword">const</span> lcpObserver = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+    <span class="token-keyword">const</span> entries = list.getEntries();
+    <span class="token-comment">// With buffered:true, first callback includes entries from BEFORE observer was created</span>
+    <span class="token-keyword">const</span> lastEntry = entries[entries.length - 1];
+    console.log(<span class="token-string">`LCP: ${lastEntry.startTime}ms`</span>, lastEntry.element);
+});
+
+<span class="token-comment">// buffered:true = "give me past entries too" (replay from buffer)</span>
+lcpObserver.observe({ type: <span class="token-string">'largest-contentful-paint'</span>, buffered: <span class="token-keyword">true</span> });
+
+<span class="token-comment">// IMPORTANT: buffered only works with single-type observe()</span>
+<span class="token-comment">// This will NOT buffer:</span>
+<span class="token-comment">// observer.observe({ entryTypes: ['resource', 'longtask'] })</span>
+<span class="token-comment">// Use separate observers for each type when you need buffering</span>
+</code></pre>
+
+            <h2>Complete Real-World Implementation: Web Vitals Collector</h2>
+<pre><code><span class="token-comment">// Production-grade metrics collection (similar to web-vitals library)</span>
+
+<span class="token-keyword">class</span> <span class="token-function">WebVitalsCollector</span> {
+    #metrics = {};
+    #observers = [];
+
+    constructor() {
+        this.#observeLCP();
+        this.#observeFID();
+        this.#observeCLS();
+        this.#observeLongTasks();
+        this.#observeResources();
+        
+        <span class="token-comment">// Report metrics when page is being unloaded</span>
+        <span class="token-comment">// visibilitychange is more reliable than beforeunload on mobile</span>
+        document.addEventListener(<span class="token-string">'visibilitychange'</span>, () =&gt; {
+            <span class="token-keyword">if</span> (document.visibilityState === <span class="token-string">'hidden'</span>) {
+                this.#flush();
+            }
+        });
+    }
+
+    #observeLCP() {
+        <span class="token-keyword">const</span> obs = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+            <span class="token-keyword">const</span> entries = list.getEntries();
+            <span class="token-comment">// LCP can fire multiple times — only the LAST one before user input matters</span>
+            <span class="token-keyword">const</span> last = entries[entries.length - 1];
+            this.#metrics.lcp = {
+                value: last.startTime,
+                element: last.element?.tagName,
+                url: last.url, <span class="token-comment">// For images</span>
+                size: last.size
+            };
+        });
+        obs.observe({ type: <span class="token-string">'largest-contentful-paint'</span>, buffered: <span class="token-keyword">true</span> });
+        this.#observers.push(obs);
+    }
+
+    #observeFID() {
+        <span class="token-keyword">const</span> obs = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+            <span class="token-keyword">const</span> entry = list.getEntries()[0]; <span class="token-comment">// Only first input matters</span>
+            this.#metrics.fid = {
+                value: entry.processingStart - entry.startTime, <span class="token-comment">// Input delay</span>
+                name: entry.name <span class="token-comment">// 'pointerdown', 'click', etc.</span>
+            };
+        });
+        obs.observe({ type: <span class="token-string">'first-input'</span>, buffered: <span class="token-keyword">true</span> });
+        this.#observers.push(obs);
+    }
+
+    #observeCLS() {
+        <span class="token-keyword">let</span> clsValue = 0;
+        <span class="token-keyword">let</span> sessionValue = 0;
+        <span class="token-keyword">let</span> sessionEntries = [];
+
+        <span class="token-keyword">const</span> obs = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+            <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+                <span class="token-comment">// Only count shifts without recent user input</span>
+                <span class="token-keyword">if</span> (!entry.hadRecentInput) {
+                    <span class="token-keyword">const</span> firstEntry = sessionEntries[0];
+                    <span class="token-keyword">const</span> lastEntry = sessionEntries[sessionEntries.length - 1];
+
+                    <span class="token-comment">// Session window: max 5s gap, max 1s duration</span>
+                    <span class="token-keyword">if</span> (sessionValue &amp;&amp;
+                        entry.startTime - lastEntry.startTime &lt; 1000 &amp;&amp;
+                        entry.startTime - firstEntry.startTime &lt; 5000) {
+                        sessionValue += entry.value;
+                        sessionEntries.push(entry);
+                    } <span class="token-keyword">else</span> {
+                        sessionValue = entry.value;
+                        sessionEntries = [entry];
+                    }
+
+                    <span class="token-comment">// CLS = largest session window value</span>
+                    <span class="token-keyword">if</span> (sessionValue &gt; clsValue) {
+                        clsValue = sessionValue;
+                        this.#metrics.cls = { value: clsValue };
+                    }
+                }
+            }
+        });
+        obs.observe({ type: <span class="token-string">'layout-shift'</span>, buffered: <span class="token-keyword">true</span> });
+        this.#observers.push(obs);
+    }
+
+    #observeLongTasks() {
+        <span class="token-keyword">const</span> longTasks = [];
+        <span class="token-keyword">const</span> obs = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+            <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+                longTasks.push({
+                    duration: entry.duration,
+                    startTime: entry.startTime,
+                    <span class="token-comment">// Attribution tells you WHAT caused the long task</span>
+                    attribution: entry.attribution?.[0]?.containerName
+                });
+            }
+            this.#metrics.longTasks = longTasks;
+        });
+        obs.observe({ type: <span class="token-string">'longtask'</span>, buffered: <span class="token-keyword">true</span> });
+        this.#observers.push(obs);
+    }
+
+    #observeResources() {
+        <span class="token-keyword">const</span> obs = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+            <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+                <span class="token-comment">// Track slow resources (&gt;1s) for debugging</span>
+                <span class="token-keyword">if</span> (entry.duration &gt; 1000) {
+                    console.warn(<span class="token-string">`Slow resource: ${entry.name} (${entry.duration}ms)`</span>);
+                }
+            }
+        });
+        obs.observe({ type: <span class="token-string">'resource'</span>, buffered: <span class="token-keyword">true</span> });
+        this.#observers.push(obs);
+    }
+
+    #flush() {
+        <span class="token-comment">// Disconnect all observers to finalize metrics</span>
+        this.#observers.forEach(obs =&gt; obs.disconnect());
+        
+        <span class="token-comment">// Use sendBeacon for reliable delivery during page unload</span>
+        <span class="token-keyword">const</span> payload = JSON.stringify(this.#metrics);
+        navigator.sendBeacon(<span class="token-string">'/api/vitals'</span>, payload);
+    }
+}
+
+<span class="token-comment">// Initialize early — ideally in &lt;head&gt; before any content loads</span>
+<span class="token-keyword">const</span> vitals = <span class="token-keyword">new</span> WebVitalsCollector();
+</code></pre>
+
+            <h2>Supported Entry Types Reference</h2>
+            <table>
+                <tr><th>Entry Type</th><th>What It Measures</th><th>Buffered?</th><th>Key Properties</th></tr>
+                <tr><td><code>navigation</code></td><td>Page load timing</td><td>Yes</td><td>domInteractive, loadEventEnd</td></tr>
+                <tr><td><code>resource</code></td><td>Individual resource loads</td><td>Yes (150 limit)</td><td>transferSize, responseEnd</td></tr>
+                <tr><td><code>paint</code></td><td>FP, FCP</td><td>Yes</td><td>startTime</td></tr>
+                <tr><td><code>largest-contentful-paint</code></td><td>LCP element</td><td>Yes</td><td>element, size, url</td></tr>
+                <tr><td><code>first-input</code></td><td>FID</td><td>Yes</td><td>processingStart, startTime</td></tr>
+                <tr><td><code>layout-shift</code></td><td>CLS</td><td>Yes</td><td>value, hadRecentInput, sources</td></tr>
+                <tr><td><code>longtask</code></td><td>Tasks &gt;50ms</td><td>Yes</td><td>duration, attribution</td></tr>
+                <tr><td><code>event</code></td><td>INP (slow interactions)</td><td>Yes</td><td>processingStart/End, duration</td></tr>
+                <tr><td><code>mark</code></td><td>User marks</td><td>Yes</td><td>Custom via performance.mark()</td></tr>
+                <tr><td><code>measure</code></td><td>User measures</td><td>Yes</td><td>Custom via performance.measure()</td></tr>
+            </table>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Google's web-vitals library</strong> — The official CWV measurement library is built entirely on PerformanceObserver. Powers Chrome UX Report data.</li>
+                <li><strong>Vercel Analytics / Next.js</strong> — Uses PerformanceObserver to collect LCP, FID, CLS and send them via the Reporting API to Vercel's dashboard.</li>
+                <li><strong>Sentry Performance Monitoring</strong> — Creates PerformanceObservers at SDK init to capture transaction spans from resource and navigation entries.</li>
+                <li><strong>Cloudflare Web Analytics</strong> — Lightweight script that relies solely on PerformanceObserver (no polling) to keep its bundle under 1KB.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Forgetting <code>buffered: true</code></strong> — Your analytics loads late. Without buffering, you miss all early entries (LCP, FCP, navigation).</li>
+                <li><strong>Using <code>entryTypes</code> (plural) when you need buffering</strong> — Buffering only works with the single-type <code>{ type: '...' }</code> syntax.</li>
+                <li><strong>Not disconnecting observers</strong> — Resource observers on long-lived SPAs accumulate thousands of entries. Disconnect or limit scope.</li>
+                <li><strong>Assuming synchronous delivery</strong> — Callbacks are queued as microtasks. Don't expect entries immediately after the event occurs.</li>
+                <li><strong>Ignoring <code>supportedEntryTypes</code></strong> — Not all browsers support all types. Check <code>PerformanceObserver.supportedEntryTypes</code> before observing.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand PerformanceObserver When...</h3>
+                <p>You can set up a complete observability pipeline for a production site using only PerformanceObserver — collecting all Core Web Vitals, detecting regressions, and sending data reliably during page teardown via <code>sendBeacon</code>.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a real-time performance dashboard overlay that shows LCP, CLS, and long task count updating live as the user interacts with your page. Use only PerformanceObserver (no polling).</p>
+                <h3>🔗 Connect It</h3>
+                <p>PerformanceObserver connects to: <strong>Long Tasks API</strong> (one of the entry types you observe), <strong>All Core Web Vitals</strong> (LCP, INP, CLS all measured through it), and <strong>Service Worker Lifecycle</strong> (navigation entries track SW fetch timing).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="75-garbage-collection-timing.html" class="nav-btn nav-btn-prev">← Garbage Collection Timing</a>
+                <a href="77-long-tasks-api.html" class="nav-btn nav-btn-next">Long Tasks API →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

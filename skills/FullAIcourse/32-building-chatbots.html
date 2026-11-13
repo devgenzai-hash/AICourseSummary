@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbots & Copilots — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 11</a> <span>›</span> Chatbots & Copilots</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Building Chatbots & Copilots</h1>
+                <p>From simple FAQ bots to full AI copilots that understand your codebase — learn how to build production chat interfaces that users actually love.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Chatbot = a receptionist.</strong> Answers common questions, routes complex ones to the right person, available 24/7.</p>
+                <p><strong>Copilot = a pair programmer sitting next to you.</strong> Sees what you're working on, suggests code, explains errors, helps you think — but YOU make the final decisions.</p>
+            </div>
+
+            <h2 id="types">Chatbot vs Copilot</h2>
+
+            <table>
+                <thead><tr><th>Feature</th><th>Chatbot</th><th>Copilot</th></tr></thead>
+                <tbody>
+                    <tr><td>Context</td><td>User's messages only</td><td>User's messages + workspace/app context</td></tr>
+                    <tr><td>Domain</td><td>General or narrow FAQ</td><td>Deeply integrated with one tool</td></tr>
+                    <tr><td>Actions</td><td>Responds with text</td><td>Can edit code, run commands, create files</td></tr>
+                    <tr><td>Example</td><td>Customer support bot</td><td>GitHub Copilot, Cursor AI</td></tr>
+                    <tr><td>Complexity</td><td>Low-medium</td><td>High (needs deep integration)</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="chatbot-code">Production Chatbot with Gradio</h2>
+
+            <pre><code><span class="token-comment"># Full chatbot with memory, RAG, and streaming</span>
+<span class="token-comment"># pip install gradio openai chromadb</span>
+
+<span class="token-keyword">import</span> gradio <span class="token-keyword">as</span> gr
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+
+SYSTEM_PROMPT = <span class="token-string">"""You are a helpful customer support assistant for TechCo.
+
+## Your Knowledge
+- Products: Widget Pro ($49), Widget Basic ($19), Widget Enterprise (custom pricing)
+- Shipping: Free over $50, otherwise $5.99. Ships in 2-5 business days.
+- Returns: 30-day money-back guarantee, no questions asked.
+- Support hours: 24/7 via chat, phone 9am-5pm EST.
+
+## Rules
+- Be friendly but concise (max 3 sentences per response)
+- If you don't know something, say "Let me connect you with a human agent"
+- Never make up information about products or pricing
+- For billing issues, always suggest contacting billing@techco.com"""</span>
+
+<span class="token-keyword">def</span> <span class="token-function">chat</span>(message: str, history: list) -> str:
+    <span class="token-string">"""Chat function for Gradio interface."""</span>
+    messages = [{<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: SYSTEM_PROMPT}]
+    
+    <span class="token-comment"># Add conversation history</span>
+    <span class="token-keyword">for</span> user_msg, bot_msg <span class="token-keyword">in</span> history:
+        messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: user_msg})
+        messages.append({<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: bot_msg})
+    
+    messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: message})
+    
+    response = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=messages,
+        temperature=<span class="token-number">0.3</span>,
+        max_tokens=<span class="token-number">300</span>,
+    )
+    
+    <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.content
+
+<span class="token-comment"># Streaming version</span>
+<span class="token-keyword">def</span> <span class="token-function">chat_stream</span>(message: str, history: list):
+    <span class="token-string">"""Streaming chat for better UX."""</span>
+    messages = [{<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: SYSTEM_PROMPT}]
+    <span class="token-keyword">for</span> user_msg, bot_msg <span class="token-keyword">in</span> history:
+        messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: user_msg})
+        messages.append({<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: bot_msg})
+    messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: message})
+    
+    stream = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=messages,
+        temperature=<span class="token-number">0.3</span>,
+        stream=<span class="token-keyword">True</span>,
+    )
+    
+    partial = <span class="token-string">""</span>
+    <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> stream:
+        <span class="token-keyword">if</span> chunk.choices[<span class="token-number">0</span>].delta.content:
+            partial += chunk.choices[<span class="token-number">0</span>].delta.content
+            <span class="token-keyword">yield</span> partial
+
+<span class="token-comment"># Launch!</span>
+demo = gr.ChatInterface(
+    fn=chat_stream,
+    title=<span class="token-string">"TechCo Support Bot"</span>,
+    description=<span class="token-string">"Ask about products, shipping, returns, or anything else!"</span>,
+    examples=[<span class="token-string">"What products do you offer?"</span>, <span class="token-string">"How long does shipping take?"</span>, <span class="token-string">"I want a refund"</span>],
+    theme=<span class="token-string">"soft"</span>,
+)
+demo.launch(share=<span class="token-keyword">True</span>)  <span class="token-comment"># share=True creates a public URL</span></code></pre>
+
+            <h2 id="rag-chatbot">RAG-Enhanced Chatbot</h2>
+
+            <pre><code><span class="token-comment"># Chatbot that answers from your documents</span>
+<span class="token-keyword">import</span> chromadb
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> SentenceTransformer
+
+<span class="token-keyword">class</span> <span class="token-function">RAGChatbot</span>:
+    <span class="token-string">"""Chatbot that answers using your company documents."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, docs_path: str):
+        self.client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+        self.embedder = SentenceTransformer(<span class="token-string">"all-MiniLM-L6-v2"</span>)
+        self.chroma = chromadb.PersistentClient(path=<span class="token-string">"./chatbot_db"</span>)
+        self.collection = self.chroma.get_or_create_collection(<span class="token-string">"docs"</span>)
+        
+        <span class="token-comment"># Index documents on first run</span>
+        <span class="token-keyword">if</span> self.collection.count() == <span class="token-number">0</span>:
+            self._index_docs(docs_path)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_index_docs</span>(self, path: str):
+        <span class="token-string">"""Index all documents for RAG."""</span>
+        <span class="token-keyword">import</span> os
+        <span class="token-keyword">for</span> filename <span class="token-keyword">in</span> os.listdir(path):
+            <span class="token-keyword">if</span> filename.endswith((<span class="token-string">".txt"</span>, <span class="token-string">".md"</span>)):
+                <span class="token-keyword">with</span> <span class="token-builtin">open</span>(os.path.join(path, filename)) <span class="token-keyword">as</span> f:
+                    text = f.read()
+                <span class="token-comment"># Chunk into paragraphs</span>
+                chunks = [c.strip() <span class="token-keyword">for</span> c <span class="token-keyword">in</span> text.split(<span class="token-string">"\n\n"</span>) <span class="token-keyword">if</span> c.strip()]
+                <span class="token-keyword">for</span> i, chunk <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(chunks):
+                    self.collection.add(
+                        ids=[<span class="token-string">f"{filename}_{i}"</span>],
+                        documents=[chunk],
+                        metadatas=[{<span class="token-string">"source"</span>: filename}]
+                    )
+    
+    <span class="token-keyword">def</span> <span class="token-function">chat</span>(self, message: str, history: list = <span class="token-keyword">None</span>) -> str:
+        <span class="token-string">"""Answer using RAG + conversation history."""</span>
+        <span class="token-comment"># Retrieve relevant documents</span>
+        results = self.collection.query(query_texts=[message], n_results=<span class="token-number">3</span>)
+        context = <span class="token-string">"\n\n"</span>.join(results[<span class="token-string">"documents"</span>][<span class="token-number">0</span>])
+        
+        system = <span class="token-string">f"""You are a helpful assistant. Answer based on the provided context.
+If the answer isn't in the context, say "I don't have information about that."
+
+Context from documents:
+{context}"""</span>
+        
+        messages = [{<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system}]
+        <span class="token-keyword">if</span> history:
+            <span class="token-keyword">for</span> user_msg, bot_msg <span class="token-keyword">in</span> history[-<span class="token-number">5</span>:]:  <span class="token-comment"># Last 5 turns</span>
+                messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: user_msg})
+                messages.append({<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: bot_msg})
+        messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: message})
+        
+        response = self.client.chat.completions.create(
+            model=<span class="token-string">"llama3.1:8b"</span>,
+            messages=messages,
+            temperature=<span class="token-number">0.3</span>,
+        )
+        <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.content</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Always stream responses</strong> — Users hate waiting 5 seconds for a blank response. Stream token-by-token.</li>
+                    <li><strong>Gradio for prototypes, custom UI for production</strong> — Gradio is fast to build. For production, use React + WebSocket.</li>
+                    <li><strong>RAG for domain-specific bots</strong> — Don't fine-tune for facts. Use RAG to ground responses in your docs.</li>
+                    <li><strong>Fallback to human</strong> — When confidence is low, route to a human agent. Never leave users stuck.</li>
+                    <li><strong>Track conversations</strong> — Log all interactions for quality analysis and improvement.</li>
+                    <li><strong>Safety guardrails</strong> — Filter harmful content, prevent prompt injection, block off-topic abuse.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Chatbot</strong>: text-in/text-out assistant. <strong>Copilot</strong>: deeply integrated into a tool/workflow.</li>
+                    <li>Use <strong>Gradio</strong> for quick prototypes, custom frontend for production.</li>
+                    <li><strong>Streaming</strong> is mandatory for good chat UX.</li>
+                    <li>Add <strong>RAG</strong> for domain-specific knowledge (docs, FAQs, policies).</li>
+                    <li>Include <strong>conversation history</strong> for multi-turn context.</li>
+                    <li>Always have a <strong>fallback to human</strong> for complex/sensitive issues.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build a Chatbot</h4>
+                <ol>
+                    <li>Build the Gradio chatbot with streaming</li>
+                    <li>Add RAG: index 5-10 markdown files and answer questions from them</li>
+                    <li>Implement conversation history (keep last 10 turns)</li>
+                    <li>Add a "confidence" check — if unsure, suggest contacting a human</li>
+                    <li>Deploy on a VPS with Docker</li>
+                    <li><strong>Bonus:</strong> Build a code copilot that reads your current file and suggests improvements</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="31-evaluation-benchmarks.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Benchmarks & Evals</span>
+                </a>
+                <a href="33-ai-automation-saas.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">AI Automation & SaaS</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

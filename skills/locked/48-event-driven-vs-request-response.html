@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event-Driven vs Request/Response - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html" class="active"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Architecture Patterns &rarr; Event-Driven vs Request/Response</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Architecture</span>
+                <span class="tag">Concept</span>
+            </div>
+            <h1>Event-Driven vs Request/Response</h1>
+            <p class="hero-subtitle">Two fundamental communication paradigms &mdash; one blocks and waits for an answer, the other fires a message and moves on. Choosing the right model determines your system&rsquo;s coupling, scalability, and failure characteristics.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of <strong>ordering food at a counter</strong> (request/response) &mdash; you walk up, place your order, and stand there waiting until the cashier hands you your food. You&rsquo;re blocked until you get a reply. Now imagine a <strong>dinner bell system</strong> (event-driven) &mdash; you place your order, take a seat, and go about your business. When the food is ready, a bell rings and your number is called. You&rsquo;re free to do other things in the meantime, and the kitchen processes orders at its own pace without caring whether you&rsquo;re standing at the counter or sitting across the room.</p>
+        </div>
+
+        <h2>Request/Response Model</h2>
+        <p>The simplest and most intuitive communication pattern. A client sends a request and <strong>synchronously waits</strong> for the server to process it and return a response:</p>
+        <ul>
+            <li><strong>Synchronous:</strong> The caller is blocked until the response arrives (or a timeout occurs)</li>
+            <li><strong>Direct coupling:</strong> The client must know exactly which service to call and how to reach it</li>
+            <li><strong>Immediate feedback:</strong> Success or failure is known right away</li>
+            <li><strong>Simple mental model:</strong> Function call semantics &mdash; input in, output out</li>
+            <li><strong>Examples:</strong> HTTP REST APIs, gRPC calls, database queries, function invocations</li>
+        </ul>
+
+        <h3>When Request/Response Shines</h3>
+        <ul>
+            <li>The caller <em>needs</em> the result before it can continue (e.g., fetching user profile for display)</li>
+            <li>Operations that require immediate confirmation (payment processing, authentication)</li>
+            <li>Simple CRUD operations with low latency requirements</li>
+            <li>Internal service calls within a bounded context where coupling is acceptable</li>
+        </ul>
+
+        <h2>Event-Driven Model</h2>
+        <p>Instead of direct calls, services communicate by <strong>producing and consuming events</strong>. The producer fires an event and moves on without waiting for a response:</p>
+        <ul>
+            <li><strong>Asynchronous:</strong> The producer doesn&rsquo;t wait &mdash; fire and forget (or fire and eventually confirm)</li>
+            <li><strong>Loose coupling:</strong> Producer doesn&rsquo;t know (or care) who consumes the event</li>
+            <li><strong>Temporal decoupling:</strong> Producer and consumer don&rsquo;t need to be online at the same time</li>
+            <li><strong>Fan-out:</strong> One event can trigger actions in multiple consumers simultaneously</li>
+            <li><strong>Examples:</strong> Kafka topics, RabbitMQ queues, AWS SNS/SQS, WebSocket notifications</li>
+        </ul>
+
+        <h3>When Event-Driven Shines</h3>
+        <ul>
+            <li>The producer doesn&rsquo;t need an immediate answer (e.g., &ldquo;order placed&rdquo; &rarr; triggers shipping, email, analytics)</li>
+            <li>Multiple systems need to react to the same action (fan-out)</li>
+            <li>Throughput matters more than latency &mdash; process millions of events per second</li>
+            <li>Services have different uptime requirements &mdash; events buffer during downtime</li>
+        </ul>
+
+        <h2>Pub/Sub Pattern</h2>
+        <p>A specific event-driven pattern where publishers emit events to a <strong>topic</strong> and subscribers listen on that topic:</p>
+        <ul>
+            <li><strong>Publishers</strong> don&rsquo;t know subscribers exist &mdash; they just publish to a topic</li>
+            <li><strong>Subscribers</strong> register interest in topics and receive all matching events</li>
+            <li><strong>Broker</strong> (Kafka, RabbitMQ, Redis Pub/Sub) mediates between publishers and subscribers</li>
+            <li>Adding a new consumer requires zero changes to the publisher</li>
+        </ul>
+
+        <h2>Event Sourcing Basics</h2>
+        <p>Instead of storing current state, you store a <strong>sequence of events</strong> that led to the current state:</p>
+        <ul>
+            <li>Every state change is captured as an immutable event (e.g., <code>OrderCreated</code>, <code>ItemAdded</code>, <code>OrderShipped</code>)</li>
+            <li>Current state is derived by replaying events from the beginning</li>
+            <li>Provides a complete audit trail and enables temporal queries (&ldquo;what was the state at time T?&rdquo;)</li>
+            <li>Naturally pairs with event-driven architectures &mdash; stored events are also publishable events</li>
+        </ul>
+
+        <h2>Message Brokers &amp; Event Buses</h2>
+        <ul>
+            <li><strong>Message Queue</strong> (RabbitMQ, SQS): Point-to-point &mdash; each message consumed by exactly one consumer</li>
+            <li><strong>Event Stream</strong> (Kafka, Kinesis): Log-based &mdash; events are appended and multiple consumers can read independently</li>
+            <li><strong>Event Bus</strong> (EventBridge, NATS): Lightweight routing of events to interested subscribers</li>
+            <li><strong>Key difference:</strong> Queues delete messages after consumption; streams retain them for replay</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Request/Response</th>
+                        <th>Event-Driven</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Coupling</strong></td>
+                        <td>Tight &mdash; caller knows callee</td>
+                        <td>Loose &mdash; producer/consumer independent</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Latency</strong></td>
+                        <td>Low (direct call)</td>
+                        <td>Higher (broker in between)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scalability</strong></td>
+                        <td>Limited by callee capacity</td>
+                        <td>Horizontal &mdash; add more consumers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Failure Handling</strong></td>
+                        <td>Immediate error propagation</td>
+                        <td>Retry/dead-letter queues, eventual consistency</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Debugging</strong></td>
+                        <td>Easy &mdash; follow the call stack</td>
+                        <td>Hard &mdash; distributed tracing needed</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Freshness</strong></td>
+                        <td>Always current (synchronous)</td>
+                        <td>Eventually consistent</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fan-out</strong></td>
+                        <td>Caller must call each service</td>
+                        <td>One event, N subscribers automatically</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Temporal Coupling</strong></td>
+                        <td>Both must be online simultaneously</td>
+                        <td>Consumer can process later</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Examples</h2>
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> queue
+<span class="token-keyword">import</span> threading
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Callable, Dict, List, Any
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># PATTERN 1: Request/Response (Synchronous)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">OrderService</span>:
+    <span class="token-string">"""Synchronous request/response — caller waits for result."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.orders: Dict[str, dict] = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">create_order</span>(self, user_id: str, items: list) -> dict:
+        <span class="token-comment"># Step 1: Validate inventory (synchronous call)</span>
+        stock = self._check_inventory(items)
+        <span class="token-keyword">if not</span> stock[<span class="token-string">"available"</span>]:
+            <span class="token-keyword">return</span> {<span class="token-string">"error"</span>: <span class="token-string">"Out of stock"</span>}
+
+        <span class="token-comment"># Step 2: Charge payment (synchronous call)</span>
+        payment = self._process_payment(user_id, stock[<span class="token-string">"total"</span>])
+        <span class="token-keyword">if not</span> payment[<span class="token-string">"success"</span>]:
+            <span class="token-keyword">return</span> {<span class="token-string">"error"</span>: <span class="token-string">"Payment failed"</span>}
+
+        <span class="token-comment"># Step 3: Create order (synchronous)</span>
+        order_id = f<span class="token-string">"ORD-{len(self.orders) + 1}"</span>
+        self.orders[order_id] = {
+            <span class="token-string">"user_id"</span>: user_id,
+            <span class="token-string">"items"</span>: items,
+            <span class="token-string">"status"</span>: <span class="token-string">"confirmed"</span>
+        }
+
+        <span class="token-comment"># Caller blocked until ALL steps complete</span>
+        <span class="token-keyword">return</span> {<span class="token-string">"order_id"</span>: order_id, <span class="token-string">"status"</span>: <span class="token-string">"confirmed"</span>}
+
+    <span class="token-keyword">def</span> <span class="token-function">_check_inventory</span>(self, items: list) -> dict:
+        time.sleep(<span class="token-number">0.05</span>)  <span class="token-comment"># Simulated network call</span>
+        <span class="token-keyword">return</span> {<span class="token-string">"available"</span>: <span class="token-keyword">True</span>, <span class="token-string">"total"</span>: <span class="token-number">99.99</span>}
+
+    <span class="token-keyword">def</span> <span class="token-function">_process_payment</span>(self, user_id: str, amount: float) -> dict:
+        time.sleep(<span class="token-number">0.1</span>)  <span class="token-comment"># Simulated payment gateway</span>
+        <span class="token-keyword">return</span> {<span class="token-string">"success"</span>: <span class="token-keyword">True</span>, <span class="token-string">"tx_id"</span>: <span class="token-string">"TXN-42"</span>}
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># PATTERN 2: Event-Driven (Asynchronous)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">EventBus</span>:
+    <span class="token-string">"""Simple in-process event bus for pub/sub communication."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._subscribers: Dict[str, List[Callable]] = {}
+        self._event_log: list = []
+
+    <span class="token-keyword">def</span> <span class="token-function">subscribe</span>(self, event_type: str, handler: Callable):
+        <span class="token-keyword">if</span> event_type <span class="token-keyword">not in</span> self._subscribers:
+            self._subscribers[event_type] = []
+        self._subscribers[event_type].append(handler)
+
+    <span class="token-keyword">def</span> <span class="token-function">publish</span>(self, event_type: str, data: dict):
+        <span class="token-string">"""Fire and forget — producer doesn't wait for consumers."""</span>
+        event = {<span class="token-string">"type"</span>: event_type, <span class="token-string">"data"</span>: data, <span class="token-string">"time"</span>: time.time()}
+        self._event_log.append(event)
+
+        <span class="token-keyword">for</span> handler <span class="token-keyword">in</span> self._subscribers.get(event_type, []):
+            <span class="token-comment"># Each handler runs independently (async in production)</span>
+            threading.Thread(target=handler, args=(data,)).start()
+
+
+<span class="token-keyword">class</span> <span class="token-class">EventDrivenOrderService</span>:
+    <span class="token-string">"""Event-driven — publishes events, doesn't wait for downstream."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, bus: EventBus):
+        self.bus = bus
+        self.orders: Dict[str, dict] = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">create_order</span>(self, user_id: str, items: list) -> dict:
+        <span class="token-comment"># Create order immediately — don't wait for downstream</span>
+        order_id = f<span class="token-string">"ORD-{len(self.orders) + 1}"</span>
+        self.orders[order_id] = {
+            <span class="token-string">"user_id"</span>: user_id,
+            <span class="token-string">"items"</span>: items,
+            <span class="token-string">"status"</span>: <span class="token-string">"pending"</span>
+        }
+
+        <span class="token-comment"># Publish event — consumers react independently</span>
+        self.bus.publish(<span class="token-string">"order.created"</span>, {
+            <span class="token-string">"order_id"</span>: order_id,
+            <span class="token-string">"user_id"</span>: user_id,
+            <span class="token-string">"items"</span>: items
+        })
+
+        <span class="token-comment"># Return immediately — caller is NOT blocked</span>
+        <span class="token-keyword">return</span> {<span class="token-string">"order_id"</span>: order_id, <span class="token-string">"status"</span>: <span class="token-string">"pending"</span>}
+
+
+<span class="token-comment"># ─── Consumers: independent services reacting to events ───</span>
+
+<span class="token-keyword">class</span> <span class="token-class">InventoryConsumer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">handle_order_created</span>(self, data: dict):
+        print(f<span class="token-string">"  [Inventory] Reserving stock for {data['order_id']}"</span>)
+        time.sleep(<span class="token-number">0.05</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">EmailConsumer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">handle_order_created</span>(self, data: dict):
+        print(f<span class="token-string">"  [Email] Sending confirmation for {data['order_id']}"</span>)
+        time.sleep(<span class="token-number">0.02</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">AnalyticsConsumer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">handle_order_created</span>(self, data: dict):
+        print(f<span class="token-string">"  [Analytics] Tracking event for {data['order_id']}"</span>)
+        time.sleep(<span class="token-number">0.01</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Comparing both approaches</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+print(<span class="token-string">"=== Request/Response vs Event-Driven ==="</span>)
+print()
+
+<span class="token-comment"># Request/Response — synchronous, blocking</span>
+print(<span class="token-string">"--- Request/Response (synchronous) ---"</span>)
+sync_service = OrderService()
+start = time.time()
+result = sync_service.create_order(<span class="token-string">"user-1"</span>, [<span class="token-string">"widget"</span>, <span class="token-string">"gadget"</span>])
+elapsed = time.time() - start
+print(f<span class="token-string">"  Result: {result}"</span>)
+print(f<span class="token-string">"  Time: {elapsed*1000:.0f}ms (blocked entire duration)"</span>)
+print()
+
+<span class="token-comment"># Event-Driven — asynchronous, non-blocking</span>
+print(<span class="token-string">"--- Event-Driven (asynchronous) ---"</span>)
+bus = EventBus()
+inventory = InventoryConsumer()
+email = EmailConsumer()
+analytics = AnalyticsConsumer()
+
+bus.subscribe(<span class="token-string">"order.created"</span>, inventory.handle_order_created)
+bus.subscribe(<span class="token-string">"order.created"</span>, email.handle_order_created)
+bus.subscribe(<span class="token-string">"order.created"</span>, analytics.handle_order_created)
+
+async_service = EventDrivenOrderService(bus)
+start = time.time()
+result = async_service.create_order(<span class="token-string">"user-1"</span>, [<span class="token-string">"widget"</span>, <span class="token-string">"gadget"</span>])
+elapsed = time.time() - start
+print(f<span class="token-string">"  Result: {result}"</span>)
+print(f<span class="token-string">"  Time: {elapsed*1000:.0f}ms (returned immediately)"</span>)
+print(f<span class="token-string">"  (Consumers processing in background...)"</span>)
+time.sleep(<span class="token-number">0.2</span>)  <span class="token-comment"># Let background threads finish for demo</span></code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Apache Kafka:</strong> The backbone of event-driven architectures at LinkedIn, Netflix, and Uber. Kafka provides a distributed commit log where events are appended, retained for configurable periods, and consumed by multiple consumer groups independently. A single Kafka cluster can handle millions of events per second with strong ordering guarantees per partition.</p>
+            <p><strong>AWS SNS/SQS:</strong> Amazon&rsquo;s managed pub/sub (SNS) and message queue (SQS) services. SNS fans out events to multiple SQS queues, Lambda functions, or HTTP endpoints. SQS provides at-least-once delivery with dead-letter queues for failed messages. This pattern powers most serverless event-driven architectures on AWS.</p>
+            <p><strong>RabbitMQ:</strong> A traditional message broker supporting multiple patterns &mdash; work queues, pub/sub, routing, and RPC. Used when you need flexible routing rules, priority queues, or message acknowledgment semantics beyond what Kafka provides. Popular in enterprise systems and microservice migrations.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Request/response is synchronous &mdash; the caller blocks until it gets a reply (simple but tightly coupled)</li>
+                <li>Event-driven is asynchronous &mdash; the producer fires an event and moves on (loose coupling, higher scalability)</li>
+                <li>Use request/response when you need immediate confirmation or the caller depends on the result</li>
+                <li>Use event-driven when multiple services need to react, or when throughput matters more than latency</li>
+                <li>Most production systems use a hybrid &mdash; synchronous for queries, event-driven for commands and side-effects</li>
+                <li>Event-driven adds complexity: eventual consistency, debugging difficulty, and message ordering challenges</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Request/response is a phone call &mdash; both parties must be present and engaged simultaneously. Event-driven is a mailbox &mdash; the sender drops a letter and walks away; the recipient picks it up whenever they&rsquo;re ready.</p>
+            <div class="model-visual">
+                <pre>
+  REQUEST/RESPONSE:
+  ══════════════════════════════════════════════════════
+
+  Client ──── request ────►  Server
+    │                          │
+    │  (blocked, waiting...)   │ (processing...)
+    │                          │
+    │  ◄──── response ─────   │
+    ▼                          ▼
+  continues                  done
+
+
+  EVENT-DRIVEN:
+  ══════════════════════════════════════════════════════
+
+  Producer ──── event ────►  [Message Broker]
+    │                          │ │ │
+    │ (continues immediately)  │ │ └──► Consumer A (email)
+    │                          │ └────► Consumer B (analytics)
+    ▼                          └──────► Consumer C (inventory)
+  does other work
+                             (each consumer processes independently)
+
+
+  HYBRID (real-world):
+  ══════════════════════════════════════════════════════
+
+  User ──► API Gateway ──► Order Service
+                               │
+              ┌───── sync ─────┤───── async ─────┐
+              ▼                │                  ▼
+         Payment Service       │           [Event Bus]
+              │                │             │  │  │
+              ▼                │             ▼  ▼  ▼
+         (confirm/deny)        │          Email Ship Analytics
+              │                │
+              ▼                │
+         ◄── response ────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Using events when you need immediate confirmation:</strong> If the user is staring at a screen waiting for &ldquo;payment successful,&rdquo; don&rsquo;t make it event-driven. The payment response must be synchronous. Use events for side-effects (send receipt email, update analytics) that happen <em>after</em> the synchronous confirmation.</li>
+                <li><strong>Ignoring event ordering:</strong> Events may arrive out of order across partitions. If you process <code>OrderShipped</code> before <code>OrderCreated</code>, your system breaks. Design consumers to be idempotent and handle out-of-order delivery, or use partition keys to guarantee ordering for related events.</li>
+                <li><strong>Not handling consumer failures:</strong> If a consumer crashes mid-processing, the event is lost unless you have acknowledgment and retry mechanisms. Always implement dead-letter queues for events that fail after N retries, and monitor DLQ depth as a critical alert.</li>
+                <li><strong>Building a distributed monolith:</strong> If your &ldquo;event-driven&rdquo; system has services that can&rsquo;t function without specific other services processing their events in a specific order, you&rsquo;ve just built a distributed monolith with extra latency. True event-driven means each consumer is independently deployable and degradable.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a hybrid order system:</strong> Create an order service that uses synchronous request/response for payment validation but publishes events for downstream actions (shipping, email, analytics). Measure the response time difference vs. a fully synchronous chain that calls all services sequentially.</li>
+                <li><strong>Implement a dead-letter queue:</strong> Build an event consumer that intentionally fails on certain messages. Implement retry logic (3 attempts with exponential backoff) and route failed messages to a dead-letter queue. Build a monitoring dashboard that shows DLQ depth and allows manual replay.</li>
+                <li><strong>Event ordering challenge:</strong> Simulate out-of-order event delivery for an e-commerce system (OrderCreated, ItemAdded, PaymentReceived, OrderShipped). Build a consumer that reconstructs correct order state regardless of arrival order using event timestamps and sequence numbers.</li>
+                <li><strong>Fan-out performance test:</strong> Compare request/response fan-out (service calls 5 downstream services sequentially) vs. event-driven fan-out (publish one event, 5 consumers react in parallel). Measure total latency and throughput under load for both approaches with 1000 requests.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="47-cache-stampede.html" class="prev">&larr; Cache Stampede</a>
+            <a href="49-pagination.html" class="next">Pagination &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

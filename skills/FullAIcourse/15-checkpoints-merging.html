@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkpoints & Model Merging — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 3</a> <span>›</span> Checkpoints & Merging</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Checkpoints & Model Merging</h1>
+                <p>How to save your training progress, pick the best checkpoint, merge LoRA adapters into base models, and even combine multiple fine-tuned models into one super-model.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Checkpoints = save points in a video game.</strong> You save your progress at regular intervals. If something goes wrong (model gets worse), you can reload a previous save.</p>
+                <p><strong>LoRA merging = gluing a lens filter permanently onto a camera.</strong> The filter (LoRA) is separate, but merging makes it part of the camera (base model) — faster to use, no extra step.</p>
+                <p><strong>Model merging = mixing paint colors.</strong> Blue model (good at code) + Yellow model (good at writing) = Green model (good at both). Sometimes the mix works, sometimes it becomes mud.</p>
+            </div>
+
+            <h2 id="checkpoints">Working with Checkpoints</h2>
+
+            <h3>Understanding Training Checkpoints:</h3>
+            <pre><code><span class="token-comment"># Checkpoints are saved during training at regular intervals</span>
+<span class="token-comment"># A typical training run produces:</span>
+<span class="token-comment"># ./output/</span>
+<span class="token-comment">#   checkpoint-100/   ← Step 100</span>
+<span class="token-comment">#   checkpoint-200/   ← Step 200</span>
+<span class="token-comment">#   checkpoint-300/   ← Step 300 (maybe this is the best!)</span>
+<span class="token-comment">#   checkpoint-400/   ← Step 400 (started overfitting)</span>
+
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> TrainingArguments
+
+<span class="token-comment"># Configure checkpoint saving</span>
+training_args = TrainingArguments(
+    output_dir=<span class="token-string">"./output"</span>,
+    save_strategy=<span class="token-string">"steps"</span>,       <span class="token-comment"># Save every N steps</span>
+    save_steps=<span class="token-number">100</span>,              <span class="token-comment"># Save every 100 steps</span>
+    save_total_limit=<span class="token-number">3</span>,          <span class="token-comment"># Keep only last 3 checkpoints (saves disk)</span>
+    load_best_model_at_end=<span class="token-keyword">True</span>, <span class="token-comment"># Auto-select best checkpoint at end</span>
+    evaluation_strategy=<span class="token-string">"steps"</span>,
+    eval_steps=<span class="token-number">100</span>,
+    metric_for_best_model=<span class="token-string">"eval_loss"</span>,  <span class="token-comment"># Lower is better</span>
+)</code></pre>
+
+            <h3>Resuming from a Checkpoint:</h3>
+            <pre><code><span class="token-comment"># If training crashes or you want to continue from a checkpoint</span>
+<span class="token-keyword">from</span> trl <span class="token-keyword">import</span> SFTTrainer
+
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    tokenizer=tokenizer,
+)
+
+<span class="token-comment"># Resume from latest checkpoint</span>
+trainer.train(resume_from_checkpoint=<span class="token-keyword">True</span>)
+
+<span class="token-comment"># Or from a specific checkpoint</span>
+trainer.train(resume_from_checkpoint=<span class="token-string">"./output/checkpoint-200"</span>)</code></pre>
+
+            <h2 id="merge-lora">Merging LoRA Adapters</h2>
+
+            <p>After training with LoRA/QLoRA, you have a small adapter file (~50MB). For deployment, you merge it into the base model for faster inference.</p>
+
+            <pre><code><span class="token-comment"># Merge LoRA adapter into base model</span>
+<span class="token-keyword">from</span> peft <span class="token-keyword">import</span> PeftModel, AutoPeftModelForCausalLM
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer
+<span class="token-keyword">import</span> torch
+
+<span class="token-comment"># Method 1: Using AutoPeftModelForCausalLM (easiest)</span>
+model = AutoPeftModelForCausalLM.from_pretrained(
+    <span class="token-string">"./my-qlora-adapter"</span>,       <span class="token-comment"># Your trained adapter directory</span>
+    torch_dtype=torch.float16,
+    device_map=<span class="token-string">"auto"</span>,
+)
+merged_model = model.merge_and_unload()  <span class="token-comment"># Merge adapter into base</span>
+
+<span class="token-comment"># Save the full merged model</span>
+merged_model.save_pretrained(<span class="token-string">"./merged-model"</span>)
+tokenizer = AutoTokenizer.from_pretrained(<span class="token-string">"./my-qlora-adapter"</span>)
+tokenizer.save_pretrained(<span class="token-string">"./merged-model"</span>)
+
+<span class="token-builtin">print</span>(<span class="token-string">"✅ Merged! Now you can deploy without PEFT library."</span>)
+
+<span class="token-comment"># Method 2: Manual (more control)</span>
+base_model = AutoModelForCausalLM.from_pretrained(
+    <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    torch_dtype=torch.float16,
+    device_map=<span class="token-string">"auto"</span>
+)
+model = PeftModel.from_pretrained(base_model, <span class="token-string">"./my-qlora-adapter"</span>)
+model = model.merge_and_unload()
+model.save_pretrained(<span class="token-string">"./merged-model"</span>)</code></pre>
+
+            <h2 id="model-merging">Model Merging (Combining Models)</h2>
+
+            <p>Model merging combines parameters from multiple fine-tuned models into one model that has capabilities of all of them. It's like creating a superhero team in one body.</p>
+
+            <h3>Merging Methods:</h3>
+            <table>
+                <thead><tr><th>Method</th><th>How It Works</th><th>Quality</th><th>When to Use</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Linear (LERP)</strong></td><td>Weighted average of parameters</td><td>Good</td><td>Combining 2 similar models</td></tr>
+                    <tr><td><strong>SLERP</strong></td><td>Spherical interpolation</td><td>Better</td><td>Smoother blending of 2 models</td></tr>
+                    <tr><td><strong>TIES</strong></td><td>Trim, Elect Sign, Merge</td><td>Great</td><td>Merging 3+ models, reduces conflicts</td></tr>
+                    <tr><td><strong>DARE</strong></td><td>Drop And REscale</td><td>Great</td><td>Similar to TIES, newer approach</td></tr>
+                    <tr><td><strong>Model Stock</strong></td><td>Geometric mean of fine-tuned models</td><td>Good</td><td>Many models, conservative merge</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Merging with mergekit:</h3>
+            <pre><code><span class="token-comment"># mergekit is the industry standard for model merging</span>
+<span class="token-comment"># pip install mergekit</span>
+
+<span class="token-comment"># Create a merge config (YAML):</span></code></pre>
+            <pre><code><span class="token-comment"># merge_config.yaml</span>
+models:
+  - model: meta-llama/Llama-3.1-8B-Instruct  <span class="token-comment"># Base</span>
+    parameters:
+      weight: 0.5
+  - model: ./my-code-model  <span class="token-comment"># Fine-tuned for code</span>
+    parameters:
+      weight: 0.3
+  - model: ./my-writing-model  <span class="token-comment"># Fine-tuned for writing</span>
+    parameters:
+      weight: 0.2
+
+merge_method: linear  <span class="token-comment"># or: slerp, ties, dare_ties</span>
+dtype: float16</code></pre>
+            <pre><code><span class="token-comment"># Run the merge</span>
+<span class="token-comment"># mergekit-yaml merge_config.yaml ./merged-output --cuda</span>
+
+<span class="token-comment"># For SLERP (2 models only, usually best quality)</span></code></pre>
+            <pre><code><span class="token-comment"># slerp_config.yaml</span>
+models:
+  - model: ./model-A
+  - model: ./model-B
+
+merge_method: slerp
+parameters:
+  t: 0.5  <span class="token-comment"># 0.0 = all A, 1.0 = all B, 0.5 = equal blend</span>
+dtype: float16</code></pre>
+
+            <h3>Merge in Python:</h3>
+            <pre><code><span class="token-comment"># Simple linear merge in Python (for understanding)</span>
+<span class="token-keyword">import</span> torch
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM
+
+<span class="token-keyword">def</span> <span class="token-function">linear_merge</span>(model_paths: list, weights: list, output_path: str):
+    <span class="token-string">"""Merge multiple models with weighted average."""</span>
+    <span class="token-keyword">assert</span> <span class="token-builtin">len</span>(model_paths) == <span class="token-builtin">len</span>(weights)
+    <span class="token-keyword">assert</span> <span class="token-builtin">abs</span>(<span class="token-builtin">sum</span>(weights) - <span class="token-number">1.0</span>) < <span class="token-number">0.01</span>
+
+    <span class="token-comment"># Load first model as base</span>
+    merged = AutoModelForCausalLM.from_pretrained(
+        model_paths[<span class="token-number">0</span>], torch_dtype=torch.float16
+    )
+    merged_state = merged.state_dict()
+
+    <span class="token-comment"># Weighted sum of all models</span>
+    <span class="token-keyword">for</span> key <span class="token-keyword">in</span> merged_state:
+        merged_state[key] = merged_state[key] * weights[<span class="token-number">0</span>]
+
+    <span class="token-keyword">for</span> path, weight <span class="token-keyword">in</span> <span class="token-builtin">zip</span>(model_paths[<span class="token-number">1</span>:], weights[<span class="token-number">1</span>:]):
+        model = AutoModelForCausalLM.from_pretrained(path, torch_dtype=torch.float16)
+        state = model.state_dict()
+        <span class="token-keyword">for</span> key <span class="token-keyword">in</span> merged_state:
+            merged_state[key] += state[key] * weight
+        <span class="token-keyword">del</span> model  <span class="token-comment"># Free memory</span>
+
+    merged.load_state_dict(merged_state)
+    merged.save_pretrained(output_path)
+    <span class="token-builtin">print</span>(<span class="token-string">f"✅ Merged model saved to {output_path}"</span>)
+
+<span class="token-comment"># Usage: 60% base + 40% fine-tuned</span>
+linear_merge(
+    [<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>, <span class="token-string">"./my-finetuned"</span>],
+    [<span class="token-number">0.6</span>, <span class="token-number">0.4</span>],
+    <span class="token-string">"./merged-output"</span>
+)</code></pre>
+
+            <h2 id="deployment-flow">Full Deployment Flow</h2>
+
+            <div class="mental-model">
+                <h4>🧠 From Training to Deployment</h4>
+                <div class="model-visual">
+                    1. Train with QLoRA → adapter.safetensors (50MB)<br>
+                    2. Pick best checkpoint → checkpoint-300/<br>
+                    3. Merge adapter into base model → merged-model/ (14GB)<br>
+                    4. (Optional) Merge with other models → super-model/<br>
+                    5. Quantize to GGUF Q4_K_M → model.gguf (4GB)<br>
+                    6. Deploy with Ollama/vLLM → Ready!
+                </div>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Always merge LoRA before deploying</strong> — Un-merged adapters add latency and complexity.</li>
+                    <li><strong>mergekit is the standard tool</strong> — Used by the entire open-source community for model merging.</li>
+                    <li><strong>SLERP for 2 models, TIES/DARE for 3+</strong> — These methods handle conflicts between models better.</li>
+                    <li><strong>Open LLM Leaderboard</strong> — Many top models on HuggingFace are merges of other models.</li>
+                    <li><strong>Save checkpoints frequently</strong> — Disk is cheap, retraining is expensive. Save every 100-500 steps.</li>
+                    <li><strong>SafeTensors format</strong> — Industry standard for saving model weights (safer than pickle, faster to load).</li>
+                    <li><strong>Push to HuggingFace Hub</strong> — Standard way to share models. Use <code>model.push_to_hub()</code>.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Checkpoints</strong> = snapshots saved during training. Use <code>load_best_model_at_end=True</code>.</li>
+                    <li><strong>LoRA merging</strong> = combining adapter into base model for deployment. Use <code>merge_and_unload()</code>.</li>
+                    <li><strong>Model merging</strong> = combining multiple fine-tuned models into one. Use mergekit.</li>
+                    <li>Full pipeline: Train → Best checkpoint → Merge LoRA → (Optional: Model merge) → Quantize → Deploy</li>
+                    <li>SLERP for 2 models, TIES/DARE for 3+ models</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Not saving checkpoints</strong> — If training crashes at epoch 3, you lose everything. Save every 100-500 steps.</li>
+                    <li><strong>Deploying un-merged LoRA</strong> — Works but is slower. Always merge for production.</li>
+                    <li><strong>Merging incompatible models</strong> — You can only merge models with the SAME architecture and tokenizer.</li>
+                    <li><strong>Not testing after merge</strong> — Model merges can sometimes produce garbage. Always evaluate.</li>
+                    <li><strong>Keeping all checkpoints</strong> — Use <code>save_total_limit=3</code> to avoid filling your disk (each checkpoint = model size).</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Merge and Deploy</h4>
+                <ol>
+                    <li>Train a LoRA adapter (use the code from Chapter 12)</li>
+                    <li>Merge it into the base model using <code>merge_and_unload()</code></li>
+                    <li>Save the merged model and verify it works</li>
+                    <li>Install mergekit: <code>pip install mergekit</code></li>
+                    <li>Create a SLERP merge config and try merging two models from HuggingFace</li>
+                    <li>Quantize your merged model to GGUF and test with Ollama</li>
+                    <li><strong>Bonus:</strong> Push your model to HuggingFace Hub</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="14-quantization.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Quantization & GGUF</span>
+                </a>
+                <a href="16-kv-cache-flash-attention.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">KV Cache & Flash Attention</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

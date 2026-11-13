@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSRF vs XSS Mitigation - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> CSRF vs XSS Mitigation
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>CSRF vs XSS Mitigation</h1>
+                <p class="subtitle">Two fundamentally different attack vectors that exploit trust — XSS exploits the user's trust in a site, CSRF exploits the site's trust in the user's browser.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Advanced</span> <span class="tag tag-concept">Security</span> <span class="tag tag-browser">Browser</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🔐 Analogy: Impersonation vs Break-In</div>
+                <p><strong>CSRF</strong> is like someone forging your signature on a check — the bank (server) sees your valid credentials (cookies) and processes the transaction. The attacker never sees your account details; they just trick the bank into acting on your behalf.</p>
+                <p><strong>XSS</strong> is like someone planting a hidden camera in your house — the attacker gets full access to everything you can see and do. They inject their code into a trusted page and operate with your full privileges.</p>
+            </div>
+
+            <h2>The Problem: Two Directions of Trust Exploitation</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Dimension</th><th>XSS (Cross-Site Scripting)</th><th>CSRF (Cross-Site Request Forgery)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Trust exploited</td><td>User trusts the website</td><td>Website trusts the user's browser</td></tr>
+                    <tr><td>What happens</td><td>Attacker's code runs in victim's browser context</td><td>Victim's browser sends authenticated request to target</td></tr>
+                    <tr><td>Attacker gains</td><td>Full DOM access, cookies, localStorage, API calls</td><td>Ability to trigger state-changing actions</td></tr>
+                    <tr><td>Requires</td><td>Injecting markup/script into the page</td><td>Victim visiting attacker's page while authenticated</td></tr>
+                    <tr><td>Data exfiltration</td><td>Yes — can read and send anything</td><td>No — attacker is blind to responses</td></tr>
+                </tbody>
+            </table>
+
+            <h2>XSS: How It Works Internally</h2>
+            <h3>Three Variants</h3>
+            <ol>
+                <li><strong>Stored XSS</strong> — Malicious script saved to database, served to all users (e.g., forum comment with <code>&lt;script&gt;</code>)</li>
+                <li><strong>Reflected XSS</strong> — Script bounced off server in response to a crafted URL (e.g., search query reflected in page)</li>
+                <li><strong>DOM-based XSS</strong> — Script injected purely client-side via unsafe DOM manipulation (e.g., <code>innerHTML = location.hash</code>)</li>
+            </ol>
+
+<pre><code><span class="token-comment">// DOM-based XSS vulnerability example</span>
+<span class="token-comment">// An attacker crafts: https://site.com/page#&lt;img src=x onerror=alert(document.cookie)&gt;</span>
+
+<span class="token-comment">// VULNERABLE CODE — never do this</span>
+document.getElementById(<span class="token-string">'output'</span>).innerHTML = location.hash.slice(1);
+<span class="token-comment">// The hash content is parsed as HTML, executing the onerror handler</span>
+
+<span class="token-comment">// SAFE CODE — use textContent for user-controlled data</span>
+document.getElementById(<span class="token-string">'output'</span>).textContent = location.hash.slice(1);
+<span class="token-comment">// textContent treats everything as plain text — no parsing occurs</span>
+</code></pre>
+
+            <h3>XSS Mitigation Strategy (Defense in Depth)</h3>
+
+<pre><code><span class="token-comment">// Layer 1: Output encoding — context-aware escaping</span>
+<span class="token-keyword">function</span> <span class="token-function">escapeForHTML</span>(str) {
+    <span class="token-comment">// Replace characters that have special meaning in HTML</span>
+    <span class="token-comment">// This prevents browser from interpreting user input as markup</span>
+    <span class="token-keyword">const</span> map = {
+        <span class="token-string">'&amp;'</span>: <span class="token-string">'&amp;amp;'</span>,
+        <span class="token-string">'&lt;'</span>: <span class="token-string">'&amp;lt;'</span>,
+        <span class="token-string">'&gt;'</span>: <span class="token-string">'&amp;gt;'</span>,
+        <span class="token-string">'"'</span>: <span class="token-string">'&amp;quot;'</span>,
+        <span class="token-string">"'"</span>: <span class="token-string">'&amp;#x27;'</span>,
+    };
+    <span class="token-keyword">return</span> str.replace(/[&amp;&lt;&gt;"']/g, c =&gt; map[c]);
+}
+
+<span class="token-comment">// Layer 2: DOM API safety — use safe sinks instead of dangerous ones</span>
+<span class="token-comment">// DANGEROUS sinks: innerHTML, outerHTML, document.write, eval()</span>
+<span class="token-comment">// SAFE alternatives: textContent, setAttribute (for non-event attrs), createElement</span>
+
+<span class="token-comment">// Layer 3: CSP headers — restrict what scripts can execute (see topic 51)</span>
+<span class="token-comment">// Layer 4: Trusted Types — browser-enforced type safety for DOM sinks (see topic 52)</span>
+<span class="token-comment">// Layer 5: HttpOnly cookies — prevent JS from reading session tokens</span>
+
+<span class="token-comment">// Framework-level protection: React auto-escapes JSX expressions</span>
+<span class="token-comment">// This is SAFE — React calls textContent internally:</span>
+<span class="token-keyword">const</span> UserComment = ({ text }) =&gt; &lt;p&gt;{text}&lt;/p&gt;;
+
+<span class="token-comment">// This BYPASSES React's protection — treat as red flag in code review:</span>
+<span class="token-keyword">const</span> Dangerous = ({ html }) =&gt; &lt;div dangerouslySetInnerHTML={{ __html: html }} /&gt;;
+<span class="token-comment">// Only use after sanitization with DOMPurify or similar</span>
+</code></pre>
+
+            <h2>CSRF: How It Works Internally</h2>
+
+<pre><code><span class="token-comment">// Attack scenario: User is logged into bank.com</span>
+<span class="token-comment">// Attacker hosts evil.com with this hidden form:</span>
+
+<span class="token-comment">// &lt;form action="https://bank.com/transfer" method="POST" id="exploit"&gt;</span>
+<span class="token-comment">//   &lt;input type="hidden" name="to" value="attacker-account"&gt;</span>
+<span class="token-comment">//   &lt;input type="hidden" name="amount" value="10000"&gt;</span>
+<span class="token-comment">// &lt;/form&gt;</span>
+<span class="token-comment">// &lt;script&gt;document.getElementById('exploit').submit();&lt;/script&gt;</span>
+
+<span class="token-comment">// WHY this works:</span>
+<span class="token-comment">// 1. Browser automatically attaches bank.com cookies to the request</span>
+<span class="token-comment">// 2. Server sees valid session cookie → processes transfer</span>
+<span class="token-comment">// 3. Attacker never sees the cookie — just exploits automatic inclusion</span>
+</code></pre>
+
+            <h3>CSRF Mitigation Strategy</h3>
+
+<pre><code><span class="token-comment">// Defense 1: Synchronizer Token Pattern (most common)</span>
+<span class="token-comment">// Server generates unique token per session/form, validates on submission</span>
+
+<span class="token-comment">// Server-side (Node.js/Express example)</span>
+<span class="token-keyword">const</span> crypto = require(<span class="token-string">'crypto'</span>);
+
+app.use((req, res, next) =&gt; {
+    <span class="token-comment">// Generate cryptographically random token bound to user's session</span>
+    <span class="token-keyword">if</span> (!req.session.csrfToken) {
+        req.session.csrfToken = crypto.randomBytes(32).toString(<span class="token-string">'hex'</span>);
+    }
+    res.locals.csrfToken = req.session.csrfToken;
+    next();
+});
+
+app.post(<span class="token-string">'/transfer'</span>, (req, res) =&gt; {
+    <span class="token-comment">// Attacker cannot know this token — it's not in cookies</span>
+    <span class="token-keyword">if</span> (req.body._csrf !== req.session.csrfToken) {
+        <span class="token-keyword">return</span> res.status(403).send(<span class="token-string">'CSRF token mismatch'</span>);
+    }
+    <span class="token-comment">// Process legitimate request...</span>
+});
+
+<span class="token-comment">// Defense 2: SameSite cookies (modern browsers)</span>
+<span class="token-comment">// Set-Cookie: session=abc123; SameSite=Strict; Secure; HttpOnly</span>
+<span class="token-comment">// SameSite=Strict: cookie NEVER sent on cross-origin requests</span>
+<span class="token-comment">// SameSite=Lax: sent on top-level navigations (GET only), not POST/fetch</span>
+
+<span class="token-comment">// Defense 3: Double-submit cookie pattern (stateless alternative)</span>
+<span class="token-comment">// 1. Set CSRF token in a non-HttpOnly cookie</span>
+<span class="token-comment">// 2. Client reads cookie, sends token in header/body</span>
+<span class="token-comment">// 3. Server compares cookie value with header value</span>
+<span class="token-comment">// WHY it works: attacker can trigger cookie sending but cannot READ it</span>
+<span class="token-comment">//   due to Same-Origin Policy, so they can't duplicate it in the body</span>
+
+<span class="token-comment">// Defense 4: Origin/Referer header checking</span>
+app.post(<span class="token-string">'/api/*'</span>, (req, res, next) =&gt; {
+    <span class="token-keyword">const</span> origin = req.headers.origin || req.headers.referer;
+    <span class="token-keyword">const</span> allowed = [<span class="token-string">'https://mysite.com'</span>];
+    <span class="token-keyword">if</span> (!allowed.some(o =&gt; origin?.startsWith(o))) {
+        <span class="token-keyword">return</span> res.status(403).send(<span class="token-string">'Cross-origin request blocked'</span>);
+    }
+    next();
+});
+</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ XSS Defeats CSRF Protection</div>
+                <p>If an attacker achieves XSS on your site, they can read CSRF tokens from the DOM and submit valid forms. This is why XSS is considered the more severe vulnerability — it subsumes CSRF. Fix XSS first, then layer CSRF protection for defense in depth.</p>
+            </div>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Django</strong> — Built-in CSRF middleware uses double-submit cookies + hidden form tokens. The <code>{% csrf_token %}</code> template tag is mandatory for forms.</li>
+                <li><strong>Rails</strong> — <code>protect_from_forgery</code> generates per-session tokens. Rails 6+ uses SameSite=Lax as default cookie policy.</li>
+                <li><strong>React (Next.js)</strong> — Auto-escapes JSX (XSS protection). For CSRF, Server Actions use bound tokens. API routes need manual CSRF checks or rely on SameSite cookies.</li>
+                <li><strong>GitHub</strong> — Uses strict CSP + nonce-based script loading for XSS prevention, plus CSRF tokens on all state-changing forms.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Relying only on SameSite cookies</strong> — Doesn't protect against same-site subdomain attacks. Still need CSRF tokens for sensitive operations.</li>
+                <li><strong>Escaping HTML but not JavaScript/URL contexts</strong> — <code>&lt;a href="javascript:alert(1)"&gt;</code> bypasses HTML encoding. Context matters.</li>
+                <li><strong>CSRF tokens in GET requests</strong> — Tokens leak via Referer headers, browser history, and server logs.</li>
+                <li><strong>Using blocklists for XSS filtering</strong> — WAFs that block <code>&lt;script&gt;</code> are trivially bypassed (<code>&lt;img onerror&gt;</code>, <code>&lt;svg onload&gt;</code>, mutation XSS).</li>
+                <li><strong>Assuming APIs don't need CSRF protection</strong> — If your API accepts cookies for auth AND allows <code>Content-Type: application/x-www-form-urlencoded</code>, it's vulnerable.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand This When...</h3>
+                <p>You can explain why a JSON API endpoint with cookie auth might still be CSRF-vulnerable despite not accepting form submissions (hint: <code>navigator.sendBeacon</code> and simple requests that don't trigger preflight).</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a CSRF-proof form that works without JavaScript. Then add a second layer: implement a CSP that prevents inline script execution while still allowing your CSRF validation to work.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Connects to: <strong>Content Security Policy</strong> (XSS mitigation layer), <strong>SameSite Cookies</strong> (CSRF mitigation), <strong>Trusted Types</strong> (DOM XSS prevention).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="49-samesite-cookies.html" class="nav-btn nav-btn-prev">← SameSite Cookies</a>
+                <a href="51-content-security-policy.html" class="nav-btn nav-btn-next">Content Security Policy →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

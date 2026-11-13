@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Pipeline Engineering - 10M Docs, Zero Hallucination</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Overview
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="landing-hero">
+                <h1>RAG Pipeline Engineering</h1>
+                <p class="lead">Build a production-grade Retrieval-Augmented Generation system for 10 million documents with zero hallucination. From beginner concepts to advanced architecture.</p>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">10M+</div>
+                        <div class="stat-label">Documents</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Topics</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0%</div>
+                        <div class="stat-label">Hallucination Target</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>What is RAG?</h2>
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy</div>
+                <p>Imagine you're writing an important email at work. Instead of trying to remember everything from memory (which might be wrong), you <strong>open your files, find the exact documents you need, read them, and then write your email based on what you just read</strong>.</p>
+                <p>That's RAG. The AI doesn't just "guess" from memory — it <strong>retrieves real documents first</strong>, then generates answers based only on what it found. No guessing. No making stuff up.</p>
+            </div>
+
+            <p><strong>RAG (Retrieval-Augmented Generation)</strong> is a technique where an AI model first searches through your documents to find relevant information, then uses only that retrieved information to generate answers. It's like giving the AI an open-book exam instead of asking it to rely on memory.</p>
+
+            <h3>Why RAG at 10M Documents?</h3>
+            <p>At 10 million documents, everything changes. Simple search breaks down. Retrieval quality matters more than having the fanciest AI model. This course teaches you how to build a system that:</p>
+            <ul>
+                <li><strong>Finds the right information</strong> from millions of documents in milliseconds</li>
+                <li><strong>Never makes up answers</strong> — every response is grounded in real sources</li>
+                <li><strong>Tells you when it doesn't know</strong> — instead of confidently lying</li>
+                <li><strong>Gets better over time</strong> — through continuous evaluation and monitoring</li>
+            </ul>
+
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Docs Scale</div>
+                <p>Retrieval quality matters MORE than the frontier model itself. A GPT-4 with bad retrieval will hallucinate. A smaller model with perfect retrieval will be accurate. This course focuses on getting retrieval right first.</p>
+            </div>
+
+            <h2>The Full Pipeline</h2>
+            <p>Here's the complete 10-stage pipeline we'll build together:</p>
+
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 1</span>
+                    <span class="step-icon">📥</span>
+                    <span class="step-label">Ingest &amp; Normalize</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 2</span>
+                    <span class="step-icon">🔍</span>
+                    <span class="step-label">Hybrid Retrieval</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 3</span>
+                    <span class="step-icon">🎯</span>
+                    <span class="step-label">ANN &amp; Reranking</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 4</span>
+                    <span class="step-icon">⚖️</span>
+                    <span class="step-label">Source Confidence</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 5</span>
+                    <span class="step-icon">🔒</span>
+                    <span class="step-label">Constrained Gen</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 6</span>
+                    <span class="step-icon">📎</span>
+                    <span class="step-label">Citations</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 7</span>
+                    <span class="step-icon">🛡️</span>
+                    <span class="step-label">Hallucination Guard</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 8</span>
+                    <span class="step-icon">🧪</span>
+                    <span class="step-label">Continuous Evals</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 9</span>
+                    <span class="step-icon">⚡</span>
+                    <span class="step-label">Caching &amp; Memory</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">STAGE 10</span>
+                    <span class="step-icon">👁️</span>
+                    <span class="step-label">Observability</span>
+                </div>
+            </div>
+
+            <h2>Course Topics</h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">📥</div>
+                    <h4>1. Ingest &amp; Normalize</h4>
+                    <p>Remove duplicates, standardize formats, extract metadata, maintain version history. The foundation of everything.</p>
+                    <a href="01-ingest-normalize.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔍</div>
+                    <h4>2. Hybrid Retrieval</h4>
+                    <p>Combine BM25 keyword matching with semantic embeddings. Neither alone works well at 10M scale.</p>
+                    <a href="02-hybrid-retrieval.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <h4>3. ANN &amp; Reranking</h4>
+                    <p>Use Approximate Nearest Neighbors to quickly pull candidates, then rerank for precision.</p>
+                    <a href="03-ann-reranking.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚖️</div>
+                    <h4>4. Source Confidence</h4>
+                    <p>Score every retrieved chunk on freshness, trust, overlap and consistency. Low-confidence = low influence.</p>
+                    <a href="04-source-confidence.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔒</div>
+                    <h4>5. Constrained Generation</h4>
+                    <p>Force the model to ONLY answer using retrieved context. Nothing invented. Nothing hallucinated.</p>
+                    <a href="05-constrained-generation.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📎</div>
+                    <h4>6. Citation Responses</h4>
+                    <p>Every claim links back to exact chunks, documents, or timestamps. Full traceability.</p>
+                    <a href="06-citation-responses.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🛡️</div>
+                    <h4>7. Hallucination Fallback</h4>
+                    <p>When confidence drops below threshold: "Insufficient evidence found." Never guess.</p>
+                    <a href="07-hallucination-fallback.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧪</div>
+                    <h4>8. Continuous Evals</h4>
+                    <p>Adversarial queries, retrieval recall benchmarks, hallucination tests — running 24/7.</p>
+                    <a href="08-continuous-evals.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h4>9. Caching &amp; Memory</h4>
+                    <p>Cache frequent queries and retrieval paths. Reduce latency. Improve consistency.</p>
+                    <a href="09-caching-memory.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">👁️</div>
+                    <h4>10. Observability</h4>
+                    <p>Trace every retrieval path, chunk ranking, token attribution, and failure point.</p>
+                    <a href="10-observability.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>🚀 Capstone: End-to-End Production Project</h2>
+            <p>After learning all 10 stages, build the <strong>complete system from scratch</strong> — handling every document type (PDFs, Word, emails, web pages, databases, Slack messages, code repos, scanned documents, and bills) with production-ready libraries and deployment.</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🏗️</div>
+                    <h4>P1. Project Overview</h4>
+                    <p>Architecture, tech stack, Docker infrastructure, and project setup from zero to production-ready.</p>
+                    <a href="project-overview.html">Start Building →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📄</div>
+                    <h4>P2. Document Parsing</h4>
+                    <p>Parse every document type: PDFs, Word, emails, web pages, databases, Slack, code, OCR, bills.</p>
+                    <a href="project-parsing.html">Start Building →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚙️</div>
+                    <h4>P3. Ingestion Pipeline</h4>
+                    <p>Dedup, normalize, chunk smartly per doc type, embed with BGE-M3, index in Qdrant + Elasticsearch.</p>
+                    <a href="project-ingestion.html">Start Building →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔎</div>
+                    <h4>P4. Retrieval Engine</h4>
+                    <p>Hybrid BM25+vector search, RRF fusion, Cohere reranking, source confidence scoring.</p>
+                    <a href="project-retrieval.html">Start Building →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🤖</div>
+                    <h4>P5. Generation &amp; Safety</h4>
+                    <p>Constrained generation, citation extraction, NLI hallucination detection, fallback engine.</p>
+                    <a href="project-generation.html">Start Building →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🐳</div>
+                    <h4>P6. Deployment &amp; Ops</h4>
+                    <p>FastAPI, Redis caching, OpenTelemetry tracing, RAGAS evals, Docker Compose deployment.</p>
+                    <a href="project-deployment.html">Start Building →</a>
+                </div>
+            </div>
+
+            <h2>How to Use This Course</h2>
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Learning Path</div>
+                <p><strong>Follow in order:</strong> Topics build on each other. Stage 1 (Ingest) feeds into Stage 2 (Retrieval), which feeds into Stage 3 (ANN), and so on.</p>
+                <p><strong>Each topic includes:</strong> A daily-life analogy, plain English explanation, deep technical dive, code examples, comparison tables, common mistakes, and a hands-on exercise.</p>
+                <p><strong>Designed for both:</strong> Non-technical people will understand the concepts. Technical people will get production-ready implementation details.</p>
+            </div>
+
+            <h2>Key Principle</h2>
+            <div class="mental-model">
+                <h3>🧠 The Core Mental Model</h3>
+                <div class="model-visual">
+Query → [Retrieve REAL docs] → [Score confidence] → [Generate ONLY from docs] → [Cite sources] → [Verify or refuse]
+
+❌ BAD:  Query → Model guesses from training data → Hallucination
+✅ GOOD: Query → Find real docs → Read them → Answer from docs only → "Here's what I found in [Source X]"
+                </div>
+                <p>The entire pipeline exists to prevent one thing: <strong>the model making stuff up</strong>.</p>
+            </div>
+
+            <h2>Prerequisites</h2>
+            <ul>
+                <li><strong>For non-technical readers:</strong> Just curiosity. Every concept is explained from scratch.</li>
+                <li><strong>For technical readers:</strong> Basic Python, familiarity with APIs. Vector databases and ML concepts are taught as we go.</li>
+                <li><strong>For everyone:</strong> The willingness to understand WHY things work, not just HOW.</li>
+            </ul>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Important Note</div>
+                <p>At 10M documents, <strong>retrieval quality matters more than the model</strong>. A cheap model with excellent retrieval beats an expensive model with bad retrieval. This course prioritizes retrieval engineering above all else.</p>
+            </div>
+
+            <nav class="page-nav">
+                <span></span>
+                <a href="01-ingest-normalize.html" class="next">Start: Ingest &amp; Normalize</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design Engineering - From Zero to Production</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>System Design</h2>
+            <div class="subtitle">Beginner → Advanced • 68 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">System Design</a>
+                <span>/</span> Overview
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="landing-hero">
+                <h1>System Design Engineering</h1>
+                <p class="lead">Master modern system design from concurrency fundamentals to distributed systems, design patterns, and production architecture. 68 topics, beginner to advanced.</p>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">68</div>
+                        <div class="stat-label">Topics</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Modules</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">∞</div>
+                        <div class="stat-label">Scale</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>What is System Design?</h2>
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy</div>
+                <p>Imagine you're building a city. You need roads (networks), traffic lights (load balancers), water pipes (data flow), power grids (servers), hospitals for emergencies (fault tolerance), and police to keep things safe (security).</p>
+                <p>System design is <strong>the blueprint for building digital cities</strong> — deciding how data flows, where it's stored, how to handle millions of users at once, and what happens when things break.</p>
+            </div>
+
+            <p><strong>System Design</strong> is the art and science of building software systems that are reliable, scalable, and maintainable. It covers everything from how a single computer handles multiple tasks at once (concurrency) to how thousands of servers work together (distributed systems) to keep apps like Netflix, Google, and Uber running 24/7.</p>
+
+            <h3>Why Learn System Design?</h3>
+            <ul>
+                <li><strong>Build real production systems</strong> — Not just toy apps that work for 10 users</li>
+                <li><strong>Ace technical interviews</strong> — System design is THE differentiator for senior roles</li>
+                <li><strong>Debug impossible problems</strong> — Race conditions, deadlocks, data inconsistency</li>
+                <li><strong>Think at scale</strong> — From 100 users to 100 million users</li>
+            </ul>
+
+            <h2>The Learning Path</h2>
+            <p>This course is organized into 10 modules that build on each other:</p>
+
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <span class="step-num">MODULE 1-3</span>
+                    <span class="step-icon">🧵</span>
+                    <span class="step-label">Concurrency</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">MODULE 4</span>
+                    <span class="step-icon">🌐</span>
+                    <span class="step-label">Distributed Systems</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">MODULE 5</span>
+                    <span class="step-icon">🛡️</span>
+                    <span class="step-label">Resilience</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">MODULE 6</span>
+                    <span class="step-icon">🗄️</span>
+                    <span class="step-label">Databases</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">MODULE 7-8</span>
+                    <span class="step-icon">🏗️</span>
+                    <span class="step-label">Patterns</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <span class="step-num">MODULE 9-10</span>
+                    <span class="step-icon">🔒</span>
+                    <span class="step-label">API &amp; Security</span>
+                </div>
+            </div>
+
+            <h2>Module 1: Concurrency Foundations</h2>
+            <p>How a single computer juggles multiple tasks at once — and what goes wrong when it doesn't do it carefully.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🧵</div>
+                    <h4>1. Threads vs Processes</h4>
+                    <p>The two ways a computer does multiple things at once. One shares memory, the other doesn't.</p>
+                    <a href="01-threads-vs-processes.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔄</div>
+                    <h4>2. Context Switching</h4>
+                    <p>The hidden cost of switching between tasks. Why doing too many things at once makes everything slower.</p>
+                    <a href="02-context-switching.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h4>3. Race Conditions</h4>
+                    <p>When two threads try to change the same data and chaos ensues. The #1 concurrency bug.</p>
+                    <a href="03-race-conditions.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🚧</div>
+                    <h4>4. Critical Sections</h4>
+                    <p>The "danger zones" in code where only one thread should be allowed at a time.</p>
+                    <a href="04-critical-sections.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔐</div>
+                    <h4>5. Mutex &amp; Locks</h4>
+                    <p>The locks that protect shared data. The most fundamental tool for thread safety.</p>
+                    <a href="05-mutex-locks.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💀</div>
+                    <h4>6. Deadlocks</h4>
+                    <p>When threads wait for each other forever. Detection, prevention, and avoidance strategies.</p>
+                    <a href="06-deadlocks.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔁</div>
+                    <h4>7. Livelocks &amp; Starvation</h4>
+                    <p>When threads are active but making no progress, or when some threads never get a turn.</p>
+                    <a href="07-livelocks-starvation.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🛡️</div>
+                    <h4>8. Thread Safety</h4>
+                    <p>Writing code that works correctly even when multiple threads use it simultaneously.</p>
+                    <a href="08-thread-safety.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 2: Low-Level Concurrency</h2>
+            <p>The hardware-level mechanics that make concurrency possible — and the subtle bugs that come from misunderstanding them.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">⚛️</div>
+                    <h4>9. Atomic Operations &amp; CAS</h4>
+                    <p>Operations that complete in one step — no thread can interrupt them. The building block of lock-free code.</p>
+                    <a href="09-atomic-operations-cas.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">👁️</div>
+                    <h4>10. Memory Visibility</h4>
+                    <p>Why one thread's writes might be invisible to another. CPU caches and memory ordering.</p>
+                    <a href="10-memory-visibility.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⏰</div>
+                    <h4>11. Happens-Before</h4>
+                    <p>The formal guarantee that one operation's effects are visible to another. The foundation of memory models.</p>
+                    <a href="11-happens-before.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔀</div>
+                    <h4>12. Volatile vs Synchronized</h4>
+                    <p>Two different tools for visibility and atomicity. When to use which, and why.</p>
+                    <a href="12-volatile-vs-synchronized.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📍</div>
+                    <h4>13. False Sharing</h4>
+                    <p>A sneaky performance killer where unrelated data on the same cache line causes constant invalidation.</p>
+                    <a href="13-false-sharing.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 3: Concurrency Patterns &amp; Frameworks</h2>
+            <p>Battle-tested patterns for writing concurrent code that actually works in production.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🏊</div>
+                    <h4>14. Thread Pools</h4>
+                    <p>Reusing threads instead of creating new ones. The backbone of every web server and task executor.</p>
+                    <a href="14-thread-pools.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔮</div>
+                    <h4>15. Futures &amp; Async/Await</h4>
+                    <p>Write asynchronous code that reads like synchronous code. The modern approach to concurrency.</p>
+                    <a href="15-futures-promises-async.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📦</div>
+                    <h4>16. Producer-Consumer</h4>
+                    <p>One side produces work, the other consumes it. Decoupling speed differences with queues.</p>
+                    <a href="16-producer-consumer.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🚦</div>
+                    <h4>17. Blocking vs Non-Blocking</h4>
+                    <p>Wait for a resource, or check and move on? The trade-off between simplicity and performance.</p>
+                    <a href="17-blocking-vs-nonblocking.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🚀</div>
+                    <h4>18. Lock-Free Algorithms</h4>
+                    <p>Progress guarantees without locks. Maximum throughput for high-contention scenarios.</p>
+                    <a href="18-lock-free-wait-free.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📖</div>
+                    <h4>19. Read-Write Locks</h4>
+                    <p>Many readers or one writer. Optimizing for read-heavy workloads.</p>
+                    <a href="19-read-write-locks.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🚪</div>
+                    <h4>20. Semaphore/Latch/Barrier</h4>
+                    <p>Coordination primitives for controlling access counts, one-time events, and group synchronization.</p>
+                    <a href="20-semaphore-latch-barrier.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 4: Distributed Systems Core</h2>
+            <p>When one computer isn't enough. How multiple machines work together — and fight each other.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">⚖️</div>
+                    <h4>21. CAP Theorem</h4>
+                    <p>You can only pick two of three: Consistency, Availability, Partition tolerance. The fundamental trade-off.</p>
+                    <a href="21-cap-theorem.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💎</div>
+                    <h4>22. ACID Properties</h4>
+                    <p>The four guarantees that make database transactions reliable: Atomicity, Consistency, Isolation, Durability.</p>
+                    <a href="22-acid-properties.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <h4>23. Consistent Hashing</h4>
+                    <p>Distribute data across servers so adding/removing nodes doesn't shuffle everything.</p>
+                    <a href="23-consistent-hashing.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">👑</div>
+                    <h4>24. Leader Election</h4>
+                    <p>Choose one node to coordinate work. Like picking a team captain when nobody wants drama.</p>
+                    <a href="24-leader-election.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🤝</div>
+                    <h4>25. Distributed Consensus</h4>
+                    <p>Get multiple machines to agree on one value, even when some are failing. Paxos, Raft explained.</p>
+                    <a href="25-distributed-consensus.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📋</div>
+                    <h4>26. Replication</h4>
+                    <p>Keep copies of data on multiple nodes. One machine dying shouldn't kill your system.</p>
+                    <a href="26-replication.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧩</div>
+                    <h4>27. Partitioning &amp; Sharding</h4>
+                    <p>Split data across machines so no single server carries all the traffic.</p>
+                    <a href="27-partitioning-sharding.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🗳️</div>
+                    <h4>28. Quorum Reads/Writes</h4>
+                    <p>Use voting across replicas to balance consistency, latency, and fault tolerance.</p>
+                    <a href="28-quorum-reads-writes.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💬</div>
+                    <h4>29. Gossip Protocol</h4>
+                    <p>Nodes spread information like rumors — gradually, without needing one central machine.</p>
+                    <a href="29-gossip-protocol.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💓</div>
+                    <h4>30. Failure Detection</h4>
+                    <p>Decide who's alive, who's dead, and who's just slow. Heartbeats and phi accrual detectors.</p>
+                    <a href="30-failure-detection.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔒</div>
+                    <h4>31. Distributed Locking</h4>
+                    <p>Coordinate access to shared resources when many nodes want the same thing at once.</p>
+                    <a href="31-distributed-locking.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📜</div>
+                    <h4>32. Saga Pattern</h4>
+                    <p>Manage distributed transactions without two-phase commit. Compensating actions for failures.</p>
+                    <a href="32-saga-pattern.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 5: Resilience &amp; Reliability Patterns</h2>
+            <p>Patterns that keep systems alive when things go wrong — because things always go wrong.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🔁</div>
+                    <h4>33. Idempotency</h4>
+                    <p>Make repeated requests safe. Network retries shouldn't create duplicate payments or orders.</p>
+                    <a href="33-idempotency.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📨</div>
+                    <h4>34. Delivery Guarantees</h4>
+                    <p>At-most-once, at-least-once, exactly-once. The spectrum of message delivery reliability.</p>
+                    <a href="34-delivery-guarantees.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🌊</div>
+                    <h4>35. Backpressure</h4>
+                    <p>When a system is overwhelmed, push back instead of crashing. Flow control for services.</p>
+                    <a href="35-backpressure.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h4>36. Circuit Breaker</h4>
+                    <p>Stop calling a failing service. Give it time to recover instead of hammering it to death.</p>
+                    <a href="36-circuit-breaker.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🚰</div>
+                    <h4>37. Rate Limiting</h4>
+                    <p>Token bucket and leaky bucket algorithms. Control how fast requests flow through your system.</p>
+                    <a href="37-rate-limiting.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎚️</div>
+                    <h4>38. Throttling</h4>
+                    <p>Dynamically reduce processing speed when load gets too high. Graceful degradation.</p>
+                    <a href="38-throttling.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔄</div>
+                    <h4>39. Retry with Backoff</h4>
+                    <p>Retry failed work carefully instead of panic-spamming a broken service until everything burns.</p>
+                    <a href="39-retry-backoff.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 6: Database Engineering</h2>
+            <p>The internals of how databases actually store, retrieve, and protect your data.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🔬</div>
+                    <h4>40. Isolation Levels</h4>
+                    <p>How much can concurrent transactions see each other's work? From chaos to strict serialization.</p>
+                    <a href="40-isolation-levels.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🌲</div>
+                    <h4>41. Indexing Internals</h4>
+                    <p>B-Tree vs LSM Tree. The two fundamental data structures behind every database index.</p>
+                    <a href="41-indexing-internals.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📈</div>
+                    <h4>42. Write/Read Amplification</h4>
+                    <p>Why writing 1 byte might cause 10 bytes of disk I/O. The hidden cost of storage engines.</p>
+                    <a href="42-write-read-amplification.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔗</div>
+                    <h4>43. Composite Index</h4>
+                    <p>Index on multiple columns. Column order matters more than you think.</p>
+                    <a href="43-composite-index.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <h4>44. Query Optimization</h4>
+                    <p>How databases choose execution plans, and how to write queries that don't kill performance.</p>
+                    <a href="44-query-optimization.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h4>45. Caching Strategies</h4>
+                    <p>Write-through, write-back, cache-aside. Where to put your cache and how to keep it fresh.</p>
+                    <a href="45-caching-strategies.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🗑️</div>
+                    <h4>46. Cache Invalidation</h4>
+                    <p>The hardest problem in computer science. When and how to expire stale cached data.</p>
+                    <a href="46-cache-invalidation.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🦬</div>
+                    <h4>47. Cache Stampede</h4>
+                    <p>When a cache expires and thousands of requests all hit the database simultaneously.</p>
+                    <a href="47-cache-stampede.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 7: Architecture Patterns</h2>
+            <p>High-level patterns for structuring entire systems.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">📡</div>
+                    <h4>48. Event-Driven vs Request-Response</h4>
+                    <p>Fire-and-forget events vs ask-and-wait requests. Two fundamentally different communication styles.</p>
+                    <a href="48-event-driven-vs-request-response.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📄</div>
+                    <h4>49. Pagination</h4>
+                    <p>Offset, cursor, keyset pagination. Returning large datasets without destroying your server.</p>
+                    <a href="49-pagination.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 8: Design Patterns</h2>
+            <p>Classic software design patterns — reusable solutions to common programming problems.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">1️⃣</div>
+                    <h4>50. Singleton</h4>
+                    <p>One instance to rule them all. Global access point with controlled instantiation.</p>
+                    <a href="50-singleton.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🏭</div>
+                    <h4>51. Factory Method</h4>
+                    <p>Create objects without specifying their exact class. Delegate creation to subclasses.</p>
+                    <a href="51-factory-method.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧱</div>
+                    <h4>52. Builder</h4>
+                    <p>Construct complex objects step-by-step. Separate construction from representation.</p>
+                    <a href="52-builder.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔌</div>
+                    <h4>53. Adapter</h4>
+                    <p>Connect incompatible interfaces. Make old code work with new systems without rewriting.</p>
+                    <a href="53-adapter.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎨</div>
+                    <h4>54. Decorator</h4>
+                    <p>Add functionality dynamically without modifying original code. Stack behaviors like layers.</p>
+                    <a href="54-decorator.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🏛️</div>
+                    <h4>55. Facade</h4>
+                    <p>Simplify complex subsystems with a clean, unified interface.</p>
+                    <a href="55-facade.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">👀</div>
+                    <h4>56. Observer</h4>
+                    <p>Notify dependents of state changes. The pub-sub pattern at the object level.</p>
+                    <a href="56-observer.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">♟️</div>
+                    <h4>57. Strategy</h4>
+                    <p>Switch algorithms at runtime. Define a family of algorithms and make them interchangeable.</p>
+                    <a href="57-strategy.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📋</div>
+                    <h4>58. Command</h4>
+                    <p>Encapsulate requests as objects. Enable undo, queuing, and logging of operations.</p>
+                    <a href="58-command.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 9: API &amp; Communication</h2>
+            <p>How services talk to each other and to the outside world.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🚪</div>
+                    <h4>59. API Gateway</h4>
+                    <p>The single entry point for all client requests. Routing, auth, rate limiting in one place.</p>
+                    <a href="59-api-gateway.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚖️</div>
+                    <h4>60. Load Balancer</h4>
+                    <p>Distribute traffic across multiple servers. Round-robin, least connections, consistent hashing.</p>
+                    <a href="60-load-balancer.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔄</div>
+                    <h4>61. Reverse Proxy</h4>
+                    <p>Sit between clients and servers. SSL termination, caching, compression, security.</p>
+                    <a href="61-reverse-proxy.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h4>62. GraphQL</h4>
+                    <p>Ask for exactly what you need. No more over-fetching or under-fetching data.</p>
+                    <a href="62-graphql.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h4>63. gRPC</h4>
+                    <p>High-performance RPC with Protocol Buffers. Binary, typed, bidirectional streaming.</p>
+                    <a href="63-grpc.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🪝</div>
+                    <h4>64. Webhooks</h4>
+                    <p>Don't poll — get pushed. Server-to-server notifications when events happen.</p>
+                    <a href="64-webhooks.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>Module 10: Security</h2>
+            <p>Protecting your systems from unauthorized access and attacks.</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🎫</div>
+                    <h4>65. JWT</h4>
+                    <p>Stateless authentication tokens. Encode user identity without hitting the database every request.</p>
+                    <a href="65-jwt.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔑</div>
+                    <h4>66. OAuth</h4>
+                    <p>Let users log in with Google/GitHub without giving you their password. Delegated authorization.</p>
+                    <a href="66-oauth.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🛡️</div>
+                    <h4>67. CSRF</h4>
+                    <p>Prevent attackers from tricking users into making unwanted requests. Token-based protection.</p>
+                    <a href="67-csrf.html">Start Learning →</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔐</div>
+                    <h4>68. mTLS</h4>
+                    <p>Both sides prove their identity. Zero-trust networking between services.</p>
+                    <a href="68-mtls.html">Start Learning →</a>
+                </div>
+            </div>
+
+            <h2>How to Use This Course</h2>
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Learning Path</div>
+                <p><strong>Follow in order:</strong> Topics build on each other. You need to understand threads before deadlocks, and deadlocks before distributed locking.</p>
+                <p><strong>Each topic includes:</strong> A daily-life analogy, plain English explanation, deep technical dive, Python code examples, comparison tables, industry use cases, common mistakes, and a hands-on exercise.</p>
+                <p><strong>Designed for both:</strong> Non-technical people will understand the concepts. Technical people will get production-ready implementation details.</p>
+            </div>
+
+            <h2>Key Principle</h2>
+            <div class="mental-model">
+                <h3>🧠 The Core Mental Model</h3>
+                <div class="model-visual">
+Single Machine          →  Multiple Machines       →  Production System
+(Threads, Locks)           (Consensus, Replication)   (Resilience, Security)
+
+Concurrency: How ONE computer does many things at once
+Distributed:  How MANY computers work together
+Resilience:   How systems SURVIVE when things break
+Patterns:     PROVEN solutions to recurring problems
+                </div>
+                <p>Everything in system design exists to solve one core tension: <strong>doing more work, faster, without breaking things</strong>.</p>
+            </div>
+
+            <h2>Prerequisites</h2>
+            <ul>
+                <li><strong>For non-technical readers:</strong> Just curiosity. Every concept is explained from scratch with daily-life analogies.</li>
+                <li><strong>For technical readers:</strong> Basic Python knowledge. All code examples are in Python with Go alternatives for concurrency topics.</li>
+                <li><strong>For everyone:</strong> The willingness to understand WHY things work, not just memorize definitions.</li>
+            </ul>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Important Note</div>
+                <p>System design is not about memorizing buzzwords. It's about understanding <strong>trade-offs</strong>. Every design decision has a cost. This course teaches you to evaluate those costs and make informed decisions.</p>
+            </div>
+
+            <nav class="page-nav">
+                <span></span>
+                <a href="01-threads-vs-processes.html" class="next">Start: Threads vs Processes</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

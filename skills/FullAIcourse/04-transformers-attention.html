@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformers & Attention Mechanism — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 1</a> <span>›</span> Transformers & Attention</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Transformers & The Attention Mechanism</h1>
+                <p>The Transformer is THE architecture behind every modern AI model — GPT, Llama, Claude, Gemini, all of them. The secret sauce? The "attention mechanism" that lets models focus on what matters.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Attention = highlighting a textbook while studying.</strong></p>
+                <p>When you read a textbook and need to answer a question, you don't re-read the entire book equally. You scan, find the relevant paragraphs, and focus on those. That's exactly what attention does — for each word it generates, it "highlights" the most relevant previous words and pays more attention to them.</p>
+                <p><strong>Transformer = a team of expert speed-readers</strong> who can all read different parts of the text simultaneously (in parallel), then share notes with each other. This is why Transformers are so much faster than older approaches that had to read text one-word-at-a-time.</p>
+            </div>
+
+            <h2 id="before-transformers">Before Transformers: The Problem</h2>
+
+            <p>Before 2017, AI used <strong>RNNs</strong> (Recurrent Neural Networks) and <strong>LSTMs</strong> to process text. These had two major problems:</p>
+
+            <table>
+                <thead><tr><th>Problem</th><th>What It Means</th><th>Daily Life Analogy</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Sequential processing</strong></td>
+                        <td>Must read one word at a time, in order</td>
+                        <td>Like reading a book letter-by-letter instead of seeing the whole page</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Forgetting</strong></td>
+                        <td>Loses information from earlier in the text</td>
+                        <td>Like reading a 500-page book but forgetting chapter 1 by chapter 20</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>In 2017, Google published <strong>"Attention Is All You Need"</strong> — the paper that introduced Transformers and changed everything.</p>
+
+            <h2 id="what-is-transformer">What is a Transformer?</h2>
+
+            <p>A Transformer is a neural network architecture with these key properties:</p>
+
+            <ul>
+                <li><strong>Parallel processing</strong> — Reads all words simultaneously (not one-by-one)</li>
+                <li><strong>Attention mechanism</strong> — Knows which words to focus on for each decision</li>
+                <li><strong>Position awareness</strong> — Knows word order even though it reads in parallel</li>
+                <li><strong>Scalable</strong> — Gets better with more data and more parameters (this is why bigger = better usually)</li>
+            </ul>
+
+            <h3>Transformer Architecture Overview:</h3>
+            <pre><code><span class="token-comment"># Simplified Transformer structure</span>
+Input: <span class="token-string">"The cat sat on the mat"</span>
+    ↓
+[Token Embeddings + Position Encodings]  <span class="token-comment"># Convert to vectors + add position info</span>
+    ↓
+[Self-Attention Layer 1]    <span class="token-comment"># Each word looks at all other words</span>
+[Feed-Forward Layer 1]     <span class="token-comment"># Process attention results</span>
+    ↓
+[Self-Attention Layer 2]    <span class="token-comment"># Deeper understanding</span>
+[Feed-Forward Layer 2]     <span class="token-comment"># More processing</span>
+    ↓
+... (repeat 32-80 times for modern LLMs) ...
+    ↓
+[Output Layer]             <span class="token-comment"># Predict next token probabilities</span>
+    ↓
+Output: <span class="token-string">"because"</span> (predicted next word)</code></pre>
+
+            <h2 id="attention-mechanism">The Attention Mechanism (The Secret Sauce)</h2>
+
+            <p><strong>Self-attention</strong> answers the question: "When processing this word, which other words in the sentence should I pay attention to?"</p>
+
+            <h3>Example:</h3>
+            <p>Sentence: <em>"The <strong>animal</strong> didn't cross the street because <strong>it</strong> was too tired"</em></p>
+            <p>When processing the word "it", attention helps the model understand that "it" refers to "animal" (not "street"). The attention mechanism assigns high weight to "animal" and low weight to "street" when processing "it".</p>
+
+            <h3>How Attention Works (Simplified):</h3>
+
+            <p>For each word, we compute three things:</p>
+            <ol>
+                <li><strong>Query (Q)</strong>: "What am I looking for?" — what this word needs</li>
+                <li><strong>Key (K)</strong>: "What do I contain?" — what this word offers</li>
+                <li><strong>Value (V)</strong>: "What information do I provide?" — the actual content</li>
+            </ol>
+
+            <div class="analogy-box">
+                <h4>🏠 Analogy: Library Search</h4>
+                <p><strong>Query</strong> = Your search question ("I need info about cats")<br>
+                <strong>Key</strong> = Book titles on the shelf ("Cat Encyclopedia", "Dog Training", "World History")<br>
+                <strong>Value</strong> = The actual book contents</p>
+                <p>Attention = Match your Query against all Keys → Find best matches → Read those Values</p>
+            </div>
+
+            <h3>The Math (Simplified):</h3>
+            <pre><code><span class="token-comment"># Attention formula: Attention(Q, K, V) = softmax(QK^T / √d) × V</span>
+
+<span class="token-comment"># Step 1: Each word creates Q, K, V vectors by multiplying with learned weights</span>
+Q = word_embedding × W_query   <span class="token-comment"># "What am I looking for?"</span>
+K = word_embedding × W_key     <span class="token-comment"># "What do I have to offer?"</span>
+V = word_embedding × W_value   <span class="token-comment"># "Here's my actual information"</span>
+
+<span class="token-comment"># Step 2: Calculate attention scores (how much each word should attend to every other word)</span>
+scores = Q @ K.T / sqrt(d_k)   <span class="token-comment"># Higher score = more relevant</span>
+
+<span class="token-comment"># Step 3: Convert to probabilities (sum to 1)</span>
+attention_weights = softmax(scores)  <span class="token-comment"># e.g., [0.7, 0.1, 0.05, 0.15]</span>
+
+<span class="token-comment"># Step 4: Weighted sum of values</span>
+output = attention_weights @ V  <span class="token-comment"># Mix values based on relevance</span></code></pre>
+
+            <h2 id="multi-head">Multi-Head Attention</h2>
+
+            <p>Instead of one attention mechanism, Transformers use <strong>multiple "heads"</strong> (typically 32-128). Each head learns to focus on different types of relationships:</p>
+
+            <table>
+                <thead><tr><th>Head</th><th>Might Learn to Focus On</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td>Head 1</td><td>Grammar/syntax</td><td>"the" → "cat" (article-noun relationship)</td></tr>
+                    <tr><td>Head 2</td><td>Coreference</td><td>"it" → "animal" (pronoun resolution)</td></tr>
+                    <tr><td>Head 3</td><td>Semantic similarity</td><td>"happy" → "joyful" (synonyms)</td></tr>
+                    <tr><td>Head 4</td><td>Position/distance</td><td>Adjacent words</td></tr>
+                </tbody>
+            </table>
+
+            <p>All heads work in <strong>parallel</strong>, then their results are combined. This is why GPUs (which excel at parallel computation) are perfect for Transformers.</p>
+
+            <h2 id="types">Types of Transformer Architectures</h2>
+
+            <div class="comparison-table">
+                <table>
+                    <thead><tr><th>Type</th><th>How It Works</th><th>Used By</th><th>Best For</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Decoder-only</strong></td>
+                            <td>Generates text left-to-right, can only look at previous tokens</td>
+                            <td>GPT, Llama, Claude, Gemini</td>
+                            <td>Text generation, chatbots, coding</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Encoder-only</strong></td>
+                            <td>Looks at all tokens at once, creates representations</td>
+                            <td>BERT, RoBERTa</td>
+                            <td>Classification, embeddings, NER</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Encoder-Decoder</strong></td>
+                            <td>Encoder reads input, Decoder generates output</td>
+                            <td>T5, BART, mBART</td>
+                            <td>Translation, summarization</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Key Insight</div>
+                <p>All modern chat-style LLMs (GPT-4, Claude, Llama, Gemini) are <strong>decoder-only</strong> Transformers. They generate text one token at a time, looking only at what came before (not the future). This is called "causal" or "autoregressive" generation.</p>
+            </div>
+
+            <h2 id="code">Production Code: Visualizing Attention</h2>
+
+            <pre><code><span class="token-comment"># pip install transformers torch bertviz</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoTokenizer, AutoModel
+<span class="token-keyword">import</span> torch
+
+<span class="token-comment"># Load a small model to inspect attention</span>
+model_name = <span class="token-string">"bert-base-uncased"</span>
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name, output_attentions=<span class="token-keyword">True</span>)
+
+<span class="token-comment"># Tokenize a sentence</span>
+text = <span class="token-string">"The cat sat on the mat because it was tired"</span>
+inputs = tokenizer(text, return_tensors=<span class="token-string">"pt"</span>)
+
+<span class="token-comment"># Get attention weights</span>
+<span class="token-keyword">with</span> torch.no_grad():
+    outputs = model(**inputs)
+
+<span class="token-comment"># outputs.attentions is a tuple: (num_layers, batch, num_heads, seq_len, seq_len)</span>
+attentions = outputs.attentions
+<span class="token-builtin">print</span>(<span class="token-string">f"Number of layers: {len(attentions)}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Attention shape per layer: {attentions[0].shape}"</span>)
+
+<span class="token-comment"># Look at what "it" attends to in the last layer</span>
+tokens = tokenizer.convert_ids_to_tokens(inputs[<span class="token-string">"input_ids"</span>][<span class="token-number">0</span>])
+it_index = tokens.index(<span class="token-string">"it"</span>)
+
+<span class="token-comment"># Average attention across all heads for "it"</span>
+last_layer_attn = attentions[-<span class="token-number">1</span>][<span class="token-number">0</span>].mean(dim=<span class="token-number">0</span>)  <span class="token-comment"># Average across heads</span>
+it_attention = last_layer_attn[it_index]
+
+<span class="token-builtin">print</span>(<span class="token-string">f"\nWhat does 'it' pay attention to:"</span>)
+<span class="token-keyword">for</span> token, score <span class="token-keyword">in</span> <span class="token-builtin">sorted</span>(<span class="token-builtin">zip</span>(tokens, it_attention.tolist()), key=<span class="token-keyword">lambda</span> x: x[<span class="token-number">1</span>], reverse=<span class="token-keyword">True</span>)[:5]:
+    <span class="token-builtin">print</span>(<span class="token-string">f"  {token:12s} → {score:.4f}"</span>)
+<span class="token-comment"># Expected: "cat" will have high attention (it=the cat)</span></code></pre>
+
+            <h3>Minimal Transformer Block (PyTorch)</h3>
+            <pre><code><span class="token-comment"># Simplified transformer block — the core building block of every LLM</span>
+<span class="token-keyword">import</span> torch
+<span class="token-keyword">import</span> torch.nn <span class="token-keyword">as</span> nn
+<span class="token-keyword">import</span> math
+
+<span class="token-keyword">class</span> <span class="token-class">SelfAttention</span>(nn.Module):
+    <span class="token-string">"""Single-head self-attention (simplified for learning)."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, embed_dim):
+        <span class="token-builtin">super</span>().__init__()
+        self.W_q = nn.Linear(embed_dim, embed_dim)
+        self.W_k = nn.Linear(embed_dim, embed_dim)
+        self.W_v = nn.Linear(embed_dim, embed_dim)
+        self.scale = math.sqrt(embed_dim)
+
+    <span class="token-keyword">def</span> <span class="token-function">forward</span>(self, x):
+        <span class="token-comment"># x shape: (batch, seq_len, embed_dim)</span>
+        Q = self.W_q(x)  <span class="token-comment"># Queries</span>
+        K = self.W_k(x)  <span class="token-comment"># Keys</span>
+        V = self.W_v(x)  <span class="token-comment"># Values</span>
+
+        <span class="token-comment"># Attention scores: how much each token attends to every other</span>
+        scores = torch.matmul(Q, K.transpose(-<span class="token-number">2</span>, -<span class="token-number">1</span>)) / self.scale
+
+        <span class="token-comment"># Causal mask: can't look at future tokens (for text generation)</span>
+        seq_len = x.size(<span class="token-number">1</span>)
+        mask = torch.triu(torch.ones(seq_len, seq_len), diagonal=<span class="token-number">1</span>).bool()
+        scores.masked_fill_(mask, <span class="token-builtin">float</span>(<span class="token-string">'-inf'</span>))
+
+        <span class="token-comment"># Softmax → probabilities</span>
+        attention_weights = torch.softmax(scores, dim=-<span class="token-number">1</span>)
+
+        <span class="token-comment"># Weighted sum of values</span>
+        output = torch.matmul(attention_weights, V)
+        <span class="token-keyword">return</span> output
+
+<span class="token-keyword">class</span> <span class="token-class">TransformerBlock</span>(nn.Module):
+    <span class="token-string">"""One transformer block = Attention + Feed-Forward + Layer Norms."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, embed_dim, ff_dim):
+        <span class="token-builtin">super</span>().__init__()
+        self.attention = SelfAttention(embed_dim)
+        self.norm1 = nn.LayerNorm(embed_dim)
+        self.norm2 = nn.LayerNorm(embed_dim)
+        self.ff = nn.Sequential(
+            nn.Linear(embed_dim, ff_dim),
+            nn.GELU(),
+            nn.Linear(ff_dim, embed_dim),
+        )
+
+    <span class="token-keyword">def</span> <span class="token-function">forward</span>(self, x):
+        <span class="token-comment"># Attention with residual connection</span>
+        x = x + self.attention(self.norm1(x))
+        <span class="token-comment"># Feed-forward with residual connection</span>
+        x = x + self.ff(self.norm2(x))
+        <span class="token-keyword">return</span> x
+
+<span class="token-comment"># A "7B parameter" model ≈ 32 of these blocks stacked together</span>
+<span class="token-comment"># with embed_dim=4096 and ff_dim=11008</span></code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Decoder-only dominates</strong> — All major LLMs in 2024-2026 use decoder-only architecture</li>
+                    <li><strong>Flash Attention</strong> — Production models use Flash Attention 2 for 2-4x faster training (covered in Ch. 16)</li>
+                    <li><strong>RoPE positional encoding</strong> — Modern models use Rotary Position Embeddings (Llama, Qwen, Mistral)</li>
+                    <li><strong>GQA (Grouped Query Attention)</strong> — Optimization where multiple Q heads share K/V heads (saves memory)</li>
+                    <li><strong>Layer count</strong> — 7B model = ~32 layers, 70B = ~80 layers, 405B = ~126 layers</li>
+                    <li><strong>Hidden dimension</strong> — 7B = 4096, 70B = 8192, 405B = 16384</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Transformers</strong> = the architecture behind ALL modern LLMs (invented 2017)</li>
+                    <li><strong>Self-attention</strong> = each word looks at all other words to understand context</li>
+                    <li>Uses Query, Key, Value vectors — like searching a library</li>
+                    <li><strong>Multi-head attention</strong> = multiple attention mechanisms running in parallel, each learning different patterns</li>
+                    <li><strong>Decoder-only</strong> = can only look backward (used by GPT, Llama, Claude)</li>
+                    <li>Transformers process text in parallel (fast) unlike old RNNs (sequential, slow)</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    [Word₁ Word₂ Word₃ ... WordN]<br>
+                          ↕    ↕    ↕         ↕<br>
+                    Every word "looks at" every other word<br>
+                    (but future words are masked in generation)<br><br>
+                    Repeat this 32-80 times = one LLM
+                </div>
+                <p><strong>Transformer = parallel reading + selective highlighting, stacked many times.</strong> Each layer understands the text a little deeper — from surface grammar to deep semantics.</p>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Thinking attention is like human attention</strong> — It's purely mathematical, not conscious focus.</li>
+                    <li><strong>Confusing "Transformer" with "ChatGPT"</strong> — Transformer is the architecture; ChatGPT is one product built on it.</li>
+                    <li><strong>Ignoring the quadratic cost</strong> — Attention cost grows as O(n²) with sequence length. 2x longer text = 4x more compute.</li>
+                    <li><strong>Thinking more layers = always better</strong> — After a point, adding layers gives diminishing returns without more data.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Explore Attention</h4>
+                <ol>
+                    <li>Run the attention visualization code above with different sentences</li>
+                    <li>Try: "The dog chased the cat because it was fast" — what does "it" attend to?</li>
+                    <li>Try: "The dog chased the cat because it was scared" — does "it" shift attention?</li>
+                    <li>Notice how attention patterns change across different layers (early vs late)</li>
+                    <li><strong>Bonus:</strong> Install <code>bertviz</code> for beautiful interactive attention visualizations</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="03-embeddings.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Embeddings</span>
+                </a>
+                <a href="05-parameters-training.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Parameters & Training</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

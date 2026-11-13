@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoC Container & BeanFactory - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals &bull; 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Spring Core & IoC Internals</li>
+            <li><a href="01-ioc-container.html"><span class="nav-number">1</span> IoC Container & BeanFactory</a></li>
+            <li><a href="02-application-context.html"><span class="nav-number">2</span> ApplicationContext Lifecycle</a></li>
+            <li><a href="03-bean-lifecycle.html"><span class="nav-number">3</span> Bean Lifecycle & Callbacks</a></li>
+            <li><a href="04-dependency-injection.html"><span class="nav-number">4</span> Dependency Injection Internals</a></li>
+            <li><a href="05-component-scanning.html"><span class="nav-number">5</span> Component Scanning</a></li>
+            <li><a href="06-bean-scopes.html"><span class="nav-number">6</span> Bean Scopes & Proxy Mechanisms</a></li>
+            <li><a href="07-aop-internals.html"><span class="nav-number">7</span> AOP Internals</a></li>
+            <li><a href="08-spel.html"><span class="nav-number">8</span> Spring Expression Language</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html"><span class="nav-number">14</span> Profile Management</a></li>
+            <li><a href="15-custom-starters.html"><span class="nav-number">15</span> Custom Starters</a></li>
+            <li class="module-label">Web Layer (Spring MVC)</li>
+            <li><a href="16-dispatcher-servlet.html"><span class="nav-number">16</span> DispatcherServlet Internals</a></li>
+            <li><a href="17-handler-mapping.html"><span class="nav-number">17</span> Handler Mapping & Adapters</a></li>
+            <li><a href="18-request-lifecycle.html"><span class="nav-number">18</span> Request Lifecycle</a></li>
+            <li><a href="19-content-negotiation.html"><span class="nav-number">19</span> Content Negotiation</a></li>
+            <li><a href="20-exception-handling.html"><span class="nav-number">20</span> Exception Handling</a></li>
+            <li><a href="21-validation.html"><span class="nav-number">21</span> Validation Framework</a></li>
+            <li><a href="22-filters-interceptors.html"><span class="nav-number">22</span> Filters vs Interceptors</a></li>
+            <li class="module-label">Data Access</li>
+            <li><a href="23-spring-data-jpa.html"><span class="nav-number">23</span> Spring Data JPA Internals</a></li>
+            <li><a href="24-repository-abstraction.html"><span class="nav-number">24</span> Repository Proxy Generation</a></li>
+            <li><a href="25-transaction-management.html"><span class="nav-number">25</span> @Transactional Internals</a></li>
+            <li><a href="26-connection-pooling.html"><span class="nav-number">26</span> Connection Pooling (HikariCP)</a></li>
+            <li><a href="27-entity-lifecycle.html"><span class="nav-number">27</span> JPA Entity Lifecycle</a></li>
+            <li><a href="28-n-plus-one.html"><span class="nav-number">28</span> N+1 Problem & Optimization</a></li>
+            <li><a href="29-database-migrations.html"><span class="nav-number">29</span> Database Migrations</a></li>
+            <li><a href="30-multi-datasource.html"><span class="nav-number">30</span> Multi-DataSource Config</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="31-security-architecture.html"><span class="nav-number">31</span> Spring Security Architecture</a></li>
+            <li><a href="32-filter-chain.html"><span class="nav-number">32</span> Security Filter Chain</a></li>
+            <li><a href="33-authentication.html"><span class="nav-number">33</span> Authentication Mechanisms</a></li>
+            <li><a href="34-authorization.html"><span class="nav-number">34</span> Authorization & Method Security</a></li>
+            <li><a href="35-oauth2-jwt.html"><span class="nav-number">35</span> OAuth2 & JWT</a></li>
+            <li><a href="36-cors.html"><span class="nav-number">36</span> CORS Configuration</a></li>
+            <li><a href="37-csrf-protection.html"><span class="nav-number">37</span> CSRF Protection</a></li>
+            <li class="module-label">Reactive Programming</li>
+            <li><a href="38-project-reactor.html"><span class="nav-number">38</span> Project Reactor</a></li>
+            <li><a href="39-webflux.html"><span class="nav-number">39</span> WebFlux Internals</a></li>
+            <li><a href="40-r2dbc.html"><span class="nav-number">40</span> R2DBC Reactive Data</a></li>
+            <li><a href="41-backpressure.html"><span class="nav-number">41</span> Backpressure Strategies</a></li>
+            <li><a href="42-reactive-security.html"><span class="nav-number">42</span> Reactive Security</a></li>
+            <li class="module-label">Messaging & Async</li>
+            <li><a href="43-application-events.html"><span class="nav-number">43</span> Application Events</a></li>
+            <li><a href="44-kafka-integration.html"><span class="nav-number">44</span> Kafka Integration</a></li>
+            <li><a href="45-rabbitmq.html"><span class="nav-number">45</span> RabbitMQ Integration</a></li>
+            <li><a href="46-async-processing.html"><span class="nav-number">46</span> @Async Internals</a></li>
+            <li><a href="47-scheduling.html"><span class="nav-number">47</span> @Scheduled Internals</a></li>
+            <li class="module-label">Testing</li>
+            <li><a href="48-spring-boot-test.html"><span class="nav-number">48</span> @SpringBootTest Internals</a></li>
+            <li><a href="49-slice-testing.html"><span class="nav-number">49</span> Slice Testing</a></li>
+            <li><a href="50-testcontainers.html"><span class="nav-number">50</span> TestContainers</a></li>
+            <li><a href="51-mockmvc.html"><span class="nav-number">51</span> MockMvc Deep Dive</a></li>
+            <li><a href="52-contract-testing.html"><span class="nav-number">52</span> Contract Testing</a></li>
+            <li class="module-label">Production Readiness</li>
+            <li><a href="53-actuator.html"><span class="nav-number">53</span> Actuator Internals</a></li>
+            <li><a href="54-health-checks.html"><span class="nav-number">54</span> Health Checks</a></li>
+            <li><a href="55-metrics.html"><span class="nav-number">55</span> Metrics & Prometheus</a></li>
+            <li><a href="56-distributed-tracing.html"><span class="nav-number">56</span> Distributed Tracing</a></li>
+            <li><a href="57-logging.html"><span class="nav-number">57</span> Logging Architecture</a></li>
+            <li><a href="58-graceful-shutdown.html"><span class="nav-number">58</span> Graceful Shutdown</a></li>
+            <li class="module-label">Cloud Native & Microservices</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-service-discovery.html"><span class="nav-number">60</span> Service Discovery</a></li>
+            <li><a href="61-circuit-breaker.html"><span class="nav-number">61</span> Circuit Breaker</a></li>
+            <li><a href="62-config-server.html"><span class="nav-number">62</span> Config Server</a></li>
+            <li><a href="63-distributed-caching.html"><span class="nav-number">63</span> Distributed Caching</a></li>
+            <li><a href="64-docker-optimization.html"><span class="nav-number">64</span> Docker Optimization</a></li>
+            <li><a href="65-kubernetes.html"><span class="nav-number">65</span> Kubernetes Deployment</a></li>
+            <li class="module-label">Performance & Advanced</li>
+            <li><a href="66-jvm-tuning.html"><span class="nav-number">66</span> JVM Tuning</a></li>
+            <li><a href="67-graalvm-native.html"><span class="nav-number">67</span> GraalVM Native Image</a></li>
+            <li><a href="68-caching-abstraction.html"><span class="nav-number">68</span> Caching Abstraction</a></li>
+            <li><a href="69-thread-pool-tuning.html"><span class="nav-number">69</span> Thread Pool Tuning</a></li>
+            <li><a href="70-startup-optimization.html"><span class="nav-number">70</span> Startup Optimization</a></li>
+            <li><a href="71-virtual-threads.html"><span class="nav-number">71</span> Virtual Threads (Loom)</a></li>
+            <li><a href="72-observability.html"><span class="nav-number">72</span> Observability Stack</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Spring Boot Mastery</a>
+                <span>/</span> IoC Container & BeanFactory
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>IoC Container & BeanFactory</h1>
+                <p class="subtitle">The heart of Spring — how Inversion of Control actually works at the bytecode level, and why BeanFactory is the foundation everything else builds upon.</p>
+                <div class="tag-row">
+                    <span class="tag tag-concept">Core Concept</span>
+                    <span class="tag tag-spring">Spring Framework</span>
+                    <span class="tag tag-internal">Internals</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏭 Daily-Life Analogy: The Restaurant Kitchen</div>
+                <p>Think of the IoC container as a <strong>restaurant kitchen manager</strong>. Instead of each waiter going to the market, buying ingredients, and cooking their own dishes (traditional "new Object()" approach), the kitchen manager <strong>prepares everything centrally</strong> and hands fully-prepared dishes to waiters when they need them.</p>
+                <p>The waiter (your class) doesn't know HOW the dish was prepared, WHERE ingredients came from, or what other dishes share the same sauce. It just <strong>declares what it needs</strong> and receives it. That's Inversion of Control — the control of object creation is <em>inverted</em> from your code to the container.</p>
+            </div>
+
+            <h2>What is Inversion of Control?</h2>
+            <p>IoC is a <strong>design principle</strong> (not a pattern) where the flow of control is inverted compared to traditional programming:</p>
+            <ul>
+                <li><strong>Traditional</strong>: Your code creates dependencies → <code>OrderService service = new OrderService(new OrderRepository())</code></li>
+                <li><strong>IoC</strong>: A container creates dependencies and injects them into your code</li>
+            </ul>
+            <p>Spring's IoC container implements this via <strong>Dependency Injection (DI)</strong> — the most common form of IoC. But IoC is broader: it also covers the Template Method pattern, Strategy pattern, and Service Locator.</p>
+
+            <h2>BeanFactory: The Root Interface</h2>
+            <p><code>BeanFactory</code> is the <strong>root interface</strong> of Spring's IoC container. It defines the fundamental contract for managing beans:</p>
+
+<pre><code><span class="token-keyword">public interface</span> <span class="token-class">BeanFactory</span> {
+    <span class="token-comment">// Core method — retrieve a bean by name</span>
+    <span class="token-type">Object</span> <span class="token-function">getBean</span>(<span class="token-type">String</span> name) <span class="token-keyword">throws</span> BeansException;
+    
+    <span class="token-comment">// Type-safe retrieval</span>
+    &lt;<span class="token-type">T</span>&gt; <span class="token-type">T</span> <span class="token-function">getBean</span>(<span class="token-type">Class</span>&lt;<span class="token-type">T</span>&gt; requiredType) <span class="token-keyword">throws</span> BeansException;
+    
+    <span class="token-comment">// Check existence without instantiation</span>
+    <span class="token-keyword">boolean</span> <span class="token-function">containsBean</span>(<span class="token-type">String</span> name);
+    
+    <span class="token-comment">// Scope checks</span>
+    <span class="token-keyword">boolean</span> <span class="token-function">isSingleton</span>(<span class="token-type">String</span> name);
+    <span class="token-keyword">boolean</span> <span class="token-function">isPrototype</span>(<span class="token-type">String</span> name);
+}
+</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Key Insight</div>
+                <p><code>BeanFactory</code> uses <strong>lazy initialization</strong> by default — beans are created only when first requested via <code>getBean()</code>. This is crucial for understanding memory behavior. <code>ApplicationContext</code> (its child) does eager initialization of singletons at startup.</p>
+            </div>
+
+            <h2>The Internal Architecture</h2>
+            <p>Here's how the container actually stores and manages beans internally:</p>
+
+            <div class="architecture-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                    BeanFactory                                │
+│                         │                                    │
+│              ┌──────────┴──────────┐                         │
+│              │                     │                         │
+│    DefaultListableBeanFactory    HierarchicalBeanFactory     │
+│              │                                               │
+│    ┌─────────┼─────────────────┐                             │
+│    │         │                 │                             │
+│  BeanDefinitionMap    SingletonObjects    FactoryBeans       │
+│  (ConcurrentHashMap)  (ConcurrentHashMap)  (Special beans)  │
+│    │                   │                                     │
+│  Metadata about       Actual singleton                       │
+│  how to create        instances cached                       │
+│  each bean            here                                   │
+└─────────────────────────────────────────────────────────────┘
+            </div>
+
+            <h3>DefaultListableBeanFactory — The Real Implementation</h3>
+            <p>Almost everything in Spring ultimately delegates to <code>DefaultListableBeanFactory</code>. It maintains:</p>
+            <ul>
+                <li><strong><code>beanDefinitionMap</code></strong> — A <code>ConcurrentHashMap&lt;String, BeanDefinition&gt;</code> storing metadata (class name, scope, init-method, constructor args, etc.)</li>
+                <li><strong><code>singletonObjects</code></strong> — The first-level cache: <code>ConcurrentHashMap&lt;String, Object&gt;</code> holding fully initialized singletons</li>
+                <li><strong><code>earlySingletonObjects</code></strong> — Second-level cache for beans in the process of creation (handles circular dependencies)</li>
+                <li><strong><code>singletonFactories</code></strong> — Third-level cache: <code>ObjectFactory&lt;?&gt;</code> lambdas that can create early bean references</li>
+            </ul>
+
+            <h2>Three-Level Cache: Solving Circular Dependencies</h2>
+            <p>This is one of Spring's most clever internal mechanisms. When Bean A depends on Bean B, and Bean B depends on Bean A:</p>
+
+<pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">PaymentService</span> paymentService; <span class="token-comment">// Depends on PaymentService</span>
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">PaymentService</span> {
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">OrderService</span> orderService; <span class="token-comment">// Circular! Depends on OrderService</span>
+}
+</code></pre>
+
+            <p>Spring resolves this with three maps (the "three-level cache"):</p>
+            <ol>
+                <li><strong>singletonObjects</strong> (Level 1) — Fully initialized beans. Final destination.</li>
+                <li><strong>earlySingletonObjects</strong> (Level 2) — Partially created beans (instantiated but not yet injected). Exposed early.</li>
+                <li><strong>singletonFactories</strong> (Level 3) — ObjectFactory lambdas that wrap the early bean reference (needed for AOP proxies).</li>
+            </ol>
+
+            <h3>Resolution Flow:</h3>
+            <div class="flow-diagram">
+                <span class="flow-step">Create OrderService</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Put ObjectFactory in L3</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Inject PaymentService</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Create PaymentService</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Needs OrderService</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Get from L3 factory</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Move to L2</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Complete both → L1</span>
+            </div>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Constructor Injection Breaks Circular Dependencies</div>
+                <p>The three-level cache only works for <strong>field/setter injection</strong>. With constructor injection, the bean can't be instantiated at all without its dependency — there's no "partially created" state. Spring will throw <code>BeanCurrentlyInCreationException</code>. This is actually a <strong>good thing</strong> — circular dependencies are a design smell, and constructor injection forces you to fix them.</p>
+            </div>
+
+            <h2>BeanDefinition: The Blueprint</h2>
+            <p>Every bean starts as a <code>BeanDefinition</code> — metadata describing HOW to create the bean:</p>
+
+<pre><code><span class="token-keyword">public interface</span> <span class="token-class">BeanDefinition</span> {
+    <span class="token-type">String</span> <span class="token-function">getBeanClassName</span>();          <span class="token-comment">// "com.example.OrderService"</span>
+    <span class="token-type">String</span> <span class="token-function">getScope</span>();                  <span class="token-comment">// "singleton" or "prototype"</span>
+    <span class="token-keyword">boolean</span> <span class="token-function">isLazyInit</span>();               <span class="token-comment">// Delay creation?</span>
+    <span class="token-type">String</span> <span class="token-function">getInitMethodName</span>();          <span class="token-comment">// Call after creation</span>
+    <span class="token-type">String</span> <span class="token-function">getDestroyMethodName</span>();       <span class="token-comment">// Call before destruction</span>
+    <span class="token-type">ConstructorArgumentValues</span> <span class="token-function">getConstructorArgumentValues</span>();
+    <span class="token-type">MutablePropertyValues</span> <span class="token-function">getPropertyValues</span>();
+    <span class="token-type">String</span> <span class="token-function">getFactoryMethodName</span>();       <span class="token-comment">// For @Bean methods</span>
+    <span class="token-keyword">boolean</span> <span class="token-function">isPrimary</span>();                <span class="token-comment">// @Primary annotation</span>
+}
+</code></pre>
+
+            <p>When you annotate a class with <code>@Component</code>, Spring creates a <code>ScannedGenericBeanDefinition</code>. When you use <code>@Bean</code> in a config class, it creates a <code>ConfigurationClassBeanDefinition</code>. These are registered into the <code>beanDefinitionMap</code> during startup.</p>
+
+            <h2>How getBean() Works Internally</h2>
+            <p>When you call <code>context.getBean("orderService")</code>, here's the actual execution path inside <code>AbstractBeanFactory.doGetBean()</code>:</p>
+
+<pre><code><span class="token-comment">// Simplified pseudocode of AbstractBeanFactory.doGetBean()</span>
+<span class="token-keyword">protected</span> &lt;T&gt; T <span class="token-function">doGetBean</span>(String name, Class&lt;T&gt; requiredType) {
+    <span class="token-comment">// 1. Transform name (strip "&" prefix for FactoryBeans, resolve aliases)</span>
+    String beanName = transformedBeanName(name);
+    
+    <span class="token-comment">// 2. Check singleton cache FIRST (fast path)</span>
+    Object sharedInstance = getSingleton(beanName);
+    <span class="token-keyword">if</span> (sharedInstance != <span class="token-keyword">null</span>) {
+        <span class="token-keyword">return</span> getObjectForBeanInstance(sharedInstance, name);
+    }
+    
+    <span class="token-comment">// 3. Check parent BeanFactory (hierarchical containers)</span>
+    BeanFactory parentBeanFactory = getParentBeanFactory();
+    <span class="token-keyword">if</span> (parentBeanFactory != <span class="token-keyword">null</span> && !containsBeanDefinition(beanName)) {
+        <span class="token-keyword">return</span> parentBeanFactory.getBean(name, requiredType);
+    }
+    
+    <span class="token-comment">// 4. Get merged BeanDefinition (handle parent bean definitions)</span>
+    RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+    
+    <span class="token-comment">// 5. Handle depends-on (create dependencies first)</span>
+    String[] dependsOn = mbd.getDependsOn();
+    <span class="token-keyword">if</span> (dependsOn != <span class="token-keyword">null</span>) {
+        <span class="token-keyword">for</span> (String dep : dependsOn) {
+            getBean(dep); <span class="token-comment">// Recursive call!</span>
+        }
+    }
+    
+    <span class="token-comment">// 6. Create bean based on scope</span>
+    <span class="token-keyword">if</span> (mbd.isSingleton()) {
+        sharedInstance = getSingleton(beanName, () -> createBean(beanName, mbd));
+    } <span class="token-keyword">else if</span> (mbd.isPrototype()) {
+        Object prototypeInstance = createBean(beanName, mbd);
+        <span class="token-keyword">return</span> prototypeInstance;
+    }
+    
+    <span class="token-keyword">return</span> adaptBeanInstance(name, sharedInstance, requiredType);
+}
+</code></pre>
+
+            <h2>BeanFactory vs ApplicationContext</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Feature</th><th>BeanFactory</th><th>ApplicationContext</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Bean Instantiation</td><td>Lazy (on first getBean)</td><td>Eager (all singletons at startup)</td></tr>
+                    <tr><td>Event Publishing</td><td>❌ Not supported</td><td>✅ ApplicationEventPublisher</td></tr>
+                    <tr><td>Internationalization</td><td>❌ No MessageSource</td><td>✅ Built-in i18n</td></tr>
+                    <tr><td>Resource Loading</td><td>Basic</td><td>Advanced (classpath:, file:, http:)</td></tr>
+                    <tr><td>AOP Integration</td><td>Manual setup</td><td>Automatic proxy creation</td></tr>
+                    <tr><td>Environment Abstraction</td><td>❌</td><td>✅ Profiles + Properties</td></tr>
+                    <tr><td>Memory Usage</td><td>Lower (lazy)</td><td>Higher (eager, all loaded)</td></tr>
+                    <tr><td>Startup Time</td><td>Faster</td><td>Slower (pre-instantiates)</td></tr>
+                    <tr><td>Production Use</td><td>Rare (IoT, memory-constrained)</td><td>Standard (99% of apps)</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Industry Production Pattern: Custom BeanFactoryPostProcessor</h2>
+<pre><code><span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">EncryptedPropertyPostProcessor</span> 
+        <span class="token-keyword">implements</span> <span class="token-type">BeanFactoryPostProcessor</span> {
+    
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">postProcessBeanFactory</span>(
+            <span class="token-type">ConfigurableListableBeanFactory</span> beanFactory) {
+        
+        <span class="token-comment">// This runs BEFORE any beans are created</span>
+        <span class="token-comment">// Use case: decrypt encrypted properties from vault</span>
+        
+        String[] beanNames = beanFactory.getBeanDefinitionNames();
+        <span class="token-keyword">for</span> (String beanName : beanNames) {
+            BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+            MutablePropertyValues pvs = bd.getPropertyValues();
+            
+            <span class="token-keyword">for</span> (PropertyValue pv : pvs.getPropertyValueList()) {
+                <span class="token-keyword">if</span> (pv.getValue() <span class="token-keyword">instanceof</span> String val 
+                        && val.startsWith(<span class="token-string">"ENC("</span>)) {
+                    <span class="token-comment">// Decrypt before bean instantiation</span>
+                    String decrypted = decrypt(val);
+                    pvs.addPropertyValue(pv.getName(), decrypted);
+                }
+            }
+        }
+    }
+}
+</code></pre>
+
+            <div class="callout callout-success">
+                <div class="callout-title">🏢 Industry Usage</div>
+                <p><strong>Netflix</strong> uses custom BeanFactoryPostProcessors to dynamically modify bean definitions based on region-specific configurations. <strong>Spring Cloud Vault</strong> uses this mechanism to inject secrets from HashiCorp Vault before beans are created. This is the hook that makes Spring infinitely extensible.</p>
+            </div>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Using <code>new</code> to create Spring-managed beans</strong> — If you do <code>new OrderService()</code>, Spring doesn't manage it. No injection, no AOP, no lifecycle callbacks. Always let the container create beans.</li>
+                <li><strong>Confusing BeanFactory with ApplicationContext</strong> — In Spring Boot, you always get an ApplicationContext. Don't use raw BeanFactory unless building a framework.</li>
+                <li><strong>Ignoring circular dependency warnings</strong> — Spring 6+ / Boot 3+ prohibits circular references by default. Refactor with <code>@Lazy</code> or redesign.</li>
+                <li><strong>Heavy logic in constructors</strong> — The container might call your constructor during startup. Expensive I/O in constructors delays application start.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand IoC Container When...</h3>
+                <p>You can explain why calling <code>new MyService()</code> bypasses all Spring features (AOP, transactions, events), and you can trace the exact path from <code>@Autowired</code> annotation to the three-level cache resolution that satisfies it.</p>
+                <h3>🧪 Interview Challenge</h3>
+                <p>Question: "Why does Spring need THREE levels of cache for circular dependency resolution? Why not just two?" Answer: Level 3 (ObjectFactory) is needed because of AOP — the early reference might need to be a proxy, not the raw object. The factory decides whether to return the raw bean or its AOP proxy.</p>
+                <h3>🔗 Connect It</h3>
+                <p>This connects to: <strong>ApplicationContext Lifecycle</strong> (how the container bootstraps), <strong>Bean Lifecycle</strong> (what happens after creation), <strong>AOP Internals</strong> (why the third cache level exists).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="02-application-context.html" class="nav-btn nav-btn-next">ApplicationContext Lifecycle →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

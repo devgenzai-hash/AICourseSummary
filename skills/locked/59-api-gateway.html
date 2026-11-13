@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Gateway - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html" class="active"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">API &amp; Communication &rarr; API Gateway</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">API</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>API Gateway</h1>
+            <p class="hero-subtitle">A single entry point that sits between clients and your microservices &mdash; handling routing, authentication, rate limiting, and request aggregation so individual services don&rsquo;t have to.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>hotel front desk</strong>. Guests don&rsquo;t walk directly to housekeeping, the kitchen, or maintenance when they need something. They go to the front desk, which understands the request, verifies the guest is checked in, and routes the request to the right department. The front desk might even combine responses &mdash; &ldquo;Your room is ready, breakfast is at 7am, and your dry cleaning will arrive at 3pm&rdquo; &mdash; all from a single interaction. An API Gateway works the same way for your microservices.</p>
+        </div>
+
+        <h2>What Does an API Gateway Do?</h2>
+        <ul>
+            <li><strong>Request routing:</strong> Maps incoming URLs to the correct backend service &mdash; <code>/users/*</code> &rarr; User Service, <code>/orders/*</code> &rarr; Order Service</li>
+            <li><strong>Authentication &amp; authorization:</strong> Validates tokens (JWT, API keys) once at the gateway instead of in every service</li>
+            <li><strong>Rate limiting:</strong> Protects backends from being overwhelmed &mdash; 1000 requests/min per client, no matter which services they call</li>
+            <li><strong>Request transformation:</strong> Converts between protocols (REST &rarr; gRPC), adds headers, rewrites paths</li>
+            <li><strong>Response aggregation:</strong> Combines data from multiple services into a single response for the client</li>
+            <li><strong>Caching:</strong> Stores frequent responses to reduce backend load</li>
+            <li><strong>Logging &amp; monitoring:</strong> Centralized access logs, latency metrics, error tracking</li>
+        </ul>
+
+        <h2>Single Entry Point for Microservices</h2>
+        <h3>The Problem Without a Gateway</h3>
+        <ul>
+            <li>Clients must know the address of every service &mdash; tight coupling to infrastructure</li>
+            <li>Each service implements its own auth, rate limiting, and CORS &mdash; duplicated logic everywhere</li>
+            <li>Changing service URLs breaks all clients &mdash; no abstraction layer</li>
+            <li>Mobile clients make 5&ndash;10 API calls per screen &mdash; high latency on slow networks</li>
+        </ul>
+
+        <h3>The Gateway Solution</h3>
+        <ul>
+            <li>Clients talk to one URL &mdash; <code>api.company.com</code> &mdash; the gateway handles the rest</li>
+            <li>Services can move, scale, or split without clients knowing</li>
+            <li>Cross-cutting concerns live in one place &mdash; update auth logic once, applied everywhere</li>
+            <li>The gateway can aggregate multiple service calls into one client response</li>
+        </ul>
+
+        <h2>Backend for Frontend (BFF) Pattern</h2>
+        <ul>
+            <li><strong>One gateway per client type:</strong> Web BFF, Mobile BFF, Third-Party BFF</li>
+            <li>Each BFF is optimized for its client &mdash; mobile gets compressed payloads, web gets full data</li>
+            <li>The mobile BFF aggregates aggressively (fewer round-trips on cellular networks)</li>
+            <li>The web BFF might allow fine-grained queries (faster networks, more screen real-estate)</li>
+            <li>Teams own their BFF &mdash; the mobile team controls their gateway without blocking the web team</li>
+        </ul>
+
+        <h2>Gateway vs Service Mesh</h2>
+        <ul>
+            <li><strong>API Gateway:</strong> North-south traffic (client &rarr; services). Handles external concerns like auth, rate limiting, protocol translation</li>
+            <li><strong>Service Mesh:</strong> East-west traffic (service &rarr; service). Handles internal concerns like mTLS, retries, circuit breaking between services</li>
+            <li>They complement each other &mdash; the gateway guards the perimeter, the mesh secures internal communication</li>
+            <li>Some tools blur the line &mdash; Envoy can act as both gateway and sidecar proxy</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concern</th>
+                        <th>API Gateway</th>
+                        <th>Service Mesh</th>
+                        <th>Both?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Authentication</strong></td>
+                        <td>JWT/API key validation</td>
+                        <td>mTLS between services</td>
+                        <td>Yes &mdash; different layers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rate Limiting</strong></td>
+                        <td>Per-client limits</td>
+                        <td>Per-service limits</td>
+                        <td>Yes &mdash; different scopes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Load Balancing</strong></td>
+                        <td>Across service instances</td>
+                        <td>Across pods/containers</td>
+                        <td>Yes &mdash; different levels</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Protocol Translation</strong></td>
+                        <td>REST &rarr; gRPC for clients</td>
+                        <td>Not typically</td>
+                        <td>Gateway only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Observability</strong></td>
+                        <td>Access logs, external metrics</td>
+                        <td>Distributed tracing, internal metrics</td>
+                        <td>Yes &mdash; complementary</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementation</h2>
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Dict, List, Callable, Optional
+<span class="token-keyword">from</span> collections <span class="token-keyword">import</span> defaultdict
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Request / Response models</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-class">Request</span>:
+    method: str
+    path: str
+    headers: Dict[str, str] = field(default_factory=dict)
+    body: Optional[str] = <span class="token-keyword">None</span>
+    client_ip: str = <span class="token-string">"127.0.0.1"</span>
+
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-class">Response</span>:
+    status: int
+    body: dict
+    headers: Dict[str, str] = field(default_factory=dict)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Rate Limiter (Token Bucket)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">RateLimiter</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, max_requests: int, window_seconds: int):
+        self.max_requests = max_requests
+        self.window = window_seconds
+        self.requests: Dict[str, List[float]] = defaultdict(list)
+
+    <span class="token-keyword">def</span> <span class="token-function">is_allowed</span>(self, client_id: str) -> bool:
+        now = time.time()
+        window_start = now - self.window
+        <span class="token-comment"># Remove expired timestamps</span>
+        self.requests[client_id] = [
+            ts <span class="token-keyword">for</span> ts <span class="token-keyword">in</span> self.requests[client_id]
+            <span class="token-keyword">if</span> ts > window_start
+        ]
+        <span class="token-keyword">if</span> len(self.requests[client_id]) >= self.max_requests:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        self.requests[client_id].append(now)
+        <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Authentication Middleware</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">AuthMiddleware</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        <span class="token-comment"># Simulated valid API keys</span>
+        self.valid_keys = {
+            <span class="token-string">"key-abc123"</span>: {<span class="token-string">"client"</span>: <span class="token-string">"mobile-app"</span>, <span class="token-string">"tier"</span>: <span class="token-string">"premium"</span>},
+            <span class="token-string">"key-def456"</span>: {<span class="token-string">"client"</span>: <span class="token-string">"web-app"</span>, <span class="token-string">"tier"</span>: <span class="token-string">"free"</span>},
+        }
+
+    <span class="token-keyword">def</span> <span class="token-function">authenticate</span>(self, request: Request) -> Optional[dict]:
+        api_key = request.headers.get(<span class="token-string">"X-API-Key"</span>)
+        <span class="token-keyword">if not</span> api_key:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        <span class="token-keyword">return</span> self.valid_keys.get(api_key)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Service Registry &amp; Backend Services</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">BackendService</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, name: str, base_url: str):
+        self.name = name
+        self.base_url = base_url
+
+    <span class="token-keyword">def</span> <span class="token-function">handle</span>(self, request: Request) -> Response:
+        <span class="token-comment"># Simulate service response</span>
+        <span class="token-keyword">return</span> Response(
+            status=<span class="token-number">200</span>,
+            body={<span class="token-string">"service"</span>: self.name, <span class="token-string">"path"</span>: request.path}
+        )
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># API Gateway</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">APIGateway</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.routes: Dict[str, BackendService] = {}
+        self.auth = AuthMiddleware()
+        self.rate_limiter = RateLimiter(max_requests=<span class="token-number">100</span>, window_seconds=<span class="token-number">60</span>)
+        self.middleware: List[Callable] = []
+
+    <span class="token-keyword">def</span> <span class="token-function">register_route</span>(self, path_prefix: str, service: BackendService):
+        <span class="token-string">"""Register a path prefix to route to a backend service."""</span>
+        self.routes[path_prefix] = service
+
+    <span class="token-keyword">def</span> <span class="token-function">_find_service</span>(self, path: str) -> Optional[BackendService]:
+        <span class="token-string">"""Match request path to a registered service."""</span>
+        <span class="token-keyword">for</span> prefix, service <span class="token-keyword">in</span> sorted(
+            self.routes.items(), key=<span class="token-keyword">lambda</span> x: len(x[<span class="token-number">0</span>]), reverse=<span class="token-keyword">True</span>
+        ):
+            <span class="token-keyword">if</span> path.startswith(prefix):
+                <span class="token-keyword">return</span> service
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">handle_request</span>(self, request: Request) -> Response:
+        <span class="token-string">"""Main gateway logic &mdash; auth, rate limit, route."""</span>
+
+        <span class="token-comment"># Step 1: Authentication</span>
+        client_info = self.auth.authenticate(request)
+        <span class="token-keyword">if not</span> client_info:
+            <span class="token-keyword">return</span> Response(
+                status=<span class="token-number">401</span>,
+                body={<span class="token-string">"error"</span>: <span class="token-string">"Unauthorized &mdash; invalid or missing API key"</span>}
+            )
+
+        <span class="token-comment"># Step 2: Rate Limiting</span>
+        client_id = client_info[<span class="token-string">"client"</span>]
+        <span class="token-keyword">if not</span> self.rate_limiter.is_allowed(client_id):
+            <span class="token-keyword">return</span> Response(
+                status=<span class="token-number">429</span>,
+                body={<span class="token-string">"error"</span>: <span class="token-string">"Rate limit exceeded"</span>},
+                headers={<span class="token-string">"Retry-After"</span>: <span class="token-string">"60"</span>}
+            )
+
+        <span class="token-comment"># Step 3: Route to backend service</span>
+        service = self._find_service(request.path)
+        <span class="token-keyword">if not</span> service:
+            <span class="token-keyword">return</span> Response(
+                status=<span class="token-number">404</span>,
+                body={<span class="token-string">"error"</span>: f<span class="token-string">"No service found for path: {request.path}"</span>}
+            )
+
+        <span class="token-comment"># Step 4: Forward request to service</span>
+        response = service.handle(request)
+        response.headers[<span class="token-string">"X-Gateway"</span>] = <span class="token-string">"api-gateway-v1"</span>
+        <span class="token-keyword">return</span> response
+
+    <span class="token-keyword">def</span> <span class="token-function">aggregate_requests</span>(self, requests: List[Request]) -> Response:
+        <span class="token-string">"""Combine multiple service calls into one response."""</span>
+        results = {}
+        <span class="token-keyword">for</span> req <span class="token-keyword">in</span> requests:
+            service = self._find_service(req.path)
+            <span class="token-keyword">if</span> service:
+                resp = service.handle(req)
+                results[service.name] = resp.body
+        <span class="token-keyword">return</span> Response(status=<span class="token-number">200</span>, body={<span class="token-string">"aggregated"</span>: results})
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: API Gateway in action</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+gateway = APIGateway()
+
+<span class="token-comment"># Register backend services</span>
+gateway.register_route(<span class="token-string">"/api/users"</span>, BackendService(<span class="token-string">"user-service"</span>, <span class="token-string">"http://users:8001"</span>))
+gateway.register_route(<span class="token-string">"/api/orders"</span>, BackendService(<span class="token-string">"order-service"</span>, <span class="token-string">"http://orders:8002"</span>))
+gateway.register_route(<span class="token-string">"/api/products"</span>, BackendService(<span class="token-string">"product-service"</span>, <span class="token-string">"http://products:8003"</span>))
+
+<span class="token-comment"># Authenticated request &rarr; routes correctly</span>
+req = Request(
+    method=<span class="token-string">"GET"</span>,
+    path=<span class="token-string">"/api/users/123"</span>,
+    headers={<span class="token-string">"X-API-Key"</span>: <span class="token-string">"key-abc123"</span>}
+)
+print(<span class="token-string">"Authenticated:"</span>, gateway.handle_request(req).body)
+
+<span class="token-comment"># Missing API key &rarr; 401</span>
+bad_req = Request(method=<span class="token-string">"GET"</span>, path=<span class="token-string">"/api/users/123"</span>, headers={})
+print(<span class="token-string">"No auth:"</span>, gateway.handle_request(bad_req).body)
+
+<span class="token-comment"># Aggregation &mdash; one call fetches from multiple services</span>
+agg = gateway.aggregate_requests([
+    Request(method=<span class="token-string">"GET"</span>, path=<span class="token-string">"/api/users/123"</span>, headers={}),
+    Request(method=<span class="token-string">"GET"</span>, path=<span class="token-string">"/api/orders?user=123"</span>, headers={}),
+])
+print(<span class="token-string">"Aggregated:"</span>, json.dumps(agg.body, indent=<span class="token-number">2</span>))</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Kong:</strong> Open-source API gateway built on nginx/OpenResty. Plugin-based architecture &mdash; add auth, rate limiting, logging without modifying your services. Used by companies processing billions of requests per day. Supports declarative configuration via YAML for GitOps workflows.</p>
+            <p><strong>AWS API Gateway:</strong> Fully managed, serverless gateway. Integrates natively with Lambda, Cognito (auth), and CloudWatch (monitoring). Supports REST, HTTP, and WebSocket APIs. Charges per request &mdash; no idle costs, but can get expensive at massive scale.</p>
+            <p><strong>Netflix Zuul / Spring Cloud Gateway:</strong> Zuul was Netflix&rsquo;s battle-tested gateway handling billions of requests. Spring Cloud Gateway is its modern successor &mdash; built on reactive programming (Project Reactor) for non-blocking I/O. Used when your backend is JVM-based.</p>
+            <p><strong>Envoy Proxy:</strong> Originally built by Lyft, now a CNCF graduated project. Can serve as both an API gateway (edge proxy) and service mesh sidecar. Its xDS API allows dynamic configuration without restarts &mdash; critical for Kubernetes environments where services appear and disappear constantly.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>An API Gateway provides a single entry point for all client requests &mdash; routing, auth, and rate limiting happen in one place</li>
+                <li>Without a gateway, every microservice must implement cross-cutting concerns independently &mdash; duplication and inconsistency</li>
+                <li>The BFF pattern creates specialized gateways per client type &mdash; mobile, web, and third-party get optimized experiences</li>
+                <li>Gateways handle north-south traffic (external &rarr; internal), while service meshes handle east-west traffic (service &rarr; service)</li>
+                <li>Request aggregation reduces round-trips &mdash; critical for mobile clients on high-latency networks</li>
+                <li>The gateway is a single point of failure &mdash; it must be highly available, horizontally scaled, and carefully monitored</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of the API Gateway as an airport&rsquo;s main terminal. All passengers (requests) enter through one building, go through security (auth), get directed to their gate (routing), and the terminal manages crowd control (rate limiting). Airlines (services) don&rsquo;t each build their own terminal.</p>
+            <div class="model-visual">
+                <pre>
+  API GATEWAY ARCHITECTURE:
+  ══════════════════════════════════════════════════════
+
+  Clients              Gateway                Services
+  ───────              ───────                ────────
+
+  Mobile App ──┐                         ┌── User Service
+               │    ┌──────────────┐     │
+  Web App ─────┼───▶│  API Gateway │─────┼── Order Service
+               │    │              │     │
+  3rd Party ───┘    │  • Auth      │     ├── Product Service
+                    │  • Rate Limit│     │
+                    │  • Routing   │     └── Payment Service
+                    │  • Aggregate │
+                    └──────────────┘
+
+  REQUEST FLOW:
+  ══════════════════════════════════════════════════════
+
+  Client Request
+       │
+       ▼
+  ┌─────────────┐    401 Unauthorized
+  │ Authenticate│───────────────────────▶ Client
+  └──────┬──────┘
+         │ ✓ valid
+         ▼
+  ┌─────────────┐    429 Too Many Requests
+  │ Rate Limit  │───────────────────────▶ Client
+  └──────┬──────┘
+         │ ✓ allowed
+         ▼
+  ┌─────────────┐    404 Not Found
+  │ Route Match │───────────────────────▶ Client
+  └──────┬──────┘
+         │ ✓ matched
+         ▼
+  ┌─────────────┐
+  │ Forward to  │───▶ Backend Service
+  │ Service     │◀─── Response
+  └──────┬──────┘
+         │
+         ▼
+  Return to Client (+ gateway headers)
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Putting business logic in the gateway:</strong> The gateway should route, authenticate, and rate-limit &mdash; not transform data or execute domain rules. If your gateway has if/else branches based on business entities, that logic belongs in a service. Keep the gateway thin and generic.</li>
+                <li><strong>Single gateway for all client types:</strong> Mobile needs compressed, aggregated responses. Web needs fine-grained APIs. Third parties need stable versioned endpoints. One gateway trying to serve all three becomes a bloated mess. Use the BFF pattern instead.</li>
+                <li><strong>No health checks on backends:</strong> The gateway routes to a service that&rsquo;s down, returning 502 errors to clients. Always implement health checks so the gateway can remove unhealthy instances from the routing pool and return graceful fallback responses.</li>
+                <li><strong>Gateway as a single point of failure:</strong> If your gateway goes down, everything goes down. Deploy multiple gateway instances behind a load balancer. Use blue-green deployments for gateway updates. Never deploy a single gateway instance in production.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a gateway with middleware chain:</strong> Implement a gateway where middleware functions are composable. Each middleware can modify the request, short-circuit the response, or pass to the next. Implement logging, auth, rate limiting, and CORS as separate middleware. Test that order matters (auth before rate-limit).</li>
+                <li><strong>Implement request aggregation:</strong> Build an endpoint <code>/api/dashboard</code> that fetches from 3 services concurrently (user profile, recent orders, recommendations) and returns a combined response. Handle partial failures &mdash; if one service is slow, return what you have after a timeout with a &ldquo;degraded&rdquo; flag.</li>
+                <li><strong>Add API versioning:</strong> Extend the gateway to support versioned routes (<code>/v1/users</code>, <code>/v2/users</code>). Version can also come from a header (<code>Accept: application/vnd.api.v2+json</code>). Route different versions to different service deployments. Implement a deprecation warning header for v1 clients.</li>
+                <li><strong>Implement circuit breaking at the gateway:</strong> If a backend service returns 5xx errors more than 50% of the time in the last 30 seconds, stop forwarding requests to it (open circuit). After 10 seconds, allow one request through (half-open). If it succeeds, close the circuit. Track state per-service and expose a health dashboard.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="58-command.html" class="prev">&larr; Command</a>
+            <a href="60-load-balancer.html" class="next">Load Balancer &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

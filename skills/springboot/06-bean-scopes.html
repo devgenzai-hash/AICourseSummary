@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bean Scopes & Proxy Mechanisms - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Spring Core & IoC Internals</li>
+            <li><a href="01-ioc-container.html"><span class="nav-number">1</span> IoC Container & BeanFactory</a></li>
+            <li><a href="02-application-context.html"><span class="nav-number">2</span> ApplicationContext Lifecycle</a></li>
+            <li><a href="03-bean-lifecycle.html"><span class="nav-number">3</span> Bean Lifecycle & Callbacks</a></li>
+            <li><a href="04-dependency-injection.html"><span class="nav-number">4</span> Dependency Injection Internals</a></li>
+            <li><a href="05-component-scanning.html"><span class="nav-number">5</span> Component Scanning</a></li>
+            <li><a href="06-bean-scopes.html" class="active"><span class="nav-number">6</span> Bean Scopes & Proxy Mechanisms</a></li>
+            <li><a href="07-aop-internals.html"><span class="nav-number">7</span> AOP Internals</a></li>
+            <li><a href="08-spel.html"><span class="nav-number">8</span> Spring Expression Language</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Spring Core & IoC Internals → Bean Scopes & Proxy Mechanisms</div>
+        <div class="topic-number">Topic 6 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Bean Scopes & Proxy Mechanisms</h1>
+            <p class="subtitle-description">How Spring manages bean lifecycle boundaries — from singletons to request-scoped proxies, and the CGLIB magic that makes short-lived beans injectable into long-lived ones.</p>
+
+            <div class="tags">
+                <span class="tag tag-advanced">advanced</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-internal">internal</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏨 The Hotel Reception Desk Analogy</div>
+                <p>Think of a <strong>singleton bean</strong> as the hotel building itself — there's exactly one, and everyone shares it. A <strong>prototype bean</strong> is like a disposable coffee cup — you get a brand new one each time you ask. A <strong>request-scoped bean</strong> is like a hotel room key card — it belongs to one guest for the duration of their stay (HTTP request), and the same card number may be reused for the next guest. Now here's the twist: the <strong>concierge desk</strong> (a singleton) needs to hand you the right key card for YOUR stay. The concierge can't hold one specific card permanently — it needs a magic drawer (the <strong>CGLIB proxy</strong>) that always produces the correct card for whoever is standing in front of it at that moment. That's exactly what scoped proxies do: they're the magic drawer that resolves to the right instance based on the current context.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: All Six Scopes -->
+            <!-- ============================================ -->
+            <h2>1. The Six Bean Scopes</h2>
+
+            <p>Spring provides six built-in scopes. Only <code>singleton</code> and <code>prototype</code> work in any ApplicationContext; the other four require a web-aware context (like <code><span class="token-class">WebApplicationContext</span></code>).</p>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Scope</th>
+                            <th>Instances</th>
+                            <th>Lifecycle Managed?</th>
+                            <th>Destruction Callback?</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>singleton</code></td>
+                            <td>One per IoC container</td>
+                            <td>✅ Full</td>
+                            <td>✅ @PreDestroy called</td>
+                            <td>Stateless services, repositories, configs</td>
+                        </tr>
+                        <tr>
+                            <td><code>prototype</code></td>
+                            <td>New instance every <code>getBean()</code></td>
+                            <td>⚠️ Creation only</td>
+                            <td>❌ Never called</td>
+                            <td>Stateful commands, builders, non-thread-safe objects</td>
+                        </tr>
+                        <tr>
+                            <td><code>request</code></td>
+                            <td>One per HTTP request</td>
+                            <td>✅ Full</td>
+                            <td>✅ On request completion</td>
+                            <td>Request-specific data, audit context</td>
+                        </tr>
+                        <tr>
+                            <td><code>session</code></td>
+                            <td>One per HTTP session</td>
+                            <td>✅ Full</td>
+                            <td>✅ On session invalidation</td>
+                            <td>User preferences, shopping cart</td>
+                        </tr>
+                        <tr>
+                            <td><code>application</code></td>
+                            <td>One per ServletContext</td>
+                            <td>✅ Full</td>
+                            <td>✅ On context shutdown</td>
+                            <td>App-wide shared state (rarely used)</td>
+                        </tr>
+                        <tr>
+                            <td><code>websocket</code></td>
+                            <td>One per WebSocket session</td>
+                            <td>✅ Full</td>
+                            <td>✅ On WS session close</td>
+                            <td>Per-connection state in WebSocket handlers</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pre><code><span class="token-comment">// Declaring scopes</span>
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(<span class="token-string">"singleton"</span>) <span class="token-comment">// Default — you don't actually need this</span>
+<span class="token-keyword">public class</span> <span class="token-class">PaymentService</span> { }
+
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(<span class="token-string">"prototype"</span>)
+<span class="token-keyword">public class</span> <span class="token-class">ShoppingCart</span> { }
+
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(value = <span class="token-type">WebApplicationContext</span>.SCOPE_REQUEST, proxyMode = <span class="token-type">ScopedProxyMode</span>.TARGET_CLASS)
+<span class="token-keyword">public class</span> <span class="token-class">RequestAuditContext</span> { }
+
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@RequestScope</span> <span class="token-comment">// Shorthand — includes proxyMode = TARGET_CLASS</span>
+<span class="token-keyword">public class</span> <span class="token-class">CurrentUserContext</span> { }
+
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@SessionScope</span> <span class="token-comment">// Shorthand for session scope with proxy</span>
+<span class="token-keyword">public class</span> <span class="token-class">UserPreferences</span> { }</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: How Request/Session Scopes Work -->
+            <!-- ============================================ -->
+            <h2>2. How Request/Session Scopes Work Internally</h2>
+
+            <p>Web scopes rely on <code><span class="token-class">RequestContextHolder</span></code> — a <code><span class="token-type">ThreadLocal</span></code>-based registry that stores the current <code><span class="token-type">RequestAttributes</span></code> for the executing thread. The scope implementation uses this to store and retrieve bean instances.</p>
+
+            <pre><code><span class="token-comment">// RequestContextHolder — the backbone of web scopes</span>
+<span class="token-keyword">public abstract class</span> <span class="token-class">RequestContextHolder</span> {
+
+    <span class="token-keyword">private static final</span> <span class="token-type">ThreadLocal</span>&lt;<span class="token-type">RequestAttributes</span>&gt; requestAttributesHolder =
+        <span class="token-keyword">new</span> <span class="token-type">NamedInheritableThreadLocal</span>&lt;&gt;(<span class="token-string">"Request attributes"</span>);
+
+    <span class="token-keyword">public static</span> <span class="token-type">RequestAttributes</span> <span class="token-function">currentRequestAttributes</span>() {
+        <span class="token-type">RequestAttributes</span> attributes = requestAttributesHolder.<span class="token-function">get</span>();
+        <span class="token-keyword">if</span> (attributes == <span class="token-keyword">null</span>) {
+            <span class="token-keyword">throw new</span> <span class="token-type">IllegalStateException</span>(
+                <span class="token-string">"No thread-bound request found — are you outside a web request?"</span>);
+        }
+        <span class="token-keyword">return</span> attributes;
+    }
+}
+
+<span class="token-comment">// RequestScope implementation — stores beans as request attributes</span>
+<span class="token-keyword">public class</span> <span class="token-class">RequestScope</span> <span class="token-keyword">extends</span> <span class="token-type">AbstractRequestAttributesScope</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">protected int</span> <span class="token-function">getScope</span>() {
+        <span class="token-keyword">return</span> <span class="token-type">RequestAttributes</span>.SCOPE_REQUEST;
+    }
+}
+
+<span class="token-keyword">public abstract class</span> <span class="token-class">AbstractRequestAttributesScope</span> <span class="token-keyword">implements</span> <span class="token-type">Scope</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">get</span>(<span class="token-type">String</span> name, <span class="token-type">ObjectFactory</span>&lt;?&gt; objectFactory) {
+        <span class="token-type">RequestAttributes</span> attributes = <span class="token-type">RequestContextHolder</span>.<span class="token-function">currentRequestAttributes</span>();
+
+        <span class="token-comment">// Try to find existing bean instance in current request</span>
+        <span class="token-type">Object</span> scopedObject = attributes.<span class="token-function">getAttribute</span>(name, <span class="token-function">getScope</span>());
+
+        <span class="token-keyword">if</span> (scopedObject == <span class="token-keyword">null</span>) {
+            <span class="token-comment">// First access in this request — create new instance</span>
+            scopedObject = objectFactory.<span class="token-function">getObject</span>();
+            attributes.<span class="token-function">setAttribute</span>(name, scopedObject, <span class="token-function">getScope</span>());
+
+            <span class="token-comment">// Retrieve again for potential wrapper (session serialization, etc.)</span>
+            <span class="token-type">Object</span> retrieved = attributes.<span class="token-function">getAttribute</span>(name, <span class="token-function">getScope</span>());
+            <span class="token-keyword">if</span> (retrieved != <span class="token-keyword">null</span>) {
+                scopedObject = retrieved;
+            }
+        }
+        <span class="token-keyword">return</span> scopedObject;
+    }
+}</code></pre>
+
+            <div class="architecture-diagram">
+                <h3>📐 Request Scope Resolution Flow</h3>
+                <pre class="diagram-ascii">
+┌─────────────────────────────────────────────────────────────────────────┐
+│  HTTP Request Thread                                                     │
+│                                                                          │
+│  DispatcherServlet                                                       │
+│       │                                                                  │
+│       ▼                                                                  │
+│  RequestContextFilter sets ThreadLocal                                   │
+│       │                                                                  │
+│       ▼                                                                  │
+│  ┌────────────────────────────────────────────┐                         │
+│  │ RequestContextHolder (ThreadLocal)          │                         │
+│  │   └── RequestAttributes                    │                         │
+│  │         └── attributeMap: {                │                         │
+│  │               "auditContext" → instance1,  │                         │
+│  │               "currentUser" → instance2    │                         │
+│  │             }                              │                         │
+│  └────────────────────────────────────────────┘                         │
+│       ▲                                                                  │
+│       │  scope.get("auditContext", factory)                              │
+│       │                                                                  │
+│  ┌────┴──────────────────────────────────┐                              │
+│  │ CGLIB Proxy (AuditContext$$EnhancerBy │                              │
+│  │ SpringCGLIB$$...)                      │                              │
+│  │   └── delegates to RequestScope.get() │                              │
+│  └───────────────────────────────────────┘                              │
+│       ▲                                                                  │
+│       │  @Autowired                                                      │
+│       │                                                                  │
+│  ┌────┴──────────────────────────────────┐                              │
+│  │ SingletonService (lives forever)       │                              │
+│  │   └── holds reference to PROXY,        │                              │
+│  │       NOT the actual request bean      │                              │
+│  └───────────────────────────────────────┘                              │
+└─────────────────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: Why proxyMode is Required -->
+            <!-- ============================================ -->
+            <h2>3. Why proxyMode is Mandatory for Narrow Scopes in Singletons</h2>
+
+            <p>Consider the problem: a <code>singleton</code> bean is created <strong>once</strong> at startup. Its dependencies are injected <strong>once</strong>. If you inject a request-scoped bean directly, the singleton holds a reference to one specific instance — but request-scoped beans change with every HTTP request!</p>
+
+            <pre><code><span class="token-comment">// ❌ BROKEN — Without proxy, singleton gets ONE instance forever</span>
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(<span class="token-string">"request"</span>) <span class="token-comment">// No proxyMode!</span>
+<span class="token-keyword">public class</span> <span class="token-class">RequestData</span> {
+    <span class="token-keyword">private</span> <span class="token-type">String</span> clientIp;
+    <span class="token-comment">// ...</span>
+}
+
+<span class="token-annotation">@Service</span> <span class="token-comment">// Singleton by default</span>
+<span class="token-keyword">public class</span> <span class="token-class">AuditService</span> {
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">RequestData</span> requestData; <span class="token-comment">// 💥 BeanCreationException!</span>
+    <span class="token-comment">// Spring can't inject request-scoped bean during singleton creation</span>
+    <span class="token-comment">// because there's no active request at startup time</span>
+}
+
+<span class="token-comment">// ✅ CORRECT — With proxy, singleton gets a smart delegate</span>
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(value = <span class="token-string">"request"</span>, proxyMode = <span class="token-type">ScopedProxyMode</span>.TARGET_CLASS)
+<span class="token-keyword">public class</span> <span class="token-class">RequestData</span> {
+    <span class="token-keyword">private</span> <span class="token-type">String</span> clientIp;
+    <span class="token-comment">// ...</span>
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">AuditService</span> {
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">RequestData</span> requestData; <span class="token-comment">// ✅ Injects a CGLIB PROXY</span>
+
+    <span class="token-keyword">public void</span> <span class="token-function">audit</span>() {
+        <span class="token-comment">// Each call goes through the proxy → resolves current request's instance</span>
+        <span class="token-type">String</span> ip = requestData.<span class="token-function">getClientIp</span>(); <span class="token-comment">// Proxy delegates to correct instance</span>
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 What the Proxy Actually Does</div>
+                <p>When you call <code>requestData.getClientIp()</code>, the proxy intercepts and does: (1) Gets the current thread's <code>RequestAttributes</code> from <code>RequestContextHolder</code>, (2) Looks up the bean by name in those attributes, (3) Creates it via <code>ObjectFactory</code> if it doesn't exist yet for this request, (4) Delegates the <code>getClientIp()</code> call to that real instance.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: CGLIB Proxy Deep Dive -->
+            <!-- ============================================ -->
+            <h2>4. CGLIB Proxy: Runtime Subclass Generation</h2>
+
+            <p>CGLIB (Code Generation Library) creates a <strong>subclass at runtime</strong> that overrides every non-final method. Each overridden method goes through an interceptor chain before (optionally) calling the real target.</p>
+
+            <pre><code><span class="token-comment">// What CGLIB generates conceptually (simplified):</span>
+<span class="token-keyword">public class</span> <span class="token-class">RequestData$$EnhancerBySpringCGLIB$$a1b2c3</span> <span class="token-keyword">extends</span> <span class="token-type">RequestData</span> {
+
+    <span class="token-keyword">private</span> <span class="token-type">MethodInterceptor</span> interceptor; <span class="token-comment">// Set by Spring</span>
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">String</span> <span class="token-function">getClientIp</span>() {
+        <span class="token-comment">// Instead of calling super.getClientIp(), delegate to interceptor</span>
+        <span class="token-keyword">return</span> (<span class="token-type">String</span>) interceptor.<span class="token-function">intercept</span>(
+            <span class="token-keyword">this</span>,
+            RequestData.<span class="token-keyword">class</span>.<span class="token-function">getMethod</span>(<span class="token-string">"getClientIp"</span>),
+            <span class="token-keyword">new</span> <span class="token-type">Object</span>[]{},
+            methodProxy
+        );
+    }
+}
+
+<span class="token-comment">// Spring's scoped proxy interceptor logic:</span>
+<span class="token-keyword">class</span> <span class="token-class">ScopedProxyMethodInterceptor</span> <span class="token-keyword">implements</span> <span class="token-type">MethodInterceptor</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">BeanFactory</span> beanFactory;
+    <span class="token-keyword">private final</span> <span class="token-type">String</span> targetBeanName;
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">intercept</span>(<span class="token-type">Object</span> obj, <span class="token-type">Method</span> method, <span class="token-type">Object</span>[] args,
+                            <span class="token-type">MethodProxy</span> proxy) {
+        <span class="token-comment">// Resolve the REAL bean from the correct scope</span>
+        <span class="token-type">Object</span> target = beanFactory.<span class="token-function">getBean</span>(targetBeanName);
+        <span class="token-comment">// Invoke the method on the real instance</span>
+        <span class="token-keyword">return</span> method.<span class="token-function">invoke</span>(target, args);
+    }
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ CGLIB Limitations</div>
+                <ul>
+                    <li><code><span class="token-keyword">final</span></code> classes cannot be proxied — CGLIB cannot extend them. You'll get a <code>BeanCreationException</code>.</li>
+                    <li><code><span class="token-keyword">final</span></code> methods are not intercepted — they call the proxy's own (empty) state, not the target's.</li>
+                    <li>The proxy's constructor runs <strong>without calling the real constructor</strong> (uses Objenesis) — so field initializers in the proxy are skipped.</li>
+                    <li>Self-invocation within the target bypasses the proxy (same AOP pitfall).</li>
+                </ul>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: JDK vs CGLIB Proxy -->
+            <!-- ============================================ -->
+            <h2>5. JDK Dynamic Proxy vs CGLIB Proxy</h2>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>JDK Dynamic Proxy</th>
+                            <th>CGLIB Proxy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Mechanism</strong></td>
+                            <td>Implements interface(s) at runtime</td>
+                            <td>Generates subclass at runtime</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Requirement</strong></td>
+                            <td>Target must implement an interface</td>
+                            <td>Target must be non-final class</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Performance</strong></td>
+                            <td>Slightly slower (reflection-based invoke)</td>
+                            <td>Faster after generation (direct method call via MethodProxy)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Type casting</strong></td>
+                            <td>Only castable to interface types</td>
+                            <td>Castable to the concrete class type</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spring Boot default</strong></td>
+                            <td>❌ Not default since Spring Boot 2.0</td>
+                            <td>✅ Default (<code>proxyTargetClass=true</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Library</strong></td>
+                            <td>Built into JDK (<code>java.lang.reflect.Proxy</code>)</td>
+                            <td>Spring repackaged CGLIB in <code>spring-core</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>final methods</strong></td>
+                            <td>N/A (works on interface methods)</td>
+                            <td>Cannot intercept — silently bypassed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pre><code><span class="token-comment">// JDK Dynamic Proxy — requires interface</span>
+<span class="token-keyword">public interface</span> <span class="token-class">PaymentGateway</span> {
+    <span class="token-type">PaymentResult</span> <span class="token-function">charge</span>(<span class="token-type">Money</span> amount);
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">StripeGateway</span> <span class="token-keyword">implements</span> <span class="token-type">PaymentGateway</span> {
+    <span class="token-keyword">public</span> <span class="token-type">PaymentResult</span> <span class="token-function">charge</span>(<span class="token-type">Money</span> amount) { <span class="token-comment">/* ... */</span> }
+}
+
+<span class="token-comment">// With proxyTargetClass=false, Spring creates:</span>
+<span class="token-comment">// Proxy implements PaymentGateway (JDK proxy)</span>
+<span class="token-comment">// ✅ Can inject as: PaymentGateway gateway;</span>
+<span class="token-comment">// ❌ Cannot inject as: StripeGateway gateway; — ClassCastException!</span>
+
+<span class="token-comment">// With proxyTargetClass=true (Spring Boot default), Spring creates:</span>
+<span class="token-comment">// Proxy extends StripeGateway (CGLIB proxy)</span>
+<span class="token-comment">// ✅ Can inject as: PaymentGateway gateway;</span>
+<span class="token-comment">// ✅ Can inject as: StripeGateway gateway; — works!</span>
+
+<span class="token-comment">// Configuring globally:</span>
+<span class="token-annotation">@SpringBootApplication</span>(proxyBeanMethods = <span class="token-keyword">false</span>) <span class="token-comment">// Disables CGLIB on @Configuration</span>
+
+<span class="token-comment">// Or in application.properties:</span>
+<span class="token-comment">// spring.aop.proxy-target-class=false  → forces JDK proxies where possible</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Thread Safety -->
+            <!-- ============================================ -->
+            <h2>6. Singleton Thread Safety</h2>
+
+            <p>Singletons are <strong>shared across all threads</strong>. If your singleton has mutable fields, multiple threads can corrupt them simultaneously. Spring does NOT add any synchronization — thread safety is your responsibility.</p>
+
+            <pre><code><span class="token-comment">// ❌ DANGEROUS — mutable singleton state</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">CounterService</span> {
+    <span class="token-keyword">private int</span> count = <span class="token-number">0</span>; <span class="token-comment">// 💥 Race condition!</span>
+
+    <span class="token-keyword">public void</span> <span class="token-function">increment</span>() {
+        count++; <span class="token-comment">// Not atomic — read-modify-write</span>
+    }
+}
+
+<span class="token-comment">// ✅ SAFE — approaches for thread-safe singletons</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">CounterService</span> {
+    <span class="token-comment">// Option 1: AtomicInteger</span>
+    <span class="token-keyword">private final</span> <span class="token-type">AtomicInteger</span> count = <span class="token-keyword">new</span> <span class="token-type">AtomicInteger</span>(<span class="token-number">0</span>);
+
+    <span class="token-keyword">public void</span> <span class="token-function">increment</span>() {
+        count.<span class="token-function">incrementAndGet</span>(); <span class="token-comment">// Atomic CAS operation</span>
+    }
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">UserService</span> {
+    <span class="token-comment">// Option 2: Stateless design (PREFERRED)</span>
+    <span class="token-keyword">private final</span> <span class="token-type">UserRepository</span> repo; <span class="token-comment">// Immutable reference to another singleton</span>
+
+    <span class="token-keyword">public</span> <span class="token-type">User</span> <span class="token-function">findUser</span>(<span class="token-type">Long</span> id) {
+        <span class="token-keyword">return</span> repo.<span class="token-function">findById</span>(id); <span class="token-comment">// No mutable state — inherently thread-safe</span>
+    }
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">CacheService</span> {
+    <span class="token-comment">// Option 3: ConcurrentHashMap for mutable collections</span>
+    <span class="token-keyword">private final</span> <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; cache = <span class="token-keyword">new</span> <span class="token-type">ConcurrentHashMap</span>&lt;&gt;();
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Prototype Scope Pitfall -->
+            <!-- ============================================ -->
+            <h2>7. The Prototype-in-Singleton Trap</h2>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Critical Pitfall: Prototype Injected into Singleton</div>
+                <p>When you inject a prototype bean into a singleton, the prototype is resolved <strong>once</strong> at singleton creation time. The singleton then holds that <strong>same instance forever</strong> — defeating the purpose of prototype scope entirely. Spring does not re-resolve dependencies after initial injection.</p>
+            </div>
+
+            <pre><code><span class="token-comment">// ❌ THE TRAP — prototype is resolved once and cached in singleton</span>
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(<span class="token-string">"prototype"</span>)
+<span class="token-keyword">public class</span> <span class="token-class">Command</span> {
+    <span class="token-keyword">private</span> <span class="token-type">UUID</span> id = <span class="token-type">UUID</span>.<span class="token-function">randomUUID</span>();
+    <span class="token-keyword">public</span> <span class="token-type">UUID</span> <span class="token-function">getId</span>() { <span class="token-keyword">return</span> id; }
+}
+
+<span class="token-annotation">@Service</span> <span class="token-comment">// Singleton!</span>
+<span class="token-keyword">public class</span> <span class="token-class">CommandExecutor</span> {
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">Command</span> command; <span class="token-comment">// 💥 Same UUID every time!</span>
+
+    <span class="token-keyword">public void</span> <span class="token-function">execute</span>() {
+        System.out.<span class="token-function">println</span>(command.<span class="token-function">getId</span>()); <span class="token-comment">// Always prints the same UUID</span>
+    }
+}
+
+<span class="token-comment">// Also note: Spring NEVER calls @PreDestroy on prototypes!</span>
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(<span class="token-string">"prototype"</span>)
+<span class="token-keyword">public class</span> <span class="token-class">ExpensiveResource</span> {
+    <span class="token-annotation">@PreDestroy</span>
+    <span class="token-keyword">public void</span> <span class="token-function">cleanup</span>() {
+        <span class="token-comment">// ❌ This is NEVER called! Spring forgets about prototypes after creation.</span>
+        <span class="token-comment">// YOU must manage destruction yourself.</span>
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: ObjectProvider Solution -->
+            <!-- ============================================ -->
+            <h2>8. ObjectFactory/ObjectProvider — Correct Prototype Injection</h2>
+
+            <p>To get a <strong>new prototype instance on each use</strong> within a singleton, use <code><span class="token-type">ObjectProvider</span></code> (or its simpler parent <code><span class="token-type">ObjectFactory</span></code>). These are lazy lookup handles — each call to <code><span class="token-function">getObject()</span></code> triggers a fresh <code><span class="token-function">getBean()</span></code> call.</p>
+
+            <pre><code><span class="token-comment">// ✅ SOLUTION 1: ObjectProvider (recommended)</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">CommandExecutor</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">ObjectProvider</span>&lt;<span class="token-type">Command</span>&gt; commandProvider;
+
+    <span class="token-keyword">public</span> <span class="token-function">CommandExecutor</span>(<span class="token-type">ObjectProvider</span>&lt;<span class="token-type">Command</span>&gt; commandProvider) {
+        <span class="token-keyword">this</span>.commandProvider = commandProvider;
+    }
+
+    <span class="token-keyword">public void</span> <span class="token-function">execute</span>() {
+        <span class="token-type">Command</span> cmd = commandProvider.<span class="token-function">getObject</span>(); <span class="token-comment">// New instance each time!</span>
+        System.out.<span class="token-function">println</span>(cmd.<span class="token-function">getId</span>()); <span class="token-comment">// Different UUID every call</span>
+    }
+}
+
+<span class="token-comment">// ✅ SOLUTION 2: ObjectFactory (simpler interface)</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">CommandExecutor</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">ObjectFactory</span>&lt;<span class="token-type">Command</span>&gt; commandFactory;
+
+    <span class="token-keyword">public</span> <span class="token-function">CommandExecutor</span>(<span class="token-type">ObjectFactory</span>&lt;<span class="token-type">Command</span>&gt; commandFactory) {
+        <span class="token-keyword">this</span>.commandFactory = commandFactory;
+    }
+
+    <span class="token-keyword">public void</span> <span class="token-function">execute</span>() {
+        <span class="token-type">Command</span> cmd = commandFactory.<span class="token-function">getObject</span>(); <span class="token-comment">// Fresh prototype</span>
+    }
+}
+
+<span class="token-comment">// ✅ SOLUTION 3: Provider (JSR-330) — javax.inject.Provider</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">CommandExecutor</span> {
+
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">Provider</span>&lt;<span class="token-type">Command</span>&gt; commandProvider;
+
+    <span class="token-keyword">public void</span> <span class="token-function">execute</span>() {
+        <span class="token-type">Command</span> cmd = commandProvider.<span class="token-function">get</span>(); <span class="token-comment">// Fresh prototype</span>
+    }
+}
+
+<span class="token-comment">// ✅ SOLUTION 4: @Lookup method injection</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public abstract class</span> <span class="token-class">CommandExecutor</span> {
+
+    <span class="token-annotation">@Lookup</span>
+    <span class="token-keyword">protected abstract</span> <span class="token-type">Command</span> <span class="token-function">createCommand</span>(); <span class="token-comment">// Spring overrides via CGLIB</span>
+
+    <span class="token-keyword">public void</span> <span class="token-function">execute</span>() {
+        <span class="token-type">Command</span> cmd = <span class="token-function">createCommand</span>(); <span class="token-comment">// Fresh prototype each call</span>
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 ObjectProvider vs ObjectFactory</div>
+                <p><code><span class="token-type">ObjectProvider</span></code> extends <code><span class="token-type">ObjectFactory</span></code> with extra capabilities: <code><span class="token-function">getIfAvailable()</span></code> (returns null instead of exception), <code><span class="token-function">getIfUnique()</span></code> (handles multiple beans), <code><span class="token-function">stream()</span></code> (iterate all matching beans), and <code><span class="token-function">orderedStream()</span></code> (ordered by @Order). Prefer <code>ObjectProvider</code> unless you explicitly want the fail-fast behavior of <code>ObjectFactory</code>.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 9: Custom Scope Implementation -->
+            <!-- ============================================ -->
+            <h2>9. Custom Scope Implementation — Tenant Scope Example</h2>
+
+            <p>In multi-tenant applications, you often need beans scoped to the current tenant. Spring lets you register custom scopes by implementing the <code><span class="token-type">Scope</span></code> interface.</p>
+
+            <pre><code><span class="token-comment">// Step 1: Implement the Scope interface</span>
+<span class="token-keyword">public class</span> <span class="token-class">TenantScope</span> <span class="token-keyword">implements</span> <span class="token-type">Scope</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt;&gt; tenantBeans = <span class="token-keyword">new</span> <span class="token-type">ConcurrentHashMap</span>&lt;&gt;();
+    <span class="token-keyword">private final</span> <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Runnable</span>&gt;&gt; destructionCallbacks = <span class="token-keyword">new</span> <span class="token-type">ConcurrentHashMap</span>&lt;&gt;();
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">get</span>(<span class="token-type">String</span> name, <span class="token-type">ObjectFactory</span>&lt;?&gt; objectFactory) {
+        <span class="token-type">String</span> tenantId = <span class="token-type">TenantContext</span>.<span class="token-function">getCurrentTenant</span>();
+        <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; beans = tenantBeans
+            .<span class="token-function">computeIfAbsent</span>(tenantId, k -> <span class="token-keyword">new</span> <span class="token-type">ConcurrentHashMap</span>&lt;&gt;());
+
+        <span class="token-keyword">return</span> beans.<span class="token-function">computeIfAbsent</span>(name, k -> objectFactory.<span class="token-function">getObject</span>());
+    }
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">remove</span>(<span class="token-type">String</span> name) {
+        <span class="token-type">String</span> tenantId = <span class="token-type">TenantContext</span>.<span class="token-function">getCurrentTenant</span>();
+        <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; beans = tenantBeans.<span class="token-function">get</span>(tenantId);
+        <span class="token-keyword">return</span> beans != <span class="token-keyword">null</span> ? beans.<span class="token-function">remove</span>(name) : <span class="token-keyword">null</span>;
+    }
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">registerDestructionCallback</span>(<span class="token-type">String</span> name, <span class="token-type">Runnable</span> callback) {
+        <span class="token-type">String</span> tenantId = <span class="token-type">TenantContext</span>.<span class="token-function">getCurrentTenant</span>();
+        destructionCallbacks
+            .<span class="token-function">computeIfAbsent</span>(tenantId, k -> <span class="token-keyword">new</span> <span class="token-type">ConcurrentHashMap</span>&lt;&gt;())
+            .<span class="token-function">put</span>(name, callback);
+    }
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">resolveContextualObject</span>(<span class="token-type">String</span> key) {
+        <span class="token-keyword">return</span> <span class="token-type">TenantContext</span>.<span class="token-function">getCurrentTenant</span>();
+    }
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">String</span> <span class="token-function">getConversationId</span>() {
+        <span class="token-keyword">return</span> <span class="token-type">TenantContext</span>.<span class="token-function">getCurrentTenant</span>();
+    }
+
+    <span class="token-comment">// Called when a tenant is removed/offboarded</span>
+    <span class="token-keyword">public void</span> <span class="token-function">destroyTenant</span>(<span class="token-type">String</span> tenantId) {
+        <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Runnable</span>&gt; callbacks = destructionCallbacks.<span class="token-function">remove</span>(tenantId);
+        <span class="token-keyword">if</span> (callbacks != <span class="token-keyword">null</span>) {
+            callbacks.<span class="token-function">values</span>().<span class="token-function">forEach</span>(<span class="token-type">Runnable</span>::run);
+        }
+        tenantBeans.<span class="token-function">remove</span>(tenantId);
+    }
+}
+
+<span class="token-comment">// Step 2: Register the custom scope</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-keyword">public class</span> <span class="token-class">TenantScopeConfig</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-keyword">public static</span> <span class="token-type">CustomScopeConfigurer</span> <span class="token-function">tenantScopeConfigurer</span>() {
+        <span class="token-type">CustomScopeConfigurer</span> configurer = <span class="token-keyword">new</span> <span class="token-type">CustomScopeConfigurer</span>();
+        configurer.<span class="token-function">addScope</span>(<span class="token-string">"tenant"</span>, <span class="token-keyword">new</span> <span class="token-type">TenantScope</span>());
+        <span class="token-keyword">return</span> configurer;
+    }
+}
+
+<span class="token-comment">// Step 3: Use it!</span>
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(value = <span class="token-string">"tenant"</span>, proxyMode = <span class="token-type">ScopedProxyMode</span>.TARGET_CLASS)
+<span class="token-keyword">public class</span> <span class="token-class">TenantDataSource</span> {
+    <span class="token-comment">// One instance per tenant — auto-resolved based on TenantContext</span>
+    <span class="token-keyword">private final</span> <span class="token-type">DataSource</span> dataSource;
+
+    <span class="token-keyword">public</span> <span class="token-function">TenantDataSource</span>() {
+        <span class="token-type">String</span> tenant = <span class="token-type">TenantContext</span>.<span class="token-function">getCurrentTenant</span>();
+        <span class="token-keyword">this</span>.dataSource = <span class="token-function">createDataSourceForTenant</span>(tenant);
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 10: @RefreshScope -->
+            <!-- ============================================ -->
+            <h2>10. @RefreshScope — Dynamic Bean Recreation</h2>
+
+            <p><code><span class="token-annotation">@RefreshScope</span></code> from Spring Cloud is a custom scope that destroys and recreates beans when a <code>/actuator/refresh</code> event occurs. It's used for beans that read <code><span class="token-annotation">@Value</span></code> properties that may change at runtime (e.g., from Spring Cloud Config Server).</p>
+
+            <pre><code><span class="token-comment">// Bean that reads externalized config — recreated on refresh</span>
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@RefreshScope</span>
+<span class="token-keyword">public class</span> <span class="token-class">FeatureFlags</span> {
+
+    <span class="token-annotation">@Value</span>(<span class="token-string">"${feature.new-checkout:false}"</span>)
+    <span class="token-keyword">private boolean</span> newCheckoutEnabled;
+
+    <span class="token-annotation">@Value</span>(<span class="token-string">"${feature.dark-mode:false}"</span>)
+    <span class="token-keyword">private boolean</span> darkModeEnabled;
+
+    <span class="token-comment">// When config changes and /actuator/refresh is called:</span>
+    <span class="token-comment">// 1. This bean is destroyed (@PreDestroy called)</span>
+    <span class="token-comment">// 2. On next access, a NEW instance is created</span>
+    <span class="token-comment">// 3. @Value is re-resolved from the updated Environment</span>
+}
+
+<span class="token-comment">// How RefreshScope works internally (simplified):</span>
+<span class="token-keyword">public class</span> <span class="token-class">RefreshScope</span> <span class="token-keyword">extends</span> <span class="token-type">GenericScope</span> {
+
+    <span class="token-comment">// Cache of created beans</span>
+    <span class="token-keyword">private final</span> <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">BeanLifecycleWrapper</span>&gt; cache = <span class="token-keyword">new</span> <span class="token-type">ConcurrentHashMap</span>&lt;&gt;();
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">get</span>(<span class="token-type">String</span> name, <span class="token-type">ObjectFactory</span>&lt;?&gt; objectFactory) {
+        <span class="token-comment">// Return cached instance, or create if not present</span>
+        <span class="token-type">BeanLifecycleWrapper</span> wrapper = cache.<span class="token-function">computeIfAbsent</span>(name,
+            k -> <span class="token-keyword">new</span> <span class="token-type">BeanLifecycleWrapper</span>(name, objectFactory));
+        <span class="token-keyword">return</span> wrapper.<span class="token-function">getBean</span>();
+    }
+
+    <span class="token-comment">// Called on /actuator/refresh</span>
+    <span class="token-keyword">public boolean</span> <span class="token-function">refresh</span>(<span class="token-type">String</span> name) {
+        <span class="token-type">BeanLifecycleWrapper</span> wrapper = cache.<span class="token-function">remove</span>(name);
+        <span class="token-keyword">if</span> (wrapper != <span class="token-keyword">null</span>) {
+            wrapper.<span class="token-function">destroy</span>(); <span class="token-comment">// Calls @PreDestroy</span>
+            <span class="token-keyword">return true</span>;
+        }
+        <span class="token-keyword">return false</span>;
+    }
+
+    <span class="token-comment">// Refresh ALL beans in this scope</span>
+    <span class="token-keyword">public void</span> <span class="token-function">refreshAll</span>() {
+        cache.<span class="token-function">keySet</span>().<span class="token-function">forEach</span>(<span class="token-keyword">this</span>::refresh);
+    }
+}
+
+<span class="token-comment">// Triggering refresh programmatically:</span>
+<span class="token-annotation">@Autowired</span>
+<span class="token-keyword">private</span> <span class="token-type">RefreshScope</span> refreshScope;
+
+<span class="token-keyword">public void</span> <span class="token-function">onConfigChange</span>() {
+    refreshScope.<span class="token-function">refreshAll</span>(); <span class="token-comment">// Destroys all @RefreshScope beans</span>
+    <span class="token-comment">// Next access creates fresh instances with new config values</span>
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 RefreshScope is also proxy-based</div>
+                <p><code><span class="token-annotation">@RefreshScope</span></code> beans are wrapped in a CGLIB proxy, just like request-scoped beans. The proxy resolves through the <code>RefreshScope.get()</code> method. When the cache is cleared during a refresh, the next method call through the proxy triggers re-creation. This means existing references to the proxy continue to work — they automatically pick up the new instance.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🧠 Deep Understanding Check</h3>
+
+                <h4>Mental Model: Scope as a Map Lookup</h4>
+                <p>Every scope is fundamentally a <strong>keyed cache</strong>:</p>
+                <ul>
+                    <li><strong>Singleton</strong>: key = bean name, cache = the container itself (one global map)</li>
+                    <li><strong>Prototype</strong>: no cache — always creates new (conceptually, cache size = 0)</li>
+                    <li><strong>Request</strong>: key = bean name, cache = request attributes (per-request map)</li>
+                    <li><strong>Session</strong>: key = bean name, cache = session attributes (per-session map)</li>
+                    <li><strong>Custom (tenant)</strong>: key = bean name, cache = your custom map per context</li>
+                    <li><strong>Refresh</strong>: key = bean name, cache = a clearable ConcurrentHashMap</li>
+                </ul>
+                <p>The proxy simply does: <code>scope.get(beanName, factoryThatCreatesTheBean)</code> on every method call.</p>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>What happens if you inject a request-scoped bean into a singleton WITHOUT <code>proxyMode</code>? At what point does it fail?</li>
+                    <li>Why does Spring Boot default to CGLIB proxies instead of JDK dynamic proxies? What problem did the old default cause?</li>
+                    <li>You have a prototype bean with a <code>@PreDestroy</code> method. How do you ensure cleanup happens?</li>
+                    <li>Explain why <code>@Lookup</code> requires the class to be non-final (or abstract). What does Spring generate?</li>
+                    <li>In a <code>@RefreshScope</code> bean, what happens to in-flight requests when <code>/actuator/refresh</code> is called? Is there a race condition?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"Your team has a singleton service that holds a HashMap as a local cache. Under load, the application throws ConcurrentModificationException intermittently. Explain the root cause and three different solutions, including one that uses bean scopes."</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Root cause</strong> — HashMap is not thread-safe. Singleton beans are shared across all request threads. Concurrent reads and writes cause structural corruption (infinite loops on resize) or CME during iteration.</li>
+                    <li><strong>Solution 1 (Concurrent collection)</strong> — Replace with <code>ConcurrentHashMap</code>. Thread-safe for concurrent access, lock-striping minimizes contention.</li>
+                    <li><strong>Solution 2 (Request scope)</strong> — If the cache is request-specific, make it <code>@RequestScope</code>. Each request gets its own map — no sharing, no contention.</li>
+                    <li><strong>Solution 3 (Immutable + Refresh)</strong> — Use an immutable map rebuilt periodically. Wrap in <code>@RefreshScope</code> or use <code>AtomicReference&lt;Map&gt;</code> for lock-free reads with periodic full replacement.</li>
+                </ol>
+            </div>
+
+            <div class="nav-footer">
+                <a href="05-component-scanning.html" class="nav-btn nav-btn-prev">← Component Scanning</a>
+                <a href="07-aop-internals.html" class="nav-btn nav-btn-next">AOP Internals →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

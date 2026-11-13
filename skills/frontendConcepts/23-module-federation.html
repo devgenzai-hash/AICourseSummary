@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Federation - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interop</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preconnect</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Module Federation
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Module Federation</h1>
+                <p class="subtitle">How independently deployed JavaScript applications share code at runtime — enabling true micro-frontend architectures without duplicating dependencies.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-concept">Architecture</span>
+                    <span class="tag tag-browser">Webpack 5+</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏗️ Daily-Life Analogy: International Power Adapters</div>
+                <p>Imagine different countries (teams) each build their own electrical appliances (apps). Without Module Federation, if you want to use a Japanese appliance in the US, you'd need to rebuild the entire appliance. With Module Federation, you define a <strong>universal adapter interface</strong> — each country exposes its appliances through a standard plug, and any other country can import and use them <em>without rebuilding</em>.</p>
+                <p>The key insight: each app is <strong>independently deployed</strong> but can dynamically consume modules from other apps at runtime — no build-time dependency required.</p>
+            </div>
+
+            <h2>The Problem: Why Module Federation Exists</h2>
+            <p>Large organizations face a fundamental scaling problem:</p>
+            <ul>
+                <li><strong>Monolithic frontends</strong> become unmanageable — 50+ developers touching one repo means slow CI, merge conflicts, and coupled deployments</li>
+                <li><strong>npm packages</strong> require version coordination — updating a shared component means rebuilding every consumer</li>
+                <li><strong>iframes</strong> provide isolation but kill performance and UX (no shared state, no shared dependencies, poor accessibility)</li>
+                <li><strong>Traditional micro-frontends</strong> (e.g., single-spa) still duplicate React, lodash, etc. across every sub-app</li>
+            </ul>
+            <p>Module Federation solves this by enabling <strong>runtime code sharing</strong> between independently built and deployed applications. App A can import a component from App B's deployed bundle — no npm publish cycle needed.</p>
+
+            <h2>How Module Federation Works Internally</h2>
+
+            <h3>Core Concepts</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Term</th><th>Definition</th><th>Analogy</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Host</strong></td><td>The app that consumes remote modules</td><td>The app loading the plugin</td></tr>
+                    <tr><td><strong>Remote</strong></td><td>The app that exposes modules for others</td><td>The plugin provider</td></tr>
+                    <tr><td><strong>Shared</strong></td><td>Dependencies used by both (deduplicated)</td><td>Shared runtime like React</td></tr>
+                    <tr><td><strong>Container</strong></td><td>The runtime manifest generated per remote</td><td>The adapter/plug interface</td></tr>
+                    <tr><td><strong>Expose</strong></td><td>What a remote makes available</td><td>The public API surface</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Runtime Resolution Flow</h3>
+            <ol>
+                <li><strong>Host boots up</strong> — Webpack runtime initializes the shared scope (a registry of available shared modules)</li>
+                <li><strong>Remote entry loaded</strong> — Host fetches <code>remoteEntry.js</code> from the remote's CDN (a tiny manifest file)</li>
+                <li><strong>Shared scope negotiation</strong> — Remote checks if the host already has compatible versions of shared deps (e.g., React 18.x). If yes, it reuses them. If not, it loads its own.</li>
+                <li><strong>Module requested</strong> — When host code hits <code>import('app2/Button')</code>, webpack resolves it through the remote's container</li>
+                <li><strong>Chunk loaded on demand</strong> — Only the requested module's chunk is fetched from the remote's server</li>
+                <li><strong>Module returned</strong> — The remote module is returned as a regular ES module — host code uses it normally</li>
+            </ol>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Version Mismatch Hell</div>
+                <p>If the host has React 18.2 and the remote was built with React 18.3, the shared scope negotiation determines whether they're "compatible." By default, webpack uses semver ranges. If they're incompatible, the remote loads its <em>own</em> copy of React — resulting in two React instances. This causes hooks to break (different React contexts), doubling bundle size, and subtle state bugs.</p>
+            </div>
+
+            <h2>Code: Webpack 5 Module Federation Configuration</h2>
+<pre><code><span class="token-comment">// webpack.config.js — REMOTE APP (the one exposing modules)</span>
+<span class="token-keyword">const</span> { ModuleFederationPlugin } = require(<span class="token-string">'webpack'</span>).container;
+
+module.exports = {
+    <span class="token-comment">// Each remote needs a unique public path — this is where chunks are fetched from</span>
+    output: {
+        publicPath: <span class="token-string">'https://team-checkout.cdn.example.com/'</span>,
+        uniqueName: <span class="token-string">'checkout_app'</span>,  <span class="token-comment">// Prevents global variable collisions between remotes</span>
+    },
+    plugins: [
+        <span class="token-keyword">new</span> ModuleFederationPlugin({
+            <span class="token-comment">// Name used by hosts to reference this remote</span>
+            name: <span class="token-string">'checkout'</span>,
+            
+            <span class="token-comment">// The manifest file — hosts fetch this to discover available modules</span>
+            filename: <span class="token-string">'remoteEntry.js'</span>,
+            
+            <span class="token-comment">// What this app makes available to other apps</span>
+            exposes: {
+                <span class="token-string">'./CartWidget'</span>: <span class="token-string">'./src/components/CartWidget'</span>,
+                <span class="token-string">'./CheckoutFlow'</span>: <span class="token-string">'./src/components/CheckoutFlow'</span>,
+                <span class="token-string">'./useCart'</span>: <span class="token-string">'./src/hooks/useCart'</span>,
+            },
+            
+            <span class="token-comment">// Shared dependencies — prevents loading React twice</span>
+            shared: {
+                react: { 
+                    singleton: <span class="token-keyword">true</span>,      <span class="token-comment">// Only ONE instance of React in the page</span>
+                    requiredVersion: <span class="token-string">'^18.0.0'</span>,
+                    eager: <span class="token-keyword">false</span>,         <span class="token-comment">// Load async (don't bundle into initial chunk)</span>
+                },
+                <span class="token-string">'react-dom'</span>: { 
+                    singleton: <span class="token-keyword">true</span>, 
+                    requiredVersion: <span class="token-string">'^18.0.0'</span> 
+                },
+            },
+        }),
+    ],
+};
+</code></pre>
+
+<pre><code><span class="token-comment">// webpack.config.js — HOST APP (the one consuming remote modules)</span>
+<span class="token-keyword">const</span> { ModuleFederationPlugin } = require(<span class="token-string">'webpack'</span>).container;
+
+module.exports = {
+    plugins: [
+        <span class="token-keyword">new</span> ModuleFederationPlugin({
+            name: <span class="token-string">'shell'</span>,
+            
+            <span class="token-comment">// Declare where to find remote containers</span>
+            remotes: {
+                <span class="token-comment">// Format: "internalName@URL_to_remote_entry"</span>
+                <span class="token-comment">// At runtime, webpack fetches this URL to discover the remote's modules</span>
+                checkout: <span class="token-string">'checkout@https://team-checkout.cdn.example.com/remoteEntry.js'</span>,
+            },
+            
+            shared: {
+                react: { singleton: <span class="token-keyword">true</span>, requiredVersion: <span class="token-string">'^18.0.0'</span> },
+                <span class="token-string">'react-dom'</span>: { singleton: <span class="token-keyword">true</span>, requiredVersion: <span class="token-string">'^18.0.0'</span> },
+            },
+        }),
+    ],
+};
+</code></pre>
+
+<pre><code><span class="token-comment">// Host app consuming the remote module — looks like a normal dynamic import</span>
+<span class="token-keyword">import</span> React, { lazy, Suspense } <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+
+<span class="token-comment">// This triggers: fetch remoteEntry.js → negotiate shared scope → fetch CartWidget chunk</span>
+<span class="token-keyword">const</span> CartWidget = lazy(() => import(<span class="token-string">'checkout/CartWidget'</span>));
+
+<span class="token-keyword">function</span> <span class="token-function">App</span>() {
+    <span class="token-keyword">return</span> (
+        &lt;div&gt;
+            &lt;h1&gt;Main Store&lt;/h1&gt;
+            <span class="token-comment">{/* Remote module loads on demand — user sees fallback during load */}</span>
+            &lt;Suspense fallback={&lt;div&gt;Loading cart...&lt;/div&gt;}&gt;
+                &lt;CartWidget /&gt;
+            &lt;/Suspense&gt;
+        &lt;/div&gt;
+    );
+}
+</code></pre>
+
+            <h2>The remoteEntry.js — What's Actually Generated</h2>
+<pre><code><span class="token-comment">// Simplified version of what remoteEntry.js contains</span>
+<span class="token-comment">// This is the "container" that webpack generates for the remote</span>
+<span class="token-keyword">var</span> checkout;
+(() => {
+    <span class="token-comment">// The container exposes two methods:</span>
+    <span class="token-keyword">var</span> moduleMap = {
+        <span class="token-string">'./CartWidget'</span>: () => Promise.all([
+            __webpack_require__.e(<span class="token-string">"src_components_CartWidget_js"</span>)
+        ]).then(() => () => __webpack_require__(<span class="token-string">"./src/components/CartWidget.js"</span>)),
+    };
+    
+    checkout = {
+        <span class="token-comment">// get() — returns a factory for the requested module</span>
+        get: (module) => moduleMap[module](),
+        
+        <span class="token-comment">// init() — receives the shared scope from the host</span>
+        <span class="token-comment">// This is where version negotiation happens</span>
+        init: (shareScope) => {
+            <span class="token-comment">// Register this remote's shared modules into the shared scope</span>
+            <span class="token-comment">// If host already has React 18.x, this remote will reuse it</span>
+            __webpack_require__.S = shareScope;
+        }
+    };
+})();
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Spotify</strong> — Uses Module Federation to compose their desktop app from independent team bundles (player, search, library, social). Each team deploys independently multiple times per day.</li>
+                <li><strong>Walmart</strong> — Their e-commerce platform federates checkout, product catalog, and recommendation modules across different team domains, enabling independent deploys for 20+ teams.</li>
+                <li><strong>SAP</strong> — Their Fiori platform uses Module Federation to allow enterprise customers to extend the UI with custom federated modules without rebuilding the core application.</li>
+            </ul>
+
+            <h2>Trade-offs & Alternatives</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Approach</th><th>Pros</th><th>Cons</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Module Federation</td><td>Runtime sharing, independent deploys, shared deps</td><td>Webpack-specific, version conflicts, complex debugging</td></tr>
+                    <tr><td>npm packages</td><td>Simple, type-safe, well-understood</td><td>Requires rebuilding all consumers on update</td></tr>
+                    <tr><td>iframes</td><td>Perfect isolation, framework-agnostic</td><td>No shared state, poor perf, accessibility issues</td></tr>
+                    <tr><td>Import maps</td><td>Native browser, no bundler lock-in</td><td>No shared scope negotiation, no chunk splitting</td></tr>
+                    <tr><td>single-spa</td><td>Framework-agnostic routing</td><td>Duplicates shared deps, complex lifecycle</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Not setting <code>singleton: true</code> for React</strong> — Results in two React instances, breaking hooks and context. Always singleton React and React-DOM.</li>
+                <li><strong>Forgetting <code>eager: false</code></strong> — If shared modules are eagerly loaded, the async boundary breaks and the app crashes on boot.</li>
+                <li><strong>Hardcoding remote URLs</strong> — In production, remote URLs should be configurable (env vars, runtime config) so you can point to staging/canary versions.</li>
+                <li><strong>No fallback for remote failures</strong> — If the remote CDN is down, the host crashes. Always wrap remote imports in error boundaries.</li>
+                <li><strong>Sharing too many or too few deps</strong> — Sharing everything bloats the shared scope; sharing nothing defeats the purpose. Share framework deps + design system only.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Module Federation When...</h3>
+                <p>You can explain what happens at runtime when a host app encounters <code>import('remote/Component')</code> — including the network requests made, the shared scope negotiation, and what happens when versions are incompatible.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Set up two webpack apps where App A exposes a <code>Button</code> component and App B consumes it. Then change the Button in App A, redeploy only App A, and verify App B picks up the new version without rebuilding.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Module Federation connects to: <strong>Code Splitting</strong> (federation is code splitting across deployment boundaries), <strong>Dynamic Import Chunking</strong> (same underlying mechanism), and <strong>Micro-Frontend Orchestration</strong> (federation is the build tool layer that enables it).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="22-dynamic-import-chunking.html" class="nav-btn nav-btn-prev">← Dynamic Import Chunking</a>
+                <a href="24-shadow-dom.html" class="nav-btn nav-btn-next">Shadow DOM →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

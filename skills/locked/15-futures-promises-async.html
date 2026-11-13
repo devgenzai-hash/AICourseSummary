@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futures, Promises &amp; Async/Await - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Futures, Promises &amp; Async/Await</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Futures, Promises &amp; Async/Await</h1>
+                <p class="subtitle">A way to say 'start this task now, I will collect the result later.' The foundation of non-blocking programming in every modern language.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-pattern">Pattern</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">Ordering Food at a Restaurant</div>
+                <p><strong>Future/Promise</strong>: You order food (submit a task). The waiter gives you a <strong>buzzer</strong> (the Future object). You can go do other things. When the buzzer goes off, your food is ready (result available).</p>
+<p><strong>Async/Await</strong>: Same restaurant, but you say "I will wait here but let other customers order while my food cooks." You pause (await), others proceed, and you resume when ready.</p>
+            </div>
+
+
+            <h2>Futures: A Placeholder for a Result</h2>
+<pre><code><span class="token-keyword">from</span> concurrent.futures <span class="token-keyword">import</span> ThreadPoolExecutor, Future
+<span class="token-keyword">import</span> time
+
+<span class="token-keyword">def</span> <span class="token-function">slow_api_call</span>(user_id):
+    time.sleep(<span class="token-number">2</span>)
+    <span class="token-keyword">return</span> {<span class="token-string">"id"</span>: user_id, <span class="token-string">"name"</span>: <span class="token-string">f"User {user_id}"</span>}
+
+executor = ThreadPoolExecutor(max_workers=<span class="token-number">4</span>)
+
+<span class="token-comment"># Submit returns a Future immediately (non-blocking)</span>
+future = executor.submit(slow_api_call, <span class="token-number">42</span>)
+print(<span class="token-string">f"Is done? {future.done()}"</span>)  <span class="token-comment"># False — still running</span>
+
+<span class="token-comment"># Do other work while waiting...</span>
+print(<span class="token-string">"Doing other things..."</span>)
+
+<span class="token-comment"># Block until result is ready</span>
+result = future.result(timeout=<span class="token-number">5</span>)  <span class="token-comment"># Waits up to 5s</span>
+print(<span class="token-string">f"Got: {result}"</span>)
+
+<span class="token-comment"># Callback approach (don't block at all)</span>
+<span class="token-keyword">def</span> <span class="token-function">on_complete</span>(fut):
+    print(<span class="token-string">f"Callback received: {fut.result()}"</span>)
+
+future2 = executor.submit(slow_api_call, <span class="token-number">99</span>)
+future2.add_done_callback(on_complete)</code></pre>
+
+            <h2>Async/Await: Cooperative Multitasking</h2>
+<pre><code><span class="token-keyword">import</span> asyncio
+
+<span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">fetch_user</span>(user_id):
+    print(<span class="token-string">f"Fetching user {user_id}..."</span>)
+    <span class="token-keyword">await</span> asyncio.sleep(<span class="token-number">1</span>)  <span class="token-comment"># Non-blocking sleep (simulates I/O)</span>
+    <span class="token-keyword">return</span> {<span class="token-string">"id"</span>: user_id, <span class="token-string">"name"</span>: <span class="token-string">f"User {user_id}"</span>}
+
+<span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">fetch_order</span>(order_id):
+    <span class="token-keyword">await</span> asyncio.sleep(<span class="token-number">1.5</span>)
+    <span class="token-keyword">return</span> {<span class="token-string">"order"</span>: order_id, <span class="token-string">"total"</span>: <span class="token-number">99.99</span>}
+
+<span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">main</span>():
+    <span class="token-comment"># Run BOTH concurrently — total time: 1.5s (not 2.5s!)</span>
+    user, order = <span class="token-keyword">await</span> asyncio.gather(
+        fetch_user(<span class="token-number">1</span>),
+        fetch_order(<span class="token-number">100</span>)
+    )
+    print(<span class="token-string">f"User: {user}, Order: {order}"</span>)
+
+asyncio.run(main())</code></pre>
+
+            <h2>Futures vs Async/Await</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Feature</th><th>Futures (ThreadPool)</th><th>Async/Await</th></tr></thead>
+                <tbody>
+                    <tr><td>Concurrency model</td><td>Multi-threaded (OS threads)</td><td>Single-threaded (event loop)</td></tr>
+                    <tr><td>Overhead per task</td><td>~1MB (thread stack)</td><td>~1KB (coroutine frame)</td></tr>
+                    <tr><td>Max concurrency</td><td>~1000 threads</td><td>~100,000 coroutines</td></tr>
+                    <tr><td>Best for</td><td>CPU-bound, blocking I/O libs</td><td>Many I/O-bound tasks</td></tr>
+                    <tr><td>Complexity</td><td>Simpler (familiar threading)</td><td>Requires async ecosystem</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Error Handling in Async</h2>
+<pre><code><span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">risky_operation</span>():
+    <span class="token-keyword">await</span> asyncio.sleep(<span class="token-number">1</span>)
+    <span class="token-keyword">raise</span> ValueError(<span class="token-string">"Something went wrong"</span>)
+
+<span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">safe_main</span>():
+    <span class="token-keyword">try</span>:
+        result = <span class="token-keyword">await</span> risky_operation()
+    <span class="token-keyword">except</span> ValueError <span class="token-keyword">as</span> e:
+        print(<span class="token-string">f"Caught: {e}"</span>)
+
+    <span class="token-comment"># With gather: exceptions are returned, not raised</span>
+    results = <span class="token-keyword">await</span> asyncio.gather(
+        fetch_user(<span class="token-number">1</span>),
+        risky_operation(),
+        return_exceptions=<span class="token-keyword">True</span>
+    )
+    <span class="token-keyword">for</span> r <span class="token-keyword">in</span> results:
+        <span class="token-keyword">if</span> isinstance(r, Exception):
+            print(<span class="token-string">f"Failed: {r}"</span>)
+        <span class="token-keyword">else</span>:
+            print(<span class="token-string">f"Success: {r}"</span>)</code></pre>
+
+            <div class="industry-box">
+                <h4>Industry Usage</h4>
+                <ul>
+                    <li><strong>FastAPI</strong> — async/await for handling thousands of concurrent HTTP requests</li>
+                    <li><strong>Node.js</strong> — Entire runtime built on Promises and async/await</li>
+                    <li><strong>Rust tokio</strong> — Async runtime handling millions of concurrent connections</li>
+                    <li><strong>Java CompletableFuture</strong> — Chainable futures with thenApply(), thenCompose()</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>Future: a placeholder for a result that will be available later</li>
+<li>Async/await: cooperative multitasking on a single thread (event loop)</li>
+<li>Futures use real OS threads (~1MB each); coroutines use ~1KB each</li>
+<li>Use asyncio.gather() to run multiple async operations concurrently</li>
+<li>Futures for blocking libraries; async for I/O-heavy async-compatible code</li>
+<li>Always handle exceptions in futures (they are swallowed silently otherwise)</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">FUTURE:
+    submit(task) → [Future: pending...]
+    ... do other work ...
+    future.result() → [Future: DONE] → actual result
+
+ASYNC/AWAIT:
+    Event Loop: ─── run A ─── A awaits (pauses) ─── run B ─── B awaits ─── resume A ───
+    Single thread, multiple tasks interleaved at await points.
+
+    Sequential:    |--A (1s)--|--B (1s)--|  = 2s total
+    Concurrent:    |--A--|
+                   |--B--|                   = 1s total (overlapping I/O)</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Blocking inside async function</strong> — time.sleep() blocks the entire event loop! Use await asyncio.sleep().</li>
+<li><strong>Not awaiting coroutines</strong> — Calling async_func() without await = coroutine never runs.</li>
+<li><strong>Mixing sync and async</strong> — Calling sync blocking code inside async without run_in_executor().</li>
+<li><strong>Forgetting to check future exceptions</strong> — Exceptions in futures are lost unless you call .result().</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Submit 10 tasks to ThreadPoolExecutor. Use as_completed() to print results as they finish.</li>
+<li>Rewrite the same with asyncio: 10 async tasks with asyncio.gather().</li>
+<li>Benchmark: ThreadPoolExecutor vs asyncio for 1000 simulated HTTP requests.</li>
+<li>Implement a timeout: cancel a future if it takes more than 3 seconds.</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="14-thread-pools.html" class="prev">Thread Pools</a>
+                <a href="16-producer-consumer.html" class="next">Producer-Consumer</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

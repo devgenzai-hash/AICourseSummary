@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment & Serving — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 9</a> <span>›</span> Deployment & Serving</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Deployment & Serving</h1>
+                <p>You've trained your model — now how do you put it in production where real users can access it? Docker, FastAPI, load balancing, monitoring — the full deployment stack.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Training a model = cooking a meal at home.</strong> You experiment, taste, adjust. Deployment = opening a restaurant. Now you need a kitchen that handles 100 orders at once, consistent quality, health inspections (monitoring), and a menu (API).</p>
+            </div>
+
+            <h2 id="stack">The Deployment Stack</h2>
+
+            <div class="mental-model">
+                <h4>🧠 Production Architecture</h4>
+                <pre><code>Users → Load Balancer → API Gateway → FastAPI App → Model Server (vLLM/Ollama)
+                              ↓                ↓              ↓
+                        Rate Limiting    Auth/Logging    GPU Inference
+                              ↓                ↓              ↓
+                          Caching          Metrics      Health Checks</code></pre>
+            </div>
+
+            <h2 id="fastapi">FastAPI LLM Service</h2>
+
+            <pre><code><span class="token-comment"># Production-ready FastAPI server for LLM inference</span>
+<span class="token-comment"># pip install fastapi uvicorn openai pydantic</span>
+
+<span class="token-keyword">from</span> fastapi <span class="token-keyword">import</span> FastAPI, HTTPException, Depends
+<span class="token-keyword">from</span> fastapi.middleware.cors <span class="token-keyword">import</span> CORSMiddleware
+<span class="token-keyword">from</span> fastapi.responses <span class="token-keyword">import</span> StreamingResponse
+<span class="token-keyword">from</span> pydantic <span class="token-keyword">import</span> BaseModel, Field
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> logging
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title=<span class="token-string">"LLM API Service"</span>, version=<span class="token-string">"1.0"</span>)
+app.add_middleware(CORSMiddleware, allow_origins=[<span class="token-string">"*"</span>], allow_methods=[<span class="token-string">"*"</span>])
+
+<span class="token-comment"># Model client (connects to vLLM or Ollama backend)</span>
+llm_client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+
+<span class="token-comment"># Request/Response models</span>
+<span class="token-keyword">class</span> <span class="token-function">ChatRequest</span>(BaseModel):
+    message: str = Field(..., max_length=<span class="token-number">4000</span>)
+    system_prompt: Optional[str] = <span class="token-string">"You are a helpful assistant."</span>
+    model: str = <span class="token-string">"llama3.1:8b"</span>
+    temperature: float = Field(default=<span class="token-number">0.7</span>, ge=<span class="token-number">0</span>, le=<span class="token-number">2</span>)
+    max_tokens: int = Field(default=<span class="token-number">1000</span>, le=<span class="token-number">4000</span>)
+    stream: bool = <span class="token-keyword">False</span>
+
+<span class="token-keyword">class</span> <span class="token-function">ChatResponse</span>(BaseModel):
+    response: str
+    model: str
+    tokens_used: int
+    latency_ms: float
+
+<span class="token-comment"># Health check</span>
+@app.get(<span class="token-string">"/health"</span>)
+<span class="token-keyword">async def</span> <span class="token-function">health_check</span>():
+    <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"healthy"</span>, <span class="token-string">"timestamp"</span>: time.time()}
+
+<span class="token-comment"># Main chat endpoint</span>
+@app.post(<span class="token-string">"/chat"</span>, response_model=ChatResponse)
+<span class="token-keyword">async def</span> <span class="token-function">chat</span>(request: ChatRequest):
+    start = time.time()
+    
+    <span class="token-keyword">try</span>:
+        response = llm_client.chat.completions.create(
+            model=request.model,
+            messages=[
+                {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: request.system_prompt},
+                {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: request.message},
+            ],
+            temperature=request.temperature,
+            max_tokens=request.max_tokens,
+        )
+        
+        latency = (time.time() - start) * <span class="token-number">1000</span>
+        logger.info(<span class="token-string">f"Request completed in {latency:.0f}ms"</span>)
+        
+        <span class="token-keyword">return</span> ChatResponse(
+            response=response.choices[<span class="token-number">0</span>].message.content,
+            model=request.model,
+            tokens_used=response.usage.total_tokens,
+            latency_ms=latency,
+        )
+    <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+        logger.error(<span class="token-string">f"LLM error: {e}"</span>)
+        <span class="token-keyword">raise</span> HTTPException(status_code=<span class="token-number">500</span>, detail=str(e))
+
+<span class="token-comment"># Streaming endpoint</span>
+@app.post(<span class="token-string">"/chat/stream"</span>)
+<span class="token-keyword">async def</span> <span class="token-function">chat_stream</span>(request: ChatRequest):
+    <span class="token-keyword">async def</span> <span class="token-function">generate</span>():
+        stream = llm_client.chat.completions.create(
+            model=request.model,
+            messages=[
+                {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: request.system_prompt},
+                {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: request.message},
+            ],
+            temperature=request.temperature,
+            max_tokens=request.max_tokens,
+            stream=<span class="token-keyword">True</span>,
+        )
+        <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> stream:
+            <span class="token-keyword">if</span> chunk.choices[<span class="token-number">0</span>].delta.content:
+                <span class="token-keyword">yield</span> chunk.choices[<span class="token-number">0</span>].delta.content
+    
+    <span class="token-keyword">return</span> StreamingResponse(generate(), media_type=<span class="token-string">"text/plain"</span>)
+
+<span class="token-comment"># Run: uvicorn app:app --host 0.0.0.0 --port 8000 --workers 4</span></code></pre>
+
+            <h2 id="docker">Docker Deployment</h2>
+
+            <pre><code><span class="token-comment"># Dockerfile for the FastAPI LLM service</span>
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+<span class="token-comment"># Run with multiple workers for concurrency</span>
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
+<span class="token-comment"># ---</span>
+<span class="token-comment"># docker-compose.yml — Full stack with model server</span></code></pre>
+
+            <pre><code><span class="token-comment"># docker-compose.yml</span>
+version: "3.8"
+services:
+  <span class="token-comment"># Model server (vLLM for GPU production)</span>
+  model-server:
+    image: vllm/vllm-openai:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    command: >
+      --model meta-llama/Llama-3.1-8B-Instruct
+      --max-model-len 4096
+      --gpu-memory-utilization 0.9
+    ports:
+      - "8001:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+  
+  <span class="token-comment"># API service</span>
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_SERVER_URL=http://model-server:8000/v1
+    depends_on:
+      - model-server
+  
+  <span class="token-comment"># Monitoring</span>
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml</code></pre>
+
+            <h2 id="monitoring">Monitoring & Metrics</h2>
+
+            <pre><code><span class="token-comment"># Add metrics to your LLM service</span>
+<span class="token-keyword">from</span> prometheus_client <span class="token-keyword">import</span> Counter, Histogram, generate_latest
+<span class="token-keyword">from</span> fastapi <span class="token-keyword">import</span> Response
+
+<span class="token-comment"># Define metrics</span>
+REQUEST_COUNT = Counter(<span class="token-string">"llm_requests_total"</span>, <span class="token-string">"Total LLM requests"</span>, [<span class="token-string">"model"</span>, <span class="token-string">"status"</span>])
+LATENCY = Histogram(<span class="token-string">"llm_request_duration_seconds"</span>, <span class="token-string">"Request latency"</span>, [<span class="token-string">"model"</span>])
+TOKENS = Histogram(<span class="token-string">"llm_tokens_used"</span>, <span class="token-string">"Tokens per request"</span>, [<span class="token-string">"model"</span>])
+
+<span class="token-comment"># Track in your endpoint</span>
+@app.post(<span class="token-string">"/chat"</span>)
+<span class="token-keyword">async def</span> <span class="token-function">chat_with_metrics</span>(request: ChatRequest):
+    start = time.time()
+    <span class="token-keyword">try</span>:
+        result = <span class="token-keyword">await</span> process_chat(request)
+        REQUEST_COUNT.labels(model=request.model, status=<span class="token-string">"success"</span>).inc()
+        LATENCY.labels(model=request.model).observe(time.time() - start)
+        TOKENS.labels(model=request.model).observe(result.tokens_used)
+        <span class="token-keyword">return</span> result
+    <span class="token-keyword">except</span> Exception:
+        REQUEST_COUNT.labels(model=request.model, status=<span class="token-string">"error"</span>).inc()
+        <span class="token-keyword">raise</span>
+
+<span class="token-comment"># Expose metrics endpoint for Prometheus</span>
+@app.get(<span class="token-string">"/metrics"</span>)
+<span class="token-keyword">async def</span> <span class="token-function">metrics</span>():
+    <span class="token-keyword">return</span> Response(content=generate_latest(), media_type=<span class="token-string">"text/plain"</span>)
+
+<span class="token-comment"># Key metrics to track:</span>
+<span class="token-comment"># 1. Request latency (p50, p95, p99)</span>
+<span class="token-comment"># 2. Tokens per second (throughput)</span>
+<span class="token-comment"># 3. Error rate</span>
+<span class="token-comment"># 4. Queue depth (requests waiting)</span>
+<span class="token-comment"># 5. GPU utilization & VRAM usage</span>
+<span class="token-comment"># 6. Cost per request</span></code></pre>
+
+            <h2 id="scaling">Scaling Strategies</h2>
+
+            <table>
+                <thead><tr><th>Strategy</th><th>How</th><th>When</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Vertical</strong></td><td>Bigger GPU (A100 → H100)</td><td>Single model needs more VRAM/speed</td></tr>
+                    <tr><td><strong>Horizontal</strong></td><td>Multiple replicas behind load balancer</td><td>More concurrent users</td></tr>
+                    <tr><td><strong>Model parallelism</strong></td><td>Split model across GPUs</td><td>Model too large for one GPU</td></tr>
+                    <tr><td><strong>Caching</strong></td><td>Redis cache for repeated queries</td><td>Many similar requests</td></tr>
+                    <tr><td><strong>Batching</strong></td><td>Group requests, process together</td><td>High throughput needed</td></tr>
+                    <tr><td><strong>Autoscaling</strong></td><td>Kubernetes HPA on GPU metrics</td><td>Variable traffic patterns</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>vLLM for production GPU serving</strong> — Continuous batching, PagedAttention, highest throughput.</li>
+                    <li><strong>Ollama for small teams</strong> — Easy setup, good for internal tools and prototypes.</li>
+                    <li><strong>Docker + Kubernetes for scale</strong> — Standard deployment platform for production AI services.</li>
+                    <li><strong>API gateway mandatory</strong> — Rate limiting, auth, logging before requests hit your model.</li>
+                    <li><strong>Health checks</strong> — /health endpoint checked every 10s. Auto-restart unhealthy containers.</li>
+                    <li><strong>Prometheus + Grafana</strong> — Standard monitoring stack. Alert on latency spikes and error rates.</li>
+                    <li><strong>Cost tracking</strong> — Track tokens used per user/request. GPU time is expensive.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>FastAPI</strong> = standard framework for LLM API services (async, fast, typed)</li>
+                    <li><strong>Docker</strong> = containerize everything for consistent deployment</li>
+                    <li><strong>vLLM/Ollama</strong> = model serving backend (separate from API layer)</li>
+                    <li><strong>Streaming</strong> = essential for chat UX (users see tokens as they generate)</li>
+                    <li><strong>Monitoring</strong> = Prometheus metrics (latency, errors, tokens, GPU usage)</li>
+                    <li><strong>Scale</strong> = horizontal replicas + caching + batching + autoscaling</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Deploy an LLM Service</h4>
+                <ol>
+                    <li>Build the FastAPI service above with /health, /chat, and /chat/stream</li>
+                    <li>Create a Dockerfile and docker-compose.yml with Ollama as backend</li>
+                    <li>Add Prometheus metrics (request count, latency histogram)</li>
+                    <li>Load test with <code>wrk</code> or <code>locust</code> — measure throughput</li>
+                    <li>Add Redis caching for repeated identical prompts</li>
+                    <li><strong>Bonus:</strong> Set up Kubernetes deployment with HPA (auto-scaling on CPU/GPU)</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="29-model-types.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">All Model Types</span>
+                </a>
+                <a href="31-evaluation-benchmarks.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Benchmarks & Evals</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

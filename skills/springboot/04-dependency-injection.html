@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dependency Injection Internals - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Spring Core & IoC Internals</li>
+            <li><a href="01-ioc-container.html"><span class="nav-number">1</span> IoC Container & BeanFactory</a></li>
+            <li><a href="02-application-context.html"><span class="nav-number">2</span> ApplicationContext Lifecycle</a></li>
+            <li><a href="03-bean-lifecycle.html"><span class="nav-number">3</span> Bean Lifecycle & Callbacks</a></li>
+            <li><a href="04-dependency-injection.html" class="active"><span class="nav-number">4</span> Dependency Injection Internals</a></li>
+            <li><a href="05-component-scanning.html"><span class="nav-number">5</span> Component Scanning</a></li>
+            <li><a href="06-bean-scopes.html"><span class="nav-number">6</span> Bean Scopes & Proxy Mechanisms</a></li>
+            <li><a href="07-aop-internals.html"><span class="nav-number">7</span> AOP Internals</a></li>
+            <li><a href="08-spel.html"><span class="nav-number">8</span> Spring Expression Language</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Spring Core & IoC Internals → Dependency Injection Internals</div>
+        <div class="topic-number">Topic 4 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Dependency Injection Internals</h1>
+            <p class="subtitle-description">How Spring resolves, wires, and injects dependencies at the bytecode level — the machinery behind <code><span class="token-annotation">@Autowired</span></code></p>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🔌 The Wiring Analogy</div>
+                <p>Think of Spring DI as an electrical contractor wiring a building. The <strong>blueprint</strong> (BeanDefinition) says "this office needs a power outlet here." The <strong>contractor</strong> (AutowiredAnnotationBeanPostProcessor) reads the blueprint, finds the correct wire gauge (type matching), labels (qualifiers), and connects the circuit. The office occupant (your bean) never needs to know where the power plant is — they just flip the switch.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: How @Autowired Works Internally -->
+            <!-- ============================================ -->
+            <h2>1. How @Autowired Works Internally</h2>
+
+            <p>The <code><span class="token-annotation">@Autowired</span></code> annotation is processed by <code><span class="token-class">AutowiredAnnotationBeanPostProcessor</span></code>, which implements <code><span class="token-type">SmartInstantiationAwareBeanPostProcessor</span></code>. This processor is registered automatically when you use annotation-based configuration.</p>
+
+            <h3>The Processing Pipeline</h3>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p><code><span class="token-class">AutowiredAnnotationBeanPostProcessor</span></code> operates at TWO phases: (1) metadata collection during <code>postProcessMergedBeanDefinition</code> and (2) actual injection during <code>postProcessProperties</code>. The metadata is cached so repeated lookups are avoided.</p>
+            </div>
+
+            <pre><code><span class="token-comment">// Phase 1: Metadata collection (called once per bean type)</span>
+<span class="token-annotation">@Override</span>
+<span class="token-keyword">public</span> <span class="token-keyword">void</span> <span class="token-function">postProcessMergedBeanDefinition</span>(
+        <span class="token-type">RootBeanDefinition</span> beanDefinition,
+        <span class="token-type">Class</span>&lt;?&gt; beanType,
+        <span class="token-type">String</span> beanName) {
+
+    <span class="token-comment">// Find all @Autowired fields and methods</span>
+    <span class="token-type">InjectionMetadata</span> metadata = <span class="token-function">findAutowiringMetadata</span>(beanName, beanType, <span class="token-keyword">null</span>);
+    metadata.<span class="token-function">checkConfigMembers</span>(beanDefinition);
+}
+
+<span class="token-comment">// Phase 2: Actual injection (called for each bean instance)</span>
+<span class="token-annotation">@Override</span>
+<span class="token-keyword">public</span> <span class="token-type">PropertyValues</span> <span class="token-function">postProcessProperties</span>(
+        <span class="token-type">PropertyValues</span> pvs,
+        <span class="token-type">Object</span> bean,
+        <span class="token-type">String</span> beanName) {
+
+    <span class="token-type">InjectionMetadata</span> metadata = <span class="token-function">findAutowiringMetadata</span>(beanName, bean.<span class="token-function">getClass</span>(), pvs);
+    metadata.<span class="token-function">inject</span>(bean, beanName, pvs);
+    <span class="token-keyword">return</span> pvs;
+}</code></pre>
+
+            <h3>Internal: findAutowiringMetadata</h3>
+
+            <pre><code><span class="token-keyword">private</span> <span class="token-type">InjectionMetadata</span> <span class="token-function">findAutowiringMetadata</span>(
+        <span class="token-type">String</span> beanName, <span class="token-type">Class</span>&lt;?&gt; clazz, <span class="token-type">PropertyValues</span> pvs) {
+
+    <span class="token-comment">// Cache key is the bean name or class name</span>
+    <span class="token-type">String</span> cacheKey = (beanName != <span class="token-keyword">null</span> ? beanName : clazz.<span class="token-function">getName</span>());
+    <span class="token-type">InjectionMetadata</span> metadata = <span class="token-keyword">this</span>.injectionMetadataCache.<span class="token-function">get</span>(cacheKey);
+
+    <span class="token-keyword">if</span> (<span class="token-type">InjectionMetadata</span>.<span class="token-function">needsRefresh</span>(metadata, clazz)) {
+        <span class="token-keyword">synchronized</span> (<span class="token-keyword">this</span>.injectionMetadataCache) {
+            metadata = <span class="token-keyword">this</span>.injectionMetadataCache.<span class="token-function">get</span>(cacheKey);
+            <span class="token-keyword">if</span> (<span class="token-type">InjectionMetadata</span>.<span class="token-function">needsRefresh</span>(metadata, clazz)) {
+                <span class="token-comment">// Walk the class hierarchy, collecting injection points</span>
+                metadata = <span class="token-function">buildAutowiringMetadata</span>(clazz);
+                <span class="token-keyword">this</span>.injectionMetadataCache.<span class="token-function">put</span>(cacheKey, metadata);
+            }
+        }
+    }
+    <span class="token-keyword">return</span> metadata;
+}</code></pre>
+
+            <h3>buildAutowiringMetadata: The Discovery Engine</h3>
+
+            <pre><code><span class="token-keyword">private</span> <span class="token-type">InjectionMetadata</span> <span class="token-function">buildAutowiringMetadata</span>(<span class="token-type">Class</span>&lt;?&gt; clazz) {
+    <span class="token-type">List</span>&lt;<span class="token-type">InjectionMetadata.InjectedElement</span>&gt; elements = <span class="token-keyword">new</span> <span class="token-type">ArrayList</span>&lt;&gt;();
+    <span class="token-type">Class</span>&lt;?&gt; targetClass = clazz;
+
+    <span class="token-keyword">do</span> {
+        <span class="token-type">List</span>&lt;<span class="token-type">InjectionMetadata.InjectedElement</span>&gt; currElements = <span class="token-keyword">new</span> <span class="token-type">ArrayList</span>&lt;&gt;();
+
+        <span class="token-comment">// Scan all declared fields</span>
+        <span class="token-type">ReflectionUtils</span>.<span class="token-function">doWithLocalFields</span>(targetClass, field -&gt; {
+            <span class="token-type">MergedAnnotation</span>&lt;?&gt; ann = <span class="token-function">findAutowiredAnnotation</span>(field);
+            <span class="token-keyword">if</span> (ann != <span class="token-keyword">null</span>) {
+                <span class="token-keyword">if</span> (<span class="token-type">Modifier</span>.<span class="token-function">isStatic</span>(field.<span class="token-function">getModifiers</span>())) {
+                    <span class="token-keyword">return</span>; <span class="token-comment">// Static fields are NEVER injected</span>
+                }
+                <span class="token-keyword">boolean</span> required = <span class="token-function">determineRequiredStatus</span>(ann);
+                currElements.<span class="token-function">add</span>(<span class="token-keyword">new</span> <span class="token-type">AutowiredFieldElement</span>(field, required));
+            }
+        });
+
+        <span class="token-comment">// Scan all declared methods</span>
+        <span class="token-type">ReflectionUtils</span>.<span class="token-function">doWithLocalMethods</span>(targetClass, method -&gt; {
+            <span class="token-type">Method</span> bridgedMethod = <span class="token-type">BridgeMethodResolver</span>.<span class="token-function">findBridgedMethod</span>(method);
+            <span class="token-type">MergedAnnotation</span>&lt;?&gt; ann = <span class="token-function">findAutowiredAnnotation</span>(bridgedMethod);
+            <span class="token-keyword">if</span> (ann != <span class="token-keyword">null</span> &amp;&amp; method.<span class="token-function">equals</span>(
+                    <span class="token-type">ClassUtils</span>.<span class="token-function">getMostSpecificMethod</span>(method, clazz))) {
+                <span class="token-keyword">boolean</span> required = <span class="token-function">determineRequiredStatus</span>(ann);
+                currElements.<span class="token-function">add</span>(<span class="token-keyword">new</span> <span class="token-type">AutowiredMethodElement</span>(method, required, pd));
+            }
+        });
+
+        elements.<span class="token-function">addAll</span>(0, currElements);
+        targetClass = targetClass.<span class="token-function">getSuperclass</span>(); <span class="token-comment">// Walk up hierarchy</span>
+    } <span class="token-keyword">while</span> (targetClass != <span class="token-keyword">null</span> &amp;&amp; targetClass != <span class="token-type">Object</span>.<span class="token-keyword">class</span>);
+
+    <span class="token-keyword">return</span> <span class="token-type">InjectionMetadata</span>.<span class="token-function">forElements</span>(elements, clazz);
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Static Fields Are Silently Skipped</div>
+                <p>Spring never injects into <code><span class="token-keyword">static</span></code> fields. There's no error — the annotation is simply ignored. This is a common source of <code><span class="token-keyword">null</span></code> pointer bugs in production code.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: Resolution Algorithm -->
+            <!-- ============================================ -->
+            <h2>2. The Resolution Algorithm: Type → Qualifier → Name</h2>
+
+            <p>When Spring encounters an injection point, it uses <code><span class="token-class">DefaultListableBeanFactory</span>.<span class="token-function">doResolveDependency</span>()</code> to find the matching bean. The algorithm follows a strict priority order:</p>
+
+            <div class="understanding-section">
+                <h3>🧠 Resolution Order (Highest to Lowest Priority)</h3>
+                <ol>
+                    <li><strong>By Type</strong> — Find all beans assignable to the injection point's declared type</li>
+                    <li><strong>By Qualifier</strong> — If multiple candidates, filter by <code><span class="token-annotation">@Qualifier</span></code> annotation</li>
+                    <li><strong>By @Primary</strong> — If still ambiguous, prefer beans marked <code><span class="token-annotation">@Primary</span></code></li>
+                    <li><strong>By Priority</strong> — Compare <code><span class="token-annotation">@Priority</span></code> (javax.annotation) ordering</li>
+                    <li><strong>By Name</strong> — Match the field/parameter name against bean names</li>
+                </ol>
+            </div>
+
+            <h3>Internal: doResolveDependency</h3>
+
+            <pre><code><span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">doResolveDependency</span>(
+        <span class="token-type">DependencyDescriptor</span> descriptor,
+        <span class="token-type">String</span> beanName,
+        <span class="token-type">Set</span>&lt;<span class="token-type">String</span>&gt; autowiredBeanNames,
+        <span class="token-type">TypeConverter</span> typeConverter) {
+
+    <span class="token-comment">// Step 1: Find all candidates by type</span>
+    <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; matchingBeans = <span class="token-function">findAutowireCandidates</span>(
+        beanName, type, descriptor);
+
+    <span class="token-keyword">if</span> (matchingBeans.<span class="token-function">isEmpty</span>()) {
+        <span class="token-keyword">if</span> (<span class="token-function">isRequired</span>(descriptor)) {
+            <span class="token-function">raiseNoMatchingBeanFound</span>(type, descriptor);
+        }
+        <span class="token-keyword">return</span> <span class="token-keyword">null</span>;
+    }
+
+    <span class="token-type">String</span> autowiredBeanName;
+    <span class="token-type">Object</span> instanceCandidate;
+
+    <span class="token-keyword">if</span> (matchingBeans.<span class="token-function">size</span>() &gt; 1) {
+        <span class="token-comment">// Step 2: Determine which single candidate to use</span>
+        autowiredBeanName = <span class="token-function">determineAutowireCandidate</span>(matchingBeans, descriptor);
+
+        <span class="token-keyword">if</span> (autowiredBeanName == <span class="token-keyword">null</span>) {
+            <span class="token-keyword">if</span> (<span class="token-function">isRequired</span>(descriptor)) {
+                <span class="token-keyword">throw</span> <span class="token-keyword">new</span> <span class="token-type">NoUniqueBeanDefinitionException</span>(type, matchingBeans.<span class="token-function">keySet</span>());
+            }
+            <span class="token-keyword">return</span> <span class="token-keyword">null</span>;
+        }
+        instanceCandidate = matchingBeans.<span class="token-function">get</span>(autowiredBeanName);
+    } <span class="token-keyword">else</span> {
+        <span class="token-comment">// Single match — use it directly</span>
+        <span class="token-type">Map.Entry</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; entry = matchingBeans.<span class="token-function">entrySet</span>().<span class="token-function">iterator</span>().<span class="token-function">next</span>();
+        autowiredBeanName = entry.<span class="token-function">getKey</span>();
+        instanceCandidate = entry.<span class="token-function">getValue</span>();
+    }
+
+    <span class="token-comment">// Resolve the actual bean instance (might be a Class reference)</span>
+    <span class="token-keyword">return</span> (instanceCandidate <span class="token-keyword">instanceof</span> <span class="token-type">Class</span>)
+        ? descriptor.<span class="token-function">resolveCandidate</span>(autowiredBeanName, type, <span class="token-keyword">this</span>)
+        : instanceCandidate;
+}</code></pre>
+
+            <h3>determineAutowireCandidate: The Tiebreaker</h3>
+
+            <pre><code><span class="token-keyword">protected</span> <span class="token-type">String</span> <span class="token-function">determineAutowireCandidate</span>(
+        <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; candidates,
+        <span class="token-type">DependencyDescriptor</span> descriptor) {
+
+    <span class="token-type">Class</span>&lt;?&gt; requiredType = descriptor.<span class="token-function">getDependencyType</span>();
+
+    <span class="token-comment">// Priority 1: Check for @Primary</span>
+    <span class="token-type">String</span> primaryCandidate = <span class="token-function">determinePrimaryCandidate</span>(candidates, requiredType);
+    <span class="token-keyword">if</span> (primaryCandidate != <span class="token-keyword">null</span>) {
+        <span class="token-keyword">return</span> primaryCandidate;
+    }
+
+    <span class="token-comment">// Priority 2: Check for @Priority (highest priority = lowest number)</span>
+    <span class="token-type">String</span> priorityCandidate = <span class="token-function">determineHighestPriorityCandidate</span>(candidates, requiredType);
+    <span class="token-keyword">if</span> (priorityCandidate != <span class="token-keyword">null</span>) {
+        <span class="token-keyword">return</span> priorityCandidate;
+    }
+
+    <span class="token-comment">// Priority 3: Fallback to name matching</span>
+    <span class="token-keyword">for</span> (<span class="token-type">Map.Entry</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; entry : candidates.<span class="token-function">entrySet</span>()) {
+        <span class="token-type">String</span> candidateName = entry.<span class="token-function">getKey</span>();
+        <span class="token-keyword">if</span> (<span class="token-function">matchesBeanName</span>(candidateName, descriptor.<span class="token-function">getDependencyName</span>())) {
+            <span class="token-keyword">return</span> candidateName;
+        }
+    }
+
+    <span class="token-keyword">return</span> <span class="token-keyword">null</span>; <span class="token-comment">// No match → NoUniqueBeanDefinitionException</span>
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Name Fallback Explained</div>
+                <p>If you have two beans of type <code><span class="token-type">DataSource</span></code> named "primaryDS" and "analyticsDS", and your field is <code><span class="token-keyword">private</span> <span class="token-type">DataSource</span> analyticsDS</code>, Spring will match by field name as a last resort — no <code><span class="token-annotation">@Qualifier</span></code> needed.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: Constructor vs Field vs Setter -->
+            <!-- ============================================ -->
+            <h2>3. Constructor vs Field vs Setter Injection</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Constructor Injection</th>
+                        <th>Field Injection</th>
+                        <th>Setter Injection</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Immutability</strong></td>
+                        <td>✅ Fields can be <code><span class="token-keyword">final</span></code></td>
+                        <td>❌ Cannot be final</td>
+                        <td>❌ Cannot be final</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Testability</strong></td>
+                        <td>✅ Pass mocks via constructor</td>
+                        <td>❌ Requires reflection or @InjectMocks</td>
+                        <td>✅ Call setter with mock</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Null Safety</strong></td>
+                        <td>✅ NPE at construction time</td>
+                        <td>❌ NPE at runtime usage</td>
+                        <td>❌ NPE at runtime usage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Circular Dependencies</strong></td>
+                        <td>❌ Fails fast (cannot resolve)</td>
+                        <td>✅ Allowed via early reference</td>
+                        <td>✅ Allowed via early reference</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Required by Default</strong></td>
+                        <td>✅ All params are mandatory</td>
+                        <td>✅ Unless required=false</td>
+                        <td>✅ Unless required=false</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Spring Coupling</strong></td>
+                        <td>✅ No @Autowired needed (since 4.3)</td>
+                        <td>❌ Requires @Autowired annotation</td>
+                        <td>⚠️ @Autowired needed on method</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Internal Mechanism</strong></td>
+                        <td>resolveConstructorArguments()</td>
+                        <td>Field.set() via reflection</td>
+                        <td>Method.invoke() via reflection</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Why Constructor Injection is Preferred</h3>
+
+            <pre><code><span class="token-comment">// ✅ PREFERRED: Constructor injection</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">PaymentGateway</span> paymentGateway;
+    <span class="token-keyword">private final</span> <span class="token-type">InventoryService</span> inventoryService;
+    <span class="token-keyword">private final</span> <span class="token-type">NotificationService</span> notificationService;
+
+    <span class="token-comment">// Single constructor → Spring auto-detects, no @Autowired needed</span>
+    <span class="token-keyword">public</span> <span class="token-function">OrderService</span>(
+            <span class="token-type">PaymentGateway</span> paymentGateway,
+            <span class="token-type">InventoryService</span> inventoryService,
+            <span class="token-type">NotificationService</span> notificationService) {
+        <span class="token-keyword">this</span>.paymentGateway = paymentGateway;
+        <span class="token-keyword">this</span>.inventoryService = inventoryService;
+        <span class="token-keyword">this</span>.notificationService = notificationService;
+    }
+}
+
+<span class="token-comment">// ❌ AVOID: Field injection — hides dependencies, untestable without Spring</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">PaymentGateway</span> paymentGateway; <span class="token-comment">// can't be final!</span>
+
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">InventoryService</span> inventoryService;
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔑 Since Spring 4.3</div>
+                <p>If a class has exactly ONE constructor, Spring uses it for injection automatically — no <code><span class="token-annotation">@Autowired</span></code> annotation required. With multiple constructors, you must annotate the preferred one with <code><span class="token-annotation">@Autowired</span></code>.</p>
+            </div>
+
+            <h3>How Constructor Injection Works Internally</h3>
+
+            <pre><code><span class="token-comment">// Inside ConstructorResolver.autowireConstructor()</span>
+<span class="token-keyword">public</span> <span class="token-type">BeanWrapper</span> <span class="token-function">autowireConstructor</span>(
+        <span class="token-type">String</span> beanName, <span class="token-type">RootBeanDefinition</span> mbd,
+        <span class="token-type">Constructor</span>&lt;?&gt;[] chosenCtors, <span class="token-type">Object</span>[] explicitArgs) {
+
+    <span class="token-comment">// 1. Sort constructors by parameter count (greedy: most params first)</span>
+    <span class="token-type">AutowireUtils</span>.<span class="token-function">sortConstructors</span>(candidates);
+
+    <span class="token-keyword">for</span> (<span class="token-type">Constructor</span>&lt;?&gt; candidate : candidates) {
+        <span class="token-comment">// 2. For each parameter, resolve the dependency</span>
+        <span class="token-type">Class</span>&lt;?&gt;[] paramTypes = candidate.<span class="token-function">getParameterTypes</span>();
+        <span class="token-type">Object</span>[] args = <span class="token-keyword">new</span> <span class="token-type">Object</span>[paramTypes.length];
+
+        <span class="token-keyword">for</span> (<span class="token-keyword">int</span> i = 0; i &lt; paramTypes.length; i++) {
+            <span class="token-comment">// Resolve each argument via the DI resolution algorithm</span>
+            args[i] = <span class="token-function">resolveAutowiredArgument</span>(
+                methodParam, beanName, autowiredBeanNames, converter);
+        }
+
+        <span class="token-comment">// 3. Instantiate via constructor</span>
+        bw.<span class="token-function">setBeanInstance</span>(<span class="token-function">instantiate</span>(beanName, mbd, candidate, args));
+    }
+    <span class="token-keyword">return</span> bw;
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: @Qualifier and @Primary -->
+            <!-- ============================================ -->
+            <h2>4. @Qualifier and @Primary Resolution Order</h2>
+
+            <div class="understanding-section">
+                <h3>🧠 Resolution Priority (When Multiple Beans Match by Type)</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Priority</th>
+                            <th>Mechanism</th>
+                            <th>Scope</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 (Highest)</td>
+                            <td><code><span class="token-annotation">@Qualifier</span></code></td>
+                            <td>Per injection point</td>
+                            <td>Explicit selection at the consumer</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><code><span class="token-annotation">@Primary</span></code></td>
+                            <td>Per bean definition</td>
+                            <td>Default choice among candidates</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><code><span class="token-annotation">@Priority</span></code></td>
+                            <td>Per bean definition</td>
+                            <td>Ordered preference</td>
+                        </tr>
+                        <tr>
+                            <td>4 (Lowest)</td>
+                            <td>Field/param name</td>
+                            <td>Per injection point</td>
+                            <td>Implicit fallback</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>@Qualifier Overrides @Primary</h3>
+
+            <pre><code><span class="token-annotation">@Configuration</span>
+<span class="token-keyword">public class</span> <span class="token-class">DataSourceConfig</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@Primary</span>  <span class="token-comment">// Default choice when no qualifier is specified</span>
+    <span class="token-keyword">public</span> <span class="token-type">DataSource</span> <span class="token-function">primaryDataSource</span>() {
+        <span class="token-keyword">return</span> <span class="token-keyword">new</span> <span class="token-type">HikariDataSource</span>(primaryConfig());
+    }
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@Qualifier</span>(<span class="token-string">"analytics"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">DataSource</span> <span class="token-function">analyticsDataSource</span>() {
+        <span class="token-keyword">return</span> <span class="token-keyword">new</span> <span class="token-type">HikariDataSource</span>(analyticsConfig());
+    }
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">ReportService</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">DataSource</span> dataSource;
+
+    <span class="token-comment">// @Qualifier WINS over @Primary — gets analyticsDataSource</span>
+    <span class="token-keyword">public</span> <span class="token-function">ReportService</span>(<span class="token-annotation">@Qualifier</span>(<span class="token-string">"analytics"</span>) <span class="token-type">DataSource</span> dataSource) {
+        <span class="token-keyword">this</span>.dataSource = dataSource;
+    }
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">UserService</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">DataSource</span> dataSource;
+
+    <span class="token-comment">// No qualifier → @Primary kicks in → gets primaryDataSource</span>
+    <span class="token-keyword">public</span> <span class="token-function">UserService</span>(<span class="token-type">DataSource</span> dataSource) {
+        <span class="token-keyword">this</span>.dataSource = dataSource;
+    }
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Multiple @Primary = Runtime Error</div>
+                <p>If two beans of the same type are both marked <code><span class="token-annotation">@Primary</span></code>, Spring throws <code><span class="token-class">NoUniqueBeanDefinitionException</span></code> at startup. There can only be ONE primary bean per type in a single application context.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: Optional Dependencies -->
+            <!-- ============================================ -->
+            <h2>5. Optional Dependencies</h2>
+
+            <p>Spring provides multiple patterns for declaring that a dependency might not exist at runtime:</p>
+
+            <pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">NotificationService</span> {
+
+    <span class="token-comment">// Pattern 1: @Autowired(required = false)</span>
+    <span class="token-comment">// Field is left null if no bean found</span>
+    <span class="token-annotation">@Autowired</span>(required = <span class="token-keyword">false</span>)
+    <span class="token-keyword">private</span> <span class="token-type">SmsGateway</span> smsGateway;
+
+    <span class="token-comment">// Pattern 2: Optional&lt;T&gt; (Java 8+)</span>
+    <span class="token-comment">// Wraps presence/absence cleanly</span>
+    <span class="token-keyword">private final</span> <span class="token-type">Optional</span>&lt;<span class="token-type">SlackIntegration</span>&gt; slackIntegration;
+
+    <span class="token-comment">// Pattern 3: ObjectProvider&lt;T&gt; (Spring's own)</span>
+    <span class="token-comment">// Lazy resolution + stream support for multiple beans</span>
+    <span class="token-keyword">private final</span> <span class="token-type">ObjectProvider</span>&lt;<span class="token-type">WebhookHandler</span>&gt; webhookHandlers;
+
+    <span class="token-keyword">public</span> <span class="token-function">NotificationService</span>(
+            <span class="token-type">Optional</span>&lt;<span class="token-type">SlackIntegration</span>&gt; slackIntegration,
+            <span class="token-type">ObjectProvider</span>&lt;<span class="token-type">WebhookHandler</span>&gt; webhookHandlers) {
+        <span class="token-keyword">this</span>.slackIntegration = slackIntegration;
+        <span class="token-keyword">this</span>.webhookHandlers = webhookHandlers;
+    }
+
+    <span class="token-keyword">public void</span> <span class="token-function">sendAlert</span>(<span class="token-type">String</span> message) {
+        <span class="token-comment">// Optional: Check presence</span>
+        slackIntegration.<span class="token-function">ifPresent</span>(slack -&gt; slack.<span class="token-function">post</span>(message));
+
+        <span class="token-comment">// ObjectProvider: Stream over all registered handlers</span>
+        webhookHandlers.<span class="token-function">orderedStream</span>()
+            .<span class="token-function">forEach</span>(handler -&gt; handler.<span class="token-function">dispatch</span>(message));
+
+        <span class="token-comment">// ObjectProvider: Get with fallback</span>
+        <span class="token-type">WebhookHandler</span> primary = webhookHandlers.<span class="token-function">getIfAvailable</span>(
+            () -&gt; <span class="token-keyword">new</span> <span class="token-type">NoOpWebhookHandler</span>());
+    }
+}</code></pre>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Null Safe</th>
+                        <th>Lazy</th>
+                        <th>Multi-Bean</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>required=false</code></td>
+                        <td>❌ Null if absent</td>
+                        <td>❌ Eager</td>
+                        <td>❌ Single</td>
+                        <td>Legacy code</td>
+                    </tr>
+                    <tr>
+                        <td><code>Optional&lt;T&gt;</code></td>
+                        <td>✅ Empty Optional</td>
+                        <td>❌ Eager</td>
+                        <td>❌ Single</td>
+                        <td>Clean functional code</td>
+                    </tr>
+                    <tr>
+                        <td><code>ObjectProvider&lt;T&gt;</code></td>
+                        <td>✅ getIfAvailable</td>
+                        <td>✅ On-demand</td>
+                        <td>✅ orderedStream()</td>
+                        <td>Framework/library code</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 How Optional&lt;T&gt; is Resolved Internally</div>
+                <p>When Spring sees <code><span class="token-type">Optional</span>&lt;<span class="token-type">SomeBean</span>&gt;</code>, it uses <code><span class="token-class">DependencyDescriptor</span>.<span class="token-function">increaseNestingLevel</span>()</code> to unwrap the generic, resolves the inner type, and wraps the result in <code><span class="token-type">Optional</span>.<span class="token-function">ofNullable</span>()</code>. No special post-processor is needed — this logic is baked into <code><span class="token-function">doResolveDependency</span>()</code>.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: @Lazy Injection -->
+            <!-- ============================================ -->
+            <h2>6. @Lazy Injection — Proxy-Based Deferred Resolution</h2>
+
+            <p>When <code><span class="token-annotation">@Lazy</span></code> is placed on an injection point, Spring does NOT inject the actual bean. Instead, it creates a <strong>CGLIB proxy</strong> that intercepts the first method call and only then resolves the real bean from the container.</p>
+
+            <pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">PaymentProcessor</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">FraudDetectionEngine</span> fraudEngine;
+
+    <span class="token-comment">// FraudDetectionEngine is expensive to initialize (ML model loading)</span>
+    <span class="token-comment">// @Lazy creates a proxy — actual bean created on FIRST USE</span>
+    <span class="token-keyword">public</span> <span class="token-function">PaymentProcessor</span>(<span class="token-annotation">@Lazy</span> <span class="token-type">FraudDetectionEngine</span> fraudEngine) {
+        <span class="token-keyword">this</span>.fraudEngine = fraudEngine;
+        <span class="token-comment">// At this point, fraudEngine is a CGLIB proxy, NOT the real instance</span>
+    }
+
+    <span class="token-keyword">public void</span> <span class="token-function">processPayment</span>(<span class="token-type">Payment</span> payment) {
+        <span class="token-keyword">if</span> (payment.<span class="token-function">getAmount</span>() &gt; 10000) {
+            <span class="token-comment">// FIRST call to proxy → triggers actual bean creation</span>
+            fraudEngine.<span class="token-function">analyze</span>(payment); <span class="token-comment">// proxy.intercept() → getBean()</span>
+        }
+    }
+}</code></pre>
+
+            <h3>Internal Proxy Mechanism</h3>
+
+            <pre><code><span class="token-comment">// Inside ContextAnnotationAutowireCandidateResolver</span>
+<span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">getLazyResolutionProxyIfNecessary</span>(
+        <span class="token-type">DependencyDescriptor</span> descriptor, <span class="token-type">String</span> beanName) {
+
+    <span class="token-keyword">if</span> (<span class="token-function">isLazy</span>(descriptor)) {
+        <span class="token-keyword">return</span> <span class="token-function">buildLazyResolutionProxy</span>(descriptor, beanName);
+    }
+    <span class="token-keyword">return</span> <span class="token-keyword">null</span>;
+}
+
+<span class="token-keyword">private</span> <span class="token-type">Object</span> <span class="token-function">buildLazyResolutionProxy</span>(
+        <span class="token-type">DependencyDescriptor</span> descriptor, <span class="token-type">String</span> beanName) {
+
+    <span class="token-type">BeanFactory</span> beanFactory = <span class="token-keyword">this</span>.beanFactory;
+
+    <span class="token-comment">// Create a TargetSource that resolves on first access</span>
+    <span class="token-type">TargetSource</span> ts = <span class="token-keyword">new</span> <span class="token-type">TargetSource</span>() {
+        <span class="token-annotation">@Override</span>
+        <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">getTarget</span>() {
+            <span class="token-comment">// This is called on FIRST method invocation on the proxy</span>
+            <span class="token-type">Object</span> target = beanFactory.<span class="token-function">doResolveDependency</span>(descriptor, beanName, <span class="token-keyword">null</span>, <span class="token-keyword">null</span>);
+            <span class="token-keyword">if</span> (target == <span class="token-keyword">null</span>) {
+                <span class="token-keyword">throw</span> <span class="token-keyword">new</span> <span class="token-type">NoSuchBeanDefinitionException</span>(descriptor.<span class="token-function">getDependencyType</span>());
+            }
+            <span class="token-keyword">return</span> target;
+        }
+    };
+
+    <span class="token-comment">// Create CGLIB proxy for classes, JDK proxy for interfaces</span>
+    <span class="token-type">ProxyFactory</span> pf = <span class="token-keyword">new</span> <span class="token-type">ProxyFactory</span>();
+    pf.<span class="token-function">setTargetSource</span>(ts);
+    pf.<span class="token-function">addInterface</span>(descriptor.<span class="token-function">getDependencyType</span>());
+    <span class="token-keyword">return</span> pf.<span class="token-function">getProxy</span>(classLoader);
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ @Lazy Pitfalls</div>
+                <ul>
+                    <li><strong>Startup errors deferred</strong> — If the lazy bean has a misconfiguration, you won't know until first use in production</li>
+                    <li><strong>Circular dependency workaround</strong> — <code><span class="token-annotation">@Lazy</span></code> on one side of a constructor circular dependency breaks the cycle by injecting a proxy</li>
+                    <li><strong>Proxy identity</strong> — <code>fraudEngine.getClass()</code> returns the CGLIB proxy class, not the actual class. Use <code><span class="token-type">AopUtils</span>.<span class="token-function">getTargetClass</span>()</code></li>
+                </ul>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Reflection Internals -->
+            <!-- ============================================ -->
+            <h2>7. The Reflection Code: Field.setAccessible + Field.set</h2>
+
+            <p>For field injection, Spring uses raw Java reflection to bypass access modifiers and directly set private field values. Here's the actual code path:</p>
+
+            <pre><code><span class="token-comment">// AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject()</span>
+<span class="token-keyword">private class</span> <span class="token-class">AutowiredFieldElement</span> <span class="token-keyword">extends</span> <span class="token-type">InjectionMetadata.InjectedElement</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-keyword">boolean</span> required;
+    <span class="token-keyword">private volatile</span> <span class="token-keyword">boolean</span> cached;
+    <span class="token-keyword">private volatile</span> <span class="token-type">Object</span> cachedFieldValue;
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">protected</span> <span class="token-keyword">void</span> <span class="token-function">inject</span>(<span class="token-type">Object</span> bean, <span class="token-type">String</span> beanName, <span class="token-type">PropertyValues</span> pvs) {
+        <span class="token-type">Field</span> field = (<span class="token-type">Field</span>) <span class="token-keyword">this</span>.member;
+        <span class="token-type">Object</span> value;
+
+        <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.cached) {
+            <span class="token-comment">// Cached resolution for prototype beans (same metadata, new instance)</span>
+            value = <span class="token-function">resolvedCachedArgument</span>(beanName, <span class="token-keyword">this</span>.cachedFieldValue);
+        } <span class="token-keyword">else</span> {
+            <span class="token-comment">// Full resolution through the DI algorithm</span>
+            <span class="token-type">DependencyDescriptor</span> desc = <span class="token-keyword">new</span> <span class="token-type">DependencyDescriptor</span>(field, <span class="token-keyword">this</span>.required);
+            desc.<span class="token-function">setContainingClass</span>(bean.<span class="token-function">getClass</span>());
+
+            <span class="token-type">Set</span>&lt;<span class="token-type">String</span>&gt; autowiredBeanNames = <span class="token-keyword">new</span> <span class="token-type">LinkedHashSet</span>&lt;&gt;(1);
+            <span class="token-type">TypeConverter</span> typeConverter = beanFactory.<span class="token-function">getTypeConverter</span>();
+
+            value = beanFactory.<span class="token-function">resolveDependency</span>(
+                desc, beanName, autowiredBeanNames, typeConverter);
+
+            <span class="token-comment">// Cache for future prototype instantiations</span>
+            <span class="token-keyword">synchronized</span> (<span class="token-keyword">this</span>) {
+                <span class="token-keyword">this</span>.cachedFieldValue = desc;
+                <span class="token-keyword">this</span>.cached = <span class="token-keyword">true</span>;
+            }
+        }
+
+        <span class="token-keyword">if</span> (value != <span class="token-keyword">null</span>) {
+            <span class="token-comment">// THE CRITICAL LINE: bypass Java access control</span>
+            <span class="token-type">ReflectionUtils</span>.<span class="token-function">makeAccessible</span>(field);  <span class="token-comment">// → field.setAccessible(true)</span>
+            field.<span class="token-function">set</span>(bean, value);                   <span class="token-comment">// → directly sets the value</span>
+        }
+    }
+}</code></pre>
+
+            <h3>ReflectionUtils.makeAccessible — The Access Bypass</h3>
+
+            <pre><code><span class="token-comment">// org.springframework.util.ReflectionUtils</span>
+<span class="token-keyword">public static</span> <span class="token-keyword">void</span> <span class="token-function">makeAccessible</span>(<span class="token-type">Field</span> field) {
+    <span class="token-keyword">if</span> ((!<span class="token-type">Modifier</span>.<span class="token-function">isPublic</span>(field.<span class="token-function">getModifiers</span>()) ||
+         !<span class="token-type">Modifier</span>.<span class="token-function">isPublic</span>(field.<span class="token-function">getDeclaringClass</span>().<span class="token-function">getModifiers</span>()) ||
+         <span class="token-type">Modifier</span>.<span class="token-function">isFinal</span>(field.<span class="token-function">getModifiers</span>())) &amp;&amp;
+        !field.<span class="token-function">isAccessible</span>()) {
+
+        field.<span class="token-function">setAccessible</span>(<span class="token-keyword">true</span>); <span class="token-comment">// Disables Java access checks</span>
+    }
+}
+
+<span class="token-comment">// What this means at the JVM level:</span>
+<span class="token-comment">// 1. The SecurityManager check is bypassed</span>
+<span class="token-comment">// 2. private/protected/package-private modifiers are ignored</span>
+<span class="token-comment">// 3. The JIT can no longer inline field access (minor perf cost)</span>
+<span class="token-comment">// 4. Module system (Java 9+) may still block access → --add-opens required</span></code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Java Module System Impact (Java 9+)</div>
+                <p>With the module system, <code><span class="token-function">setAccessible</span>(<span class="token-keyword">true</span>)</code> throws <code><span class="token-class">InaccessibleObjectException</span></code> unless the module is opened. That's why Spring Boot adds JVM flags like <code>--add-opens java.base/java.lang=ALL-UNNAMED</code>. This is why constructor injection (which doesn't need reflection to set fields) is even more preferred on modern JVMs.</p>
+            </div>
+
+            <h3>Setter Injection Reflection Path</h3>
+
+            <pre><code><span class="token-comment">// AutowiredMethodElement.inject() — similar but uses Method.invoke()</span>
+<span class="token-annotation">@Override</span>
+<span class="token-keyword">protected</span> <span class="token-keyword">void</span> <span class="token-function">inject</span>(<span class="token-type">Object</span> bean, <span class="token-type">String</span> beanName, <span class="token-type">PropertyValues</span> pvs) {
+    <span class="token-type">Method</span> method = (<span class="token-type">Method</span>) <span class="token-keyword">this</span>.member;
+    <span class="token-type">Object</span>[] arguments = <span class="token-function">resolveMethodArguments</span>(method, bean, beanName);
+
+    <span class="token-keyword">if</span> (arguments != <span class="token-keyword">null</span>) {
+        <span class="token-type">ReflectionUtils</span>.<span class="token-function">makeAccessible</span>(method);
+        method.<span class="token-function">invoke</span>(bean, arguments); <span class="token-comment">// Calls the setter</span>
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: Custom Qualifier Annotations -->
+            <!-- ============================================ -->
+            <h2>8. Industry Pattern: Custom Qualifier Annotations</h2>
+
+            <p>In large codebases with multiple implementations of the same interface, string-based <code><span class="token-annotation">@Qualifier</span>(<span class="token-string">"name"</span>)</code> becomes fragile — typos cause runtime errors. The industry solution is <strong>custom qualifier annotations</strong> that provide compile-time safety.</p>
+
+            <h3>Step 1: Define Custom Qualifier</h3>
+
+            <pre><code><span class="token-keyword">import</span> java.lang.annotation.*;
+<span class="token-keyword">import</span> org.springframework.beans.factory.annotation.<span class="token-type">Qualifier</span>;
+
+<span class="token-annotation">@Target</span>({<span class="token-type">ElementType</span>.FIELD, <span class="token-type">ElementType</span>.METHOD,
+         <span class="token-type">ElementType</span>.PARAMETER, <span class="token-type">ElementType</span>.TYPE})
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Qualifier</span>  <span class="token-comment">// ← This meta-annotation is what makes it work!</span>
+<span class="token-keyword">public</span> <span class="token-annotation">@interface</span> <span class="token-class">PaymentMethod</span> {
+    <span class="token-type">PaymentType</span> <span class="token-function">value</span>();
+}
+
+<span class="token-keyword">public enum</span> <span class="token-class">PaymentType</span> {
+    CREDIT_CARD, BANK_TRANSFER, CRYPTO, DIGITAL_WALLET
+}</code></pre>
+
+            <h3>Step 2: Annotate Implementations</h3>
+
+            <pre><code><span class="token-keyword">public interface</span> <span class="token-class">PaymentProcessor</span> {
+    <span class="token-type">PaymentResult</span> <span class="token-function">process</span>(<span class="token-type">Payment</span> payment);
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-annotation">@PaymentMethod</span>(<span class="token-type">PaymentType</span>.CREDIT_CARD)
+<span class="token-keyword">public class</span> <span class="token-class">CreditCardProcessor</span> <span class="token-keyword">implements</span> <span class="token-type">PaymentProcessor</span> {
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">PaymentResult</span> <span class="token-function">process</span>(<span class="token-type">Payment</span> payment) {
+        <span class="token-comment">// Stripe/Adyen integration</span>
+    }
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-annotation">@PaymentMethod</span>(<span class="token-type">PaymentType</span>.CRYPTO)
+<span class="token-keyword">public class</span> <span class="token-class">CryptoProcessor</span> <span class="token-keyword">implements</span> <span class="token-type">PaymentProcessor</span> {
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">PaymentResult</span> <span class="token-function">process</span>(<span class="token-type">Payment</span> payment) {
+        <span class="token-comment">// Web3 wallet integration</span>
+    }
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-annotation">@PaymentMethod</span>(<span class="token-type">PaymentType</span>.BANK_TRANSFER)
+<span class="token-keyword">public class</span> <span class="token-class">BankTransferProcessor</span> <span class="token-keyword">implements</span> <span class="token-type">PaymentProcessor</span> {
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">PaymentResult</span> <span class="token-function">process</span>(<span class="token-type">Payment</span> payment) {
+        <span class="token-comment">// ACH/SEPA integration</span>
+    }
+}</code></pre>
+
+            <h3>Step 3: Inject with Type Safety</h3>
+
+            <pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">CheckoutService</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">PaymentProcessor</span> creditCardProcessor;
+    <span class="token-keyword">private final</span> <span class="token-type">PaymentProcessor</span> cryptoProcessor;
+
+    <span class="token-keyword">public</span> <span class="token-function">CheckoutService</span>(
+            <span class="token-annotation">@PaymentMethod</span>(<span class="token-type">PaymentType</span>.CREDIT_CARD) <span class="token-type">PaymentProcessor</span> creditCardProcessor,
+            <span class="token-annotation">@PaymentMethod</span>(<span class="token-type">PaymentType</span>.CRYPTO) <span class="token-type">PaymentProcessor</span> cryptoProcessor) {
+        <span class="token-keyword">this</span>.creditCardProcessor = creditCardProcessor;
+        <span class="token-keyword">this</span>.cryptoProcessor = cryptoProcessor;
+    }
+}</code></pre>
+
+            <h3>How Custom Qualifiers are Resolved Internally</h3>
+
+            <pre><code><span class="token-comment">// Inside QualifierAnnotationAutowireCandidateResolver</span>
+<span class="token-keyword">protected</span> <span class="token-keyword">boolean</span> <span class="token-function">checkQualifier</span>(
+        <span class="token-type">BeanDefinitionHolder</span> bdHolder,
+        <span class="token-type">Annotation</span> annotation,
+        <span class="token-type">TypeConverter</span> typeConverter) {
+
+    <span class="token-type">Class</span>&lt;? <span class="token-keyword">extends</span> <span class="token-type">Annotation</span>&gt; type = annotation.<span class="token-function">annotationType</span>();
+
+    <span class="token-comment">// Check if the annotation itself is meta-annotated with @Qualifier</span>
+    <span class="token-keyword">if</span> (!<span class="token-type">AnnotationUtils</span>.<span class="token-function">isQualifierAnnotation</span>(type)) {
+        <span class="token-keyword">return</span> <span class="token-keyword">true</span>; <span class="token-comment">// Not a qualifier, skip</span>
+    }
+
+    <span class="token-comment">// Compare ALL annotation attributes (e.g., value = PaymentType.CRYPTO)</span>
+    <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; attributes =
+        <span class="token-type">AnnotationUtils</span>.<span class="token-function">getAnnotationAttributes</span>(annotation);
+
+    <span class="token-keyword">for</span> (<span class="token-type">Map.Entry</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; entry : attributes.<span class="token-function">entrySet</span>()) {
+        <span class="token-type">String</span> attributeName = entry.<span class="token-function">getKey</span>();
+        <span class="token-type">Object</span> expectedValue = entry.<span class="token-function">getValue</span>();
+
+        <span class="token-comment">// Get the corresponding attribute from the candidate bean's annotation</span>
+        <span class="token-type">Annotation</span> candidateAnnotation = <span class="token-function">getQualifierAnnotation</span>(bdHolder, type);
+        <span class="token-type">Object</span> actualValue = <span class="token-type">AnnotationUtils</span>.<span class="token-function">getValue</span>(candidateAnnotation, attributeName);
+
+        <span class="token-keyword">if</span> (!expectedValue.<span class="token-function">equals</span>(actualValue)) {
+            <span class="token-keyword">return</span> <span class="token-keyword">false</span>; <span class="token-comment">// Attribute mismatch → not a match</span>
+        }
+    }
+    <span class="token-keyword">return</span> <span class="token-keyword">true</span>; <span class="token-comment">// All attributes match!</span>
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Advanced Pattern: Map Injection for Strategy Pattern</div>
+                <p>For runtime dynamic dispatch (e.g., selecting processor based on user request), inject all implementations into a Map:</p>
+            </div>
+
+            <pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">DynamicPaymentRouter</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">PaymentProcessor</span>&gt; processors;
+
+    <span class="token-comment">// Spring auto-populates: key=bean name, value=bean instance</span>
+    <span class="token-keyword">public</span> <span class="token-function">DynamicPaymentRouter</span>(<span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">PaymentProcessor</span>&gt; processors) {
+        <span class="token-keyword">this</span>.processors = processors;
+        <span class="token-comment">// {"creditCardProcessor": CreditCardProcessor@abc,</span>
+        <span class="token-comment">//  "cryptoProcessor": CryptoProcessor@def, ...}</span>
+    }
+
+    <span class="token-keyword">public</span> <span class="token-type">PaymentResult</span> <span class="token-function">route</span>(<span class="token-type">String</span> method, <span class="token-type">Payment</span> payment) {
+        <span class="token-type">PaymentProcessor</span> processor = processors.<span class="token-function">get</span>(method + <span class="token-string">"Processor"</span>);
+        <span class="token-keyword">if</span> (processor == <span class="token-keyword">null</span>) {
+            <span class="token-keyword">throw new</span> <span class="token-type">UnsupportedPaymentMethodException</span>(method);
+        }
+        <span class="token-keyword">return</span> processor.<span class="token-function">process</span>(payment);
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SUMMARY -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>AutowiredAnnotationBeanPostProcessor</strong> is the engine — it scans for <code><span class="token-annotation">@Autowired</span></code>, <code><span class="token-annotation">@Value</span></code>, and <code><span class="token-annotation">@Inject</span></code> at two phases: metadata collection and injection</li>
+                    <li><strong>Resolution order</strong>: Type → Qualifier → Primary → Priority → Name fallback</li>
+                    <li><strong>Constructor injection</strong> is preferred: immutability, testability, no reflection needed for field setting, fails fast on missing dependencies</li>
+                    <li><strong>@Qualifier overrides @Primary</strong> — @Primary is the default; @Qualifier is the explicit override</li>
+                    <li><strong>ObjectProvider&lt;T&gt;</strong> is the most powerful optional pattern: lazy, safe, supports multiple beans</li>
+                    <li><strong>@Lazy creates a CGLIB proxy</strong> that resolves the real bean on first method invocation — defers errors too</li>
+                    <li><strong>Field injection uses reflection</strong>: <code>Field.setAccessible(true)</code> + <code>Field.set()</code> — bypasses access control, breaks with Java modules</li>
+                    <li><strong>Custom qualifier annotations</strong> provide compile-time safety for multi-implementation scenarios — meta-annotate with <code><span class="token-annotation">@Qualifier</span></code></li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="03-bean-lifecycle.html" class="nav-btn nav-btn-prev">← Bean Lifecycle</a>
+                <a href="05-component-scanning.html" class="nav-btn nav-btn-next">Component Scanning →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

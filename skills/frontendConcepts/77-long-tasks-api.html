@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Long Tasks API - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li class="active"><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (INP)</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Long Tasks API
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Long Tasks API</h1>
+                <p class="subtitle">The browser API that identifies JavaScript tasks exceeding 50ms — the threshold where users perceive the UI as unresponsive and interactions feel sluggish.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-performance">Performance</span>
+                    <span class="tag tag-api">Web API</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🚦 Analogy: Traffic Light Monitoring</div>
+                <p>Imagine a traffic intersection where each car (task) gets a green light. If any car takes more than 50 seconds (ms) to cross, it blocks all other cars (user interactions, rendering). The Long Tasks API is the traffic camera that logs every vehicle that overstayed its green light — you can then investigate WHY those specific cars were slow.</p>
+            </div>
+
+            <h2>The Problem: The 50ms Responsiveness Budget</h2>
+<pre><code><span class="token-comment">// RAIL model (Google's UX performance model):</span>
+<span class="token-comment">// Response: &lt;100ms for user to feel instant feedback</span>
+<span class="token-comment">// Animation: &lt;16ms per frame (60fps)</span>
+<span class="token-comment">// Idle: use idle time for deferred work</span>
+<span class="token-comment">// Load: &lt;1000ms for meaningful content</span>
+
+<span class="token-comment">// WHY 50ms is the threshold:</span>
+<span class="token-comment">// If a task takes 50ms, and user input arrives at the START of that task,</span>
+<span class="token-comment">// the input waits 50ms (task) + processing time = ~100ms total</span>
+<span class="token-comment">// 100ms is the upper bound before users perceive delay</span>
+<span class="token-comment">// So 50ms per task is the budget to stay under 100ms response time</span>
+
+<span class="token-comment">// ┌──────────────── Task (70ms) ──────────────────────┐</span>
+<span class="token-comment">// │████████████████████████████████████████████████████│</span>
+<span class="token-comment">// └───────────────────────────────────────────────────-┘</span>
+<span class="token-comment">//        ↑ User clicks here                    ↑ Input finally processed</span>
+<span class="token-comment">//        │         (blocked for remaining 55ms) │</span>
+<span class="token-comment">//        └──────── perceivable delay ───────────┘</span>
+</code></pre>
+
+            <h2>How It Works</h2>
+<pre><code><span class="token-comment">// Basic Long Tasks observation</span>
+<span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+        <span class="token-comment">// Every entry here is a task that took &gt;50ms on the main thread</span>
+        console.log(<span class="token-string">'Long Task detected:'</span>, {
+            duration: entry.duration,     <span class="token-comment">// How long it ran (ms)</span>
+            startTime: entry.startTime,   <span class="token-comment">// When it started (relative to navigationStart)</span>
+            name: entry.name,             <span class="token-comment">// Always 'self' for same-origin, 'cross-origin-*' for iframes</span>
+            attribution: entry.attribution <span class="token-comment">// WHERE the long task originated</span>
+        });
+    }
+});
+
+<span class="token-comment">// buffered:true captures long tasks that fired before this code ran</span>
+observer.observe({ type: <span class="token-string">'longtask'</span>, buffered: <span class="token-keyword">true</span> });
+</code></pre>
+
+            <h3>TaskAttributionTiming: Finding the Culprit</h3>
+<pre><code><span class="token-comment">// The attribution property tells you WHERE the long task came from</span>
+<span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+        <span class="token-keyword">const</span> attribution = entry.attribution[0];
+        
+        console.log({
+            <span class="token-comment">// containerType: 'iframe', 'embed', 'object', or 'window'</span>
+            containerType: attribution.containerType,
+            
+            <span class="token-comment">// containerSrc: URL of the iframe/embed that caused it</span>
+            containerSrc: attribution.containerSrc,
+            
+            <span class="token-comment">// containerName: name/id attribute of the container</span>
+            containerName: attribution.containerName,
+            
+            <span class="token-comment">// containerId: id of the container element</span>
+            containerId: attribution.containerId
+        });
+        
+        <span class="token-comment">// Example output for a third-party ad iframe:</span>
+        <span class="token-comment">// { containerType: 'iframe',</span>
+        <span class="token-comment">//   containerSrc: 'https://ads.example.com/banner.html',</span>
+        <span class="token-comment">//   containerName: 'ad-slot-1',</span>
+        <span class="token-comment">//   containerId: 'google-ad-top' }</span>
+    }
+});
+
+observer.observe({ type: <span class="token-string">'longtask'</span>, buffered: <span class="token-keyword">true</span> });
+</code></pre>
+
+            <h2>Production Implementation: Long Task Budget Monitor</h2>
+<pre><code><span class="token-comment">// Real-world long task monitoring with actionable diagnostics</span>
+
+<span class="token-keyword">class</span> <span class="token-function">LongTaskMonitor</span> {
+    #tasks = [];
+    #totalBlockingTime = 0;
+    #observer;
+
+    constructor({ reportThreshold = 100, onReport }) {
+        this.#observer = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+            <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+                <span class="token-comment">// Total Blocking Time (TBT) = sum of (duration - 50ms) for all long tasks</span>
+                <span class="token-comment">// TBT is the lab-measurable proxy for FID</span>
+                <span class="token-keyword">const</span> blockingTime = entry.duration - 50;
+                this.#totalBlockingTime += blockingTime;
+
+                <span class="token-keyword">const</span> taskInfo = {
+                    duration: entry.duration,
+                    blockingTime,
+                    startTime: entry.startTime,
+                    attribution: this.#getAttribution(entry),
+                    <span class="token-comment">// Capture stack context — what was the page doing?</span>
+                    pageState: {
+                        url: location.href,
+                        visibility: document.visibilityState,
+                        <span class="token-comment">// Was user interacting? (rough heuristic)</span>
+                        hadRecentInput: performance.now() - this.#lastInputTime &lt; 500
+                    }
+                };
+
+                this.#tasks.push(taskInfo);
+
+                <span class="token-comment">// Report immediately for very long tasks (likely causing visible jank)</span>
+                <span class="token-keyword">if</span> (entry.duration &gt;= reportThreshold) {
+                    onReport?.({
+                        type: <span class="token-string">'critical-long-task'</span>,
+                        task: taskInfo,
+                        tbt: this.#totalBlockingTime
+                    });
+                }
+            }
+        });
+
+        this.#observer.observe({ type: <span class="token-string">'longtask'</span>, buffered: <span class="token-keyword">true</span> });
+        this.#trackInput();
+    }
+
+    #lastInputTime = 0;
+    #trackInput() {
+        <span class="token-comment">// Track when user last interacted to correlate with long tasks</span>
+        [<span class="token-string">'click'</span>, <span class="token-string">'keydown'</span>, <span class="token-string">'pointerdown'</span>].forEach(evt =&gt; {
+            document.addEventListener(evt, () =&gt; {
+                this.#lastInputTime = performance.now();
+            }, { capture: <span class="token-keyword">true</span>, passive: <span class="token-keyword">true</span> });
+        });
+    }
+
+    #getAttribution(entry) {
+        <span class="token-keyword">const</span> attr = entry.attribution?.[0];
+        <span class="token-keyword">if</span> (!attr) <span class="token-keyword">return</span> <span class="token-string">'unknown'</span>;
+        <span class="token-keyword">if</span> (attr.containerType === <span class="token-string">'iframe'</span>) {
+            <span class="token-keyword">return</span> <span class="token-string">`iframe: ${attr.containerSrc || attr.containerName || 'anonymous'}`</span>;
+        }
+        <span class="token-keyword">return</span> <span class="token-string">'self'</span>;
+    }
+
+    get totalBlockingTime() { <span class="token-keyword">return</span> this.#totalBlockingTime; }
+    get taskCount() { <span class="token-keyword">return</span> this.#tasks.length; }
+    
+    getWorstTasks(n = 5) {
+        <span class="token-keyword">return</span> [...this.#tasks]
+            .sort((a, b) =&gt; b.duration - a.duration)
+            .slice(0, n);
+    }
+
+    disconnect() { this.#observer.disconnect(); }
+}
+
+<span class="token-comment">// Usage</span>
+<span class="token-keyword">const</span> monitor = <span class="token-keyword">new</span> LongTaskMonitor({
+    reportThreshold: 150, <span class="token-comment">// Alert on tasks >150ms</span>
+    onReport: (data) =&gt; {
+        <span class="token-comment">// Send to your analytics/alerting system</span>
+        navigator.sendBeacon(<span class="token-string">'/api/perf-alert'</span>, JSON.stringify(data));
+    }
+});
+</code></pre>
+
+            <h2>Breaking Up Long Tasks: The yield() Pattern</h2>
+<pre><code><span class="token-comment">// Long task: processing 10,000 items in one synchronous loop</span>
+<span class="token-comment">// This blocks the main thread for 200ms+</span>
+<span class="token-keyword">function</span> <span class="token-function">processAllItemsBAD</span>(items) {
+    items.forEach(item =&gt; heavyComputation(item)); <span class="token-comment">// 200ms blocked</span>
+}
+
+<span class="token-comment">// SOLUTION: Yield to the main thread periodically</span>
+<span class="token-comment">// This breaks one 200ms task into multiple &lt;50ms tasks</span>
+
+<span class="token-keyword">function</span> <span class="token-function">yieldToMain</span>() {
+    <span class="token-comment">// scheduler.yield() is the ideal API (Chrome 129+)</span>
+    <span class="token-keyword">if</span> (<span class="token-string">'scheduler'</span> <span class="token-keyword">in</span> window &amp;&amp; <span class="token-string">'yield'</span> <span class="token-keyword">in</span> scheduler) {
+        <span class="token-keyword">return</span> scheduler.yield();
+    }
+    <span class="token-comment">// Fallback: setTimeout(0) moves to next task</span>
+    <span class="token-comment">// Downside: loses priority position in the task queue</span>
+    <span class="token-keyword">return</span> <span class="token-keyword">new</span> Promise(resolve =&gt; setTimeout(resolve, 0));
+}
+
+<span class="token-keyword">async</span> <span class="token-keyword">function</span> <span class="token-function">processAllItemsGOOD</span>(items) {
+    <span class="token-keyword">const</span> CHUNK_SIZE = 100; <span class="token-comment">// Process 100 items per chunk (~5ms each)</span>
+    
+    <span class="token-keyword">for</span> (<span class="token-keyword">let</span> i = 0; i &lt; items.length; i += CHUNK_SIZE) {
+        <span class="token-keyword">const</span> chunk = items.slice(i, i + CHUNK_SIZE);
+        chunk.forEach(item =&gt; heavyComputation(item));
+        
+        <span class="token-comment">// YIELD: give the browser a chance to:</span>
+        <span class="token-comment">// 1. Process user input (clicks, typing)</span>
+        <span class="token-comment">// 2. Run rendering pipeline (style, layout, paint)</span>
+        <span class="token-comment">// 3. Run GC if needed</span>
+        <span class="token-keyword">if</span> (i + CHUNK_SIZE &lt; items.length) {
+            <span class="token-keyword">await</span> yieldToMain();
+        }
+    }
+}
+
+<span class="token-comment">// ADVANCED: Use isInputPending() to yield only when user is waiting</span>
+<span class="token-keyword">async</span> <span class="token-keyword">function</span> <span class="token-function">processWithInputAwareness</span>(items) {
+    <span class="token-keyword">for</span> (<span class="token-keyword">let</span> i = 0; i &lt; items.length; i++) {
+        heavyComputation(items[i]);
+        
+        <span class="token-comment">// Only yield if there's pending user input OR we've been running &gt;40ms</span>
+        <span class="token-keyword">if</span> (navigator.scheduling?.isInputPending() || 
+            (i % 50 === 0 &amp;&amp; i &gt; 0)) {
+            <span class="token-keyword">await</span> yieldToMain();
+        }
+    }
+}
+</code></pre>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Chrome User Experience Report (CrUX)</strong> — Long tasks feed into Total Blocking Time (TBT), which correlates with FID/INP. Used by Google Search ranking signals.</li>
+                <li><strong>Next.js</strong> — The built-in performance reporter uses Long Tasks API to identify hydration cost and warn when third-party scripts cause main-thread congestion.</li>
+                <li><strong>Shopify Storefront</strong> — Monitors long tasks to attribute blocking time to specific Shopify apps/widgets loaded by merchants.</li>
+                <li><strong>Facebook/Meta</strong> — Internal performance monitoring uses long task attribution to track which product teams' code is blocking interactivity.</li>
+            </ul>
+
+            <h2>Trade-offs & Limitations</h2>
+            <table>
+                <tr><th>Aspect</th><th>Detail</th></tr>
+                <tr><td>Granularity</td><td>Only reports tasks >50ms. Many 45ms tasks can still cause jank but aren't captured.</td></tr>
+                <tr><td>Attribution</td><td>Only identifies container (iframe/window), NOT the specific function. Use DevTools for stack traces.</td></tr>
+                <tr><td>Overhead</td><td>Minimal — browser already tracks task boundaries. Observer adds negligible cost.</td></tr>
+                <tr><td>Cross-origin</td><td>Can detect long tasks from cross-origin iframes but attribution is limited (security).</td></tr>
+                <tr><td>Replacement</td><td>Long Animation Frames API (LoAF) provides much richer data (scripts, render time) — shipping in Chrome 123+.</td></tr>
+            </table>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Assuming long tasks = slow JavaScript only</strong> — GC pauses, forced layouts, and style recalculations all count as task time.</li>
+                <li><strong>Ignoring third-party scripts</strong> — Ad scripts, chat widgets, and analytics often cause the worst long tasks. Use attribution to identify them.</li>
+                <li><strong>Not correlating with user input</strong> — A 200ms long task during page idle is fine. The same task during user interaction is a UX disaster.</li>
+                <li><strong>Breaking tasks too aggressively</strong> — If you yield every 1ms, the overhead of task scheduling dominates. Aim for 5-50ms chunks.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Long Tasks When...</h3>
+                <p>You can calculate Total Blocking Time from a set of long task entries, explain why TBT correlates with input delay, and refactor synchronous code into yielding chunks that keep every task under 50ms.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Create a function that sorts 1 million numbers using Array.sort() (a long task). Then rewrite it using chunked processing with <code>scheduler.yield()</code> so no individual task exceeds 50ms while maintaining sort correctness.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Long Tasks connects to: <strong>First Input Delay</strong> (FID is the delay caused by long tasks at first interaction), <strong>Time Slicing</strong> (React's approach to breaking rendering into chunks), and <strong>Event Loop</strong> (long tasks monopolize the call stack).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="76-performance-observer.html" class="nav-btn nav-btn-prev">← PerformanceObserver API</a>
+                <a href="78-first-input-delay.html" class="nav-btn nav-btn-next">First Input Delay (FID) →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isolation Levels - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Database Engineering &rarr; Isolation Levels</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Database</span>
+                <span class="tag">Concept</span>
+            </div>
+            <h1>Isolation Levels</h1>
+            <p class="hero-subtitle">Controlling how much of one transaction&rsquo;s uncommitted work is visible to other concurrent transactions &mdash; the fundamental trade-off between correctness and performance in database systems.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Imagine a <strong>library with different study room types</strong>. At an <strong>open table</strong> (Read Uncommitted), you can see everyone&rsquo;s half-written notes &mdash; even drafts they might erase. In a <strong>cubicle</strong> (Read Committed), you only see final submitted papers, but someone could update a paper between your two reads. In a <strong>private room</strong> (Repeatable Read), once you pick up a document, no one can change it until you leave &mdash; but new documents can still appear on the shelf. In a <strong>sound-proof room</strong> (Serializable), you have the entire library frozen in time &mdash; nothing changes, nothing appears, complete isolation.</p>
+        </div>
+
+        <h2>The Three Read Anomalies</h2>
+        <p>Isolation levels exist to prevent three categories of read anomalies that occur when transactions run concurrently:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Anomaly</th>
+                        <th>What Happens</th>
+                        <th>Example</th>
+                        <th>Danger</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Dirty Read</strong></td>
+                        <td>Reading uncommitted data from another transaction</td>
+                        <td>TX-A writes balance=0, TX-B reads 0, TX-A rolls back to 500</td>
+                        <td>Decisions based on data that never existed</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Non-Repeatable Read</strong></td>
+                        <td>Same row returns different values on re-read</td>
+                        <td>TX-B reads price=100, TX-A commits price=200, TX-B re-reads 200</td>
+                        <td>Inconsistent calculations within one transaction</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phantom Read</strong></td>
+                        <td>New rows appear in a repeated range query</td>
+                        <td>TX-B counts 5 orders, TX-A inserts order #6, TX-B re-counts 6</td>
+                        <td>Aggregations change mid-transaction</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>The Four SQL Isolation Levels</h2>
+        <p>SQL standard defines four levels with increasing strictness. Higher isolation means fewer anomalies but more locking and lower throughput:</p>
+
+        <h3>1. Read Uncommitted</h3>
+        <p>The weakest level &mdash; transactions can read data written by other uncommitted transactions. Almost never used in production because dirty reads make data unreliable.</p>
+
+        <h3>2. Read Committed</h3>
+        <p>Guarantees you only see committed data. Each statement gets a fresh snapshot. This is the <strong>default in PostgreSQL</strong> and Oracle. Non-repeatable reads are still possible because another transaction can commit between your two reads.</p>
+
+        <h3>3. Repeatable Read</h3>
+        <p>Once you read a row, it stays the same for the entire transaction. This is the <strong>default in MySQL InnoDB</strong>. In standard SQL, phantoms are possible, but InnoDB&rsquo;s gap locks prevent them in practice.</p>
+
+        <h3>4. Serializable</h3>
+        <p>The strongest level &mdash; transactions execute as if they ran one at a time. No anomalies possible. This is the <strong>default in CockroachDB</strong>. Implementation varies: lock-based (SQL Server), SSI/Serializable Snapshot Isolation (PostgreSQL), or optimistic concurrency (CockroachDB).</p>
+
+        <h2>Isolation Levels vs Phenomena</h2>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Isolation Level</th>
+                        <th>Dirty Read</th>
+                        <th>Non-Repeatable Read</th>
+                        <th>Phantom Read</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Read Uncommitted</strong></td>
+                        <td>&#x2717; Possible</td>
+                        <td>&#x2717; Possible</td>
+                        <td>&#x2717; Possible</td>
+                        <td>Fastest</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read Committed</strong></td>
+                        <td>&#x2713; Prevented</td>
+                        <td>&#x2717; Possible</td>
+                        <td>&#x2717; Possible</td>
+                        <td>Fast</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repeatable Read</strong></td>
+                        <td>&#x2713; Prevented</td>
+                        <td>&#x2713; Prevented</td>
+                        <td>&#x2717; Possible*</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Serializable</strong></td>
+                        <td>&#x2713; Prevented</td>
+                        <td>&#x2713; Prevented</td>
+                        <td>&#x2713; Prevented</td>
+                        <td>Slowest</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p><em>*MySQL InnoDB&rsquo;s Repeatable Read uses gap locks to also prevent phantoms in practice.</em></p>
+
+        <h2>MVCC &mdash; Multi-Version Concurrency Control</h2>
+        <p>Modern databases avoid heavy locking by keeping multiple versions of each row. Readers don&rsquo;t block writers, and writers don&rsquo;t block readers:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Lock-Based</th>
+                        <th>MVCC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Reads block writes?</strong></td>
+                        <td>Yes (shared locks held)</td>
+                        <td>No (reads see a snapshot)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Writes block reads?</strong></td>
+                        <td>Yes (exclusive locks held)</td>
+                        <td>No (old version still visible)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Storage overhead</strong></td>
+                        <td>Minimal (one version)</td>
+                        <td>Higher (multiple versions + vacuum)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deadlock risk</strong></td>
+                        <td>High</td>
+                        <td>Lower (but write-write conflicts remain)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Used by</strong></td>
+                        <td>SQL Server (default)</td>
+                        <td>PostgreSQL, MySQL InnoDB, Oracle</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Demonstrating Isolation Levels in Python</h2>
+        <p>Using sqlite3 to show how isolation levels affect concurrent access. SQLite uses a simpler model but demonstrates the core concepts:</p>
+
+        <pre><code><span class="token-keyword">import</span> sqlite3
+<span class="token-keyword">import</span> threading
+<span class="token-keyword">import</span> time
+
+<span class="token-keyword">def</span> <span class="token-function">setup_database</span>(db_path: str):
+    <span class="token-string">"""Create a test database with account balances."""</span>
+    conn = sqlite3.connect(db_path)
+    conn.execute(<span class="token-string">"CREATE TABLE IF NOT EXISTS accounts "</span>
+                 <span class="token-string">"(id INTEGER PRIMARY KEY, name TEXT, balance REAL)"</span>)
+    conn.execute(<span class="token-string">"DELETE FROM accounts"</span>)
+    conn.execute(<span class="token-string">"INSERT INTO accounts VALUES (1, 'Alice', 1000.0)"</span>)
+    conn.execute(<span class="token-string">"INSERT INTO accounts VALUES (2, 'Bob', 500.0)"</span>)
+    conn.commit()
+    conn.close()
+
+
+<span class="token-keyword">def</span> <span class="token-function">demonstrate_dirty_read</span>(db_path: str):
+    <span class="token-string">"""Show dirty read: reading uncommitted data.
+
+    Transaction A updates but doesn't commit.
+    Transaction B reads the uncommitted value.
+    Transaction A rolls back -- B saw data that never existed.
+    """</span>
+    results = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">writer</span>():
+        conn = sqlite3.connect(db_path, isolation_level=<span class="token-string">"DEFERRED"</span>)
+        conn.execute(<span class="token-string">"UPDATE accounts SET balance = 0 WHERE id = 1"</span>)
+        time.sleep(<span class="token-number">0.5</span>)  <span class="token-comment"># Hold uncommitted change</span>
+        conn.rollback()   <span class="token-comment"># Rollback -- balance stays 1000</span>
+        conn.close()
+
+    <span class="token-keyword">def</span> <span class="token-function">reader</span>():
+        time.sleep(<span class="token-number">0.1</span>)   <span class="token-comment"># Ensure writer started</span>
+        conn = sqlite3.connect(db_path, isolation_level=<span class="token-keyword">None</span>)
+        <span class="token-comment"># In READ UNCOMMITTED, we'd see balance=0 (dirty read)</span>
+        cursor = conn.execute(
+            <span class="token-string">"SELECT balance FROM accounts WHERE id = 1"</span>
+        )
+        results[<span class="token-string">"read_value"</span>] = cursor.fetchone()[<span class="token-number">0</span>]
+        conn.close()
+
+    t1 = threading.Thread(target=writer)
+    t2 = threading.Thread(target=reader)
+    t1.start(); t2.start()
+    t1.join(); t2.join()
+
+    print(<span class="token-string">f"Reader saw balance: </span>{results[<span class="token-string">'read_value'</span>]}<span class="token-string">"</span>)
+    print(<span class="token-string">"With READ UNCOMMITTED: would see 0 (dirty!)"</span>)
+    print(<span class="token-string">"With READ COMMITTED+: sees 1000 (correct)"</span>)
+
+
+<span class="token-keyword">def</span> <span class="token-function">demonstrate_non_repeatable_read</span>(db_path: str):
+    <span class="token-string">"""Show non-repeatable read at Read Committed level.
+
+    Transaction B reads a row twice.
+    Between reads, Transaction A commits an update.
+    B sees different values for the same row.
+    """</span>
+    results = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">updater</span>():
+        time.sleep(<span class="token-number">0.2</span>)  <span class="token-comment"># After first read</span>
+        conn = sqlite3.connect(db_path)
+        conn.execute(<span class="token-string">"UPDATE accounts SET balance = 750 WHERE id = 1"</span>)
+        conn.commit()
+        conn.close()
+
+    <span class="token-keyword">def</span> <span class="token-function">reader</span>():
+        conn = sqlite3.connect(db_path, isolation_level=<span class="token-string">"DEFERRED"</span>)
+        <span class="token-comment"># First read</span>
+        cur = conn.execute(
+            <span class="token-string">"SELECT balance FROM accounts WHERE id = 1"</span>
+        )
+        results[<span class="token-string">"first_read"</span>] = cur.fetchone()[<span class="token-number">0</span>]
+
+        time.sleep(<span class="token-number">0.5</span>)  <span class="token-comment"># Allow updater to commit</span>
+
+        <span class="token-comment"># Second read -- different value at Read Committed!</span>
+        cur = conn.execute(
+            <span class="token-string">"SELECT balance FROM accounts WHERE id = 1"</span>
+        )
+        results[<span class="token-string">"second_read"</span>] = cur.fetchone()[<span class="token-number">0</span>]
+        conn.close()
+
+    t1 = threading.Thread(target=updater)
+    t2 = threading.Thread(target=reader)
+    t2.start(); t1.start()
+    t2.join(); t1.join()
+
+    print(<span class="token-string">f"First read:  </span>{results[<span class="token-string">'first_read'</span>]}<span class="token-string">"</span>)
+    print(<span class="token-string">f"Second read: </span>{results[<span class="token-string">'second_read'</span>]}<span class="token-string">"</span>)
+    print(<span class="token-string">"At READ COMMITTED: values may differ (non-repeatable)"</span>)
+    print(<span class="token-string">"At REPEATABLE READ: both reads return same value"</span>)
+
+
+<span class="token-keyword">def</span> <span class="token-function">demonstrate_phantom_read</span>(db_path: str):
+    <span class="token-string">"""Show phantom read: new rows appearing in range query.
+
+    Transaction B counts rows matching a condition.
+    Transaction A inserts a new matching row and commits.
+    Transaction B re-counts and gets a different number.
+    """</span>
+    results = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">inserter</span>():
+        time.sleep(<span class="token-number">0.2</span>)
+        conn = sqlite3.connect(db_path)
+        conn.execute(
+            <span class="token-string">"INSERT INTO accounts VALUES (3, 'Charlie', 2000.0)"</span>
+        )
+        conn.commit()
+        conn.close()
+
+    <span class="token-keyword">def</span> <span class="token-function">counter</span>():
+        conn = sqlite3.connect(db_path, isolation_level=<span class="token-string">"DEFERRED"</span>)
+        <span class="token-comment"># First count</span>
+        cur = conn.execute(
+            <span class="token-string">"SELECT COUNT(*) FROM accounts WHERE balance > 0"</span>
+        )
+        results[<span class="token-string">"first_count"</span>] = cur.fetchone()[<span class="token-number">0</span>]
+
+        time.sleep(<span class="token-number">0.5</span>)
+
+        <span class="token-comment"># Second count -- phantom row appeared!</span>
+        cur = conn.execute(
+            <span class="token-string">"SELECT COUNT(*) FROM accounts WHERE balance > 0"</span>
+        )
+        results[<span class="token-string">"second_count"</span>] = cur.fetchone()[<span class="token-number">0</span>]
+        conn.close()
+
+    t1 = threading.Thread(target=inserter)
+    t2 = threading.Thread(target=counter)
+    t2.start(); t1.start()
+    t2.join(); t1.join()
+
+    print(<span class="token-string">f"First count:  </span>{results[<span class="token-string">'first_count'</span>]}<span class="token-string">"</span>)
+    print(<span class="token-string">f"Second count: </span>{results[<span class="token-string">'second_count'</span>]}<span class="token-string">"</span>)
+    print(<span class="token-string">"At REPEATABLE READ: new row appears (phantom)"</span>)
+    print(<span class="token-string">"At SERIALIZABLE: count stays consistent"</span>)
+
+
+<span class="token-comment"># --- Setting isolation levels in real databases ---</span>
+
+<span class="token-keyword">def</span> <span class="token-function">postgresql_isolation_example</span>():
+    <span class="token-string">"""PostgreSQL isolation level configuration."""</span>
+    <span class="token-comment"># import psycopg2</span>
+    <span class="token-comment"># conn = psycopg2.connect(dsn)</span>
+    <span class="token-comment"># conn.set_isolation_level(</span>
+    <span class="token-comment">#     psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE</span>
+    <span class="token-comment"># )</span>
+    <span class="token-comment"># -- Or via SQL:</span>
+    <span class="token-comment"># cursor.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")</span>
+    <span class="token-keyword">pass</span>
+
+
+<span class="token-comment"># Run demonstrations</span>
+<span class="token-keyword">if</span> __name__ == <span class="token-string">"__main__"</span>:
+    db = <span class="token-string">":memory:"</span>
+    setup_database(db)
+    print(<span class="token-string">"=== Dirty Read Demo ==="</span>)
+    demonstrate_dirty_read(db)
+    print(<span class="token-string">"\n=== Non-Repeatable Read Demo ==="</span>)
+    setup_database(db)
+    demonstrate_non_repeatable_read(db)
+    print(<span class="token-string">"\n=== Phantom Read Demo ==="</span>)
+    setup_database(db)
+    demonstrate_phantom_read(db)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>PostgreSQL (Read Committed default):</strong> Uses MVCC with transaction snapshots. Each SQL statement sees a snapshot as of statement start. Serializable mode uses SSI (Serializable Snapshot Isolation) &mdash; detects serialization conflicts and aborts one transaction rather than holding locks. Applications must be prepared to retry aborted transactions.</p>
+            <p><strong>MySQL InnoDB (Repeatable Read default):</strong> Uses MVCC with consistent reads and next-key locking. Gap locks prevent phantoms even at Repeatable Read, making it stronger than the SQL standard requires. Serializable mode converts all reads to <code>SELECT ... LOCK IN SHARE MODE</code>.</p>
+            <p><strong>CockroachDB (Serializable default):</strong> Uses a timestamp-ordered optimistic concurrency scheme. All transactions run at Serializable &mdash; there is no weaker option. This simplifies reasoning about correctness at the cost of higher abort rates under contention. Retries are built into the client drivers.</p>
+            <p><strong>SQL Server:</strong> Offers both lock-based isolation and snapshot isolation (MVCC). <code>READ_COMMITTED_SNAPSHOT ON</code> makes Read Committed use row versioning instead of shared locks &mdash; similar to PostgreSQL&rsquo;s behavior. This dramatically reduces blocking in OLTP workloads.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Isolation levels trade correctness for performance &mdash; higher isolation means more locking or aborts</li>
+                <li>Read Committed (PostgreSQL default) prevents dirty reads but allows non-repeatable reads and phantoms</li>
+                <li>Repeatable Read (MySQL default) freezes row values but standard allows phantom inserts</li>
+                <li>Serializable guarantees correctness equivalent to serial execution &mdash; use for financial transactions</li>
+                <li>MVCC avoids read/write blocking by maintaining multiple row versions &mdash; used by PostgreSQL, MySQL, Oracle</li>
+                <li>Always design applications to handle transaction aborts and retries at Serializable level</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of isolation levels as a spectrum from &ldquo;everyone sees everything instantly&rdquo; to &ldquo;each transaction operates in a private universe.&rdquo; The key insight: you&rsquo;re choosing where on the consistency-performance slider your application sits.</p>
+            <div class="model-visual">
+                <pre>
+  ISOLATION LEVELS SPECTRUM:
+
+  Weak                                              Strong
+  &larr;──────────────────────────────────────────────────&rarr;
+
+  READ           READ            REPEATABLE       SERIALIZABLE
+  UNCOMMITTED    COMMITTED       READ
+  │              │               │                │
+  ▼              ▼               ▼                ▼
+  ┌──────┐      ┌──────┐       ┌──────┐         ┌──────┐
+  │See   │      │See   │       │Frozen│         │Frozen│
+  │dirty │      │commit│       │rows  │         │world │
+  │writes│      │only  │       │same  │         │no new│
+  │      │      │      │       │values│         │rows  │
+  └──────┘      └──────┘       └──────┘         └──────┘
+
+  Anomalies allowed:
+  Dirty:    YES         NO          NO              NO
+  Non-Rep:  YES         YES         NO              NO
+  Phantom:  YES         YES         YES*            NO
+
+  Performance: ████████  ██████      ████            ██
+  Correctness: ██        ████        ██████          ████████
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Using Read Uncommitted for &ldquo;performance&rdquo;:</strong> The speed gain is negligible in MVCC databases (PostgreSQL, MySQL) because reads don&rsquo;t take locks anyway. You get all the anomalies with almost no performance benefit. Use Read Committed instead &mdash; it&rsquo;s nearly as fast and prevents dirty reads.</li>
+                <li><strong>Assuming Repeatable Read prevents all anomalies:</strong> Standard Repeatable Read still allows phantom reads. Your aggregate queries (COUNT, SUM) can return inconsistent results if new rows are inserted. Only Serializable guarantees complete consistency for range queries.</li>
+                <li><strong>Not handling serialization failures:</strong> At Serializable level, databases will abort conflicting transactions. If your application doesn&rsquo;t catch and retry these errors (SQLSTATE 40001 in PostgreSQL), users see random failures. Always wrap Serializable transactions in a retry loop.</li>
+                <li><strong>Holding transactions open too long:</strong> Long-running transactions at Repeatable Read or higher hold snapshots that prevent MVCC cleanup (vacuum). This causes table bloat in PostgreSQL and undo log growth in MySQL. Keep transactions short &mdash; milliseconds, not minutes.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Reproduce all three anomalies:</strong> Using PostgreSQL or MySQL, write two concurrent sessions that demonstrate a dirty read (at Read Uncommitted), a non-repeatable read (at Read Committed), and a phantom read (at Repeatable Read). Document the exact SQL and timing.</li>
+                <li><strong>Benchmark isolation level performance:</strong> Run 1000 concurrent transfer transactions at Read Committed vs Serializable. Measure throughput (tx/sec), abort rate, and average latency. Quantify the actual cost of stronger isolation.</li>
+                <li><strong>Implement application-level retry:</strong> Write a Python function that wraps a Serializable transaction with automatic retry on serialization failure (catching error code 40001). Add exponential backoff and a maximum retry count.</li>
+                <li><strong>MVCC version chain analysis:</strong> In PostgreSQL, update the same row 100 times without vacuuming. Use <code>pgstattuple</code> to measure dead tuple accumulation. Then run VACUUM and observe the reclaimed space. Explain why long transactions prevent cleanup.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="39-retry-backoff.html" class="prev">&larr; Retry with Backoff</a>
+            <a href="41-indexing-internals.html" class="next">Indexing Internals &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

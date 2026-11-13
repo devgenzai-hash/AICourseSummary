@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Conflict Resolution - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing Complexity</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop (Macro vs Microta…</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interoperabil…</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver Internals</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver Loop Limits</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver Cost</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle Traps</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation Strategies</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preco…</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture & State Machines</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+            <li><a href="64-finite-state-modeling.html"><span class="nav-number">64</span> Finite State Modeling</a></li>
+            <li><a href="65-event-sourcing-frontend.html"><span class="nav-number">65</span> Event Sourcing in Frontend</a></li>
+            <li><a href="66-optimistic-ui-rollback.html"><span class="nav-number">66</span> Optimistic UI Rollback Strat…</a></li>
+            <li class="module-label">Offline & Collaboration</li>
+            <li><a href="67-offline-conflict-resolution.html"><span class="nav-number">67</span> Offline Conflict Resolution</a></li>
+            <li><a href="68-crdt-basics.html"><span class="nav-number">68</span> CRDT Basics for Collaboration</a></li>
+            <li><a href="69-webrtc.html"><span class="nav-number">69</span> WebRTC</a></li>
+            <li class="module-label">Streams & Async Patterns</li>
+            <li><a href="70-backpressure-streams.html"><span class="nav-number">70</span> Backpressure in Streams API</a></li>
+            <li><a href="71-abort-controller.html"><span class="nav-number">71</span> AbortController</a></li>
+            <li><a href="72-streaming-fetch.html"><span class="nav-number">72</span> Streaming Fetch Response Han…</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (I…</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async …</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/88 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Offline Conflict Resolution
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Offline Conflict Resolution</h1>
+                <p class="subtitle">When users make changes offline and reconnect, their local mutations may conflict with changes made by others. This is the fundamental distributed systems problem — brought to the browser — and there's no single "correct" answer, only trade-off strategies.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span> <span class="tag tag-concept">Distributed Systems</span> <span class="tag tag-performance">Offline-First</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📚 Analogy: Two People Editing a Whiteboard Photo</div>
+                <p>Imagine two people photograph the same whiteboard, go to separate rooms, and each draws additions on their photo. When they come back together, they need to merge their drawings onto one whiteboard. If they drew in different areas — easy merge. If they both changed the same spot — <strong>conflict</strong>. Do you keep both? Pick the most recent? Ask the users? This is exactly what offline-first apps face when clients reconnect.</p>
+            </div>
+
+            <h2>The Problem: Divergent State</h2>
+<pre><code><span class="token-comment">// The scenario that creates conflicts:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Server state: { title: "Original", items: [A, B, C] }</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Alice goes offline, makes changes:</span>
+<span class="token-comment">//   - Renames title to "Alice's Version"</span>
+<span class="token-comment">//   - Deletes item B</span>
+<span class="token-comment">//   - Adds item D</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Bob (online) simultaneously:</span>
+<span class="token-comment">//   - Renames title to "Bob's Version"</span>
+<span class="token-comment">//   - Edits item B's content</span>
+<span class="token-comment">//   - Reorders items to [C, B, A]</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Alice reconnects. Now what?</span>
+<span class="token-comment">// - Title conflict: "Alice's Version" vs "Bob's Version"</span>
+<span class="token-comment">// - Item B: Alice deleted it, Bob edited it (delete-edit conflict)</span>
+<span class="token-comment">// - Order: Alice assumes [A, C, D], Bob has [C, B, A]</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// There is NO universally "correct" merge — only STRATEGIES</span>
+</code></pre>
+
+            <h2>Strategy 1: Last-Write-Wins (LWW)</h2>
+<pre><code><span class="token-comment">// Simplest strategy: most recent timestamp wins</span>
+<span class="token-comment">// Used by: DynamoDB, Cassandra, many mobile apps</span>
+
+<span class="token-keyword">function</span> <span class="token-function">lastWriteWins</span>(localChange, serverChange) {
+  <span class="token-comment">// Compare timestamps — later write overwrites earlier</span>
+  <span class="token-keyword">if</span> (localChange.timestamp > serverChange.timestamp) {
+    <span class="token-keyword">return</span> localChange.value;  <span class="token-comment">// Local wins</span>
+  }
+  <span class="token-keyword">return</span> serverChange.value;    <span class="token-comment">// Server wins</span>
+}
+
+<span class="token-comment">// PROBLEM 1: Clock skew — client clocks are unreliable</span>
+<span class="token-comment">// Alice's laptop clock is 5 minutes ahead → she always "wins"</span>
+<span class="token-comment">// Solution: Use Hybrid Logical Clocks (HLC) or server-assigned timestamps</span>
+
+<span class="token-comment">// PROBLEM 2: Data loss — the "losing" write is silently discarded</span>
+<span class="token-comment">// If Alice writes "Meeting at 3pm" and Bob writes "Meeting at 4pm",</span>
+<span class="token-comment">// one of those is LOST without notification</span>
+
+<span class="token-comment">// WHEN TO USE: Low-stakes data; user preferences; non-collaborative;</span>
+<span class="token-comment">//              cases where any consistent value is acceptable</span>
+
+<span class="token-keyword">class</span> <span class="token-function">LWWRegister</span> {
+  <span class="token-keyword">constructor</span>(value, timestamp = 0) {
+    <span class="token-keyword">this</span>.value = value;
+    <span class="token-keyword">this</span>.timestamp = timestamp;
+  }
+
+  <span class="token-function">set</span>(newValue) {
+    <span class="token-keyword">this</span>.value = newValue;
+    <span class="token-keyword">this</span>.timestamp = Date.now();
+  }
+
+  <span class="token-comment">// Merge with a remote version — higher timestamp wins</span>
+  <span class="token-function">merge</span>(remote) {
+    <span class="token-keyword">if</span> (remote.timestamp > <span class="token-keyword">this</span>.timestamp) {
+      <span class="token-keyword">this</span>.value = remote.value;
+      <span class="token-keyword">this</span>.timestamp = remote.timestamp;
+    }
+    <span class="token-comment">// If equal timestamps, use tiebreaker (e.g., client ID comparison)</span>
+  }
+}
+</code></pre>
+
+            <h2>Strategy 2: Three-Way Merge</h2>
+<pre><code><span class="token-comment">// Used by: Git, Google Docs (simplified), CouchDB</span>
+<span class="token-comment">// Requires: knowing the COMMON ANCESTOR (state before divergence)</span>
+
+<span class="token-keyword">function</span> <span class="token-function">threeWayMerge</span>(base, local, remote) {
+  <span class="token-keyword">const</span> result = {};
+
+  <span class="token-comment">// For each field, determine who changed what relative to base</span>
+  <span class="token-keyword">const</span> allKeys = <span class="token-keyword">new</span> Set([
+    ...Object.keys(base),
+    ...Object.keys(local),
+    ...Object.keys(remote)
+  ]);
+
+  <span class="token-keyword">for</span> (<span class="token-keyword">const</span> key <span class="token-keyword">of</span> allKeys) {
+    <span class="token-keyword">const</span> baseVal = base[key];
+    <span class="token-keyword">const</span> localVal = local[key];
+    <span class="token-keyword">const</span> remoteVal = remote[key];
+
+    <span class="token-keyword">const</span> localChanged = !deepEqual(baseVal, localVal);
+    <span class="token-keyword">const</span> remoteChanged = !deepEqual(baseVal, remoteVal);
+
+    <span class="token-keyword">if</span> (!localChanged && !remoteChanged) {
+      <span class="token-comment">// Neither changed this field — keep base value</span>
+      result[key] = baseVal;
+    } <span class="token-keyword">else if</span> (localChanged && !remoteChanged) {
+      <span class="token-comment">// Only local changed — take local (clean merge)</span>
+      result[key] = localVal;
+    } <span class="token-keyword">else if</span> (!localChanged && remoteChanged) {
+      <span class="token-comment">// Only remote changed — take remote (clean merge)</span>
+      result[key] = remoteVal;
+    } <span class="token-keyword">else if</span> (deepEqual(localVal, remoteVal)) {
+      <span class="token-comment">// Both changed to SAME value — no conflict</span>
+      result[key] = localVal;
+    } <span class="token-keyword">else</span> {
+      <span class="token-comment">// CONFLICT: both changed to DIFFERENT values</span>
+      <span class="token-comment">// This is where strategy matters — cannot auto-resolve</span>
+      result[key] = { conflict: <span class="token-keyword">true</span>, local: localVal, remote: remoteVal, base: baseVal };
+    }
+  }
+
+  <span class="token-keyword">return</span> result;
+}
+
+<span class="token-comment">// Usage with conflict UI</span>
+<span class="token-keyword">const</span> merged = threeWayMerge(baseDoc, localDoc, remoteDoc);
+<span class="token-keyword">const</span> conflicts = Object.entries(merged).filter(([k, v]) => v?.conflict);
+
+<span class="token-keyword">if</span> (conflicts.length > 0) {
+  <span class="token-comment">// Show conflict resolution UI to the user</span>
+  showConflictDialog(conflicts);
+} <span class="token-keyword">else</span> {
+  <span class="token-comment">// Clean merge — apply automatically</span>
+  applyMergedState(merged);
+}
+</code></pre>
+
+            <h2>Strategy 3: Operational Transform (OT) Queue</h2>
+<pre><code><span class="token-comment">// Instead of merging STATE, merge OPERATIONS (actions/events)</span>
+<span class="token-comment">// Each offline mutation is stored as an operation</span>
+<span class="token-comment">// On reconnect, operations are transformed against concurrent ops</span>
+
+<span class="token-keyword">class</span> <span class="token-function">OfflineQueue</span> {
+  <span class="token-keyword">constructor</span>() {
+    <span class="token-keyword">this</span>.pendingOps = [];     <span class="token-comment">// Operations made while offline</span>
+    <span class="token-keyword">this</span>.baseVersion = 0;     <span class="token-comment">// Server version when we went offline</span>
+  }
+
+  <span class="token-comment">// Record an operation while offline</span>
+  <span class="token-function">enqueue</span>(operation) {
+    <span class="token-keyword">this</span>.pendingOps.push({
+      ...operation,
+      clientSeq: <span class="token-keyword">this</span>.pendingOps.length,
+      baseVersion: <span class="token-keyword">this</span>.baseVersion
+    });
+  }
+
+  <span class="token-comment">// On reconnect: sync with server</span>
+  <span class="token-keyword">async</span> <span class="token-function">sync</span>(serverOps) {
+    <span class="token-comment">// serverOps = operations that happened on server while we were offline</span>
+
+    <span class="token-comment">// Transform our pending ops against server ops</span>
+    <span class="token-comment">// This adjusts indices, handles deletions, resolves conflicts</span>
+    <span class="token-keyword">let</span> transformedOps = <span class="token-keyword">this</span>.pendingOps;
+
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> serverOp <span class="token-keyword">of</span> serverOps) {
+      transformedOps = transformedOps.map(localOp =>
+        transform(localOp, serverOp)
+      );
+    }
+
+    <span class="token-comment">// Send transformed operations to server</span>
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> op <span class="token-keyword">of</span> transformedOps) {
+      <span class="token-keyword">await</span> api.submitOperation(op);
+    }
+
+    <span class="token-keyword">this</span>.pendingOps = [];
+  }
+}
+
+<span class="token-comment">// Transform function: adjust operation against concurrent operation</span>
+<span class="token-keyword">function</span> <span class="token-function">transform</span>(localOp, serverOp) {
+  <span class="token-comment">// Example: list insert position adjustment</span>
+  <span class="token-keyword">if</span> (localOp.type === <span class="token-string">'INSERT'</span> && serverOp.type === <span class="token-string">'INSERT'</span>) {
+    <span class="token-comment">// If server inserted before our position, shift our position right</span>
+    <span class="token-keyword">if</span> (serverOp.index <= localOp.index) {
+      <span class="token-keyword">return</span> { ...localOp, index: localOp.index + 1 };
+    }
+  }
+  <span class="token-keyword">if</span> (localOp.type === <span class="token-string">'INSERT'</span> && serverOp.type === <span class="token-string">'DELETE'</span>) {
+    <span class="token-comment">// If server deleted before our insert position, shift left</span>
+    <span class="token-keyword">if</span> (serverOp.index < localOp.index) {
+      <span class="token-keyword">return</span> { ...localOp, index: localOp.index - 1 };
+    }
+  }
+  <span class="token-keyword">if</span> (localOp.type === <span class="token-string">'DELETE'</span> && serverOp.type === <span class="token-string">'DELETE'</span>) {
+    <span class="token-comment">// Both deleted same item — our delete is now a no-op</span>
+    <span class="token-keyword">if</span> (serverOp.index === localOp.index) {
+      <span class="token-keyword">return</span> { type: <span class="token-string">'NOOP'</span> };
+    }
+  }
+  <span class="token-keyword">return</span> localOp;
+}
+</code></pre>
+
+            <h2>Strategy 4: Version Vectors</h2>
+<pre><code><span class="token-comment">// Track causality: which updates has each client "seen"?</span>
+<span class="token-comment">// Used by: CouchDB, Riak, Amazon DynamoDB (internally)</span>
+
+<span class="token-keyword">class</span> <span class="token-function">VersionVector</span> {
+  <span class="token-keyword">constructor</span>() {
+    <span class="token-comment">// Map of clientId → sequence number (how many ops this client has done)</span>
+    <span class="token-keyword">this</span>.clock = {};
+  }
+
+  <span class="token-function">increment</span>(clientId) {
+    <span class="token-keyword">this</span>.clock[clientId] = (<span class="token-keyword">this</span>.clock[clientId] || 0) + 1;
+  }
+
+  <span class="token-comment">// Can we determine ordering between two version vectors?</span>
+  <span class="token-function">compare</span>(other) {
+    <span class="token-keyword">let</span> dominated = <span class="token-keyword">false</span>, dominates = <span class="token-keyword">false</span>;
+    <span class="token-keyword">const</span> allClients = <span class="token-keyword">new</span> Set([
+      ...Object.keys(<span class="token-keyword">this</span>.clock),
+      ...Object.keys(other.clock)
+    ]);
+
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> client <span class="token-keyword">of</span> allClients) {
+      <span class="token-keyword">const</span> mine = <span class="token-keyword">this</span>.clock[client] || 0;
+      <span class="token-keyword">const</span> theirs = other.clock[client] || 0;
+      <span class="token-keyword">if</span> (mine < theirs) dominated = <span class="token-keyword">true</span>;
+      <span class="token-keyword">if</span> (mine > theirs) dominates = <span class="token-keyword">true</span>;
+    }
+
+    <span class="token-keyword">if</span> (dominates && !dominated) <span class="token-keyword">return</span> <span class="token-string">'AFTER'</span>;   <span class="token-comment">// We happened after them</span>
+    <span class="token-keyword">if</span> (dominated && !dominates) <span class="token-keyword">return</span> <span class="token-string">'BEFORE'</span>;  <span class="token-comment">// They happened after us</span>
+    <span class="token-keyword">if</span> (!dominated && !dominates) <span class="token-keyword">return</span> <span class="token-string">'EQUAL'</span>; <span class="token-comment">// Same version</span>
+    <span class="token-keyword">return</span> <span class="token-string">'CONCURRENT'</span>;  <span class="token-comment">// CONFLICT — neither dominates the other</span>
+  }
+
+  <span class="token-function">merge</span>(other) {
+    <span class="token-comment">// Take max of each component — the union of all known operations</span>
+    <span class="token-keyword">const</span> merged = <span class="token-keyword">new</span> VersionVector();
+    <span class="token-keyword">const</span> allClients = <span class="token-keyword">new</span> Set([
+      ...Object.keys(<span class="token-keyword">this</span>.clock),
+      ...Object.keys(other.clock)
+    ]);
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> client <span class="token-keyword">of</span> allClients) {
+      merged.clock[client] = Math.max(
+        <span class="token-keyword">this</span>.clock[client] || 0,
+        other.clock[client] || 0
+      );
+    }
+    <span class="token-keyword">return</span> merged;
+  }
+}
+</code></pre>
+
+            <h2>Real-World Usage</h2>
+            <ul>
+                <li><strong>CouchDB/PouchDB</strong> — Multi-master replication with automatic conflict detection via revision trees. Conflicts are stored as document branches; apps choose resolution strategy.</li>
+                <li><strong>Figma</strong> — Uses operational transform with a central server ordering. Offline changes are queued as operations and transformed against server operations on reconnect.</li>
+                <li><strong>Linear</strong> — Offline-first architecture where all mutations are queued locally in IndexedDB. On reconnect, a sync engine replays mutations with server-side conflict resolution.</li>
+                <li><strong>Apple Notes / iCloud</strong> — Uses three-way merge with Last-Write-Wins at the field level. Each note field has an independent timestamp; conflicts show "this note has conflicting changes."</li>
+                <li><strong>Notion</strong> — Block-level operations with OT. Each block is independently versioned, so conflicts are localized to individual blocks rather than entire pages.</li>
+            </ul>
+
+            <h2>Implementation: Complete Offline Sync Engine</h2>
+<pre><code><span class="token-comment">// A sync engine that handles: offline queue, reconnection, conflict resolution</span>
+
+<span class="token-keyword">class</span> <span class="token-function">SyncEngine</span> {
+  <span class="token-keyword">constructor</span>(store, api, conflictStrategy = <span class="token-string">'server-wins'</span>) {
+    <span class="token-keyword">this</span>.store = store;            <span class="token-comment">// Local state (IndexedDB)</span>
+    <span class="token-keyword">this</span>.api = api;                <span class="token-comment">// Server API</span>
+    <span class="token-keyword">this</span>.strategy = conflictStrategy;
+    <span class="token-keyword">this</span>.offlineQueue = [];        <span class="token-comment">// Mutations made while offline</span>
+    <span class="token-keyword">this</span>.isOnline = navigator.onLine;
+    <span class="token-keyword">this</span>.lastSyncVersion = 0;
+
+    <span class="token-comment">// Listen for connectivity changes</span>
+    window.addEventListener(<span class="token-string">'online'</span>, () => <span class="token-keyword">this</span>.handleReconnect());
+    window.addEventListener(<span class="token-string">'offline'</span>, () => { <span class="token-keyword">this</span>.isOnline = <span class="token-keyword">false</span>; });
+  }
+
+  <span class="token-comment">// Called for every local mutation (online or offline)</span>
+  <span class="token-keyword">async</span> <span class="token-function">mutate</span>(operation) {
+    <span class="token-comment">// Always apply locally first (offline-first principle)</span>
+    <span class="token-keyword">this</span>.store.apply(operation);
+
+    <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.isOnline) {
+      <span class="token-keyword">try</span> {
+        <span class="token-keyword">await this</span>.api.submit(operation);
+      } <span class="token-keyword">catch</span> (e) {
+        <span class="token-comment">// Network failed mid-request — queue for retry</span>
+        <span class="token-keyword">this</span>.offlineQueue.push(operation);
+      }
+    } <span class="token-keyword">else</span> {
+      <span class="token-comment">// Offline — queue for later sync</span>
+      <span class="token-keyword">this</span>.offlineQueue.push(operation);
+      <span class="token-keyword">await this</span>.persistQueue(); <span class="token-comment">// Save to IndexedDB (survives page refresh)</span>
+    }
+  }
+
+  <span class="token-keyword">async</span> <span class="token-function">handleReconnect</span>() {
+    <span class="token-keyword">this</span>.isOnline = <span class="token-keyword">true</span>;
+
+    <span class="token-comment">// Step 1: Fetch all server changes since our last sync</span>
+    <span class="token-keyword">const</span> serverChanges = <span class="token-keyword">await this</span>.api.getChangesSince(<span class="token-keyword">this</span>.lastSyncVersion);
+
+    <span class="token-comment">// Step 2: Detect conflicts (our offline ops vs server ops)</span>
+    <span class="token-keyword">const</span> conflicts = <span class="token-keyword">this</span>.detectConflicts(<span class="token-keyword">this</span>.offlineQueue, serverChanges);
+
+    <span class="token-comment">// Step 3: Resolve conflicts based on strategy</span>
+    <span class="token-keyword">const</span> resolved = <span class="token-keyword">this</span>.resolveConflicts(conflicts);
+
+    <span class="token-comment">// Step 4: Apply server changes + resolved conflicts locally</span>
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> change <span class="token-keyword">of</span> serverChanges) {
+      <span class="token-keyword">if</span> (!resolved.overriddenByLocal.has(change.id)) {
+        <span class="token-keyword">this</span>.store.apply(change);
+      }
+    }
+
+    <span class="token-comment">// Step 5: Push our non-conflicting offline ops to server</span>
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> op <span class="token-keyword">of</span> resolved.toSubmit) {
+      <span class="token-keyword">await this</span>.api.submit(op);
+    }
+
+    <span class="token-keyword">this</span>.offlineQueue = [];
+    <span class="token-keyword">this</span>.lastSyncVersion = serverChanges.at(-1)?.version || <span class="token-keyword">this</span>.lastSyncVersion;
+  }
+
+  <span class="token-function">detectConflicts</span>(localOps, serverOps) {
+    <span class="token-keyword">const</span> conflicts = [];
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> localOp <span class="token-keyword">of</span> localOps) {
+      <span class="token-keyword">for</span> (<span class="token-keyword">const</span> serverOp <span class="token-keyword">of</span> serverOps) {
+        <span class="token-comment">// Conflict = same entity modified by both sides</span>
+        <span class="token-keyword">if</span> (localOp.entityId === serverOp.entityId) {
+          conflicts.push({ local: localOp, server: serverOp });
+        }
+      }
+    }
+    <span class="token-keyword">return</span> conflicts;
+  }
+
+  <span class="token-function">resolveConflicts</span>(conflicts) {
+    <span class="token-keyword">switch</span> (<span class="token-keyword">this</span>.strategy) {
+      <span class="token-keyword">case</span> <span class="token-string">'server-wins'</span>:
+        <span class="token-comment">// Discard all conflicting local ops</span>
+        <span class="token-keyword">return</span> { toSubmit: [], overriddenByLocal: <span class="token-keyword">new</span> Set() };
+
+      <span class="token-keyword">case</span> <span class="token-string">'client-wins'</span>:
+        <span class="token-comment">// Local ops override — submit them to server</span>
+        <span class="token-keyword">return</span> {
+          toSubmit: conflicts.map(c => c.local),
+          overriddenByLocal: <span class="token-keyword">new</span> Set(conflicts.map(c => c.server.id))
+        };
+
+      <span class="token-keyword">case</span> <span class="token-string">'manual'</span>:
+        <span class="token-comment">// Show conflict UI — let user choose</span>
+        <span class="token-keyword">this</span>.showConflictUI(conflicts);
+        <span class="token-keyword">return</span> { toSubmit: [], overriddenByLocal: <span class="token-keyword">new</span> Set() };
+
+      <span class="token-keyword">case</span> <span class="token-string">'field-level-merge'</span>:
+        <span class="token-comment">// Merge at field level — non-conflicting fields auto-merge</span>
+        <span class="token-keyword">return this</span>.fieldLevelMerge(conflicts);
+    }
+  }
+}
+</code></pre>
+
+            <h2>Trade-offs & Alternatives</h2>
+            <table>
+                <thead><tr><th>Strategy</th><th>Strengths</th><th>Weaknesses</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Last-Write-Wins</td>
+                        <td>Simplest; always converges; no user input needed</td>
+                        <td>Silent data loss; clock skew issues; no merge semantics</td>
+                    </tr>
+                    <tr>
+                        <td>Three-Way Merge</td>
+                        <td>Preserves non-conflicting changes; familiar (Git-like)</td>
+                        <td>Needs common ancestor; true conflicts need manual resolution</td>
+                    </tr>
+                    <tr>
+                        <td>Operational Transform</td>
+                        <td>Fine-grained merging; handles concurrent edits well</td>
+                        <td>Complex transform functions; server ordering required; hard to debug</td>
+                    </tr>
+                    <tr>
+                        <td>CRDTs</td>
+                        <td>Conflict-free by design; no coordination needed; works P2P</td>
+                        <td>Limited data types; tombstone growth; can't express all operations</td>
+                    </tr>
+                    <tr>
+                        <td>Manual Resolution UI</td>
+                        <td>User always in control; best for high-stakes data</td>
+                        <td>Interrupts workflow; requires UI design; user may not understand</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Assuming "server wins" is always safe</strong> — If a user spent 30 minutes editing offline and reconnects to find all their work discarded, they'll never trust your app again. At minimum, preserve discarded changes somewhere recoverable.</li>
+                <li><strong>Not persisting the offline queue</strong> — If the user closes the tab while offline, their pending mutations must survive in IndexedDB. In-memory queues lose data on page refresh.</li>
+                <li><strong>Ignoring the base version</strong> — Without knowing what version both sides diverged from, you can't distinguish "Alice changed X" from "Alice left X unchanged." The base/ancestor is essential for three-way merge.</li>
+                <li><strong>Merging at document level instead of field level</strong> — If Alice edits the title and Bob edits the body, a document-level merge sees a conflict. A field-level merge resolves cleanly: take Alice's title + Bob's body.</li>
+                <li><strong>Not testing the offline→online transition</strong> — Most sync bugs appear in the reconnection flow. Test with: close WiFi → make changes → make changes on another device → restore WiFi. Automate this in CI with network throttling.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Offline Conflict Resolution When...</h3>
+                <p>You can identify WHICH conflict strategy is appropriate for each field in your data model (LWW for user preferences, OT for text editing, CRDTs for counters, manual resolution for financial data) and implement a sync engine that handles all of these within a single application.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a shared shopping list app. Both users can add, remove, check-off, and reorder items. Implement offline support where: (1) changes are stored in IndexedDB, (2) on reconnect, a three-way merge resolves non-conflicting edits, (3) conflicting edits (same item changed differently) show a resolution UI, and (4) the sync engine handles the case where one user deletes an item the other user edited.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Offline Conflict Resolution connects to: <strong>CRDT Basics</strong> (CRDTs are the "conflict-free" answer to this problem), <strong>Event Sourcing</strong> (operations-based sync is event sourcing distributed across clients), and <strong>Optimistic UI Rollback</strong> (offline apps are inherently optimistic — every local change assumes it will be accepted).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="66-optimistic-ui-rollback.html" class="nav-btn nav-btn-prev">← Optimistic UI Rollback Strategy</a>
+                <a href="68-crdt-basics.html" class="nav-btn nav-btn-next">CRDT Basics for Collaboration →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

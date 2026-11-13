@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cumulative Layout Shift (CLS) - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (INP)</a></li>
+            <li class="active"><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Cumulative Layout Shift (CLS)
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Cumulative Layout Shift (CLS)</h1>
+                <p class="subtitle">The Core Web Vital that quantifies visual instability — measuring how much visible content unexpectedly moves during a page's lifetime, causing users to click the wrong button or lose their reading position.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-performance">Core Web Vital</span>
+                    <span class="tag tag-ux">Visual Stability</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📰 Analogy: Reading a Newspaper on a Windy Day</div>
+                <p>Imagine reading a newspaper where paragraphs randomly shift position as ads load in. You're about to tap "Cancel" but the page jumps and you hit "Confirm Order" instead. CLS measures this chaos — the total area of content that moved multiplied by how far it moved.</p>
+            </div>
+
+            <h2>The Problem: Unexpected Layout Shifts</h2>
+<pre><code><span class="token-comment">// Common scenarios that cause layout shifts:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 1. Image without dimensions loads → pushes content down</span>
+<span class="token-comment">// 2. Ad banner injects above the fold → content jumps</span>
+<span class="token-comment">// 3. Web font loads → text reflows (FOUT)</span>
+<span class="token-comment">// 4. Dynamic content inserted above viewport → reading position lost</span>
+<span class="token-comment">// 5. Cookie consent banner pushes page content</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Real user impact:</span>
+<span class="token-comment">// - Misclicks (tapped wrong button after shift)</span>
+<span class="token-comment">// - Lost reading position (scrolled back to find paragraph)</span>
+<span class="token-comment">// - Rage quits (form resets after accidental navigation)</span>
+</code></pre>
+
+            <h2>How CLS Is Calculated</h2>
+<pre><code><span class="token-comment">// CLS formula per layout shift:</span>
+<span class="token-comment">// layout shift score = impact fraction × distance fraction</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// impact fraction = (area of viewport affected by shift) / (total viewport area)</span>
+<span class="token-comment">// distance fraction = (max distance any element moved) / (viewport height or width)</span>
+
+<span class="token-comment">// Example: A 200px tall element at top of a 800px viewport shifts down by 100px</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Impact fraction: element was in 200px area, now occupies 200px area 100px lower</span>
+<span class="token-comment">//                  Union of old + new position = 300px of viewport height</span>
+<span class="token-comment">//                  Impact = 300/800 = 0.375</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Distance fraction: moved 100px in 800px viewport = 0.125</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Shift score: 0.375 × 0.125 = 0.047</span>
+
+<span class="token-comment">// CLS is NOT the sum of all shift scores!</span>
+<span class="token-comment">// It uses a "session window" approach:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Session window rules:</span>
+<span class="token-comment">// - Max 1 second gap between shifts in same window</span>
+<span class="token-comment">// - Max 5 seconds total window duration</span>
+<span class="token-comment">// - CLS = the LARGEST session window value</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// This prevents long-lived SPAs from accumulating infinite CLS</span>
+
+<span class="token-comment">// Google thresholds:</span>
+<span class="token-comment">// Good: ≤0.1 | Needs Improvement: 0.1-0.25 | Poor: >0.25</span>
+</code></pre>
+
+            <h3>Measuring CLS with PerformanceObserver</h3>
+<pre><code><span class="token-keyword">let</span> clsValue = 0;
+<span class="token-keyword">let</span> clsEntries = [];
+<span class="token-keyword">let</span> sessionValue = 0;
+<span class="token-keyword">let</span> sessionEntries = [];
+
+<span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+        <span class="token-comment">// CRITICAL: Ignore shifts caused by user interaction</span>
+        <span class="token-comment">// hadRecentInput = user clicked/tapped/typed within 500ms</span>
+        <span class="token-keyword">if</span> (entry.hadRecentInput) <span class="token-keyword">continue</span>;
+
+        <span class="token-comment">// Session window logic</span>
+        <span class="token-keyword">const</span> firstSessionEntry = sessionEntries[0];
+        <span class="token-keyword">const</span> lastSessionEntry = sessionEntries[sessionEntries.length - 1];
+
+        <span class="token-keyword">if</span> (sessionValue &amp;&amp;
+            entry.startTime - lastSessionEntry.startTime &lt; 1000 &amp;&amp;
+            entry.startTime - firstSessionEntry.startTime &lt; 5000) {
+            <span class="token-comment">// Still in same session window</span>
+            sessionValue += entry.value;
+            sessionEntries.push(entry);
+        } <span class="token-keyword">else</span> {
+            <span class="token-comment">// New session window</span>
+            sessionValue = entry.value;
+            sessionEntries = [entry];
+        }
+
+        <span class="token-comment">// CLS = largest session window</span>
+        <span class="token-keyword">if</span> (sessionValue &gt; clsValue) {
+            clsValue = sessionValue;
+            clsEntries = [...sessionEntries];
+        }
+    }
+});
+
+observer.observe({ type: <span class="token-string">'layout-shift'</span>, buffered: <span class="token-keyword">true</span> });
+
+<span class="token-comment">// Debug: identify WHAT shifted</span>
+document.addEventListener(<span class="token-string">'visibilitychange'</span>, () =&gt; {
+    <span class="token-keyword">if</span> (document.visibilityState === <span class="token-string">'hidden'</span>) {
+        console.log(<span class="token-string">`CLS: ${clsValue}`</span>);
+        clsEntries.forEach(entry =&gt; {
+            <span class="token-comment">// entry.sources tells you WHICH elements moved</span>
+            entry.sources?.forEach(source =&gt; {
+                console.log(<span class="token-string">'Shifted element:'</span>, source.node);
+                console.log(<span class="token-string">'Previous rect:'</span>, source.previousRect);
+                console.log(<span class="token-string">'Current rect:'</span>, source.currentRect);
+            });
+        });
+    }
+});
+</code></pre>
+
+            <h2>Common Causes and Fixes</h2>
+<pre><code><span class="token-comment">// CAUSE 1: Images without width/height attributes</span>
+<span class="token-comment">// Browser can't reserve space before image loads → shift when it appears</span>
+
+<span class="token-comment">// BAD:</span>
+&lt;img src=<span class="token-string">"hero.jpg"</span> alt=<span class="token-string">"Hero"</span>&gt;
+
+<span class="token-comment">// GOOD: Always specify dimensions (browser calculates aspect ratio)</span>
+&lt;img src=<span class="token-string">"hero.jpg"</span> alt=<span class="token-string">"Hero"</span> width=<span class="token-string">"1200"</span> height=<span class="token-string">"600"</span>&gt;
+
+<span class="token-comment">// ALSO GOOD: Use aspect-ratio in CSS</span>
+<span class="token-comment">// .hero-img { aspect-ratio: 2/1; width: 100%; }</span>
+
+
+<span class="token-comment">// CAUSE 2: Ads/embeds without reserved space</span>
+
+<span class="token-comment">// BAD: Ad container collapses to 0 until ad loads</span>
+&lt;div id=<span class="token-string">"ad-slot"</span>&gt;&lt;/div&gt;
+
+<span class="token-comment">// GOOD: Reserve minimum space even if ad doesn't fill it</span>
+&lt;div id=<span class="token-string">"ad-slot"</span> style=<span class="token-string">"min-height: 250px;"</span>&gt;&lt;/div&gt;
+
+<span class="token-comment">// BEST: Use contain-intrinsic-size with content-visibility</span>
+<span class="token-comment">// .ad-slot { content-visibility: auto; contain-intrinsic-size: 0 250px; }</span>
+
+
+<span class="token-comment">// CAUSE 3: Web fonts causing text reflow (FOUT/FOIT)</span>
+
+<span class="token-comment">// BAD: System font renders, then swaps to web font → layout shift</span>
+@font-face { font-family: <span class="token-string">'Brand'</span>; src: url(<span class="token-string">'brand.woff2'</span>); }
+
+<span class="token-comment">// GOOD: Use font-display: optional (no swap, no shift)</span>
+@font-face {
+    font-family: <span class="token-string">'Brand'</span>;
+    src: url(<span class="token-string">'brand.woff2'</span>) format(<span class="token-string">'woff2'</span>);
+    font-display: optional; <span class="token-comment">// Use cached font or skip entirely</span>
+}
+
+<span class="token-comment">// ALSO: Preload critical fonts to reduce swap window</span>
+&lt;link rel=<span class="token-string">"preload"</span> href=<span class="token-string">"brand.woff2"</span> as=<span class="token-string">"font"</span> type=<span class="token-string">"font/woff2"</span> crossorigin&gt;
+
+<span class="token-comment">// ALSO: Use size-adjust to match fallback metrics to web font</span>
+@font-face {
+    font-family: <span class="token-string">'Brand-Fallback'</span>;
+    src: local(<span class="token-string">'Arial'</span>);
+    size-adjust: 105%;   <span class="token-comment">// Make Arial take same space as Brand font</span>
+    ascent-override: 95%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+}
+
+
+<span class="token-comment">// CAUSE 4: Dynamic content injected above viewport</span>
+
+<span class="token-comment">// BAD: Banner inserted at top pushes everything down</span>
+document.body.insertBefore(banner, document.body.firstChild);
+
+<span class="token-comment">// GOOD: Use CSS transform instead (doesn't cause layout shift)</span>
+banner.style.transform = <span class="token-string">'translateY(-100%)'</span>;
+document.body.insertBefore(banner, document.body.firstChild);
+requestAnimationFrame(() =&gt; {
+    banner.style.transition = <span class="token-string">'transform 0.3s'</span>;
+    banner.style.transform = <span class="token-string">'translateY(0)'</span>;
+});
+
+<span class="token-comment">// GOOD: Use overlay/fixed positioning (doesn't shift content)</span>
+<span class="token-comment">// .notification-banner { position: fixed; top: 0; z-index: 1000; }</span>
+</code></pre>
+
+            <h2>Advanced: CLS Debugging Overlay</h2>
+<pre><code><span class="token-comment">// Visual debugging tool: highlights elements that shift</span>
+<span class="token-keyword">function</span> <span class="token-function">enableCLSDebugging</span>() {
+    <span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+        <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> list.getEntries()) {
+            <span class="token-keyword">if</span> (entry.hadRecentInput) <span class="token-keyword">continue</span>;
+            <span class="token-keyword">if</span> (entry.value &lt; 0.001) <span class="token-keyword">continue</span>; <span class="token-comment">// Skip negligible shifts</span>
+
+            entry.sources?.forEach(source =&gt; {
+                <span class="token-keyword">if</span> (!source.node) <span class="token-keyword">return</span>;
+                
+                <span class="token-comment">// Flash red border on shifted element</span>
+                <span class="token-keyword">const</span> el = source.node;
+                el.style.outline = <span class="token-string">'3px solid red'</span>;
+                el.style.outlineOffset = <span class="token-string">'-3px'</span>;
+                
+                <span class="token-comment">// Show shift info as tooltip</span>
+                el.title = [
+                    <span class="token-string">`Shift score: ${entry.value.toFixed(4)}`</span>,
+                    <span class="token-string">`From: ${JSON.stringify(source.previousRect)}`</span>,
+                    <span class="token-string">`To: ${JSON.stringify(source.currentRect)}`</span>
+                ].join(<span class="token-string">'\n'</span>);
+                
+                <span class="token-comment">// Clear after 2 seconds</span>
+                setTimeout(() =&gt; {
+                    el.style.outline = <span class="token-string">''</span>;
+                    el.title = <span class="token-string">''</span>;
+                }, 2000);
+            });
+        }
+    });
+    
+    observer.observe({ type: <span class="token-string">'layout-shift'</span>, buffered: <span class="token-keyword">false</span> });
+    <span class="token-keyword">return</span> observer; <span class="token-comment">// Call .disconnect() to stop</span>
+}
+</code></pre>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Google Search Ranking</strong> — CLS is one of three Core Web Vitals affecting page experience ranking signal.</li>
+                <li><strong>The Guardian</strong> — Reduced CLS from 0.25 to 0.05 by reserving ad slots and preloading fonts, resulting in measurable engagement increases.</li>
+                <li><strong>Smashing Magazine</strong> — Uses <code>aspect-ratio</code> on all images and <code>font-display: optional</code> to maintain near-zero CLS.</li>
+                <li><strong>YouTube</strong> — Reserves exact skeleton dimensions for video thumbnails, titles, and channel info to prevent shifts during lazy loading.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Testing CLS only on fast connections</strong> — Slow networks have longer load waterfalls, meaning more opportunities for late-loading content to cause shifts.</li>
+                <li><strong>Ignoring SPA route transitions</strong> — Client-side navigation in SPAs can cause layout shifts that accumulate into CLS (session windows still apply).</li>
+                <li><strong>Using <code>font-display: swap</code> without size-adjust</strong> — Swap guarantees text is visible early but causes shift when the real font loads if metrics differ.</li>
+                <li><strong>Thinking transforms are free</strong> — Transforms don't cause layout shifts, but they also don't reserve space. Other content won't reflow around a transformed element.</li>
+                <li><strong>Not accounting for responsive images</strong> — An image that's 1200x600 on desktop but fluid on mobile needs both width/height AND CSS to maintain aspect ratio.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand CLS When...</h3>
+                <p>You can look at a layout-shift PerformanceEntry, calculate its impact fraction and distance fraction manually, explain why the session window approach exists (for SPAs), and identify whether a shift was caused by late-loading content, font swap, or dynamic injection — then fix each one differently.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a page that intentionally has CLS > 0.5 (images without dimensions, injected banners, font swaps). Then fix it to CLS < 0.05 without removing any content. Verify using the CLS debugging overlay above.</p>
+                <h3>🔗 Connect It</h3>
+                <p>CLS connects to: <strong>Critical Rendering Path</strong> (resource load order causes shifts), <strong>Preload vs Prefetch</strong> (preloading fonts reduces font-swap shifts), and <strong>CSS Containment</strong> (contain: layout limits shift propagation).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="79-interaction-next-paint.html" class="nav-btn nav-btn-prev">← Interaction to Next Paint (INP)</a>
+                <a href="81-largest-contentful-paint.html" class="nav-btn nav-btn-next">Largest Contentful Paint (LCP) →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

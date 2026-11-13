@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read-Write Locks - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Read-Write Locks</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Read-Write Locks</h1>
+                <p class="subtitle">Allow multiple readers simultaneously but only one writer at a time. Perfect when reads vastly outnumber writes (which is most systems!).</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-pattern">Pattern</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">A Library Reading Room</div>
+                <p>A library reading room with a special book:</p>
+<ul><li><strong>Many people can read</strong> the book simultaneously (readers don't conflict)</li>
+<li>But when someone needs to <strong>edit/update</strong> the book, everyone else must leave the room</li>
+<li>While the editor works, no readers are allowed in</li>
+<li>Once done editing, readers can come back in</li></ul>
+            </div>
+
+
+            <h2>Why Read-Write Locks?</h2>
+            <p>A regular mutex blocks everyone — even readers who could safely run together. Read-write locks (RWLock) exploit the fact that concurrent reads are safe.</p>
+
+            <table class="comparison-table">
+                <thead><tr><th>Scenario</th><th>Regular Lock</th><th>Read-Write Lock</th></tr></thead>
+                <tbody>
+                    <tr><td>5 readers, 0 writers</td><td>Sequential (slow)</td><td>All 5 simultaneous (fast!)</td></tr>
+                    <tr><td>1 writer working</td><td>Others wait</td><td>Others wait (same)</td></tr>
+                    <tr><td>95% reads, 5% writes</td><td>All sequential</td><td>95% concurrent!</td></tr>
+                </tbody>
+            </table>
+
+<pre><code><span class="token-keyword">import</span> threading
+<span class="token-keyword">import</span> time
+
+<span class="token-keyword">class</span> <span class="token-class">ReadWriteLock</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._readers = <span class="token-number">0</span>
+        self._lock = threading.Lock()
+        self._write_lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">acquire_read</span>(self):
+        <span class="token-keyword">with</span> self._lock:
+            self._readers += <span class="token-number">1</span>
+            <span class="token-keyword">if</span> self._readers == <span class="token-number">1</span>:
+                self._write_lock.acquire()  <span class="token-comment"># First reader blocks writers</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">release_read</span>(self):
+        <span class="token-keyword">with</span> self._lock:
+            self._readers -= <span class="token-number">1</span>
+            <span class="token-keyword">if</span> self._readers == <span class="token-number">0</span>:
+                self._write_lock.release()  <span class="token-comment"># Last reader unblocks writers</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">acquire_write</span>(self):
+        self._write_lock.acquire()
+
+    <span class="token-keyword">def</span> <span class="token-function">release_write</span>(self):
+        self._write_lock.release()
+
+<span class="token-comment"># Usage</span>
+rwlock = ReadWriteLock()
+cache = {<span class="token-string">"key"</span>: <span class="token-string">"value"</span>}
+
+<span class="token-keyword">def</span> <span class="token-function">reader</span>(name):
+    rwlock.acquire_read()
+    <span class="token-keyword">try</span>:
+        print(<span class="token-string">f"[{name}] Reading: {cache}"</span>)
+        time.sleep(<span class="token-number">0.5</span>)  <span class="token-comment"># Multiple readers here simultaneously!</span>
+    <span class="token-keyword">finally</span>:
+        rwlock.release_read()
+
+<span class="token-keyword">def</span> <span class="token-function">writer</span>(name, value):
+    rwlock.acquire_write()
+    <span class="token-keyword">try</span>:
+        cache[<span class="token-string">"key"</span>] = value
+        print(<span class="token-string">f"[{name}] Wrote: {value}"</span>)
+        time.sleep(<span class="token-number">0.2</span>)
+    <span class="token-keyword">finally</span>:
+        rwlock.release_write()</code></pre>
+
+            <h2>Reader vs Writer Priority</h2>
+            <div class="callout callout-warning">
+                <div class="callout-title">Starvation Risk!</div>
+                <p><strong>Reader-preferring</strong>: New readers keep entering → writer waits forever (writer starvation).<br>
+                <strong>Writer-preferring</strong>: Waiting writer blocks new readers → readers starve.<br>
+                <strong>Fair</strong>: Alternates between readers and writers (most complex).</p>
+            </div>
+
+            <div class="industry-box">
+                <h4>Industry Usage</h4>
+                <ul>
+                    <li><strong>Database query caches</strong> — Many SELECT queries (read) vs occasional UPDATE (write)</li>
+                    <li><strong>DNS caches</strong> — Millions of lookups (read) vs rare record updates (write)</li>
+                    <li><strong>Configuration stores</strong> — Read constantly, update occasionally</li>
+                    <li><strong>Go sync.RWMutex</strong> — Built-in read-write lock, writer-preferring</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>RWLock: multiple simultaneous readers OR one exclusive writer</li>
+<li>Huge speedup when reads >> writes (90%+ reads = common case)</li>
+<li>Writer starvation: continuous readers can block writers forever</li>
+<li>Writer-preferring locks prevent writer starvation but may slow readers</li>
+<li>Python: no built-in RWLock (use third-party or implement yourself)</li>
+<li>Best for: caches, config stores, DNS, any read-heavy shared data</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">REGULAR LOCK:    R1 | R2 | R3 | W1 | R4 | R5    (all sequential)
+READ-WRITE LOCK: R1 R2 R3 | W1 | R4 R5 R6 R7   (readers overlap!)
+                  ^^^^^^^^       ^^^^^^^^^^^^^
+                  concurrent!    concurrent!
+
+RULE:
+    Readers: unlimited concurrent (they don't modify)
+    Writer:  exclusive access (must be alone)</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Using RWLock when writes are frequent</strong> — If writes are 50%, regular lock may be faster (less overhead).</li>
+<li><strong>Upgrading read to write</strong> — Cannot do: acquire_read() then acquire_write() = deadlock. Must release read first.</li>
+<li><strong>Not considering starvation</strong> — Reader-preferring locks can starve writers in read-heavy workloads.</li>
+<li><strong>Holding read lock too long</strong> — Long reads still block writers. Keep read sections short.</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Implement a ReadWriteLock. Test with 10 readers and 2 writers.</li>
+<li>Show writer starvation: continuous readers that prevent any writer from executing.</li>
+<li>Fix it with a writer-preferring variant.</li>
+<li>Benchmark: RWLock vs regular Lock with 95% reads / 5% writes. Show the speedup.</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="18-lock-free-wait-free.html" class="prev">Lock-Free Algorithms</a>
+                <a href="20-semaphore-latch-barrier.html" class="next">Semaphore/Latch/Barrier</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

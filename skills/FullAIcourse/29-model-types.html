@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Model Types — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 8</a> <span>›</span> All Model Types</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>All Model Types</h1>
+                <p>Not all AI models are the same. Base models, instruct models, chat models, code models, vision models, MoE models — each is designed for different jobs. Know which to pick and when.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Base model = a university graduate.</strong> They have broad knowledge but no job training. They might ramble or be unpredictable.</p>
+                <p><strong>Instruct model = a trained employee.</strong> They follow instructions clearly. "Write a summary" → they write a summary.</p>
+                <p><strong>Chat model = a customer service rep.</strong> They're conversational, polite, multi-turn, and helpful.</p>
+                <p><strong>Code model = a specialist programmer.</strong> They live and breathe code — autocomplete, debugging, and generation.</p>
+            </div>
+
+            <h2 id="types-overview">Model Types Explained</h2>
+
+            <table>
+                <thead><tr><th>Type</th><th>Training</th><th>Behavior</th><th>Use Case</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Base</strong></td><td>Pre-training only</td><td>Completes text (no instructions)</td><td>Fine-tuning starting point</td><td>Llama-3.1-8B, Mistral-7B</td></tr>
+                    <tr><td><strong>Instruct</strong></td><td>Base + SFT</td><td>Follows instructions</td><td>Single-turn tasks</td><td>Llama-3.1-8B-Instruct</td></tr>
+                    <tr><td><strong>Chat</strong></td><td>Base + SFT + RLHF/DPO</td><td>Multi-turn conversation</td><td>Chatbots, assistants</td><td>GPT-4o, Claude 3.5</td></tr>
+                    <tr><td><strong>Code</strong></td><td>Trained on code data</td><td>Code generation/completion</td><td>IDE copilots, code gen</td><td>CodeLlama, DeepSeek-Coder</td></tr>
+                    <tr><td><strong>Vision (VLM)</strong></td><td>Text + image training</td><td>Understands images + text</td><td>Image description, OCR</td><td>GPT-4o, LLaVA, Qwen-VL</td></tr>
+                    <tr><td><strong>Embedding</strong></td><td>Contrastive learning</td><td>Converts text → vectors</td><td>Search, RAG, similarity</td><td>all-MiniLM, text-embedding-3</td></tr>
+                    <tr><td><strong>MoE</strong></td><td>Multiple expert sub-networks</td><td>Activates subset per token</td><td>High quality, lower cost</td><td>Mixtral, DeepSeek-V3</td></tr>
+                    <tr><td><strong>Multimodal</strong></td><td>Text + image + audio + video</td><td>Handles multiple modalities</td><td>Universal assistants</td><td>GPT-4o, Gemini 2.0</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="base-vs-instruct">Base vs Instruct — The Key Difference</h2>
+
+            <pre><code><span class="token-comment"># Base model: just completes text (unpredictable for instructions)</span>
+<span class="token-comment"># Input: "Write a Python function to sort a list"</span>
+<span class="token-comment"># Base output: "of numbers. The function should take a list as input..."</span>
+<span class="token-comment"># (It continues the text, doesn't follow the instruction!)</span>
+
+<span class="token-comment"># Instruct model: follows instructions properly</span>
+<span class="token-comment"># Input: "Write a Python function to sort a list"</span>
+<span class="token-comment"># Instruct output: "def sort_list(lst): return sorted(lst)"</span>
+
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+
+<span class="token-comment"># This works great with instruct/chat models</span>
+response = client.chat.completions.create(
+    model=<span class="token-string">"llama3.1:8b"</span>,  <span class="token-comment"># This is the instruct version</span>
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Write a Python function to sort a list"</span>}],
+)
+<span class="token-builtin">print</span>(response.choices[<span class="token-number">0</span>].message.content)
+
+<span class="token-comment"># When to use BASE models:</span>
+<span class="token-comment"># 1. As starting point for YOUR fine-tuning (SFT/DPO)</span>
+<span class="token-comment"># 2. Creative text generation (novels, roleplay)</span>
+<span class="token-comment"># 3. When you want to control behavior entirely through fine-tuning</span></code></pre>
+
+            <h2 id="moe">Mixture of Experts (MoE)</h2>
+
+            <div class="mental-model">
+                <h4>🧠 MoE Mental Model</h4>
+                <pre><code>Traditional model: Every token goes through ALL 70B parameters
+    → Slow, expensive
+
+MoE model (e.g., Mixtral 8x7B):
+    Total params: 47B (8 experts × ~7B each, shared layers)
+    Active params per token: ~13B (only 2 experts activated)
+    
+    Token → Router → "This is a code token"
+                   → Activates Expert 3 (code specialist)
+                   → Activates Expert 7 (logic specialist)
+                   → Other 6 experts sleep 💤
+
+Result: Quality of 70B model, speed of 13B model!</code></pre>
+            </div>
+
+            <pre><code><span class="token-comment"># MoE models in practice — same API, just different characteristics</span>
+
+<span class="token-comment"># Mixtral 8x7B: 47B total params, ~13B active</span>
+<span class="token-comment"># Quality ≈ Llama-2-70B, Speed ≈ Llama-2-13B</span>
+
+<span class="token-comment"># DeepSeek-V3: 671B total params, ~37B active per token</span>
+<span class="token-comment"># One of the best open models, runs efficiently despite huge size</span>
+
+<span class="token-comment"># Using MoE models via Ollama</span>
+response = client.chat.completions.create(
+    model=<span class="token-string">"mixtral:8x7b"</span>,  <span class="token-comment"># MoE model</span>
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Explain quantum computing in 3 sentences"</span>}],
+)
+
+<span class="token-comment"># MoE pros: Better quality-to-speed ratio</span>
+<span class="token-comment"># MoE cons: Higher VRAM (all experts loaded), less efficient for batching</span></code></pre>
+
+            <h2 id="vision">Vision Language Models (VLMs)</h2>
+
+            <pre><code><span class="token-comment"># Using vision models to understand images</span>
+<span class="token-keyword">import</span> base64
+
+<span class="token-keyword">def</span> <span class="token-function">describe_image</span>(image_path: str) -> str:
+    <span class="token-string">"""Use a vision model to describe an image."""</span>
+    <span class="token-comment"># Encode image to base64</span>
+    <span class="token-keyword">with</span> <span class="token-builtin">open</span>(image_path, <span class="token-string">"rb"</span>) <span class="token-keyword">as</span> f:
+        image_data = base64.b64encode(f.read()).decode(<span class="token-string">"utf-8"</span>)
+    
+    <span class="token-comment"># OpenAI-compatible vision API</span>
+    response = client.chat.completions.create(
+        model=<span class="token-string">"llava:7b"</span>,  <span class="token-comment"># or "gpt-4o" for OpenAI</span>
+        messages=[{
+            <span class="token-string">"role"</span>: <span class="token-string">"user"</span>,
+            <span class="token-string">"content"</span>: [
+                {<span class="token-string">"type"</span>: <span class="token-string">"text"</span>, <span class="token-string">"text"</span>: <span class="token-string">"Describe what you see in this image."</span>},
+                {<span class="token-string">"type"</span>: <span class="token-string">"image_url"</span>, <span class="token-string">"image_url"</span>: {
+                    <span class="token-string">"url"</span>: <span class="token-string">f"data:image/jpeg;base64,{image_data}"</span>
+                }}
+            ]
+        }],
+    )
+    <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.content
+
+<span class="token-comment"># Use cases for vision models:</span>
+<span class="token-comment"># 1. Image description (alt text, captions)</span>
+<span class="token-comment"># 2. Document OCR (read text from images/PDFs)</span>
+<span class="token-comment"># 3. UI understanding (browser agents)</span>
+<span class="token-comment"># 4. Chart/diagram analysis</span>
+<span class="token-comment"># 5. Visual Q&A ("What color is the car?")</span></code></pre>
+
+            <h2 id="choosing">Choosing the Right Model</h2>
+
+            <table>
+                <thead><tr><th>Task</th><th>Best Model Type</th><th>Recommended Models (2025)</th></tr></thead>
+                <tbody>
+                    <tr><td>General chat/assistant</td><td>Chat model</td><td>GPT-4o, Claude 3.5 Sonnet, Llama 3.1 70B</td></tr>
+                    <tr><td>Code generation</td><td>Code model</td><td>Claude 3.5, DeepSeek-Coder-V2, Qwen2.5-Coder</td></tr>
+                    <tr><td>Image understanding</td><td>Vision model</td><td>GPT-4o, Claude 3.5, LLaVA, Qwen-VL</td></tr>
+                    <tr><td>RAG / search</td><td>Embedding model</td><td>text-embedding-3-large, all-MiniLM, nomic-embed</td></tr>
+                    <tr><td>Fine-tuning (custom)</td><td>Base model</td><td>Llama-3.1-8B, Mistral-7B, Qwen2.5-7B</td></tr>
+                    <tr><td>Classification</td><td>Small instruct</td><td>Llama-3.1-8B-Instruct, Phi-3.5</td></tr>
+                    <tr><td>Translation</td><td>Multilingual model</td><td>Qwen2.5, NLLB, Aya</td></tr>
+                    <tr><td>Reasoning/math</td><td>Reasoning model</td><td>o1, DeepSeek-R1, Qwen-QwQ</td></tr>
+                    <tr><td>Cheap & fast</td><td>Small MoE or distilled</td><td>Mixtral, Phi-3.5, Gemma-2</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Start with instruct models</strong> — 99% of applications use instruct/chat variants, not base models.</li>
+                    <li><strong>MoE is the future</strong> — Mixtral, DeepSeek-V3 prove MoE gives best quality/cost ratio.</li>
+                    <li><strong>Model size rule of thumb</strong> — 7B for simple tasks, 13-34B for complex reasoning, 70B+ for frontier quality.</li>
+                    <li><strong>Embedding models are separate</strong> — Never use chat models for embeddings. Use dedicated embedding models.</li>
+                    <li><strong>Reasoning models (o1, R1)</strong> — New category that "thinks longer" for complex problems. Higher cost but better accuracy.</li>
+                    <li><strong>Multimodal is standard now</strong> — GPT-4o, Claude 3.5, Gemini all handle text + images natively.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Base</strong>: raw pre-trained, for fine-tuning. <strong>Instruct</strong>: follows commands. <strong>Chat</strong>: conversational.</li>
+                    <li><strong>Code models</strong>: specialized for programming. <strong>Vision</strong>: understands images.</li>
+                    <li><strong>MoE</strong>: multiple experts, only some activate per token (fast + smart).</li>
+                    <li><strong>Embedding</strong>: text → vector for search/RAG (separate from chat models).</li>
+                    <li><strong>Reasoning</strong>: new category that "thinks step by step" internally (o1, R1).</li>
+                    <li>Pick based on task: chat for assistants, code for programming, base for fine-tuning.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Explore Model Types</h4>
+                <ol>
+                    <li>Try the same prompt on a base model vs instruct model — observe the difference</li>
+                    <li>Use a vision model (LLaVA via Ollama) to describe 3 different images</li>
+                    <li>Compare Mixtral (MoE) vs Llama-3.1-8B speed and quality on 5 prompts</li>
+                    <li>Generate embeddings with sentence-transformers and measure similarity</li>
+                    <li>Build a model router that picks the right model based on the task</li>
+                    <li><strong>Bonus:</strong> Fine-tune a base model into an instruct model using TRL SFT</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="28-browser-agents.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Browser Agents</span>
+                </a>
+                <a href="30-deployment.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Deployment & Serving</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

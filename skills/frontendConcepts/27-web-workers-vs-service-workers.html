@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Workers vs Service Workers - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Web Workers vs Service Workers
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Web Workers vs Service Workers</h1>
+                <p class="subtitle">Two fundamentally different threading models in the browser — one for parallel computation, the other for network interception. Same "worker" name, completely different purposes and lifecycles.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Threading</span>
+                    <span class="tag tag-browser">Browser API</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏭 Daily-Life Analogy: Kitchen Staff vs Security Guard</div>
+                <p>A <strong>Web Worker</strong> is like a kitchen assistant — you hand them a task (chop vegetables, calculate tax), they do it in the back room without blocking the front counter (main thread), and hand you back the result. Hire as many as you need, fire them when done.</p>
+                <p>A <strong>Service Worker</strong> is like a security guard at the building entrance — they intercept every delivery (network request) and decide: deliver from the vault (cache), order fresh from the supplier (network), or reject it entirely. They persist even when the store is closed (page not open).</p>
+            </div>
+
+            <h2>The Core Difference</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Feature</th><th>Web Worker</th><th>Service Worker</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Purpose</strong></td><td>Parallel computation (offload CPU work)</td><td>Network proxy + offline + push notifications</td></tr>
+                    <tr><td><strong>Lifetime</strong></td><td>Lives as long as the page or until terminated</td><td>Persists across page loads (event-driven lifecycle)</td></tr>
+                    <tr><td><strong>Scope</strong></td><td>Tied to one page/tab</td><td>Controls all pages under its scope</td></tr>
+                    <tr><td><strong>DOM access</strong></td><td>❌ No</td><td>❌ No</td></tr>
+                    <tr><td><strong>Network intercept</strong></td><td>❌ No</td><td>✅ Yes (fetch event)</td></tr>
+                    <tr><td><strong>Multiple instances</strong></td><td>✅ Yes (spawn many)</td><td>❌ One per scope</td></tr>
+                    <tr><td><strong>HTTPS required</strong></td><td>❌ No (works on HTTP)</td><td>✅ Yes (security requirement)</td></tr>
+                    <tr><td><strong>Can wake without page</strong></td><td>❌ No</td><td>✅ Yes (push events, sync events)</td></tr>
+                    <tr><td><strong>SharedArrayBuffer</strong></td><td>✅ Yes</td><td>❌ No</td></tr>
+                    <tr><td><strong>Typical use case</strong></td><td>Image processing, crypto, parsing</td><td>Caching, offline, background sync</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Web Worker: Parallel Computation</h2>
+<pre><code><span class="token-comment">// main.js — Offload expensive work to avoid blocking UI</span>
+<span class="token-keyword">const</span> worker = <span class="token-keyword">new</span> Worker(<span class="token-string">'heavy-computation.js'</span>);
+
+<span class="token-comment">// Communication is via message passing (structured clone algorithm)</span>
+<span class="token-comment">// Data is COPIED, not shared (unless using SharedArrayBuffer)</span>
+worker.postMessage({
+    type: <span class="token-string">'PROCESS_IMAGE'</span>,
+    pixels: imageData,  <span class="token-comment">// This gets copied — expensive for large data!</span>
+});
+
+worker.onmessage = (event) => {
+    <span class="token-keyword">const</span> { type, result } = event.data;
+    <span class="token-keyword">if</span> (type === <span class="token-string">'RESULT'</span>) {
+        renderProcessedImage(result);
+    }
+};
+
+<span class="token-comment">// Terminate when done — frees the OS thread</span>
+worker.terminate();
+</code></pre>
+
+<pre><code><span class="token-comment">// heavy-computation.js — Runs on a separate OS thread</span>
+<span class="token-comment">// Has NO access to: document, window, DOM, localStorage</span>
+<span class="token-comment">// HAS access to: fetch, IndexedDB, WebSocket, crypto, timers</span>
+
+self.onmessage = (event) => {
+    <span class="token-keyword">const</span> { type, pixels } = event.data;
+    
+    <span class="token-keyword">if</span> (type === <span class="token-string">'PROCESS_IMAGE'</span>) {
+        <span class="token-comment">// Heavy computation happens here — doesn't block main thread</span>
+        <span class="token-keyword">const</span> processed = applyGaussianBlur(pixels, 5);
+        
+        <span class="token-comment">// Send result back — also copied unless using Transferable</span>
+        self.postMessage({ type: <span class="token-string">'RESULT'</span>, result: processed });
+    }
+};
+
+<span class="token-keyword">function</span> <span class="token-function">applyGaussianBlur</span>(pixels, radius) {
+    <span class="token-comment">// CPU-intensive operation that would freeze UI if on main thread</span>
+    <span class="token-comment">// ... matrix convolution over every pixel ...</span>
+    <span class="token-keyword">return</span> blurredPixels;
+}
+</code></pre>
+
+            <h2>Service Worker: Network Proxy</h2>
+<pre><code><span class="token-comment">// Register the service worker (from your main page)</span>
+<span class="token-keyword">if</span> (<span class="token-string">'serviceWorker'</span> <span class="token-keyword">in</span> navigator) {
+    navigator.serviceWorker.register(<span class="token-string">'/sw.js'</span>, {
+        scope: <span class="token-string">'/'</span>  <span class="token-comment">// Controls all pages under this path</span>
+    });
+}
+</code></pre>
+
+<pre><code><span class="token-comment">// sw.js — The Service Worker (a network-level proxy)</span>
+
+<span class="token-comment">// INSTALL: Cache critical assets (runs once when SW is first registered)</span>
+self.addEventListener(<span class="token-string">'install'</span>, (event) => {
+    event.waitUntil(
+        caches.open(<span class="token-string">'v1'</span>).then(cache => 
+            cache.addAll([<span class="token-string">'/'</span>, <span class="token-string">'/app.js'</span>, <span class="token-string">'/styles.css'</span>])
+        )
+    );
+});
+
+<span class="token-comment">// FETCH: Intercept EVERY network request from controlled pages</span>
+self.addEventListener(<span class="token-string">'fetch'</span>, (event) => {
+    event.respondWith(
+        caches.match(event.request).then(cached => {
+            <span class="token-comment">// Return cached version if available, otherwise fetch from network</span>
+            <span class="token-keyword">return</span> cached || fetch(event.request);
+        })
+    );
+});
+
+<span class="token-comment">// PUSH: Can receive push notifications even when all tabs are closed</span>
+self.addEventListener(<span class="token-string">'push'</span>, (event) => {
+    <span class="token-keyword">const</span> data = event.data.json();
+    event.waitUntil(
+        self.registration.showNotification(data.title, { body: data.body })
+    );
+});
+</code></pre>
+
+            <h2>When to Use Which</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Scenario</th><th>Use</th><th>Why</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>JSON parsing of 10MB file</td><td>Web Worker</td><td>CPU work — don't block UI</td></tr>
+                    <tr><td>Offline-first app</td><td>Service Worker</td><td>Intercepts fetch, serves from cache</td></tr>
+                    <tr><td>Real-time video filters</td><td>Web Worker + OffscreenCanvas</td><td>Per-frame computation off main thread</td></tr>
+                    <tr><td>Background data sync</td><td>Service Worker</td><td>Runs even when tab is closed</td></tr>
+                    <tr><td>WebAssembly computation</td><td>Web Worker</td><td>Long-running Wasm execution</td></tr>
+                    <tr><td>Push notifications</td><td>Service Worker</td><td>Only SW can handle push events</td></tr>
+                    <tr><td>Spell-checking large document</td><td>Web Worker</td><td>CPU-bound, per-page scope</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Figma</strong> — Uses Web Workers for rendering engine computations (vector math, layout algorithms) while the main thread handles UI interactions.</li>
+                <li><strong>Google Docs</strong> — Service Worker provides offline editing; Web Workers handle spell-checking and autosave conflict resolution.</li>
+                <li><strong>Squoosh (Google)</strong> — Web Workers run image codec WASM modules (mozjpeg, webp) without freezing the UI during compression.</li>
+                <li><strong>Twitter/X</strong> — Service Worker caches the app shell and timeline data for instant re-opens.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Using Service Worker for computation</strong> — Service Workers are event-driven and can be terminated by the browser when idle. Don't run long computations there.</li>
+                <li><strong>Forgetting postMessage serialization cost</strong> — Large objects sent to Web Workers are cloned (structured clone). For big ArrayBuffers, use Transferable objects instead.</li>
+                <li><strong>Not handling Service Worker updates</strong> — A new SW version sits in "waiting" state until all tabs close. Users get stale code indefinitely without proper update flow.</li>
+                <li><strong>Trying to access DOM from workers</strong> — Neither worker type has DOM access. Use postMessage to send data back to main thread for DOM updates.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Web Workers vs Service Workers When...</h3>
+                <p>You can explain why you'd use a Web Worker to parse a 50MB CSV file but a Service Worker to cache API responses — and why the reverse would be wrong in each case.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build both: (1) A Web Worker that sorts 1 million numbers and posts the result back, with a progress callback showing percentage. (2) A Service Worker that implements stale-while-revalidate caching for an API endpoint.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Workers connect to: <strong>SharedArrayBuffer</strong> (shared memory between workers), <strong>Transferable Objects</strong> (zero-copy data transfer), <strong>OffscreenCanvas</strong> (rendering in workers), and <strong>Service Worker Lifecycle Traps</strong> (the gotchas of SW updates).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="26-web-components-interop.html" class="nav-btn nav-btn-prev">← Web Components Interop</a>
+                <a href="28-sharedarraybuffer.html" class="nav-btn nav-btn-next">SharedArrayBuffer →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

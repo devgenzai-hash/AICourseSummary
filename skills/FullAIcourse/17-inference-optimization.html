@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inference Optimization — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 4</a> <span>›</span> Inference Optimization</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Inference Optimization</h1>
+                <p>How do companies serve millions of AI requests per second? Batching, speculative decoding, continuous batching, and more. The techniques that make production AI economically viable.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Batching = a bus vs a taxi.</strong> A taxi (single request) is fast for one person but expensive. A bus (batch) carries 50 people at once — each person's cost is 1/50th. The GPU is the vehicle; batching fills it up.</p>
+                <p><strong>Speculative decoding = writing with a pencil first.</strong> You quickly draft sentences in pencil (small model), then check them with a fine pen (big model). If the draft is right (usually is), you save time. If wrong, erase and redo just that part.</p>
+                <p><strong>Continuous batching = a conveyor belt sushi restaurant.</strong> New plates (requests) join the belt at any time, and finished plates leave whenever they're done. No waiting for everyone to finish together.</p>
+            </div>
+
+            <h2 id="batching">Batching Strategies</h2>
+
+            <h3>Static Batching (Simple):</h3>
+            <pre><code><span class="token-comment"># Static batching: Process multiple requests together</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer
+<span class="token-keyword">import</span> torch
+
+model_name = <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name, device_map=<span class="token-string">"auto"</span>)
+
+<span class="token-comment"># Process 4 prompts at once (static batch)</span>
+prompts = [
+    <span class="token-string">"What is Python?"</span>,
+    <span class="token-string">"Explain gravity simply."</span>,
+    <span class="token-string">"Write a haiku about coding."</span>,
+    <span class="token-string">"What is 2+2?"</span>,
+]
+
+<span class="token-comment"># Pad to same length for batching</span>
+tokenizer.pad_token = tokenizer.eos_token
+inputs = tokenizer(prompts, return_tensors=<span class="token-string">"pt"</span>, padding=<span class="token-keyword">True</span>).to(model.device)
+
+<span class="token-comment"># Generate all at once (much faster than 4 separate calls!)</span>
+outputs = model.generate(**inputs, max_new_tokens=<span class="token-number">100</span>)
+
+<span class="token-keyword">for</span> i, output <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(outputs):
+    text = tokenizer.decode(output, skip_special_tokens=<span class="token-keyword">True</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"Response {i+1}: {text}\n"</span>)
+
+<span class="token-comment"># Problem: Short responses must wait for the longest to finish!</span></code></pre>
+
+            <h3>Continuous Batching (Production):</h3>
+            <pre><code><span class="token-comment"># Continuous batching: New requests join as others finish</span>
+<span class="token-comment"># This is what vLLM/TGI do internally</span>
+
+<span class="token-keyword">import</span> asyncio
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-function">Request</span>:
+    prompt: str
+    max_tokens: int
+    generated_tokens: int = <span class="token-number">0</span>
+    output: str = <span class="token-string">""</span>
+    done: <span class="token-builtin">bool</span> = <span class="token-keyword">False</span>
+
+<span class="token-keyword">class</span> <span class="token-function">ContinuousBatcher</span>:
+    <span class="token-string">"""Simplified continuous batching scheduler."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, model, max_batch_size=<span class="token-number">32</span>):
+        self.model = model
+        self.max_batch_size = max_batch_size
+        self.waiting_queue = []
+        self.active_batch = []
+    
+    <span class="token-keyword">def</span> <span class="token-function">add_request</span>(self, request: Request):
+        <span class="token-string">"""New request joins immediately (no waiting for batch to finish)."""</span>
+        self.waiting_queue.append(request)
+    
+    <span class="token-keyword">def</span> <span class="token-function">step</span>(self):
+        <span class="token-string">"""One generation step for all active requests."""</span>
+        <span class="token-comment"># Remove finished requests</span>
+        self.active_batch = [r <span class="token-keyword">for</span> r <span class="token-keyword">in</span> self.active_batch <span class="token-keyword">if not</span> r.done]
+        
+        <span class="token-comment"># Add waiting requests to fill batch</span>
+        <span class="token-keyword">while</span> self.waiting_queue <span class="token-keyword">and</span> <span class="token-builtin">len</span>(self.active_batch) < self.max_batch_size:
+            self.active_batch.append(self.waiting_queue.pop(<span class="token-number">0</span>))
+        
+        <span class="token-keyword">if not</span> self.active_batch:
+            <span class="token-keyword">return</span>
+        
+        <span class="token-comment"># Generate ONE token for all active requests simultaneously</span>
+        <span class="token-comment"># (In reality, this is a single forward pass through the model)</span>
+        <span class="token-keyword">for</span> req <span class="token-keyword">in</span> self.active_batch:
+            <span class="token-comment"># next_token = model.forward(req.current_tokens)  # simplified</span>
+            req.generated_tokens += <span class="token-number">1</span>
+            <span class="token-keyword">if</span> req.generated_tokens >= req.max_tokens:
+                req.done = <span class="token-keyword">True</span>
+
+<span class="token-comment"># Key insight: Short responses leave immediately,</span>
+<span class="token-comment"># freeing space for new requests to join mid-batch!</span></code></pre>
+
+            <h2 id="speculative">Speculative Decoding</h2>
+
+            <p>Use a small, fast model to "guess" multiple tokens ahead, then verify with the big model in one forward pass.</p>
+
+            <pre><code><span class="token-comment"># Speculative Decoding: 2-3x faster generation!</span>
+<span class="token-comment"># Small model drafts, big model verifies</span>
+
+<span class="token-keyword">class</span> <span class="token-function">SpeculativeDecoder</span>:
+    <span class="token-string">"""Speculative decoding: draft + verify pattern."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, draft_model, target_model, num_speculative=<span class="token-number">5</span>):
+        self.draft = draft_model    <span class="token-comment"># Small/fast (e.g., 1B model)</span>
+        self.target = target_model  <span class="token-comment"># Large/accurate (e.g., 70B model)</span>
+        self.num_speculative = num_speculative  <span class="token-comment"># Tokens to draft ahead</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">generate_step</span>(self, context):
+        <span class="token-string">"""Generate tokens using speculative decoding."""</span>
+        
+        <span class="token-comment"># Step 1: Draft model quickly generates N tokens</span>
+        draft_tokens = []
+        <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> <span class="token-builtin">range</span>(self.num_speculative):
+            token = self.draft.predict_next(context)  <span class="token-comment"># Fast!</span>
+            draft_tokens.append(token)
+            context = context + [token]
+        
+        <span class="token-comment"># Step 2: Target model verifies ALL draft tokens in ONE pass</span>
+        <span class="token-comment"># (One forward pass for N tokens vs N forward passes normally!)</span>
+        verified = self.target.verify_batch(context, draft_tokens)
+        
+        <span class="token-comment"># Step 3: Accept tokens until first disagreement</span>
+        accepted = []
+        <span class="token-keyword">for</span> draft, target_agrees <span class="token-keyword">in</span> <span class="token-builtin">zip</span>(draft_tokens, verified):
+            <span class="token-keyword">if</span> target_agrees:
+                accepted.append(draft)  <span class="token-comment"># Draft was correct!</span>
+            <span class="token-keyword">else</span>:
+                <span class="token-keyword">break</span>  <span class="token-comment"># Stop at first wrong token</span>
+        
+        <span class="token-keyword">return</span> accepted  <span class="token-comment"># Usually 3-4 out of 5 are accepted!</span>
+
+<span class="token-comment"># With transformers (built-in support):</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer
+
+<span class="token-comment"># Load both models</span>
+target = AutoModelForCausalLM.from_pretrained(<span class="token-string">"meta-llama/Llama-3.1-70B-Instruct"</span>)
+draft = AutoModelForCausalLM.from_pretrained(<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>)
+
+tokenizer = AutoTokenizer.from_pretrained(<span class="token-string">"meta-llama/Llama-3.1-70B-Instruct"</span>)
+inputs = tokenizer(<span class="token-string">"Explain quantum computing"</span>, return_tensors=<span class="token-string">"pt"</span>)
+
+<span class="token-comment"># Speculative decoding with assistant model</span>
+outputs = target.generate(
+    **inputs,
+    max_new_tokens=<span class="token-number">200</span>,
+    assistant_model=draft,  <span class="token-comment"># ← This enables speculative decoding!</span>
+)
+<span class="token-builtin">print</span>(tokenizer.decode(outputs[<span class="token-number">0</span>], skip_special_tokens=<span class="token-keyword">True</span>))</code></pre>
+
+            <h2 id="other-techniques">Other Optimization Techniques</h2>
+
+            <h3>Token Streaming:</h3>
+            <pre><code><span class="token-comment"># Streaming: Show tokens as they're generated (better UX)</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> TextIteratorStreamer
+<span class="token-keyword">from</span> threading <span class="token-keyword">import</span> Thread
+
+streamer = TextIteratorStreamer(tokenizer, skip_special_tokens=<span class="token-keyword">True</span>)
+
+<span class="token-comment"># Generate in a thread so we can stream output</span>
+generation_kwargs = {
+    <span class="token-string">"input_ids"</span>: inputs[<span class="token-string">"input_ids"</span>],
+    <span class="token-string">"max_new_tokens"</span>: <span class="token-number">200</span>,
+    <span class="token-string">"streamer"</span>: streamer,
+}
+thread = Thread(target=model.generate, kwargs=generation_kwargs)
+thread.start()
+
+<span class="token-comment"># Print tokens as they arrive (like ChatGPT does)</span>
+<span class="token-keyword">for</span> text <span class="token-keyword">in</span> streamer:
+    <span class="token-builtin">print</span>(text, end=<span class="token-string">""</span>, flush=<span class="token-keyword">True</span>)</code></pre>
+
+            <h3>Structured Generation (Constrained Decoding):</h3>
+            <pre><code><span class="token-comment"># Force model to output valid JSON using outlines</span>
+<span class="token-comment"># pip install outlines</span>
+<span class="token-keyword">import</span> outlines
+
+model = outlines.models.transformers(<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>)
+
+<span class="token-comment"># Define JSON schema</span>
+schema = {
+    <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+    <span class="token-string">"properties"</span>: {
+        <span class="token-string">"name"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>},
+        <span class="token-string">"age"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"integer"</span>},
+        <span class="token-string">"skills"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"array"</span>, <span class="token-string">"items"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>}}
+    },
+    <span class="token-string">"required"</span>: [<span class="token-string">"name"</span>, <span class="token-string">"age"</span>, <span class="token-string">"skills"</span>]
+}
+
+<span class="token-comment"># Model is FORCED to output valid JSON matching this schema</span>
+generator = outlines.generate.json(model, schema)
+result = generator(<span class="token-string">"Create a developer profile for a senior Python engineer"</span>)
+<span class="token-builtin">print</span>(result)
+<span class="token-comment"># {"name": "Alex Chen", "age": 32, "skills": ["Python", "FastAPI", "ML"]}</span></code></pre>
+
+            <h2 id="metrics">Key Performance Metrics</h2>
+
+            <table>
+                <thead><tr><th>Metric</th><th>What It Measures</th><th>Good Target</th><th>How to Improve</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>TTFT</strong></td><td>Time to First Token</td><td>&lt; 500ms</td><td>Smaller prompt, prefix caching</td></tr>
+                    <tr><td><strong>TPS</strong></td><td>Tokens Per Second (per user)</td><td>30-100 tok/s</td><td>Quantization, Flash Attention</td></tr>
+                    <tr><td><strong>Throughput</strong></td><td>Total tokens/sec (all users)</td><td>1000+ tok/s</td><td>Batching, vLLM, more GPUs</td></tr>
+                    <tr><td><strong>Latency P99</strong></td><td>99th percentile response time</td><td>&lt; 5s</td><td>Smaller model, speculative decoding</td></tr>
+                    <tr><td><strong>Concurrency</strong></td><td>Simultaneous users</td><td>10-100</td><td>PagedAttention, continuous batching</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Measuring Performance:</h3>
+            <pre><code><span class="token-comment"># Benchmark your inference setup</span>
+<span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> torch
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer
+
+<span class="token-keyword">class</span> <span class="token-function">InferenceBenchmark</span>:
+    <span class="token-string">"""Measure key inference performance metrics."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, model, tokenizer):
+        self.model = model
+        self.tokenizer = tokenizer
+    
+    <span class="token-keyword">def</span> <span class="token-function">benchmark</span>(self, prompt: str, max_new_tokens: int = <span class="token-number">100</span>, num_runs: int = <span class="token-number">5</span>):
+        <span class="token-string">"""Run benchmark and report metrics."""</span>
+        inputs = self.tokenizer(prompt, return_tensors=<span class="token-string">"pt"</span>).to(self.model.device)
+        input_length = inputs[<span class="token-string">"input_ids"</span>].shape[<span class="token-number">1</span>]
+        
+        ttfts = []
+        tps_list = []
+        
+        <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> <span class="token-builtin">range</span>(num_runs):
+            <span class="token-comment"># Measure TTFT (Time to First Token)</span>
+            start = time.perf_counter()
+            
+            <span class="token-keyword">with</span> torch.no_grad():
+                outputs = self.model.generate(
+                    **inputs,
+                    max_new_tokens=max_new_tokens,
+                    do_sample=<span class="token-keyword">False</span>,
+                )
+            
+            total_time = time.perf_counter() - start
+            output_tokens = outputs.shape[<span class="token-number">1</span>] - input_length
+            
+            <span class="token-comment"># Approximate TTFT (first token out of total)</span>
+            ttft = total_time / output_tokens  <span class="token-comment"># Simplified</span>
+            tps = output_tokens / total_time
+            
+            ttfts.append(ttft)
+            tps_list.append(tps)
+        
+        <span class="token-comment"># Report</span>
+        <span class="token-builtin">print</span>(<span class="token-string">f"📊 Inference Benchmark Results:"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Input tokens:  {input_length}"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Output tokens: {output_tokens}"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Avg TPS:       {sum(tps_list)/len(tps_list):.1f} tokens/sec"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Avg TTFT:      {sum(ttfts)/len(ttfts)*1000:.0f} ms"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   GPU Memory:    {torch.cuda.max_memory_allocated()/1e9:.1f} GB"</span>)
+
+<span class="token-comment"># Usage</span>
+bench = InferenceBenchmark(model, tokenizer)
+bench.benchmark(<span class="token-string">"Explain the theory of relativity in simple terms"</span>)</code></pre>
+
+            <div class="comparison-table">
+                <h3>Optimization Techniques Summary:</h3>
+                <table>
+                    <thead><tr><th>Technique</th><th>Speedup</th><th>Effort</th><th>When to Use</th></tr></thead>
+                    <tbody>
+                        <tr><td>Flash Attention 2</td><td>2-4x</td><td>One line of code</td><td>Always (on supported GPU)</td></tr>
+                        <tr><td>Quantization (4-bit)</td><td>2-3x</td><td>Low</td><td>When VRAM is limited</td></tr>
+                        <tr><td>Continuous Batching</td><td>2-4x throughput</td><td>Use vLLM</td><td>Production serving</td></tr>
+                        <tr><td>Speculative Decoding</td><td>2-3x</td><td>Medium</td><td>Large models, latency-sensitive</td></tr>
+                        <tr><td>Prefix Caching</td><td>1.5-2x TTFT</td><td>Use vLLM</td><td>Shared system prompts</td></tr>
+                        <tr><td>Structured Output</td><td>N/A (quality)</td><td>Low</td><td>Need guaranteed JSON/format</td></tr>
+                        <tr><td>Streaming</td><td>Better perceived</td><td>Low</td><td>All user-facing apps</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>vLLM or TGI for production serving</strong> — Never use raw transformers.generate() in production.</li>
+                    <li><strong>Continuous batching is the default</strong> — All production systems use it. Static batching is only for benchmarks.</li>
+                    <li><strong>Streaming is expected</strong> — Users expect to see tokens appear immediately, like ChatGPT.</li>
+                    <li><strong>Target: 30+ TPS per user</strong> — Faster than reading speed. Below 10 TPS feels sluggish.</li>
+                    <li><strong>Speculative decoding for large models</strong> — Used by OpenAI, Anthropic, Google for their biggest models.</li>
+                    <li><strong>Structured output with Outlines/LMFE</strong> — Guaranteed valid JSON without retry loops.</li>
+                    <li><strong>Benchmark before and after every change</strong> — Measure TTFT, TPS, throughput, memory.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Batching</strong> = process multiple requests simultaneously to maximize GPU utilization</li>
+                    <li><strong>Continuous batching</strong> = requests join/leave the batch dynamically (vLLM/TGI)</li>
+                    <li><strong>Speculative decoding</strong> = small model drafts, big model verifies (2-3x faster)</li>
+                    <li><strong>Streaming</strong> = show tokens as they generate (better UX)</li>
+                    <li><strong>Structured output</strong> = force valid JSON/format using constrained decoding</li>
+                    <li>Key metrics: TTFT, TPS, Throughput, P99 latency</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Using transformers.generate() in production</strong> — It's fine for testing, terrible for serving. Use vLLM or TGI.</li>
+                    <li><strong>Not streaming responses</strong> — Makes the app feel slow even if the model is fast. Always stream.</li>
+                    <li><strong>Ignoring TTFT</strong> — Users notice the delay before the first token more than generation speed.</li>
+                    <li><strong>Retry loops for JSON</strong> — If you need structured output, use outlines/LMFE, not "try again if JSON is invalid".</li>
+                    <li><strong>Not measuring before optimizing</strong> — Profile first, then optimize the actual bottleneck.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Benchmark and Optimize</h4>
+                <ol>
+                    <li>Write a benchmark script using the InferenceBenchmark class above</li>
+                    <li>Compare: <code>attn_implementation="eager"</code> vs <code>"sdpa"</code> vs <code>"flash_attention_2"</code></li>
+                    <li>Implement token streaming with <code>TextIteratorStreamer</code></li>
+                    <li>Try speculative decoding: use an 8B model as target, 1B as draft</li>
+                    <li>Use outlines to generate structured JSON output with a schema</li>
+                    <li>Install vLLM and serve a model: observe continuous batching in action</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="16-kv-cache-flash-attention.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">KV Cache & Flash Attention</span>
+                </a>
+                <a href="18-gpu-vram-basics.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">GPU & VRAM</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

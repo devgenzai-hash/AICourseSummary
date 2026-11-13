@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HealthBridge — Clinic Admin (File 4 of 4)</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#0F172A;color:#F8FAFC;line-height:1.5}
+
+    .page-header{background:linear-gradient(135deg,#F59E0B,#EF4444,#0D9488);padding:3rem 2rem;text-align:center}
+    .page-header .file-badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
+      border-radius:20px;padding:.25rem .9rem;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:.8rem}
+    .page-header h1{font-size:2.2rem;font-weight:800;margin-bottom:.4rem}
+    .page-header p{font-size:1rem;opacity:.9;max-width:580px;margin:0 auto}
+
+    .file-nav{background:#1E293B;padding:1rem 2rem;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;
+      border-bottom:1px solid #334155}
+    .file-nav a{color:#94A3B8;text-decoration:none;font-size:.8rem;padding:.3rem .7rem;border-radius:6px;
+      border:1px solid #334155;transition:.2s}
+    .file-nav a:hover,.file-nav a.active{background:#0D9488;color:white;border-color:#0D9488}
+
+    .section{padding:2.5rem 2rem;border-bottom:1px solid #1E293B}
+    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#64748B;margin-bottom:.4rem}
+    .section h2{font-size:1.5rem;font-weight:800;margin-bottom:.4rem}
+    .section .desc{font-size:.88rem;color:#94A3B8;max-width:900px;margin-bottom:2rem}
+
+    /* phone */
+    .phone{flex-shrink:0;width:255px}
+    .phone-label{text-align:center;font-size:.72rem;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem}
+    .phone-device{background:#1a1a2e;border-radius:36px;padding:9px;
+      box-shadow:0 0 0 2px #2a2a4a,0 24px 60px rgba(0,0,0,.5);position:relative}
+    .phone-notch{width:80px;height:20px;background:#1a1a2e;border-radius:0 0 12px 12px;
+      position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:5}
+    .phone-screen{border-radius:28px;overflow:hidden;height:540px;display:flex;flex-direction:column;background:#0F172A}
+    .status-bar{display:flex;justify-content:space-between;align-items:center;
+      padding:24px 16px 5px;font-size:10px;font-weight:700;flex-shrink:0;color:#94A3B8}
+    .bottom-nav-dark{display:flex;border-top:1px solid #334155;flex-shrink:0;background:#1E293B}
+    .nav-d{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0 8px;gap:2px}
+    .nav-d .ni{font-size:15px}
+    .nav-d .nl{font-size:7.5px;font-weight:600;color:#475569}
+    .nav-d.a .nl,.nav-d.a .ni{color:#F59E0B}
+    .scr{overflow-y:auto;flex:1}
+    .scr::-webkit-scrollbar{display:none}
+
+    .phones-row{display:flex;gap:2.5rem;flex-wrap:wrap;align-items:flex-start}
+    .flow-arrow{font-size:1.4rem;color:#334155;flex-shrink:0;align-self:center;margin-top:20px}
+
+    /* desktop */
+    .desktop-frame{background:#1E293B;border-radius:12px;border:1.5px solid #334155;overflow:hidden;
+      box-shadow:0 16px 48px rgba(0,0,0,.4)}
+    .desktop-topbar{background:#0F172A;height:30px;display:flex;align-items:center;padding:0 .8rem;gap:.4rem}
+    .desktop-dot{width:10px;height:10px;border-radius:50%}
+    .desktop-url{flex:1;background:#1E293B;border-radius:4px;height:16px;margin:0 .5rem;display:flex;align-items:center;
+      padding:0 .5rem;font-size:.62rem;color:#64748B}
+    .desktop-screen{display:flex;height:420px}
+    .desktop-sidebar{width:175px;background:#0F172A;border-right:1px solid #1E293B;padding:.5rem 0;flex-shrink:0}
+    .ds-logo{padding:.4rem .7rem .6rem;border-bottom:1px solid #1E293B;margin-bottom:.3rem}
+    .ds-logo div:first-child{font-size:.78rem;font-weight:800;color:white}
+    .ds-logo div:nth-child(2){font-size:.6rem;color:#F59E0B;font-weight:600}
+    .ds-logo div:last-child{font-size:.6rem;color:#64748B;margin-top:1px}
+    .ds-item{padding:.4rem .7rem;display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:#64748B;cursor:pointer}
+    .ds-item.act{background:#F59E0B20;color:#F59E0B;border-left:3px solid #F59E0B}
+    .di{font-size:13px}
+    .desktop-content{flex:1;overflow:hidden;padding:.65rem;background:#0F172A}
+
+    .annotation{background:#1E293B;border-left:3px solid #F59E0B;border-radius:0 8px 8px 0;
+      padding:.75rem 1rem;font-size:.82rem;color:#CBD5E1;margin-top:.75rem}
+    .annotation strong{color:#F8FAFC;display:block;margin-bottom:.2rem}
+
+    /* mini chart bars */
+    .bar-chart{display:flex;align-items:flex-end;gap:3px;height:48px}
+    .bar{border-radius:3px 3px 0 0;min-width:8px;flex:1}
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="file-badge">🏥 File 4 of 4 — Clinic Admin</div>
+  <h1>Clinic Admin & Owner Screens</h1>
+  <p>The business intelligence layer — analytics, patient outreach, WhatsApp messaging, and appointment management. Amber accent used for admin role.</p>
+</div>
+<div class="file-nav">
+  <a href="mockup-01-design-systems.html">1 · Design Systems</a>
+  <a href="mockup-02-patient-screens.html">2 · Patient Journey</a>
+  <a href="mockup-03-doctor-screens.html">3 · Doctor Experience</a>
+  <a href="mockup-04-clinic-admin.html" class="active">4 · Clinic Admin</a>
+</div>
+
+<!-- ══════════════════════════════
+     ADMIN MOBILE SCREENS
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Admin Role</div>
+  <h2>Clinic Admin Mobile Screens</h2>
+  <div class="desc">Clinic owner / reception uses these screens. Amber accent distinguishes the admin role from doctor (teal) and patient (teal/white).</div>
+
+  <div class="phones-row">
+
+    <!-- Admin Home -->
+    <div class="phone">
+      <div class="phone-label">Admin Home</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <div style="padding:.6rem .8rem">
+              <!-- header -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem">
+                <div>
+                  <div style="color:#64748B;font-size:.65rem">Friday, 30 May 2026</div>
+                  <div style="color:white;font-size:.95rem;font-weight:700">Apollo Clinic</div>
+                  <div style="color:#F59E0B;font-size:.65rem;font-weight:600">Admin · Ravi Kumar</div>
+                </div>
+                <div style="width:36px;height:36px;background:#F59E0B20;border:1px solid #F59E0B40;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px">🔔</div>
+              </div>
+
+              <!-- today stats -->
+              <div style="background:#1E293B;border-radius:12px;padding:.8rem;margin-bottom:.65rem">
+                <div style="font-size:.62rem;font-weight:700;color:#F59E0B;text-transform:uppercase;margin-bottom:.5rem">Today's Overview</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+                  <div style="background:#0F172A;border-radius:8px;padding:.55rem;text-align:center">
+                    <div style="font-size:1.3rem;font-weight:800;color:#F8FAFC">12</div>
+                    <div style="font-size:.6rem;color:#64748B">Appointments</div>
+                  </div>
+                  <div style="background:#0F172A;border-radius:8px;padding:.55rem;text-align:center">
+                    <div style="font-size:1.3rem;font-weight:800;color:#22C55E">₹6,500</div>
+                    <div style="font-size:.6rem;color:#64748B">Revenue so far</div>
+                  </div>
+                  <div style="background:#0F172A;border-radius:8px;padding:.55rem;text-align:center">
+                    <div style="font-size:1.3rem;font-weight:800;color:#EF4444">3</div>
+                    <div style="font-size:.6rem;color:#64748B">Pending Payment</div>
+                  </div>
+                  <div style="background:#0F172A;border-radius:8px;padding:.55rem;text-align:center">
+                    <div style="font-size:1.3rem;font-weight:800;color:#F59E0B">2</div>
+                    <div style="font-size:.6rem;color:#64748B">No-shows</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- quick actions -->
+              <div style="background:#1E293B;border-radius:12px;padding:.75rem;margin-bottom:.65rem">
+                <div style="font-size:.62rem;font-weight:700;color:#F59E0B;text-transform:uppercase;margin-bottom:.5rem">Quick Actions</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem">
+                  <div style="background:#0F172A;border-radius:8px;padding:.55rem;display:flex;align-items:center;gap:.4rem">
+                    <span style="font-size:16px">➕</span>
+                    <span style="font-size:.7rem;font-weight:600;color:#CBD5E1">Add Patient</span>
+                  </div>
+                  <div style="background:#0F172A;border-radius:8px;padding:.55rem;display:flex;align-items:center;gap:.4rem">
+                    <span style="font-size:16px">💬</span>
+                    <span style="font-size:.7rem;font-weight:600;color:#CBD5E1">Send Alerts</span>
+                  </div>
+                  <div style="background:#0F172A;border-radius:8px;padding:.55rem;display:flex;align-items:center;gap:.4rem">
+                    <span style="font-size:16px">📅</span>
+                    <span style="font-size:.7rem;font-weight:600;color:#CBD5E1">View Calendar</span>
+                  </div>
+                  <div style="background:#0F172A;border-radius:8px;padding:.55rem;display:flex;align-items:center;gap:.4rem">
+                    <span style="font-size:16px">💳</span>
+                    <span style="font-size:.7rem;font-weight:600;color:#CBD5E1">Payments</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI insight -->
+              <div style="background:#F59E0B10;border:1px solid #F59E0B30;border-radius:10px;padding:.65rem;margin-bottom:.5rem">
+                <div style="font-size:.62rem;font-weight:700;color:#F59E0B;margin-bottom:.25rem">🤖 AI CLINIC INSIGHT</div>
+                <div style="font-size:.7rem;color:#CBD5E1">You're 40% underbooked on Tuesday afternoons. <span style="color:#F59E0B;font-weight:600">Send recall messages to 8 patients</span> due for follow-up?</div>
+                <div style="display:flex;gap:.35rem;margin-top:.45rem">
+                  <div style="flex:1;background:#F59E0B;border-radius:6px;padding:.3rem;text-align:center;font-size:.65rem;font-weight:700;color:#0F172A">Send Messages</div>
+                  <div style="flex:1;background:#1E293B;border-radius:6px;padding:.3rem;text-align:center;font-size:.65rem;color:#64748B">Later</div>
+                </div>
+              </div>
+              <div style="height:8px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav-dark">
+            <div class="nav-d a"><div class="ni">🏠</div><div class="nl" style="color:#F59E0B">Home</div></div>
+            <div class="nav-d"><div class="ni">👥</div><div class="nl">Patients</div></div>
+            <div class="nav-d"><div class="ni">📅</div><div class="nl">Calendar</div></div>
+            <div class="nav-d"><div class="ni">💬</div><div class="nl">Messages</div></div>
+            <div class="nav-d"><div class="ni">📊</div><div class="nl">Analytics</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient List / Management -->
+    <div class="phone">
+      <div class="phone-label">Patient Management</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <div style="background:#1E293B;padding:.55rem .75rem;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between">
+              <div style="color:white;font-size:.85rem;font-weight:700">Patients · 248</div>
+              <div style="background:#F59E0B;border-radius:6px;padding:.2rem .5rem;font-size:.65rem;color:#0F172A;font-weight:700">+ Add Patient</div>
+            </div>
+            <div style="background:#1E293B;padding:.45rem .75rem;border-bottom:1px solid #334155">
+              <div style="background:#0F172A;border-radius:8px;padding:.4rem .6rem;font-size:.72rem;color:#475569;display:flex;align-items:center;gap:.35rem"><span>🔍</span> Search patient name, phone…</div>
+            </div>
+            <!-- filter pills -->
+            <div style="padding:.4rem .7rem;display:flex;gap:.3rem;background:#1E293B;border-bottom:1px solid #334155">
+              <div style="background:#F59E0B;color:#0F172A;border-radius:20px;padding:.15rem .5rem;font-size:.62rem;font-weight:700">All</div>
+              <div style="color:#475569;border-radius:20px;padding:.15rem .5rem;font-size:.62rem">Active</div>
+              <div style="color:#475569;border-radius:20px;padding:.15rem .5rem;font-size:.62rem">Due F/Up</div>
+              <div style="color:#EF4444;border-radius:20px;padding:.15rem .5rem;font-size:.62rem">⚠️ Alerts</div>
+            </div>
+            <div style="padding:.5rem .7rem">
+              <!-- patient rows -->
+              <div style="background:#1E293B;border-radius:10px;padding:.6rem .7rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">MS</div>
+                <div style="flex:1">
+                  <div style="font-size:.78rem;font-weight:700;color:white">Meena Sharma</div>
+                  <div style="font-size:.65rem;color:#64748B">F 52y · Diabetes · Last: 28 May</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                  <span style="background:#22C55E20;color:#22C55E;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:700">Active</span>
+                  <span style="color:#64748B;font-size:.62rem">→</span>
+                </div>
+              </div>
+              <div style="background:#1E293B;border-radius:10px;padding:.6rem .7rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem;border-left:3px solid #F59E0B">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg,#F59E0B,#FCD34D);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#0F172A;flex-shrink:0">RP</div>
+                <div style="flex:1">
+                  <div style="font-size:.78rem;font-weight:700;color:white">Rajesh Patil</div>
+                  <div style="font-size:.65rem;color:#64748B">M 58y · Diabetes · HbA1c ↑</div>
+                  <div style="font-size:.62rem;color:#F59E0B;margin-top:1px">⚠️ HbA1c trending up 3 months</div>
+                </div>
+                <span style="color:#64748B;font-size:.62rem">→</span>
+              </div>
+              <div style="background:#1E293B;border-radius:10px;padding:.6rem .7rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg,#3B82F6,#60A5FA);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">AK</div>
+                <div style="flex:1">
+                  <div style="font-size:.78rem;font-weight:700;color:white">Arjun Kumar</div>
+                  <div style="font-size:.65rem;color:#64748B">M 45y · Hypertension · Last: 14 May</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                  <span style="background:#22C55E20;color:#22C55E;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:700">Active</span>
+                  <span style="color:#64748B;font-size:.62rem">→</span>
+                </div>
+              </div>
+              <div style="background:#1E293B;border-radius:10px;padding:.6rem .7rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem;border-left:3px solid #EF4444">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg,#EF4444,#F87171);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">SR</div>
+                <div style="flex:1">
+                  <div style="font-size:.78rem;font-weight:700;color:white">Sunita Rao</div>
+                  <div style="font-size:.65rem;color:#64748B">F 38y · Thyroid · Last: 2 Apr</div>
+                  <div style="font-size:.62rem;color:#EF4444;margin-top:1px">⚠️ No follow-up in 58 days</div>
+                </div>
+                <span style="color:#64748B;font-size:.62rem">→</span>
+              </div>
+              <div style="background:#1E293B;border-radius:10px;padding:.6rem .7rem;display:flex;align-items:center;gap:.5rem">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg,#8B5CF6,#A78BFA);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">PG</div>
+                <div style="flex:1">
+                  <div style="font-size:.78rem;font-weight:700;color:white">Priti Gupta</div>
+                  <div style="font-size:.65rem;color:#64748B">F 31y · General · Last: 20 May</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                  <span style="background:#22C55E20;color:#22C55E;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:700">Active</span>
+                  <span style="color:#64748B;font-size:.62rem">→</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav-dark">
+            <div class="nav-d"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-d a"><div class="ni">👥</div><div class="nl" style="color:#F59E0B">Patients</div></div>
+            <div class="nav-d"><div class="ni">📅</div><div class="nl">Calendar</div></div>
+            <div class="nav-d"><div class="ni">💬</div><div class="nl">Messages</div></div>
+            <div class="nav-d"><div class="ni">📊</div><div class="nl">Analytics</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WhatsApp Messaging -->
+    <div class="phone">
+      <div class="phone-label">Patient Outreach</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <div style="background:#1E293B;padding:.55rem .75rem;border-bottom:1px solid #334155">
+              <div style="color:white;font-size:.85rem;font-weight:700">Send Message</div>
+              <div style="color:#64748B;font-size:.62rem">WhatsApp + SMS · Apollo Clinic</div>
+            </div>
+            <div style="padding:.6rem .75rem">
+              <!-- recipient selector -->
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Send To</div>
+              <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.65rem">
+                <div style="background:#F59E0B20;border:1px solid #F59E0B50;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#F59E0B;font-weight:700">All patients (248)</div>
+                <div style="background:#1E293B;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#64748B">Due F/Up (22)</div>
+                <div style="background:#1E293B;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#64748B">No-show (8)</div>
+                <div style="background:#1E293B;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#64748B">Custom</div>
+              </div>
+
+              <!-- template picker -->
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Message Template</div>
+              <div style="background:#1E293B;border-radius:10px;overflow:hidden;margin-bottom:.65rem">
+                <div style="padding:.5rem .65rem;border-bottom:1px solid #0F172A;display:flex;align-items:center;justify-content:space-between;background:#F59E0B10;cursor:pointer">
+                  <div>
+                    <div style="font-size:.75rem;color:white;font-weight:600">📅 Follow-up Reminder</div>
+                    <div style="font-size:.62rem;color:#64748B">Hi [Name], it's time for your check-up…</div>
+                  </div>
+                  <span style="color:#F59E0B;font-size:16px">●</span>
+                </div>
+                <div style="padding:.5rem .65rem;border-bottom:1px solid #0F172A;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+                  <div>
+                    <div style="font-size:.75rem;color:#94A3B8;font-weight:600">📋 Lab Report Ready</div>
+                    <div style="font-size:.62rem;color:#64748B">Your reports are ready. Please collect…</div>
+                  </div>
+                </div>
+                <div style="padding:.5rem .65rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+                  <div>
+                    <div style="font-size:.75rem;color:#94A3B8;font-weight:600">💊 Medication Refill</div>
+                    <div style="font-size:.62rem;color:#64748B">Reminder: your medication is running low…</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- preview -->
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.3rem">Preview</div>
+              <div style="background:#0D9488;border-radius:12px 12px 12px 0;padding:.65rem .75rem;margin-bottom:.6rem">
+                <div style="font-size:.72rem;color:white;line-height:1.5">Hi Meena 👋<br>It's time for your routine check-up at Apollo Clinic. Dr. Priya recommends a follow-up for your diabetes. <strong>Book your slot now →</strong><br><br>📱 Reply STOP to unsubscribe.</div>
+                <div style="font-size:.62rem;color:rgba(255,255,255,.6);margin-top:.3rem;text-align:right">WhatsApp · Apollo Clinic ✓</div>
+              </div>
+
+              <!-- channel select -->
+              <div style="display:flex;gap:.35rem;margin-bottom:.7rem">
+                <div style="flex:1;background:#25D36620;border:1px solid #25D36640;border-radius:8px;padding:.4rem;display:flex;align-items:center;justify-content:center;gap:.3rem">
+                  <span style="font-size:14px">📱</span>
+                  <span style="font-size:.68rem;color:#25D366;font-weight:700">WhatsApp</span>
+                </div>
+                <div style="flex:1;background:#1E293B;border:1px solid #334155;border-radius:8px;padding:.4rem;display:flex;align-items:center;justify-content:center;gap:.3rem">
+                  <span style="font-size:14px">💬</span>
+                  <span style="font-size:.68rem;color:#64748B">SMS only</span>
+                </div>
+              </div>
+
+              <div style="background:#F59E0B;border-radius:10px;padding:.6rem;text-align:center;font-size:.78rem;font-weight:700;color:#0F172A">📤 Send to 248 Patients</div>
+              <div style="text-align:center;font-size:.65rem;color:#64748B;margin-top:.35rem">Estimated cost: ₹248 · WhatsApp only</div>
+            </div>
+          </div>
+          <div class="bottom-nav-dark">
+            <div class="nav-d"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-d"><div class="ni">👥</div><div class="nl">Patients</div></div>
+            <div class="nav-d"><div class="ni">📅</div><div class="nl">Calendar</div></div>
+            <div class="nav-d a"><div class="ni">💬</div><div class="nl" style="color:#F59E0B">Messages</div></div>
+            <div class="nav-d"><div class="ni">📊</div><div class="nl">Analytics</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Verification -->
+    <div class="phone">
+      <div class="phone-label">Verify UPI Payment</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <div style="background:#1E293B;padding:.55rem .75rem;border-bottom:1px solid #334155;display:flex;align-items:center;gap:.5rem">
+              <div style="color:white;font-size:.85rem;font-weight:700">Pending Payments</div>
+              <div style="background:#EF4444;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:white;margin-left:auto">3</div>
+            </div>
+            <div style="padding:.55rem .7rem">
+              <!-- payment to verify -->
+              <div style="background:#1E293B;border-radius:12px;padding:.75rem;margin-bottom:.5rem;border-left:3px solid #F59E0B">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem">
+                  <div>
+                    <div style="font-size:.8rem;font-weight:700;color:white">Meena Sharma</div>
+                    <div style="font-size:.65rem;color:#64748B">Consultation · 30 May</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-size:.9rem;font-weight:800;color:#22C55E">₹500</div>
+                    <div style="font-size:.62rem;color:#F59E0B">Awaiting verify</div>
+                  </div>
+                </div>
+                <!-- screenshot preview box -->
+                <div style="background:#0F172A;border-radius:8px;padding:.5rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;border:1px dashed #334155">
+                  <div style="width:36px;height:44px;background:linear-gradient(135deg,#22C55E,#16A34A);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📸</div>
+                  <div>
+                    <div style="font-size:.72rem;color:#CBD5E1;font-weight:600">UPI_SS_May30.jpg</div>
+                    <div style="font-size:.62rem;color:#64748B">Patient uploaded · 10:24 AM</div>
+                    <div style="font-size:.62rem;color:#22C55E;font-weight:600">GooglePay → apollo-andheri@upi</div>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.35rem">
+                  <div style="background:#22C55E;border-radius:8px;padding:.45rem;text-align:center;font-size:.7rem;font-weight:700;color:white">✓ Verified</div>
+                  <div style="background:#EF444420;border:1px solid #EF444440;border-radius:8px;padding:.45rem;text-align:center;font-size:.7rem;font-weight:600;color:#EF4444">✗ Reject</div>
+                </div>
+              </div>
+
+              <!-- 2nd pending -->
+              <div style="background:#1E293B;border-radius:12px;padding:.75rem;margin-bottom:.5rem;border-left:3px solid #F59E0B">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem">
+                  <div>
+                    <div style="font-size:.8rem;font-weight:700;color:white">Rajesh Patil</div>
+                    <div style="font-size:.65rem;color:#64748B">HbA1c Review · 30 May</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-size:.9rem;font-weight:800;color:#22C55E">₹700</div>
+                    <div style="font-size:.62rem;color:#F59E0B">Awaiting verify</div>
+                  </div>
+                </div>
+                <div style="background:#0F172A;border-radius:8px;padding:.5rem;display:flex;align-items:center;gap:.5rem;border:1px dashed #334155;margin-bottom:.5rem">
+                  <div style="width:36px;height:44px;background:linear-gradient(135deg,#3B82F6,#60A5FA);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📸</div>
+                  <div>
+                    <div style="font-size:.72rem;color:#CBD5E1;font-weight:600">payment_receipt.png</div>
+                    <div style="font-size:.62rem;color:#64748B">Patient uploaded · 10:58 AM</div>
+                    <div style="font-size:.62rem;color:#22C55E;font-weight:600">PhonePe → apollo-andheri@upi</div>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.35rem">
+                  <div style="background:#22C55E;border-radius:8px;padding:.45rem;text-align:center;font-size:.7rem;font-weight:700;color:white">✓ Verified</div>
+                  <div style="background:#EF444420;border:1px solid #EF444440;border-radius:8px;padding:.45rem;text-align:center;font-size:.7rem;font-weight:600;color:#EF4444">✗ Reject</div>
+                </div>
+              </div>
+
+              <!-- pay at clinic -->
+              <div style="background:#1E293B;border-radius:12px;padding:.65rem;opacity:.6">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-size:.78rem;font-weight:700;color:#94A3B8">Arjun Kumar</div>
+                    <div style="font-size:.62rem;color:#64748B">Paying at clinic</div>
+                  </div>
+                  <div style="font-size:.85rem;font-weight:800;color:#64748B">₹500</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav-dark">
+            <div class="nav-d"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-d"><div class="ni">👥</div><div class="nl">Patients</div></div>
+            <div class="nav-d"><div class="ni">📅</div><div class="nl">Calendar</div></div>
+            <div class="nav-d"><div class="ni">💬</div><div class="nl">Messages</div></div>
+            <div class="nav-d a"><div class="ni">💳</div><div class="nl" style="color:#F59E0B">Payments</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end phones-row -->
+  <div class="annotation"><strong>Admin UX Notes</strong>
+  Amber accent clearly distinguishes the admin role from doctor (teal) and patient (teal/white). Payment verification is one-tap — the admin sees the screenshot the patient uploaded, verifies, and the slot is locked. WhatsApp message cost (₹1/message) is shown before sending — no surprises on the clinic's bill. AI insight about Tuesday underutilization is the "wow moment" for clinic owners.</div>
+</div>
+
+<!-- ══════════════════════════════
+     ANALYTICS DESKTOP
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Desktop — Business Intelligence</div>
+  <h2>Clinic Analytics Dashboard</h2>
+  <div class="desc">The screen that justifies the subscription. "You're flying blind with a ledger book" — this changes that.</div>
+
+  <div class="desktop-frame">
+    <div class="desktop-topbar">
+      <div class="desktop-dot" style="background:#EF4444"></div>
+      <div class="desktop-dot" style="background:#F59E0B"></div>
+      <div class="desktop-dot" style="background:#22C55E"></div>
+      <div class="desktop-url">🔒 healthbridge.in/admin/analytics</div>
+    </div>
+    <div class="desktop-screen">
+      <!-- sidebar -->
+      <div class="desktop-sidebar">
+        <div class="ds-logo">
+          <div>Apollo Clinic</div>
+          <div>Admin Dashboard</div>
+          <div>Andheri West, Mumbai</div>
+        </div>
+        <div class="ds-item"><span class="di">🏠</span>Overview</div>
+        <div class="ds-item"><span class="di">👥</span>Patients</div>
+        <div class="ds-item"><span class="di">📅</span>Appointments</div>
+        <div class="ds-item act"><span class="di">📊</span>Analytics</div>
+        <div class="ds-item"><span class="di">💬</span>Messages</div>
+        <div class="ds-item"><span class="di">💳</span>Revenue</div>
+        <div class="ds-item"><span class="di">🏥</span>Settings</div>
+        <div style="border-top:1px solid #1E293B;margin-top:auto">
+          <div class="ds-item"><span class="di">🩺</span>Doctors (3)</div>
+          <div class="ds-item"><span class="di">🔔</span>Alerts</div>
+        </div>
+      </div>
+      <!-- analytics content -->
+      <div class="desktop-content">
+        <!-- top stats row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:.5rem;margin-bottom:.6rem">
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem;border-top:2px solid #22C55E">
+            <div style="font-size:.55rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">This Month Revenue</div>
+            <div style="font-size:1.05rem;font-weight:800;color:#22C55E">₹1,24,500</div>
+            <div style="font-size:.55rem;color:#22C55E">↑ 12% vs last month</div>
+          </div>
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem;border-top:2px solid #F59E0B">
+            <div style="font-size:.55rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">Total Appointments</div>
+            <div style="font-size:1.05rem;font-weight:800;color:#F59E0B">248</div>
+            <div style="font-size:.55rem;color:#F59E0B">↑ 8% vs last month</div>
+          </div>
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem;border-top:2px solid #EF4444">
+            <div style="font-size:.55rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">No-show Rate</div>
+            <div style="font-size:1.05rem;font-weight:800;color:#EF4444">14%</div>
+            <div style="font-size:.55rem;color:#EF4444">↓ 3% (improving)</div>
+          </div>
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem;border-top:2px solid #3B82F6">
+            <div style="font-size:.55rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">Active Patients</div>
+            <div style="font-size:1.05rem;font-weight:800;color:#3B82F6">186</div>
+            <div style="font-size:.55rem;color:#3B82F6">of 248 total</div>
+          </div>
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem;border-top:2px solid #14B8A6">
+            <div style="font-size:.55rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">Pending Payments</div>
+            <div style="font-size:1.05rem;font-weight:800;color:#14B8A6">₹8,200</div>
+            <div style="font-size:.55rem;color:#64748B">12 invoices</div>
+          </div>
+        </div>
+
+        <!-- charts row -->
+        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+          <!-- revenue bar chart -->
+          <div style="background:#1E293B;border-radius:8px;padding:.6rem">
+            <div style="font-size:.6rem;font-weight:700;color:#94A3B8;text-transform:uppercase;margin-bottom:.5rem">Monthly Revenue (₹ thousands)</div>
+            <div class="bar-chart">
+              <div class="bar" style="background:#0D9488;height:55%"></div>
+              <div class="bar" style="background:#0D9488;height:72%"></div>
+              <div class="bar" style="background:#0D9488;height:60%"></div>
+              <div class="bar" style="background:#0D9488;height:85%"></div>
+              <div class="bar" style="background:#0D9488;height:68%"></div>
+              <div class="bar" style="background:#F59E0B;height:100%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:.25rem">
+              <span style="font-size:.55rem;color:#475569">Dec</span>
+              <span style="font-size:.55rem;color:#475569">Jan</span>
+              <span style="font-size:.55rem;color:#475569">Feb</span>
+              <span style="font-size:.55rem;color:#475569">Mar</span>
+              <span style="font-size:.55rem;color:#475569">Apr</span>
+              <span style="font-size:.55rem;color:#F59E0B;font-weight:700">May</span>
+            </div>
+          </div>
+
+          <!-- appointment by day of week -->
+          <div style="background:#1E293B;border-radius:8px;padding:.6rem">
+            <div style="font-size:.6rem;font-weight:700;color:#94A3B8;text-transform:uppercase;margin-bottom:.5rem">Bookings by Day</div>
+            <div class="bar-chart">
+              <div class="bar" style="background:#3B82F6;height:80%"></div>
+              <div class="bar" style="background:#3B82F6;height:95%"></div>
+              <div class="bar" style="background:#3B82F6;height:100%"></div>
+              <div class="bar" style="background:#EF4444;height:35%"></div>
+              <div class="bar" style="background:#3B82F6;height:88%"></div>
+              <div class="bar" style="background:#3B82F6;height:70%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:.25rem">
+              <span style="font-size:.52rem;color:#475569">Mon</span>
+              <span style="font-size:.52rem;color:#475569">Tue</span>
+              <span style="font-size:.52rem;color:#475569">Wed</span>
+              <span style="font-size:.52rem;color:#EF4444;font-weight:700">Thu</span>
+              <span style="font-size:.52rem;color:#475569">Fri</span>
+              <span style="font-size:.52rem;color:#475569">Sat</span>
+            </div>
+            <div style="font-size:.58rem;color:#EF4444;margin-top:.3rem">⚠️ Thursday underbooked</div>
+          </div>
+
+          <!-- doctor revenue breakdown -->
+          <div style="background:#1E293B;border-radius:8px;padding:.6rem">
+            <div style="font-size:.6rem;font-weight:700;color:#94A3B8;text-transform:uppercase;margin-bottom:.4rem">Revenue by Doctor</div>
+            <div style="display:flex;flex-direction:column;gap:.3rem">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:.62rem;margin-bottom:.15rem">
+                  <span style="color:#CBD5E1">Dr. Priya Mehta</span><span style="color:#22C55E;font-weight:700">₹62K</span>
+                </div>
+                <div style="background:#334155;border-radius:20px;height:5px;overflow:hidden">
+                  <div style="background:#22C55E;width:50%;height:100%"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:.62rem;margin-bottom:.15rem">
+                  <span style="color:#CBD5E1">Dr. Amit Shah</span><span style="color:#3B82F6;font-weight:700">₹38K</span>
+                </div>
+                <div style="background:#334155;border-radius:20px;height:5px;overflow:hidden">
+                  <div style="background:#3B82F6;width:31%;height:100%"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:.62rem;margin-bottom:.15rem">
+                  <span style="color:#CBD5E1">Dr. Sonal Joshi</span><span style="color:#F59E0B;font-weight:700">₹24K</span>
+                </div>
+                <div style="background:#334155;border-radius:20px;height:5px;overflow:hidden">
+                  <div style="background:#F59E0B;width:19%;height:100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI insights row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem">
+          <div style="background:#F59E0B10;border:1px solid #F59E0B30;border-radius:8px;padding:.55rem">
+            <div style="font-size:.58rem;font-weight:700;color:#F59E0B;margin-bottom:.2rem">🤖 AI INSIGHT</div>
+            <div style="font-size:.65rem;color:#CBD5E1">Thursday afternoons are 40% underbooked. Send follow-up messages to 8 patients due for check-ups on Thursdays.</div>
+            <div style="background:#F59E0B;border-radius:5px;padding:.2rem .4rem;font-size:.6rem;font-weight:700;color:#0F172A;margin-top:.35rem;display:inline-block;cursor:pointer">Send Messages →</div>
+          </div>
+          <div style="background:#EF444410;border:1px solid #EF444430;border-radius:8px;padding:.55rem">
+            <div style="font-size:.58rem;font-weight:700;color:#EF4444;margin-bottom:.2rem">⚠️ RISK ALERT</div>
+            <div style="font-size:.65rem;color:#CBD5E1">3 patients with HbA1c trending up haven't been seen in 45+ days. Auto-schedule follow-ups?</div>
+            <div style="background:#EF4444;border-radius:5px;padding:.2rem .4rem;font-size:.6rem;font-weight:700;color:white;margin-top:.35rem;display:inline-block;cursor:pointer">Schedule Now →</div>
+          </div>
+          <div style="background:#22C55E10;border:1px solid #22C55E30;border-radius:8px;padding:.55rem">
+            <div style="font-size:.58rem;font-weight:700;color:#22C55E;margin-bottom:.2rem">📈 GROWTH</div>
+            <div style="font-size:.65rem;color:#CBD5E1">12 new patients joined via WhatsApp link this month. Word-of-mouth growing. Consider a referral program.</div>
+            <div style="background:#22C55E;border-radius:5px;padding:.2rem .4rem;font-size:.6rem;font-weight:700;color:white;margin-top:.35rem;display:inline-block;cursor:pointer">View Details →</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation" style="margin-top:1rem"><strong>Analytics Dashboard — The Revenue Justifier</strong>
+  The "Thursday afternoon underbooked" insight is generated by comparing appointment density per time slot. The "3 HbA1c patients uncontacted" card is generated by joining the lab report data with appointment history. This is the screen that makes a clinic owner say "I can't run the clinic without this anymore." One screen. That's the value proposition.</div>
+</div>
+
+<!-- ══════════════════════════════
+     NAVIGATION MAP
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Summary</div>
+  <h2>Complete Navigation Map</h2>
+  <div class="desc">All screens across all roles in one view. Role-based navigation with shared data layer.</div>
+
+  <div style="background:#1E293B;border-radius:14px;padding:1.5rem;overflow-x:auto">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;min-width:600px">
+
+      <!-- Patient nav -->
+      <div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem">
+          <div style="width:10px;height:10px;border-radius:50%;background:#0D9488"></div>
+          <div style="font-size:.8rem;font-weight:800;color:#F8FAFC">Patient</div>
+          <div style="font-size:.65rem;color:#64748B">Design A</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.3rem">
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;border-left:2px solid #0D9488;font-size:.72rem;color:#CBD5E1">🏠 Home Dashboard</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">📁 My Reports ← Upload</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">🤖 AI Report Chat</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">📅 Book Appointment</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">💊 Medicine Tracker</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">📊 Daily Health Log</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">🤝 Share Records</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">👤 Profile + Settings</div>
+        </div>
+      </div>
+
+      <!-- Doctor nav -->
+      <div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem">
+          <div style="width:10px;height:10px;border-radius:50%;background:#14B8A6"></div>
+          <div style="font-size:.8rem;font-weight:800;color:#F8FAFC">Doctor</div>
+          <div style="font-size:.65rem;color:#64748B">Design C (dark)</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.3rem">
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;border-left:2px solid #14B8A6;font-size:.72rem;color:#CBD5E1">📋 Today's Queue</div>
+          <div style="background:#0D948820;border-radius:6px;padding:.4rem .6rem;border-left:2px solid #0D9488;font-size:.72rem;color:#14B8A6;font-weight:700">⭐ AI Briefing Card</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">👥 All My Patients</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">📋 Patient Timeline</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">💊 Write Prescription</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">📁 Reports Inbox</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">📅 My Schedule</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">💬 Patient Messages</div>
+        </div>
+      </div>
+
+      <!-- Admin nav -->
+      <div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem">
+          <div style="width:10px;height:10px;border-radius:50%;background:#F59E0B"></div>
+          <div style="font-size:.8rem;font-weight:800;color:#F8FAFC">Clinic Admin</div>
+          <div style="font-size:.65rem;color:#64748B">Dark + Amber</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.3rem">
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;border-left:2px solid #F59E0B;font-size:.72rem;color:#CBD5E1">🏠 Clinic Overview</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">👥 Patient Management</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">➕ Add Patient / Doctor</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">📅 Appointment Calendar</div>
+          <div style="background:#F59E0B20;border-radius:6px;padding:.4rem .6rem;border-left:2px solid #F59E0B;font-size:.72rem;color:#F59E0B;font-weight:700">📊 Analytics + Revenue</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">💬 WhatsApp Outreach</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">💳 Payment Verification</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .6rem;font-size:.72rem;color:#CBD5E1">⚙️ Clinic Settings</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation" style="margin-top:1rem;border-color:#3B82F6"><strong>Implementation Note: Role-based routing</strong>
+  Single Next.js app. After login, role is determined (patient / doctor / admin). Route to the correct layout shell. Shared components (ReportCard, AppointmentCard, PatientCard) work across all three roles — same component, different props and permissions. Context-based access control: doctor sees all clinic patients, admin sees business data, patient only sees their own. No separate apps to build.</div>
+</div>
+
+<div style="background:#1E293B;text-align:center;padding:2.5rem;color:#64748B;font-size:.85rem">
+  <strong style="color:#F8FAFC;font-size:1rem">HealthBridge UI Mockup Series Complete</strong><br>
+  <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:1rem;font-size:.78rem">
+    <a href="mockup-01-design-systems.html" style="color:#14B8A6;text-decoration:none">1 · Design Systems</a>
+    <a href="mockup-02-patient-screens.html" style="color:#14B8A6;text-decoration:none">2 · Patient Journey</a>
+    <a href="mockup-03-doctor-screens.html" style="color:#14B8A6;text-decoration:none">3 · Doctor Experience</a>
+    <a href="mockup-04-clinic-admin.html" style="color:#14B8A6;text-decoration:none">4 · Clinic Admin</a>
+  </div>
+  <div style="margin-top:.75rem;font-size:.72rem;color:#475569;max-width:600px;margin-inline:auto">
+    Next step: Pick a design direction from File 1 → Set up Next.js + Tailwind design tokens → Build the AI Briefing Card screen first → Show to 3 real doctors.
+  </div>
+</div>
+
+</body>
+</html>

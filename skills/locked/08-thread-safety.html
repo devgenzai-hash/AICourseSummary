@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Safety - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Thread Safety</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Thread Safety</h1>
+                <p class="subtitle">How to write code that works correctly even when multiple threads use it simultaneously. The gold standard for shared code in concurrent programs.</p>
+                <div class="tag-row">
+                    <span class="tag tag-beginner">Beginner</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">The Vending Machine</div>
+                <p>A <strong>thread-safe</strong> vending machine works perfectly even when 10 people press buttons at the same time:</p>
+<ul><li>It processes one transaction at a time internally</li>
+<li>It never gives two people the same item</li>
+<li>It never takes money without dispensing</li></ul>
+<p>A <strong>non-thread-safe</strong> vending machine might give the same soda to two people or eat your money when two people insert coins simultaneously.</p>
+            </div>
+
+
+            <h2>What Is Thread Safety?</h2>
+            <p>Code is <strong>thread-safe</strong> if it behaves correctly when accessed from multiple threads simultaneously, with no additional synchronization needed by the caller.</p>
+
+            <h3>Levels of Thread Safety</h3>
+            <table class="comparison-table">
+                <thead><tr><th>Level</th><th>Definition</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Immutable</strong></td><td>Cannot be modified after creation</td><td>Python tuples, frozensets, strings</td></tr>
+                    <tr><td><strong>Thread-safe</strong></td><td>Internal synchronization handles everything</td><td>queue.Queue, logging module</td></tr>
+                    <tr><td><strong>Conditionally safe</strong></td><td>Safe for specific operations only</td><td>Python dict (single ops safe, compound ops not)</td></tr>
+                    <tr><td><strong>Not thread-safe</strong></td><td>Caller must provide synchronization</td><td>list.append is safe, but read+modify+write is not</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Strategies for Thread Safety</h2>
+<pre><code><span class="token-keyword">import</span> threading
+<span class="token-keyword">from</span> queue <span class="token-keyword">import</span> Queue
+
+<span class="token-comment"># Strategy 1: Immutability (safest)</span>
+<span class="token-keyword">class</span> <span class="token-class">ImmutableConfig</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, host, port):
+        self._host = host
+        self._port = port
+    <span class="token-builtin">@property</span>
+    <span class="token-keyword">def</span> <span class="token-function">host</span>(self): <span class="token-keyword">return</span> self._host
+    <span class="token-builtin">@property</span>
+    <span class="token-keyword">def</span> <span class="token-function">port</span>(self): <span class="token-keyword">return</span> self._port
+    <span class="token-comment"># No setters! Cannot be modified = always thread-safe</span>
+
+<span class="token-comment"># Strategy 2: Thread-local storage (no sharing)</span>
+local_data = threading.local()
+
+<span class="token-keyword">def</span> <span class="token-function">worker</span>():
+    local_data.request_id = threading.current_thread().name
+    <span class="token-comment"># Each thread has its own copy — no sharing, no conflict</span>
+    print(<span class="token-string">f"My request: {local_data.request_id}"</span>)
+
+<span class="token-comment"># Strategy 3: Synchronized access (locks)</span>
+<span class="token-keyword">class</span> <span class="token-class">ThreadSafeList</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._items = []
+        self._lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">append</span>(self, item):
+        <span class="token-keyword">with</span> self._lock:
+            self._items.append(item)
+
+    <span class="token-keyword">def</span> <span class="token-function">pop</span>(self):
+        <span class="token-keyword">with</span> self._lock:
+            <span class="token-keyword">return</span> self._items.pop() <span class="token-keyword">if</span> self._items <span class="token-keyword">else</span> <span class="token-keyword">None</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">size</span>(self):
+        <span class="token-keyword">with</span> self._lock:
+            <span class="token-keyword">return</span> len(self._items)
+
+<span class="token-comment"># Strategy 4: Message passing (no shared state)</span>
+<span class="token-keyword">def</span> <span class="token-function">producer</span>(q):
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">100</span>):
+        q.put(i)  <span class="token-comment"># Queue handles synchronization internally</span>
+
+<span class="token-keyword">def</span> <span class="token-function">consumer</span>(q):
+    <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+        item = q.get()  <span class="token-comment"># Blocks until item available</span>
+        <span class="token-keyword">if</span> item <span class="token-keyword">is</span> <span class="token-keyword">None</span>: <span class="token-keyword">break</span>
+        process(item)</code></pre>
+
+            <h2>Python GIL and Thread Safety</h2>
+            <div class="callout callout-info">
+                <div class="callout-title">The GIL Does NOT Make Your Code Thread-Safe!</div>
+                <p>Python's GIL prevents two threads from executing Python bytecodes simultaneously, but it does NOT make compound operations atomic. <code>counter += 1</code> is still three bytecodes (LOAD, ADD, STORE) and the GIL can release between any of them.</p>
+            </div>
+
+<pre><code><span class="token-comment"># GIL does NOT protect this!</span>
+counter = <span class="token-number">0</span>
+<span class="token-keyword">def</span> <span class="token-function">unsafe</span>():
+    <span class="token-keyword">global</span> counter
+    <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">100000</span>):
+        counter += <span class="token-number">1</span>  <span class="token-comment"># LOAD_GLOBAL, then BINARY_ADD, then STORE_GLOBAL</span>
+        <span class="token-comment"># GIL can switch threads between any of these!</span></code></pre>
+
+            <div class="industry-box">
+                <h4>Thread-Safe by Design</h4>
+                <ul>
+                    <li><strong>Go</strong> — "Don't communicate by sharing memory; share memory by communicating" (channels)</li>
+                    <li><strong>Rust</strong> — Ownership system prevents data races at compile time</li>
+                    <li><strong>Erlang/Elixir</strong> — All data is immutable, communication via message passing only</li>
+                    <li><strong>Java ConcurrentHashMap</strong> — Thread-safe without external synchronization</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>Thread-safe code works correctly under concurrent access without caller synchronization</li>
+<li>Strategies: immutability, thread-local storage, locks, message passing</li>
+<li>Immutability is the safest — data that cannot change cannot race</li>
+<li>Python's GIL does NOT make code thread-safe for compound operations</li>
+<li>Prefer message passing (queues) over shared mutable state when possible</li>
+<li>queue.Queue is Python's best friend for thread-safe communication</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">THREAD SAFETY HIERARCHY (safest to least safe):
+
+1. IMMUTABLE      -- Cannot be changed, always safe
+2. THREAD-LOCAL   -- Each thread owns its copy, no sharing
+3. MESSAGE PASSING-- Communicate via queues, no shared state
+4. SYNCHRONIZED   -- Shared state + locks = safe but complex
+5. UNSAFE         -- Shared state + no locks = BUGS</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Relying on the GIL</strong> — GIL protects CPython internals, NOT your logic.</li>
+<li><strong>Marking a class "thread-safe" without testing</strong> — Test with 100+ concurrent threads to find races.</li>
+<li><strong>Thread-safe individual ops but unsafe compound ops</strong> — dict[key] is safe, but check-then-set is not.</li>
+<li><strong>Mixing strategies</strong> — Using both locks AND queues for the same data creates confusion.</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Create a thread-safe stack (push, pop, peek) using locks.</li>
+<li>Create the same stack using queue.LifoQueue — compare code complexity.</li>
+<li>Show that Python's list is NOT thread-safe: have threads do check-length-then-pop.</li>
+<li>Rewrite a shared-state solution to use message passing (Queue) instead.</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="07-livelocks-starvation.html" class="prev">Livelocks & Starvation</a>
+                <a href="09-atomic-operations-cas.html" class="next">Atomic Ops & CAS</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

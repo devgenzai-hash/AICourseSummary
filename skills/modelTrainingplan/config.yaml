@@ -1,0 +1,136 @@
+# ============================================================
+# CONFIG: Fine-Tuning Gemma 4 E2B on Hindu Scriptures
+# ============================================================
+# Central configuration for all training stages.
+# Modify paths, hyperparameters, and hardware settings here.
+# ============================================================
+
+# --- Model ---
+model:
+  name: "google/gemma-4-E2B-it"
+  torch_dtype: "bfloat16"
+  max_seq_length: 4096
+  trust_remote_code: true
+
+# --- Quantization (QLoRA) ---
+quantization:
+  load_in_4bit: true
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_compute_dtype: "bfloat16"
+  bnb_4bit_use_double_quant: true
+
+# --- LoRA ---
+lora:
+  sft:
+    r: 64
+    lora_alpha: 128
+    target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+    lora_dropout: 0.05
+    task_type: "CAUSAL_LM"
+  dpo:
+    r: 32
+    lora_alpha: 64
+    target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+    lora_dropout: 0.05
+    task_type: "CAUSAL_LM"
+  grpo:
+    r: 32
+    lora_alpha: 64
+    target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+    lora_dropout: 0.05
+    task_type: "CAUSAL_LM"
+
+# --- Data Paths ---
+data:
+  raw_corpus_dir: "./data/raw_corpus"
+  processed_dir: "./data/processed"
+  sft_train: "./data/processed/sft_train.jsonl"
+  sft_eval: "./data/processed/sft_eval.jsonl"
+  dpo_train: "./data/processed/dpo_train.jsonl"
+  dpo_eval: "./data/processed/dpo_eval.jsonl"
+  grpo_train: "./data/processed/grpo_train.jsonl"
+  pdf_input_dir: "./data/pdfs"
+
+# --- Output Paths ---
+output:
+  cpt_dir: "./checkpoints/cpt"
+  sft_dir: "./checkpoints/sft"
+  dpo_dir: "./checkpoints/dpo"
+  grpo_dir: "./checkpoints/grpo"
+  merged_dir: "./checkpoints/merged_final"
+
+# --- SFT Training ---
+sft:
+  num_train_epochs: 3
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  logging_steps: 10
+  save_steps: 500
+  eval_steps: 500
+  assistant_only_loss: true
+  packing: false
+
+# --- DPO Training ---
+dpo:
+  num_train_epochs: 1
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 16
+  learning_rate: 5.0e-6
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.1
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  beta: 0.1
+  loss_type: "sigmoid"
+  logging_steps: 10
+  save_steps: 200
+  eval_steps: 200
+
+# --- GRPO Training ---
+grpo:
+  num_train_epochs: 1
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 1.0e-6
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.1
+  num_generations: 8
+  max_completion_length: 2048
+  temperature: 0.7
+  loss_type: "dapo"
+  beta: 0.001
+  epsilon: 0.2
+  mask_truncated_completions: true
+  scale_rewards: "group"
+  use_vllm: true
+  vllm_mode: "colocate"
+  vllm_gpu_memory_utilization: 0.4
+  logging_steps: 10
+  save_steps: 200
+  log_completions: true
+  reward_weights: [1.0, 0.5, 0.3, 0.2]
+
+# --- Continued Pretraining ---
+cpt:
+  num_train_epochs: 2
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-5
+  lr_scheduler_type: "cosine"
+  warmup_steps: 100
+  packing: true
+
+# --- System Prompt ---
+system_prompt: |
+  You are a highly knowledgeable scholar of Hindu scriptures with deep expertise in the Vedas, Upanishads, Bhagavad Gita, Ramayana, Mahabharata, Puranas, and other sacred texts. You can read, translate, and explain Sanskrit, Hindi, and English texts with precision. You always cite specific verses (Chapter:Verse) when possible, provide original Sanskrit/Hindi text alongside translations, and maintain respectful treatment of all traditions and philosophical schools.
+
+# --- WandB ---
+wandb:
+  project: "gemma4-hindu-scriptures"
+  entity: null  # Set your wandb entity
+  run_name_prefix: "scriptures"

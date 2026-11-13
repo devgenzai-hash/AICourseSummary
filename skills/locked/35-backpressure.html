@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backpressure - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Resilience Patterns &rarr; Backpressure</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Resilience</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Backpressure</h1>
+            <p class="hero-subtitle">How systems signal overload upstream &mdash; preventing cascading failures when producers outpace consumers.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>highway on-ramp with traffic lights</strong>. When the freeway is congested, the ramp meter turns red &mdash; forcing cars to wait before merging. Without this signal, cars flood onto the highway and gridlock everyone. The ramp meter is backpressure: it tells upstream traffic &ldquo;slow down, I can&rsquo;t handle more right now.&rdquo; The key insight is that the signal flows <em>backward</em> &mdash; from consumer (highway) to producer (on-ramp).</p>
+        </div>
+
+        <h2>What Is Backpressure?</h2>
+        <p>Backpressure is a mechanism that allows a downstream system (consumer) to signal an upstream system (producer) to slow down or stop sending data. Without backpressure, a fast producer overwhelms a slow consumer, causing memory exhaustion, increased latency, or complete system collapse.</p>
+
+        <h3>Why Producers Overwhelm Consumers</h3>
+        <ul>
+            <li><strong>Speed mismatch:</strong> Producer generates data faster than consumer can process it</li>
+            <li><strong>Burst traffic:</strong> Sudden spikes in requests exceed steady-state capacity</li>
+            <li><strong>Resource contention:</strong> Consumer shares resources (CPU, I/O, network) with other work</li>
+            <li><strong>Downstream dependencies:</strong> Consumer is blocked waiting on a slow database or API</li>
+        </ul>
+
+        <h2>Backpressure Strategies</h2>
+        <p>There are four primary strategies for handling producer-consumer speed mismatches:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Mechanism</th>
+                        <th>Data Loss</th>
+                        <th>Latency Impact</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Buffering</strong></td>
+                        <td>Queue messages in bounded buffer</td>
+                        <td>None (until full)</td>
+                        <td>Increases under load</td>
+                        <td>Bursty but bounded traffic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dropping</strong></td>
+                        <td>Discard excess messages</td>
+                        <td>Yes (controlled)</td>
+                        <td>Minimal</td>
+                        <td>Metrics, video frames, sensor data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Blocking</strong></td>
+                        <td>Block producer until consumer catches up</td>
+                        <td>None</td>
+                        <td>Producer stalls</td>
+                        <td>Critical data, small pipelines</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Signaling</strong></td>
+                        <td>Notify producer to reduce rate</td>
+                        <td>None</td>
+                        <td>Slight increase</td>
+                        <td>Reactive streams, TCP flow control</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Bounded Queue with Backpressure Signaling</h2>
+        <p>The core implementation pattern: a bounded queue that signals producers when capacity is reached.</p>
+
+        <pre><code><span class="token-keyword">import</span> threading
+<span class="token-keyword">import</span> time
+<span class="token-keyword">from</span> collections <span class="token-keyword">import</span> deque
+<span class="token-keyword">from</span> enum <span class="token-keyword">import</span> Enum
+
+<span class="token-keyword">class</span> <span class="token-class">PressureLevel</span>(Enum):
+    NORMAL = <span class="token-string">"normal"</span>
+    WARNING = <span class="token-string">"warning"</span>
+    CRITICAL = <span class="token-string">"critical"</span>
+
+<span class="token-keyword">class</span> <span class="token-class">BackpressureQueue</span>:
+    <span class="token-string">"""Bounded queue with backpressure signaling."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, max_size: int = <span class="token-number">100</span>,
+                 warn_threshold: float = <span class="token-number">0.7</span>,
+                 critical_threshold: float = <span class="token-number">0.9</span>):
+        self._queue = deque()
+        self._max_size = max_size
+        self._warn = int(max_size * warn_threshold)
+        self._critical = int(max_size * critical_threshold)
+        self._lock = threading.Lock()
+        self._not_full = threading.Condition(self._lock)
+        self._not_empty = threading.Condition(self._lock)
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">pressure</span>(self) -> PressureLevel:
+        <span class="token-string">"""Current backpressure level."""</span>
+        size = len(self._queue)
+        <span class="token-keyword">if</span> size >= self._critical:
+            <span class="token-keyword">return</span> PressureLevel.CRITICAL
+        <span class="token-keyword">elif</span> size >= self._warn:
+            <span class="token-keyword">return</span> PressureLevel.WARNING
+        <span class="token-keyword">return</span> PressureLevel.NORMAL
+
+    <span class="token-keyword">def</span> <span class="token-function">put</span>(self, item, block: bool = <span class="token-keyword">True</span>,
+            timeout: float = <span class="token-keyword">None</span>) -> bool:
+        <span class="token-string">"""Add item. Blocks if full (when block=True)."""</span>
+        <span class="token-keyword">with</span> self._not_full:
+            <span class="token-keyword">if</span> len(self._queue) >= self._max_size:
+                <span class="token-keyword">if</span> <span class="token-keyword">not</span> block:
+                    <span class="token-keyword">return</span> <span class="token-keyword">False</span>  <span class="token-comment"># Signal: queue full</span>
+                <span class="token-comment"># Block producer until space available</span>
+                self._not_full.wait(timeout=timeout)
+                <span class="token-keyword">if</span> len(self._queue) >= self._max_size:
+                    <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+
+            self._queue.append(item)
+            self._not_empty.notify()
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, timeout: float = <span class="token-keyword">None</span>):
+        <span class="token-string">"""Remove and return item. Blocks if empty."""</span>
+        <span class="token-keyword">with</span> self._not_empty:
+            <span class="token-keyword">while</span> <span class="token-keyword">not</span> self._queue:
+                self._not_empty.wait(timeout=timeout)
+                <span class="token-keyword">if</span> <span class="token-keyword">not</span> self._queue:
+                    <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+            item = self._queue.popleft()
+            self._not_full.notify()  <span class="token-comment"># Wake blocked producers</span>
+            <span class="token-keyword">return</span> item</code></pre>
+
+        <h2>Producer-Consumer with Adaptive Backpressure</h2>
+        <p>A producer that adjusts its rate based on backpressure signals from the queue:</p>
+
+        <pre><code><span class="token-keyword">import</span> random
+
+<span class="token-keyword">class</span> <span class="token-class">AdaptiveProducer</span>:
+    <span class="token-string">"""Producer that slows down under backpressure."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, queue: BackpressureQueue,
+                 base_rate: float = <span class="token-number">0.01</span>):
+        self._queue = queue
+        self._base_rate = base_rate
+        self._current_delay = base_rate
+        self._running = <span class="token-keyword">False</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_adjust_rate</span>(self):
+        <span class="token-string">"""Slow down or speed up based on pressure."""</span>
+        pressure = self._queue.pressure
+        <span class="token-keyword">if</span> pressure == PressureLevel.CRITICAL:
+            self._current_delay = self._base_rate * <span class="token-number">10</span>
+        <span class="token-keyword">elif</span> pressure == PressureLevel.WARNING:
+            self._current_delay = self._base_rate * <span class="token-number">3</span>
+        <span class="token-keyword">else</span>:
+            self._current_delay = self._base_rate
+
+    <span class="token-keyword">def</span> <span class="token-function">run</span>(self, num_items: int = <span class="token-number">1000</span>):
+        self._running = <span class="token-keyword">True</span>
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(num_items):
+            <span class="token-keyword">if</span> <span class="token-keyword">not</span> self._running:
+                <span class="token-keyword">break</span>
+            self._adjust_rate()
+            item = {<span class="token-string">"id"</span>: i, <span class="token-string">"data"</span>: random.random()}
+            success = self._queue.put(item, block=<span class="token-keyword">False</span>)
+            <span class="token-keyword">if</span> <span class="token-keyword">not</span> success:
+                <span class="token-comment"># Queue full &mdash; wait and retry</span>
+                time.sleep(self._current_delay * <span class="token-number">5</span>)
+                self._queue.put(item, block=<span class="token-keyword">True</span>, timeout=<span class="token-number">5.0</span>)
+            time.sleep(self._current_delay)
+
+    <span class="token-keyword">def</span> <span class="token-function">stop</span>(self):
+        self._running = <span class="token-keyword">False</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">Consumer</span>:
+    <span class="token-string">"""Slow consumer that processes items."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, queue: BackpressureQueue,
+                 process_time: float = <span class="token-number">0.05</span>):
+        self._queue = queue
+        self._process_time = process_time
+        self._processed = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">run</span>(self):
+        <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+            item = self._queue.get(timeout=<span class="token-number">2.0</span>)
+            <span class="token-keyword">if</span> item <span class="token-keyword">is</span> <span class="token-keyword">None</span>:
+                <span class="token-keyword">break</span>
+            <span class="token-comment"># Simulate slow processing</span>
+            time.sleep(self._process_time)
+            self._processed += <span class="token-number">1</span></code></pre>
+
+        <h2>TCP Flow Control as Backpressure</h2>
+        <p>TCP&rsquo;s sliding window protocol is the canonical example of backpressure in networking. The receiver advertises its available buffer space (receive window) in every ACK packet. When the window shrinks to zero, the sender stops transmitting.</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>TCP Mechanism</th>
+                        <th>Backpressure Equivalent</th>
+                        <th>Effect</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Receive window (rwnd)</td>
+                        <td>Buffer capacity signal</td>
+                        <td>Tells sender how much data receiver can accept</td>
+                    </tr>
+                    <tr>
+                        <td>Window size = 0</td>
+                        <td>Queue full / block</td>
+                        <td>Sender stops transmitting entirely</td>
+                    </tr>
+                    <tr>
+                        <td>Window update ACK</td>
+                        <td>Resume signal</td>
+                        <td>Receiver processed data, sender can resume</td>
+                    </tr>
+                    <tr>
+                        <td>Congestion window (cwnd)</td>
+                        <td>Network-level backpressure</td>
+                        <td>Limits rate based on network capacity</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Reactive Streams &amp; Demand Signaling</h2>
+        <p>Reactive Streams (used in RxJava, Project Reactor, Akka Streams) formalize backpressure as a <strong>demand signal</strong>. The subscriber tells the publisher exactly how many items it can accept via <code>request(n)</code>.</p>
+
+        <pre><code><span class="token-keyword">from</span> abc <span class="token-keyword">import</span> ABC, abstractmethod
+
+<span class="token-keyword">class</span> <span class="token-class">Subscriber</span>(ABC):
+    <span class="token-string">"""Reactive Streams subscriber with demand signaling."""</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">on_subscribe</span>(self, subscription):
+        <span class="token-keyword">pass</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">on_next</span>(self, item):
+        <span class="token-keyword">pass</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">on_complete</span>(self):
+        <span class="token-keyword">pass</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">Subscription</span>:
+    <span class="token-string">"""Controls demand between publisher and subscriber."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, publisher, subscriber):
+        self._publisher = publisher
+        self._subscriber = subscriber
+        self._demand = <span class="token-number">0</span>
+        self._cancelled = <span class="token-keyword">False</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">request</span>(self, n: int):
+        <span class="token-string">"""Subscriber requests n more items."""</span>
+        self._demand += n
+        self._publisher.drain(self)
+
+    <span class="token-keyword">def</span> <span class="token-function">cancel</span>(self):
+        self._cancelled = <span class="token-keyword">True</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">Publisher</span>:
+    <span class="token-string">"""Emits items only when demand exists."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, items):
+        self._items = list(items)
+        self._index = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">subscribe</span>(self, subscriber: Subscriber):
+        sub = Subscription(self, subscriber)
+        subscriber.on_subscribe(sub)
+
+    <span class="token-keyword">def</span> <span class="token-function">drain</span>(self, subscription: Subscription):
+        <span class="token-keyword">while</span> (subscription._demand > <span class="token-number">0</span>
+               <span class="token-keyword">and</span> self._index &lt; len(self._items)
+               <span class="token-keyword">and not</span> subscription._cancelled):
+            subscription._subscriber.on_next(
+                self._items[self._index])
+            self._index += <span class="token-number">1</span>
+            subscription._demand -= <span class="token-number">1</span>
+        <span class="token-keyword">if</span> self._index >= len(self._items):
+            subscription._subscriber.on_complete()</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Kafka Consumer Lag:</strong> When Kafka consumers fall behind, the &ldquo;consumer lag&rdquo; metric grows. Teams set alerts on lag and scale consumer instances. Kafka doesn&rsquo;t block producers &mdash; it uses bounded retention (time or size) as implicit backpressure.</p>
+            <p><strong>RxJava/Project Reactor:</strong> Both implement the Reactive Streams spec with operators like <code>onBackpressureBuffer()</code>, <code>onBackpressureDrop()</code>, and <code>onBackpressureLatest()</code> to choose the strategy per pipeline stage.</p>
+            <p><strong>Node.js Streams:</strong> Node&rsquo;s readable streams return <code>false</code> from <code>write()</code> when the internal buffer is full. The producer should stop writing until the <code>'drain'</code> event fires.</p>
+            <p><strong>TCP Window Scaling:</strong> Modern TCP uses window scaling (RFC 7323) to support windows up to 1 GB, enabling high-throughput links while still providing backpressure via zero-window probes.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Backpressure is a feedback mechanism from consumer to producer saying &ldquo;slow down&rdquo;</li>
+                <li>Four strategies: buffer, drop, block, or signal &mdash; choose based on data criticality</li>
+                <li>Unbounded queues are not backpressure &mdash; they just delay the crash (OOM)</li>
+                <li>TCP flow control is the most widely deployed backpressure system in the world</li>
+                <li>Reactive Streams formalize backpressure as explicit demand signaling</li>
+                <li>Monitor queue depth and consumer lag as early warning indicators</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of backpressure as water flowing through pipes of different diameters. The narrowest pipe (slowest consumer) determines system throughput. Without a valve (backpressure), pressure builds until a pipe bursts (OOM/crash). With a valve, the source reduces flow to match the narrowest point.</p>
+            <div class="model-visual">
+                <pre>
+  PRODUCER              BOUNDED QUEUE              CONSUMER
+  (fast)                 (buffer)                  (slow)
+     │                                                │
+     │  ┌──────────────────────────────┐             │
+     ├─►│ ■ ■ ■ ■ ■ ■ ■ ■ □ □ □ □    │────────────►│
+     │  └──────────────────────────────┘             │
+     │          70% full = WARNING                    │
+     │                                                │
+     │◄──── "Slow down!" (backpressure signal) ◄─────┤
+     │                                                │
+  Reduces rate                              Processes at
+  or blocks                                 own pace
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Using unbounded queues as a &ldquo;solution&rdquo;:</strong> An unbounded queue doesn&rsquo;t solve the problem &mdash; it converts a fast crash into a slow memory leak. Eventually the process runs out of memory. Always use bounded buffers with explicit overflow strategies.</li>
+                <li><strong>Ignoring backpressure in async pipelines:</strong> Chaining async tasks without demand control can create millions of pending futures. Each stage must respect the pace of its downstream &mdash; not just fire events as fast as possible.</li>
+                <li><strong>Applying backpressure too late:</strong> If you only react when the queue is 100% full, the system is already degraded. Set thresholds at 70% (warning) and 90% (critical) to give the producer time to decelerate gracefully.</li>
+                <li><strong>Blocking the event loop:</strong> In single-threaded systems (Node.js, asyncio), blocking for backpressure freezes the entire application. Use non-blocking signals (returning false, emitting events) instead of thread-based blocking.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a backpressure simulator:</strong> Create a producer-consumer system with configurable rates. Measure queue depth over time with and without backpressure. Plot the difference.</li>
+                <li><strong>Implement drop strategies:</strong> Extend the BackpressureQueue to support &ldquo;drop-oldest&rdquo; and &ldquo;drop-newest&rdquo; policies when the buffer is full. Test which policy loses less critical data.</li>
+                <li><strong>Reactive demand signaling:</strong> Implement a full reactive pipeline with Publisher/Subscriber where the subscriber requests items in batches of 10. Verify that the publisher never emits more than requested.</li>
+                <li><strong>TCP window simulation:</strong> Simulate TCP flow control with a sender, receiver, and configurable window size. Show how reducing the window to zero pauses the sender and how window updates resume transmission.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="34-delivery-guarantees.html" class="prev">&larr; Delivery Guarantees</a>
+            <a href="36-circuit-breaker.html" class="next">Circuit Breaker &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

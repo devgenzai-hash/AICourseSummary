@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingest & Normalize - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Ingest &amp; Normalize
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 1: Ingest &amp; Normalize Documents</h1>
+                <p class="subtitle">The foundation of everything. If garbage goes in, garbage comes out — no matter how smart your AI is.</p>
+                <div class="tag-row">
+                    <span class="tag tag-beginner">Beginner</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-scale">10M Scale</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: The Mail Room</div>
+                <p>Imagine you work in a huge company with <strong>10 million pieces of mail</strong> arriving every day — letters, packages, emails printed out, faxes, sticky notes, voice recordings transcribed on napkins.</p>
+                <p>Before anyone can find anything useful, someone in the mail room has to:</p>
+                <ul>
+                    <li><strong>Remove duplicates</strong> — "Wait, we got this same letter 3 times"</li>
+                    <li><strong>Put everything in the same format</strong> — Type up the napkin notes, scan the faxes</li>
+                    <li><strong>Label everything</strong> — Who sent it? When? What department? What topic?</li>
+                    <li><strong>Keep old versions</strong> — "The policy changed last month, keep both versions"</li>
+                </ul>
+                <p>Without this mail room doing its job, nobody in the company can find anything. The ingestion stage IS that mail room for your RAG system.</p>
+            </div>
+
+            <!-- ===== WHAT IS IT ===== -->
+            <h2>What Is Document Ingestion?</h2>
+            <p><strong>Ingestion</strong> is the process of taking raw documents from various sources and preparing them so your AI system can actually search through them effectively. Think of it as "food preparation" before cooking — you wash, peel, chop, and organize ingredients before you start cooking.</p>
+
+            <p>In a RAG system, your documents might come from:</p>
+            <ul>
+                <li>PDFs (company reports, research papers, manuals)</li>
+                <li>Word documents (memos, proposals, meeting notes)</li>
+                <li>Emails (customer conversations, internal communications)</li>
+                <li>Web pages (knowledge bases, documentation sites)</li>
+                <li>Databases (product catalogs, customer records)</li>
+                <li>Slack/Teams messages (discussions, decisions)</li>
+                <li>Code repositories (documentation, README files)</li>
+            </ul>
+
+            <p>Each of these comes in a different format, with different structures, and varying quality. <strong>Normalization</strong> means converting ALL of them into one clean, consistent format that your system can work with.</p>
+
+            <!-- ===== HOW IT WORKS ===== -->
+            <h2>How It Works: The 4 Steps</h2>
+
+            <h3>Step 1: Remove Duplicates (Deduplication)</h3>
+            <p><strong>Simple explanation:</strong> Don't keep 5 copies of the same document. It wastes storage and confuses search results.</p>
+
+            <p><strong>Why it matters at scale:</strong> At 10M documents, duplicates are inevitable. The same memo gets forwarded 50 times. The same PDF gets uploaded to 3 different systems. Without dedup, your retrieval returns the same information multiple times, wasting precious context window space.</p>
+
+            <h4>Technical Deep Dive: Deduplication Methods</h4>
+
+            <div class="collapsible">
+                <div class="collapsible-header">Exact Deduplication (Hash-based)</div>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <p>Create a unique fingerprint (hash) of each document. If two documents have the same fingerprint, they're identical.</p>
+<pre><code><span class="token-keyword">import</span> hashlib
+
+<span class="token-keyword">def</span> <span class="token-function">get_doc_hash</span>(content: <span class="token-builtin">str</span>) -> <span class="token-builtin">str</span>:
+    <span class="token-string">"""Create a unique fingerprint for a document."""</span>
+    <span class="token-comment"># Normalize whitespace first</span>
+    normalized = <span class="token-string">" "</span>.join(content.split()).lower().strip()
+    <span class="token-keyword">return</span> hashlib.sha256(normalized.encode()).hexdigest()
+
+<span class="token-comment"># Usage</span>
+seen_hashes = <span class="token-builtin">set</span>()
+unique_docs = []
+
+<span class="token-keyword">for</span> doc <span class="token-keyword">in</span> all_documents:
+    doc_hash = get_doc_hash(doc.content)
+    <span class="token-keyword">if</span> doc_hash <span class="token-keyword">not in</span> seen_hashes:
+        seen_hashes.add(doc_hash)
+        unique_docs.append(doc)
+    <span class="token-keyword">else</span>:
+        print(<span class="token-string">f"Duplicate found: {doc.title}"</span>)</code></pre>
+                        <p><strong>Limitation:</strong> If even one character is different (like a typo fix), it's considered a different document.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">Near-Duplicate Detection (MinHash/SimHash)</div>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <p>For documents that are <em>almost</em> the same (like different versions or slight reformats), we use fuzzy matching.</p>
+                        <p><strong>MinHash</strong> works like this: break the document into small pieces (shingles), then use mathematical magic to quickly estimate how similar two documents are without comparing every word.</p>
+<pre><code><span class="token-keyword">from</span> datasketch <span class="token-keyword">import</span> MinHash, MinHashLSH
+
+<span class="token-keyword">def</span> <span class="token-function">create_minhash</span>(text, num_perm=<span class="token-number">128</span>):
+    <span class="token-string">"""Create a MinHash signature for near-duplicate detection."""</span>
+    m = MinHash(num_perm=num_perm)
+    <span class="token-comment"># Break text into 3-word chunks (shingles)</span>
+    words = text.lower().split()
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-builtin">len</span>(words) - <span class="token-number">2</span>):
+        shingle = <span class="token-string">" "</span>.join(words[i:i+<span class="token-number">3</span>])
+        m.update(shingle.encode(<span class="token-string">'utf8'</span>))
+    <span class="token-keyword">return</span> m
+
+<span class="token-comment"># Create an LSH index for fast lookup</span>
+lsh = MinHashLSH(threshold=<span class="token-number">0.8</span>, num_perm=<span class="token-number">128</span>)
+
+<span class="token-keyword">for</span> doc_id, doc <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(documents):
+    mh = create_minhash(doc.content)
+    <span class="token-comment"># Check if a near-duplicate already exists</span>
+    duplicates = lsh.query(mh)
+    <span class="token-keyword">if</span> <span class="token-keyword">not</span> duplicates:
+        lsh.insert(<span class="token-string">f"doc_{doc_id}"</span>, mh)
+    <span class="token-keyword">else</span>:
+        print(<span class="token-string">f"Near-duplicate of {duplicates[0]}: {doc.title}"</span>)</code></pre>
+                        <p><strong>threshold=0.8</strong> means documents sharing 80%+ content are considered duplicates.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Step 2: Standardize Formats (Normalization)</h3>
+            <p><strong>Simple explanation:</strong> Convert everything into the same clean text format, regardless of whether it started as a PDF, Word doc, or web page.</p>
+
+            <p><strong>What we standardize:</strong></p>
+            <ul>
+                <li><strong>Text encoding</strong> — Everything becomes UTF-8 (a universal character standard)</li>
+                <li><strong>Line breaks</strong> — Consistent paragraph separators</li>
+                <li><strong>Headers/structure</strong> — Preserve section hierarchy</li>
+                <li><strong>Tables</strong> — Convert to a parseable format</li>
+                <li><strong>Special characters</strong> — Remove or normalize weird symbols</li>
+            </ul>
+
+<pre><code><span class="token-keyword">import</span> re
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Dict
+
+<span class="token-keyword">def</span> <span class="token-function">normalize_document</span>(raw_text: <span class="token-builtin">str</span>, source_type: <span class="token-builtin">str</span>) -> Dict:
+    <span class="token-string">"""Normalize any document into a clean, consistent format."""</span>
+    
+    <span class="token-comment"># 1. Fix encoding issues</span>
+    text = raw_text.encode(<span class="token-string">'utf-8'</span>, errors=<span class="token-string">'replace'</span>).decode(<span class="token-string">'utf-8'</span>)
+    
+    <span class="token-comment"># 2. Normalize whitespace (keep paragraph breaks)</span>
+    text = re.sub(<span class="token-string">r'[ \t]+'</span>, <span class="token-string">' '</span>, text)  <span class="token-comment"># Multiple spaces → one space</span>
+    text = re.sub(<span class="token-string">r'\n{3,}'</span>, <span class="token-string">'\n\n'</span>, text)  <span class="token-comment"># Max 2 newlines</span>
+    
+    <span class="token-comment"># 3. Remove control characters</span>
+    text = re.sub(<span class="token-string">r'[\x00-\x08\x0b\x0c\x0e-\x1f]'</span>, <span class="token-string">''</span>, text)
+    
+    <span class="token-comment"># 4. Normalize quotes and dashes</span>
+    text = text.replace(<span class="token-string">'\u2018'</span>, <span class="token-string">"'"</span>).replace(<span class="token-string">'\u2019'</span>, <span class="token-string">"'"</span>)
+    text = text.replace(<span class="token-string">'\u201c'</span>, <span class="token-string">'"'</span>).replace(<span class="token-string">'\u201d'</span>, <span class="token-string">'"'</span>)
+    text = text.replace(<span class="token-string">'\u2014'</span>, <span class="token-string">'—'</span>)
+    
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"content"</span>: text.strip(),
+        <span class="token-string">"char_count"</span>: <span class="token-builtin">len</span>(text),
+        <span class="token-string">"source_type"</span>: source_type,
+        <span class="token-string">"is_valid"</span>: <span class="token-builtin">len</span>(text.strip()) > <span class="token-number">50</span>  <span class="token-comment"># Skip near-empty docs</span>
+    }</code></pre>
+
+            <h3>Step 3: Extract Metadata</h3>
+            <p><strong>Simple explanation:</strong> Metadata is "data about data." It's the label on the box telling you what's inside, who put it there, and when.</p>
+
+            <p><strong>Critical metadata fields for RAG:</strong></p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Metadata Field</th>
+                        <th>What It Is</th>
+                        <th>Why It Matters</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>source_id</code></td>
+                        <td>Unique identifier for the document</td>
+                        <td>Track provenance, enable citations</td>
+                    </tr>
+                    <tr>
+                        <td><code>created_at</code></td>
+                        <td>When the document was created</td>
+                        <td>Freshness scoring, version control</td>
+                    </tr>
+                    <tr>
+                        <td><code>updated_at</code></td>
+                        <td>When it was last modified</td>
+                        <td>Prefer recent info over stale</td>
+                    </tr>
+                    <tr>
+                        <td><code>author</code></td>
+                        <td>Who wrote/uploaded it</td>
+                        <td>Trust scoring, access control</td>
+                    </tr>
+                    <tr>
+                        <td><code>source_system</code></td>
+                        <td>Where it came from (Confluence, Slack, etc.)</td>
+                        <td>Source reliability weighting</td>
+                    </tr>
+                    <tr>
+                        <td><code>doc_type</code></td>
+                        <td>Category (policy, FAQ, meeting notes, etc.)</td>
+                        <td>Filtering, relevance boosting</td>
+                    </tr>
+                    <tr>
+                        <td><code>version</code></td>
+                        <td>Document version number</td>
+                        <td>Always retrieve latest version</td>
+                    </tr>
+                    <tr>
+                        <td><code>confidence_level</code></td>
+                        <td>How trustworthy (verified vs draft)</td>
+                        <td>Source confidence scoring (Stage 4)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+<pre><code><span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional, List
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">DocumentMetadata</span>:
+    source_id: <span class="token-builtin">str</span>
+    title: <span class="token-builtin">str</span>
+    created_at: datetime
+    updated_at: datetime
+    author: <span class="token-builtin">str</span>
+    source_system: <span class="token-builtin">str</span>           <span class="token-comment"># "confluence", "slack", "gdrive"</span>
+    doc_type: <span class="token-builtin">str</span>               <span class="token-comment"># "policy", "faq", "meeting_notes"</span>
+    version: <span class="token-builtin">int</span> = <span class="token-number">1</span>
+    confidence_level: <span class="token-builtin">str</span> = <span class="token-string">"verified"</span>  <span class="token-comment"># "draft", "verified", "official"</span>
+    tags: List[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>
+    language: <span class="token-builtin">str</span> = <span class="token-string">"en"</span>
+    parent_doc_id: Optional[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>
+
+<span class="token-keyword">def</span> <span class="token-function">extract_metadata</span>(raw_doc, source_system: <span class="token-builtin">str</span>) -> DocumentMetadata:
+    <span class="token-string">"""Extract and structure metadata from a raw document."""</span>
+    <span class="token-keyword">return</span> DocumentMetadata(
+        source_id=generate_unique_id(raw_doc),
+        title=extract_title(raw_doc),
+        created_at=raw_doc.get(<span class="token-string">"created"</span>, datetime.now()),
+        updated_at=raw_doc.get(<span class="token-string">"modified"</span>, datetime.now()),
+        author=raw_doc.get(<span class="token-string">"author"</span>, <span class="token-string">"unknown"</span>),
+        source_system=source_system,
+        doc_type=classify_document_type(raw_doc),
+        tags=extract_tags(raw_doc)
+    )</code></pre>
+
+            <h3>Step 4: Maintain Version History</h3>
+            <p><strong>Simple explanation:</strong> When a document gets updated, don't delete the old version. Keep both. Your system needs to know what the policy was <em>last month</em> versus <em>today</em>.</p>
+
+            <p><strong>Why this matters for RAG:</strong></p>
+            <ul>
+                <li>A user might ask "What was our vacation policy in 2024?" — you need the old version</li>
+                <li>If a document is wrong, you need to trace back to when the error was introduced</li>
+                <li>Regulatory compliance often requires keeping historical records</li>
+                <li>You can detect conflicting information across versions</li>
+            </ul>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">VersionedDocumentStore</span>:
+    <span class="token-string">"""Store documents with full version history."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.documents = {}  <span class="token-comment"># doc_id → list of versions</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">ingest</span>(self, doc_id: <span class="token-builtin">str</span>, content: <span class="token-builtin">str</span>, metadata: <span class="token-builtin">dict</span>):
+        <span class="token-string">"""Add or update a document, preserving history."""</span>
+        <span class="token-keyword">if</span> doc_id <span class="token-keyword">not in</span> self.documents:
+            self.documents[doc_id] = []
+        
+        version_num = <span class="token-builtin">len</span>(self.documents[doc_id]) + <span class="token-number">1</span>
+        
+        version_entry = {
+            <span class="token-string">"version"</span>: version_num,
+            <span class="token-string">"content"</span>: content,
+            <span class="token-string">"metadata"</span>: metadata,
+            <span class="token-string">"ingested_at"</span>: datetime.now(),
+            <span class="token-string">"is_latest"</span>: <span class="token-keyword">True</span>
+        }
+        
+        <span class="token-comment"># Mark previous version as not latest</span>
+        <span class="token-keyword">if</span> self.documents[doc_id]:
+            self.documents[doc_id][-<span class="token-number">1</span>][<span class="token-string">"is_latest"</span>] = <span class="token-keyword">False</span>
+        
+        self.documents[doc_id].append(version_entry)
+    
+    <span class="token-keyword">def</span> <span class="token-function">get_latest</span>(self, doc_id: <span class="token-builtin">str</span>):
+        <span class="token-string">"""Get the most recent version of a document."""</span>
+        <span class="token-keyword">if</span> doc_id <span class="token-keyword">in</span> self.documents:
+            <span class="token-keyword">return</span> self.documents[doc_id][-<span class="token-number">1</span>]
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">get_version_at_date</span>(self, doc_id: <span class="token-builtin">str</span>, target_date: datetime):
+        <span class="token-string">"""Get the version that was current at a specific date."""</span>
+        <span class="token-keyword">if</span> doc_id <span class="token-keyword">not in</span> self.documents:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        <span class="token-keyword">for</span> version <span class="token-keyword">in</span> <span class="token-builtin">reversed</span>(self.documents[doc_id]):
+            <span class="token-keyword">if</span> version[<span class="token-string">"ingested_at"</span>] <= target_date:
+                <span class="token-keyword">return</span> version
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span></code></pre>
+
+            <!-- ===== CHUNKING ===== -->
+            <h2>The Chunking Problem</h2>
+            <p>After normalizing, you need to break documents into <strong>chunks</strong> — smaller pieces that can be individually searched and retrieved. This is one of the most important decisions in RAG.</p>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📖 Analogy: Library Books vs. Index Cards</div>
+                <p>Imagine searching a library. You wouldn't pull out an entire 500-page book every time someone asks a question. Instead, you'd point them to the exact chapter, or even the exact paragraph.</p>
+                <p><strong>Chunks are those specific paragraphs.</strong> Small enough to be precise, big enough to contain complete thoughts.</p>
+            </div>
+
+            <h3>Chunking Strategies</h3>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>How It Works</th>
+                        <th>Best For</th>
+                        <th>Chunk Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Fixed-size</strong></td>
+                        <td>Cut every N characters/tokens</td>
+                        <td>Simple docs, uniform content</td>
+                        <td>256-512 tokens</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Semantic</strong></td>
+                        <td>Split at natural paragraph/section boundaries</td>
+                        <td>Well-structured documents</td>
+                        <td>Varies (200-1000 tokens)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recursive</strong></td>
+                        <td>Try to split by sections, then paragraphs, then sentences</td>
+                        <td>Mixed content types</td>
+                        <td>Target 512, flexible</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sliding window</strong></td>
+                        <td>Overlapping chunks (like tiles overlapping)</td>
+                        <td>When context crosses chunk boundaries</td>
+                        <td>512 with 50-100 overlap</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Document-aware</strong></td>
+                        <td>Use document structure (headings, sections)</td>
+                        <td>Technical docs, legal docs</td>
+                        <td>Varies by section</td>
+                    </tr>
+                </tbody>
+            </table>
+
+<pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict
+
+<span class="token-keyword">def</span> <span class="token-function">chunk_document</span>(
+    text: <span class="token-builtin">str</span>,
+    chunk_size: <span class="token-builtin">int</span> = <span class="token-number">512</span>,
+    overlap: <span class="token-builtin">int</span> = <span class="token-number">50</span>,
+    metadata: Dict = <span class="token-keyword">None</span>
+) -> List[Dict]:
+    <span class="token-string">"""
+    Split a document into overlapping chunks.
+    
+    chunk_size: maximum number of words per chunk
+    overlap: number of words shared between adjacent chunks
+    """</span>
+    words = text.split()
+    chunks = []
+    start = <span class="token-number">0</span>
+    chunk_index = <span class="token-number">0</span>
+    
+    <span class="token-keyword">while</span> start < <span class="token-builtin">len</span>(words):
+        end = start + chunk_size
+        chunk_text = <span class="token-string">" "</span>.join(words[start:end])
+        
+        chunk = {
+            <span class="token-string">"chunk_id"</span>: <span class="token-string">f"{metadata['source_id']}_chunk_{chunk_index}"</span>,
+            <span class="token-string">"content"</span>: chunk_text,
+            <span class="token-string">"chunk_index"</span>: chunk_index,
+            <span class="token-string">"start_word"</span>: start,
+            <span class="token-string">"end_word"</span>: <span class="token-builtin">min</span>(end, <span class="token-builtin">len</span>(words)),
+            <span class="token-string">"metadata"</span>: metadata  <span class="token-comment"># Inherit parent document metadata</span>
+        }
+        chunks.append(chunk)
+        
+        start = end - overlap  <span class="token-comment"># Slide window with overlap</span>
+        chunk_index += <span class="token-number">1</span>
+    
+    <span class="token-keyword">return</span> chunks</code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Documents Scale</div>
+                <p><strong>The math:</strong> 10M documents × ~10 chunks per document = <strong>100M chunks</strong> in your index. This means:</p>
+                <ul>
+                    <li>Deduplication must be fast — O(1) lookup with hash sets, not O(n²) comparisons</li>
+                    <li>Processing must be parallelized — use distributed workers (Celery, Ray, Spark)</li>
+                    <li>Storage must be efficient — compressed storage, tiered (hot/warm/cold)</li>
+                    <li>Ingestion must be incremental — process new/changed docs only, not re-process everything</li>
+                    <li>You need a pipeline, not a script — with retry logic, dead letter queues, monitoring</li>
+                </ul>
+            </div>
+
+            <!-- ===== FULL PIPELINE ===== -->
+            <h2>The Complete Ingestion Pipeline</h2>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">IngestionPipeline</span>:
+    <span class="token-string">"""
+    Production-grade document ingestion pipeline.
+    Handles 10M+ docs with dedup, normalization, 
+    metadata extraction, chunking, and versioning.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, vector_store, doc_store):
+        self.vector_store = vector_store
+        self.doc_store = doc_store
+        self.seen_hashes = <span class="token-builtin">set</span>()  <span class="token-comment"># For dedup</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">process_document</span>(self, raw_doc: Dict) -> Dict:
+        <span class="token-string">"""Full pipeline for one document."""</span>
+        
+        <span class="token-comment"># Step 1: Parse raw content based on type</span>
+        text = self.extract_text(raw_doc)
+        
+        <span class="token-comment"># Step 2: Normalize</span>
+        normalized = normalize_document(text, raw_doc[<span class="token-string">"source_type"</span>])
+        
+        <span class="token-comment"># Step 3: Dedup check</span>
+        doc_hash = get_doc_hash(normalized[<span class="token-string">"content"</span>])
+        <span class="token-keyword">if</span> doc_hash <span class="token-keyword">in</span> self.seen_hashes:
+            <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"duplicate"</span>, <span class="token-string">"hash"</span>: doc_hash}
+        self.seen_hashes.add(doc_hash)
+        
+        <span class="token-comment"># Step 4: Extract metadata</span>
+        metadata = extract_metadata(raw_doc, raw_doc[<span class="token-string">"source_system"</span>])
+        
+        <span class="token-comment"># Step 5: Version management</span>
+        self.doc_store.ingest(
+            doc_id=metadata.source_id,
+            content=normalized[<span class="token-string">"content"</span>],
+            metadata=metadata.__dict__
+        )
+        
+        <span class="token-comment"># Step 6: Chunk the document</span>
+        chunks = chunk_document(
+            text=normalized[<span class="token-string">"content"</span>],
+            chunk_size=<span class="token-number">512</span>,
+            overlap=<span class="token-number">50</span>,
+            metadata=metadata.__dict__
+        )
+        
+        <span class="token-comment"># Step 7: Store chunks in vector store (for Stage 2)</span>
+        self.vector_store.upsert(chunks)
+        
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"status"</span>: <span class="token-string">"ingested"</span>,
+            <span class="token-string">"doc_id"</span>: metadata.source_id,
+            <span class="token-string">"chunks_created"</span>: <span class="token-builtin">len</span>(chunks),
+            <span class="token-string">"version"</span>: metadata.version
+        }</code></pre>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>Unstructured.io</strong> — Popular open-source library for parsing 25+ file formats into clean text</li>
+                    <li><strong>Apache Tika</strong> — Battle-tested document parser used by enterprises for PDFs, Office docs, etc.</li>
+                    <li><strong>LangChain/LlamaIndex</strong> — Provide document loaders and chunking strategies out of the box</li>
+                    <li><strong>Custom pipelines</strong> — Most 10M+ doc systems build custom Airflow/Dagster pipelines with domain-specific logic</li>
+                    <li><strong>Incremental processing</strong> — Change Data Capture (CDC) to only process new/updated documents</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>Ingestion is the foundation — bad input = bad retrieval = hallucination</li>
+                    <li>Deduplicate to avoid wasting context window space on repeated information</li>
+                    <li>Normalize ALL formats into one clean standard — consistent structure enables consistent search</li>
+                    <li>Rich metadata enables filtering, scoring, and citation (critical for later stages)</li>
+                    <li>Version history lets you answer time-sensitive questions and track document changes</li>
+                    <li>Chunking strategy directly impacts retrieval quality — too small loses context, too big loses precision</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+Raw Docs (PDFs, Emails, Web, DBs)
+         ↓
+    [DEDUP] — Remove copies
+         ↓
+  [NORMALIZE] — Clean & standardize
+         ↓
+  [METADATA] — Label everything
+         ↓
+   [VERSION] — Track history
+         ↓
+    [CHUNK] — Break into searchable pieces
+         ↓
+  Ready for Retrieval (Stage 2) →
+                </div>
+                <p><strong>Think of it as:</strong> A factory assembly line. Raw materials come in messy. They leave clean, labeled, organized, and ready for use.</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>Skipping dedup:</strong> "I'll just index everything" — then your retrieval returns the same info 5 times, wasting context</li>
+                    <li><strong>Ignoring metadata:</strong> Without metadata, you can't cite sources, filter by date, or score confidence</li>
+                    <li><strong>Fixed-size chunks only:</strong> Cutting mid-sentence destroys meaning. Use semantic boundaries when possible</li>
+                    <li><strong>No overlap between chunks:</strong> Important context at chunk boundaries gets lost without overlap</li>
+                    <li><strong>Re-processing everything:</strong> At 10M docs, you MUST do incremental updates or processing takes days</li>
+                    <li><strong>Not validating output:</strong> Always check chunk quality — empty chunks, encoding errors, or truncated content are common</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Mini Ingestion Pipeline</h3>
+                <p>Build a simple ingestion pipeline that handles 3 document types:</p>
+                <ol>
+                    <li>Create a Python script that reads 5 text files from a folder</li>
+                    <li>Implement exact deduplication using SHA-256 hashes</li>
+                    <li>Normalize the text (fix whitespace, encoding, strip HTML tags)</li>
+                    <li>Extract basic metadata: filename, word count, creation date</li>
+                    <li>Chunk each document using sliding window (256 words, 50 overlap)</li>
+                    <li>Save chunks as JSON with their metadata</li>
+                    <li><strong>Bonus:</strong> Add near-duplicate detection using MinHash</li>
+                </ol>
+                <p><strong>Success criteria:</strong> Given 5 docs (2 of which are duplicates), output should produce chunks from only 3 unique documents, each chunk having full metadata.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="index.html" class="prev">Course Overview</a>
+                <a href="02-hybrid-retrieval.html" class="next">Hybrid Retrieval</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

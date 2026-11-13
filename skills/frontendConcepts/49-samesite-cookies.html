@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SameSite Cookie Modes - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preconnect</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> SameSite Cookie Modes
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>SameSite Cookie Modes</h1>
+                <p class="subtitle">The three-value attribute that controls when cookies travel cross-site — the primary browser defense against CSRF attacks, and why <code>SameSite=Lax</code> became the default in 2020.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Security</span>
+                    <span class="tag tag-browser">Cookies</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🎫 Daily-Life Analogy: Event Wristbands</div>
+                <p><strong>SameSite=None</strong> = a wristband that works at ANY venue (third-party cookies sent everywhere — tracking). <strong>SameSite=Lax</strong> = a wristband that only works at the venue you originally entered from (sent on top-level navigations, not embedded requests). <strong>SameSite=Strict</strong> = a wristband that ONLY works if you walked in through the front door of THIS specific venue (never sent on any cross-site request).</p>
+            </div>
+
+            <h2>The Problem: CSRF Attacks</h2>
+<pre><code><span class="token-comment">/*
+  Without SameSite, cookies were ALWAYS sent to their origin, regardless of
+  where the request originated. This enabled CSRF (Cross-Site Request Forgery):
+  
+  1. User is logged into bank.com (has session cookie)
+  2. User visits evil.com
+  3. evil.com has: &lt;form action="https://bank.com/transfer" method="POST"&gt;
+  4. Form auto-submits via JavaScript
+  5. Browser attaches bank.com's session cookie (because it's going to bank.com)
+  6. Bank processes the transfer — it sees a valid session cookie!
+  
+  SameSite prevents step 5: "Don't send my cookie if the request
+  didn't originate from my own site."
+*/</span>
+</code></pre>
+
+            <h2>The Three Modes</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Mode</th><th>Cross-site top-level navigation (clicking a link)</th><th>Cross-site subresource (img, iframe, fetch)</th><th>Same-site requests</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>SameSite=Strict</code></td><td>❌ NOT sent</td><td>❌ NOT sent</td><td>✅ Sent</td></tr>
+                    <tr><td><code>SameSite=Lax</code></td><td>✅ Sent (GET only)</td><td>❌ NOT sent</td><td>✅ Sent</td></tr>
+                    <tr><td><code>SameSite=None; Secure</code></td><td>✅ Sent</td><td>✅ Sent</td><td>✅ Sent</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Code: Setting SameSite Cookies</h2>
+<pre><code><span class="token-comment">// Server-side (Express.js)</span>
+res.cookie(<span class="token-string">'session'</span>, token, {
+    httpOnly: <span class="token-keyword">true</span>,       <span class="token-comment">// Not accessible via JavaScript (XSS protection)</span>
+    secure: <span class="token-keyword">true</span>,         <span class="token-comment">// HTTPS only</span>
+    sameSite: <span class="token-string">'lax'</span>,      <span class="token-comment">// Sent on same-site + top-level navigation</span>
+    maxAge: 7 * 24 * 60 * 60 * 1000, <span class="token-comment">// 7 days</span>
+});
+
+<span class="token-comment">// For cross-site cookies (e.g., OAuth, embedded widgets):</span>
+res.cookie(<span class="token-string">'third_party_token'</span>, value, {
+    httpOnly: <span class="token-keyword">true</span>,
+    secure: <span class="token-keyword">true</span>,         <span class="token-comment">// ⚠️ REQUIRED when SameSite=None</span>
+    sameSite: <span class="token-string">'none'</span>,     <span class="token-comment">// Sent on ALL requests (including cross-site)</span>
+});
+
+<span class="token-comment">// Raw Set-Cookie header equivalents:</span>
+<span class="token-comment">// Set-Cookie: session=abc123; HttpOnly; Secure; SameSite=Lax; Max-Age=604800</span>
+<span class="token-comment">// Set-Cookie: widget=xyz; HttpOnly; Secure; SameSite=None; Max-Age=604800</span>
+</code></pre>
+
+            <h3>When Each Mode Sends Cookies</h3>
+<pre><code><span class="token-comment">// User is on social.com, and your cookie is for bank.com</span>
+
+<span class="token-comment">// Scenario 1: User clicks a link to bank.com (top-level navigation)</span>
+<span class="token-comment">// Strict: ❌ (user arrives "logged out" — bad UX!)</span>
+<span class="token-comment">// Lax: ✅ (user arrives logged in — good UX)</span>
+<span class="token-comment">// None: ✅</span>
+
+<span class="token-comment">// Scenario 2: social.com has &lt;img src="bank.com/avatar.png"&gt;</span>
+<span class="token-comment">// Strict: ❌ (no cookie sent — image load fails if auth required)</span>
+<span class="token-comment">// Lax: ❌ (no cookie sent — this is a subresource, not navigation)</span>
+<span class="token-comment">// None: ✅ (cookie sent — enables cross-site tracking!)</span>
+
+<span class="token-comment">// Scenario 3: social.com auto-submits a form POST to bank.com (CSRF!)</span>
+<span class="token-comment">// Strict: ❌ (CSRF blocked ✅)</span>
+<span class="token-comment">// Lax: ❌ (CSRF blocked ✅ — Lax only allows GET navigations)</span>
+<span class="token-comment">// None: ✅ (CSRF succeeds! 💀 — need other defenses like CSRF tokens)</span>
+
+<span class="token-comment">// Scenario 4: social.com fetches bank.com/api/data via JavaScript</span>
+<span class="token-comment">// Strict: ❌</span>
+<span class="token-comment">// Lax: ❌</span>
+<span class="token-comment">// None: ✅ (only if CORS also allows it)</span>
+</code></pre>
+
+            <h2>Why Lax Is the Default (Since Chrome 80, 2020)</h2>
+            <div class="callout callout-info">
+                <div class="callout-title">💡 The Browser Changed the Default</div>
+                <p>Before 2020, cookies without SameSite behaved as <code>SameSite=None</code> (sent everywhere). Chrome 80 changed the default to <code>SameSite=Lax</code>. This broke: cross-site iframes relying on cookies, OAuth flows using POST redirects, payment gateways with POST callbacks, and ad/tracking cookies. Sites had to explicitly opt in to <code>SameSite=None; Secure</code> for cross-site use.</p>
+            </div>
+
+            <h2>"Site" vs "Origin" — The Critical Distinction</h2>
+<pre><code><span class="token-comment">/*
+  "Origin" = scheme + host + port (strict)
+  https://app.example.com:443  vs  https://api.example.com:443 → DIFFERENT origins
+  
+  "Site" = scheme + registrable domain (eTLD+1) (looser)  
+  https://app.example.com  vs  https://api.example.com → SAME site!
+  (Both share "example.com" as the registrable domain)
+  
+  SameSite uses the SITE definition:
+  - app.example.com → api.example.com = SAME SITE (cookies sent with Lax!)
+  - example.com → other-domain.com = CROSS SITE (cookies blocked with Lax)
+  
+  This means: subdomains of the same domain are "same-site" for cookies.
+  Your SPA at app.example.com can share Lax cookies with api.example.com.
+*/</span>
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Every authenticated web app</strong> — Session cookies should be <code>SameSite=Lax</code> (or <code>Strict</code> for banking). This is the primary CSRF defense in modern browsers.</li>
+                <li><strong>OAuth / SSO flows</strong> — OAuth callbacks often use POST redirects, which require <code>SameSite=None; Secure</code> on the state cookie (or switching to GET redirects).</li>
+                <li><strong>Embedded payment forms (Stripe, PayPal)</strong> — Third-party payment iframes need <code>SameSite=None; Secure</code> to maintain session across the iframe boundary.</li>
+                <li><strong>Google/Facebook login buttons</strong> — Third-party auth widgets embedded in your site need their cookies to work cross-site.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Setting <code>SameSite=None</code> without <code>Secure</code></strong> — Browsers reject <code>SameSite=None</code> cookies that aren't <code>Secure</code> (HTTPS-only). The cookie is silently dropped.</li>
+                <li><strong>Using <code>SameSite=Strict</code> for session cookies</strong> — Users clicking links from email/Slack arrive at your site "logged out" because the cookie wasn't sent on the top-level navigation. Use <code>Lax</code> instead.</li>
+                <li><strong>Not testing OAuth/SSO flows after the Lax default</strong> — Many OAuth libraries broke when browsers changed the default. POST-based callbacks need explicit <code>SameSite=None</code>.</li>
+                <li><strong>Confusing "same-site" with "same-origin"</strong> — <code>a.example.com</code> and <code>b.example.com</code> are same-site (SameSite cookies work) but different origin (CORS still applies).</li>
+                <li><strong>Relying solely on SameSite for CSRF protection</strong> — SameSite=Lax allows GET requests. If your GET endpoints have side effects (bad practice!), they're still vulnerable. Use CSRF tokens as defense-in-depth.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand SameSite Cookies When...</h3>
+                <p>You can explain why <code>SameSite=Lax</code> blocks form POST CSRF attacks but allows users clicking links to arrive logged in, why <code>Strict</code> is too aggressive for most session cookies, and the difference between "same-site" (eTLD+1) and "same-origin" (scheme+host+port).</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Set up two local domains (e.g., <code>localhost:3000</code> and <code>localhost:4000</code> — these are different origins but same site!). Set a cookie with <code>SameSite=Lax</code> on port 3000. From port 4000, try: (1) a link navigation, (2) a fetch request, (3) a form POST. Observe which scenarios include the cookie.</p>
+                <h3>🔗 Connect It</h3>
+                <p>SameSite cookies connect to: <strong>CORS Preflight</strong> (CORS controls whether cross-origin requests succeed; SameSite controls whether cookies travel with them), <strong>Service Workers</strong> (SW fetch events see cookies based on SameSite rules), and <strong>Third-Party Cookie Deprecation</strong> (Chrome's plan to block all <code>SameSite=None</code> cookies entirely by 2025).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="48-cors-preflight.html" class="nav-btn nav-btn-prev">← CORS Preflight</a>
+                <a href="index.html" class="nav-btn nav-btn-next">Back to Course Overview →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

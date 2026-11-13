@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Data Collection & Preparation — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span>Fine-Tuning Guide</span>
+            <h2>🙏 Gemma × Hindu Scriptures</h2>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+                <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+                <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+                <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+                <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+                <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+                <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+                <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+                <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+                <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+                <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+                <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb">
+            <a href="index.html">Guide</a><span>›</span> Data Collection & Preparation
+        </div>
+        <div class="topbar-actions">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 2: Data Collection & Preparation</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Building your scripture corpus: extracting text from PDFs, OCR for scanned documents, cleaning, deduplication, and quality filtering for Hindi, Sanskrit, and English texts.</p>
+
+            <!-- SECTION: Scripture Sources -->
+            <h2 id="sources">📚 Scripture Sources</h2>
+            
+            <h3>Core Hindu Scriptures to Include</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Texts</th>
+                        <th>Languages Available</th>
+                        <th>Approx. Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Vedas</strong></td>
+                        <td>Rigveda, Yajurveda, Samaveda, Atharvaveda</td>
+                        <td>Sanskrit, Hindi, English</td>
+                        <td>~5M words</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Upanishads</strong></td>
+                        <td>108 Principal Upanishads (Isha, Kena, Katha, Mundaka, etc.)</td>
+                        <td>Sanskrit, Hindi, English</td>
+                        <td>~1M words</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bhagavad Gita</strong></td>
+                        <td>700 verses + commentaries (Shankaracharya, Ramanuja, etc.)</td>
+                        <td>Sanskrit, Hindi, English</td>
+                        <td>~500K words</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Epics</strong></td>
+                        <td>Ramayana (Valmiki), Mahabharata</td>
+                        <td>Sanskrit, Hindi, English</td>
+                        <td>~10M words</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Puranas</strong></td>
+                        <td>18 Mahapuranas (Vishnu, Shiva, Bhagavata, etc.)</td>
+                        <td>Sanskrit, Hindi, English</td>
+                        <td>~15M words</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Darshanas</strong></td>
+                        <td>Yoga Sutras, Brahma Sutras, Nyaya Sutras</td>
+                        <td>Sanskrit, Hindi, English</td>
+                        <td>~2M words</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Commentaries</strong></td>
+                        <td>Adi Shankaracharya, Madhvacharya, Ramanujacharya</td>
+                        <td>Sanskrit, Hindi, English</td>
+                        <td>~5M words</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Modern Works</strong></td>
+                        <td>Swami Vivekananda, Sri Aurobindo, Gita Press publications</td>
+                        <td>Hindi, English</td>
+                        <td>~3M words</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Where to Find Public Domain PDFs</h3>
+            <div class="callout callout-info">
+                <div class="callout-title">📖 Public Domain Sources</div>
+                <ul>
+                    <li><strong>Internet Archive (archive.org)</strong> — Largest collection of digitized Hindu texts</li>
+                    <li><strong>Sacred-Texts.com</strong> — English translations of major scriptures</li>
+                    <li><strong>Gita Press (gitapress.org)</strong> — Hindi translations and commentaries</li>
+                    <li><strong>Sanskrit Documents (sanskritdocuments.org)</strong> — Original Sanskrit texts in Devanagari</li>
+                    <li><strong>Wikisource (hi.wikisource.org)</strong> — Hindi public domain texts</li>
+                    <li><strong>DLI (Digital Library of India)</strong> — Massive collection of Indian texts</li>
+                    <li><strong>GRETIL (Göttingen Register)</strong> — Academic Sanskrit e-texts</li>
+                </ul>
+            </div>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Copyright Notice</div>
+                <p>Ensure all texts are in the <strong>public domain</strong> or properly licensed. Ancient scriptures are public domain, but modern translations and commentaries (post-1928) may still be under copyright. Always verify before including.</p>
+            </div>
+
+            <!-- SECTION: PDF Extraction -->
+            <h2 id="pdf-extraction">🔧 PDF Text Extraction</h2>
+
+            <h3>Strategy: Two Types of PDFs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>PDF Type</th>
+                        <th>How to Identify</th>
+                        <th>Extraction Method</th>
+                        <th>Quality</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Digital/Text-based</strong></td>
+                        <td>Can select and copy text</td>
+                        <td>PyMuPDF / pdfplumber</td>
+                        <td>High (95-100%)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scanned/Image-based</strong></td>
+                        <td>Cannot select text, looks like photos</td>
+                        <td>Tesseract OCR / Google Vision API</td>
+                        <td>Medium (70-90%)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Method 1: PyMuPDF for Text-Based PDFs</h3>
+            <pre><code>"""
+PDF Text Extraction using PyMuPDF (fitz)
+Best for: Digital PDFs where text can be selected
+Supports: Hindi (Devanagari), Sanskrit, English
+"""
+import fitz  # PyMuPDF
+import os
+from pathlib import Path
+
+def extract_text_from_pdf(pdf_path: str) -> str:
+    """Extract all text from a text-based PDF."""
+    doc = fitz.open(pdf_path)
+    full_text = []
+    
+    for page_num, page in enumerate(doc):
+        text = page.get_text("text")
+        
+        # Skip pages with very little text (likely images/covers)
+        if len(text.strip()) < 50:
+            continue
+            
+        # Remove headers/footers (typically first/last lines with page numbers)
+        lines = text.split('\n')
+        # Filter out lines that are just page numbers
+        lines = [l for l in lines if not l.strip().isdigit()]
+        
+        full_text.append('\n'.join(lines))
+    
+    doc.close()
+    return '\n\n'.join(full_text)
+
+
+def batch_extract_pdfs(input_dir: str, output_dir: str):
+    """Process all PDFs in a directory."""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    for pdf_file in Path(input_dir).glob("*.pdf"):
+        print(f"Processing: {pdf_file.name}")
+        try:
+            text = extract_text_from_pdf(str(pdf_file))
+            
+            # Save as .txt with same name
+            output_path = Path(output_dir) / f"{pdf_file.stem}.txt"
+            output_path.write_text(text, encoding='utf-8')
+            
+            print(f"  ✓ Extracted {len(text)} characters")
+        except Exception as e:
+            print(f"  ✗ Error: {e}")
+
+
+# Usage
+if __name__ == "__main__":
+    batch_extract_pdfs(
+        input_dir="./raw_pdfs/",
+        output_dir="./extracted_text/"
+    )</code></pre>
+
+            <h3>Method 2: pdfplumber for Complex Layouts</h3>
+            <pre><code>"""
+PDF extraction with pdfplumber
+Better than PyMuPDF for: Tables, multi-column layouts, footnotes
+"""
+import pdfplumber
+
+def extract_with_pdfplumber(pdf_path: str) -> str:
+    """Extract text preserving layout structure."""
+    full_text = []
+    
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            # Extract text
+            text = page.extract_text(
+                x_tolerance=3,  # Horizontal tolerance for grouping characters
+                y_tolerance=3,  # Vertical tolerance for line detection
+            )
+            
+            if text and len(text.strip()) > 50:
+                full_text.append(text)
+            
+            # Also extract tables if present
+            tables = page.extract_tables()
+            for table in tables:
+                for row in table:
+                    if row:
+                        full_text.append(' | '.join(
+                            [cell or '' for cell in row]
+                        ))
+    
+    return '\n\n'.join(full_text)</code></pre>
+
+            <h3>Method 3: Tesseract OCR for Scanned PDFs</h3>
+            <pre><code>"""
+OCR for scanned PDFs using Tesseract
+Supports Hindi (hin) and Sanskrit (san) Devanagari script
+Requirements:
+  - Install Tesseract: sudo apt install tesseract-ocr
+  - Hindi data: sudo apt install tesseract-ocr-hin
+  - Sanskrit data: sudo apt install tesseract-ocr-san
+  - Devanagari: sudo apt install tesseract-ocr-script-deva
+"""
+import pytesseract
+from pdf2image import convert_from_path
+from PIL import Image, ImageEnhance, ImageFilter
+import os
+
+def preprocess_image(image: Image.Image) -> Image.Image:
+    """Enhance image quality for better OCR results."""
+    # Convert to grayscale
+    image = image.convert('L')
+    
+    # Increase contrast
+    enhancer = ImageEnhance.Contrast(image)
+    image = enhancer.enhance(2.0)
+    
+    # Sharpen
+    image = image.filter(ImageFilter.SHARPEN)
+    
+    # Binarize (make pure black and white)
+    threshold = 128
+    image = image.point(lambda p: 255 if p > threshold else 0)
+    
+    return image
+
+
+def ocr_pdf_hindi_sanskrit(pdf_path: str, languages: str = "hin+san+eng") -> str:
+    """
+    OCR a scanned PDF with Hindi/Sanskrit/English support.
+    
+    Args:
+        pdf_path: Path to the scanned PDF
+        languages: Tesseract language codes
+                   'hin' = Hindi, 'san' = Sanskrit, 'eng' = English
+                   Combine with '+': 'hin+san+eng'
+    """
+    # Convert PDF pages to images (300 DPI for good OCR quality)
+    pages = convert_from_path(pdf_path, dpi=300)
+    
+    full_text = []
+    
+    for i, page_image in enumerate(pages):
+        print(f"  OCR page {i+1}/{len(pages)}...", end='\r')
+        
+        # Preprocess for better recognition
+        processed = preprocess_image(page_image)
+        
+        # Run OCR with custom config
+        custom_config = r'--oem 3 --psm 6'
+        # oem 3 = Default (LSTM neural net)
+        # psm 6 = Assume uniform block of text
+        
+        text = pytesseract.image_to_string(
+            processed,
+            lang=languages,
+            config=custom_config
+        )
+        
+        if text.strip():
+            full_text.append(text)
+    
+    print(f"  ✓ OCR complete: {len(pages)} pages processed")
+    return '\n\n'.join(full_text)
+
+
+def batch_ocr_pdfs(input_dir: str, output_dir: str, lang: str = "hin+san+eng"):
+    """OCR all scanned PDFs in a directory."""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    for pdf_file in sorted(os.listdir(input_dir)):
+        if not pdf_file.endswith('.pdf'):
+            continue
+        print(f"Processing: {pdf_file}")
+        
+        text = ocr_pdf_hindi_sanskrit(
+            os.path.join(input_dir, pdf_file),
+            languages=lang
+        )
+        
+        output_path = os.path.join(output_dir, pdf_file.replace('.pdf', '.txt'))
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(text)
+
+
+# Usage
+if __name__ == "__main__":
+    batch_ocr_pdfs(
+        input_dir="./scanned_pdfs/",
+        output_dir="./ocr_output/",
+        lang="hin+san+eng"
+    )</code></pre>
+
+            <h3>Method 4: Google Cloud Vision API (Best Quality for Complex Scripts)</h3>
+            <div class="collapsible">
+                <div class="collapsible-header">🔍 Google Vision API for High-Quality OCR</div>
+                <div class="collapsible-content">
+                    <pre><code>"""
+Google Cloud Vision API for highest quality OCR
+Best for: Complex Sanskrit manuscripts, mixed-script documents
+Cost: ~$1.50 per 1000 pages
+"""
+from google.cloud import vision
+from pdf2image import convert_from_path
+import io
+
+def ocr_with_google_vision(pdf_path: str) -> str:
+    """Use Google Vision API for highest quality OCR."""
+    client = vision.ImageAnnotatorClient()
+    
+    pages = convert_from_path(pdf_path, dpi=300)
+    full_text = []
+    
+    for page_image in pages:
+        # Convert PIL Image to bytes
+        img_byte_arr = io.BytesIO()
+        page_image.save(img_byte_arr, format='PNG')
+        content = img_byte_arr.getvalue()
+        
+        image = vision.Image(content=content)
+        
+        # Use document_text_detection for better structure
+        response = client.document_text_detection(
+            image=image,
+            image_context={"language_hints": ["hi", "sa", "en"]}
+        )
+        
+        if response.full_text_annotation:
+            full_text.append(response.full_text_annotation.text)
+    
+    return '\n\n'.join(full_text)</code></pre>
+                </div>
+            </div>
+
+            <!-- SECTION: Auto-Detection -->
+            <h3>Auto-Detect PDF Type & Route to Correct Method</h3>
+            <pre><code>"""
+Smart PDF processor that auto-detects whether a PDF is text-based or scanned,
+and routes to the appropriate extraction method.
+"""
+import fitz
+
+def is_scanned_pdf(pdf_path: str, threshold: float = 0.1) -> bool:
+    """
+    Detect if a PDF is scanned (image-based) or has embedded text.
+    
+    Logic: If less than 10% of pages have substantial text,
+    it's likely a scanned document.
+    """
+    doc = fitz.open(pdf_path)
+    pages_with_text = 0
+    
+    for page in doc:
+        text = page.get_text("text").strip()
+        if len(text) > 100:  # More than 100 chars = has real text
+            pages_with_text += 1
+    
+    doc.close()
+    
+    ratio = pages_with_text / max(len(doc), 1)
+    return ratio < threshold
+
+
+def smart_extract(pdf_path: str) -> str:
+    """Auto-detect and extract text using the best method."""
+    if is_scanned_pdf(pdf_path):
+        print(f"  → Scanned PDF detected, using OCR...")
+        return ocr_pdf_hindi_sanskrit(pdf_path)
+    else:
+        print(f"  → Text PDF detected, using PyMuPDF...")
+        return extract_text_from_pdf(pdf_path)</code></pre>
+
+            <!-- SECTION: Text Cleaning -->
+            <h2 id="text-cleaning">🧹 Text Cleaning & Preprocessing</h2>
+
+            <h3>Why Cleaning Matters</h3>
+            <p>Raw extracted text contains noise that degrades model training: OCR errors, page numbers, headers/footers, broken words, encoding issues. For Devanagari text, Unicode normalization is critical.</p>
+
+            <pre><code>"""
+Comprehensive text cleaning pipeline for Hindu scripture corpus.
+Handles: Hindi, Sanskrit (Devanagari), and English text.
+"""
+import re
+import unicodedata
+from typing import List
+
+class ScriptureTextCleaner:
+    """Clean and normalize extracted scripture text."""
+    
+    def __init__(self):
+        # Common OCR errors in Devanagari
+        self.devanagari_fixes = {
+            'अा': 'आ',    # Common OCR misrecognition
+            'इी': 'ई',
+            'उू': 'ऊ',
+        }
+    
+    def normalize_unicode(self, text: str) -> str:
+        """
+        Apply Unicode NFC normalization.
+        Critical for Devanagari: ensures composed characters are used
+        (e.g., 'क' + '◌ा' → 'का' as a single unit)
+        """
+        return unicodedata.normalize('NFC', text)
+    
+    def remove_page_artifacts(self, text: str) -> str:
+        """Remove page numbers, headers, footers."""
+        lines = text.split('\n')
+        cleaned = []
+        
+        for line in lines:
+            stripped = line.strip()
+            
+            # Skip empty lines (but keep paragraph breaks)
+            if not stripped:
+                cleaned.append('')
+                continue
+            
+            # Skip page numbers (standalone numbers)
+            if re.match(r'^\d{1,4}$', stripped):
+                continue
+            
+            # Skip common headers/footers
+            if re.match(r'^(page|पृष्ठ|अध्याय)\s*\d+', stripped, re.IGNORECASE):
+                continue
+            
+            # Skip lines that are just dashes or decorative
+            if re.match(r'^[-=_*~.।]+$', stripped):
+                continue
+            
+            cleaned.append(line)
+        
+        return '\n'.join(cleaned)
+    
+    def fix_broken_words(self, text: str) -> str:
+        """Fix words broken across lines (hyphenation)."""
+        # English hyphenation
+        text = re.sub(r'(\w)-\n(\w)', r'\1\2', text)
+        # Devanagari broken words (line break in middle of word)
+        text = re.sub(r'([\u0900-\u097F])\n([\u0900-\u097F])', r'\1\2', text)
+        return text
+    
+    def fix_devanagari_ocr_errors(self, text: str) -> str:
+        """Fix common OCR misrecognitions in Devanagari."""
+        for wrong, correct in self.devanagari_fixes.items():
+            text = text.replace(wrong, correct)
+        return text
+    
+    def normalize_punctuation(self, text: str) -> str:
+        """Normalize punctuation marks."""
+        # Standardize danda (।) and double danda (॥) - Sanskrit verse endings
+        text = re.sub(r'\|\|', '॥', text)  # || → ॥
+        text = re.sub(r'(?<!\|)\|(?!\|)', '।', text)  # | → ।
+        
+        # Normalize multiple spaces
+        text = re.sub(r'[ \t]+', ' ', text)
+        
+        # Normalize multiple newlines (max 2)
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        
+        return text
+    
+    def remove_watermarks(self, text: str) -> str:
+        """Remove common watermarks from digitized texts."""
+        watermark_patterns = [
+            r'(?i)digitized by.*$',
+            r'(?i)downloaded from.*$',
+            r'(?i)www\.\S+',
+            r'(?i)copyright.*$',
+            r'(?i)all rights reserved.*$',
+        ]
+        for pattern in watermark_patterns:
+            text = re.sub(pattern, '', text, flags=re.MULTILINE)
+        return text
+    
+    def clean(self, text: str) -> str:
+        """Apply full cleaning pipeline."""
+        text = self.normalize_unicode(text)
+        text = self.remove_page_artifacts(text)
+        text = self.fix_broken_words(text)
+        text = self.fix_devanagari_ocr_errors(text)
+        text = self.normalize_punctuation(text)
+        text = self.remove_watermarks(text)
+        return text.strip()
+
+
+# Usage
+cleaner = ScriptureTextCleaner()
+
+# Example with raw OCR output
+raw_text = """
+पृष्ठ 42
+
+धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः ||
+मामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय || 1||
+
+www.example.com
+42
+"""
+
+cleaned = cleaner.clean(raw_text)
+print(cleaned)
+# Output:
+# धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः ॥
+# मामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय ॥ 1॥</code></pre>
+
+            <!-- SECTION: Language Detection -->
+            <h2 id="language-detection">🌐 Language Detection & Separation</h2>
+            <pre><code>"""
+Detect and separate text by language.
+Many scripture books have mixed Hindi/Sanskrit/English content.
+"""
+from langdetect import detect, detect_langs
+import re
+
+def detect_script(text: str) -> str:
+    """
+    Detect script type based on Unicode ranges.
+    More reliable than langdetect for short texts.
+    """
+    devanagari_count = len(re.findall(r'[\u0900-\u097F]', text))
+    latin_count = len(re.findall(r'[a-zA-Z]', text))
+    total = len(text.replace(' ', ''))
+    
+    if total == 0:
+        return 'unknown'
+    
+    deva_ratio = devanagari_count / total
+    latin_ratio = latin_count / total
+    
+    if deva_ratio > 0.5:
+        return 'devanagari'  # Could be Hindi or Sanskrit
+    elif latin_ratio > 0.5:
+        return 'latin'  # English or IAST transliteration
+    else:
+        return 'mixed'
+
+
+def classify_devanagari(text: str) -> str:
+    """
+    Distinguish Hindi from Sanskrit in Devanagari script.
+    Heuristic: Sanskrit has more complex sandhi, vedic accents,
+    and specific grammatical patterns.
+    """
+    # Sanskrit indicators
+    sanskrit_markers = [
+        r'॥',          # Double danda (common in verses)
+        r'ँ',          # Chandrabindu (nasal, common in Sanskrit)
+        r'ः',          # Visarga (very common in Sanskrit)
+        r'[\u0951\u0952]',  # Vedic accents
+        r'\bइति\b',   # "iti" (quotation marker in Sanskrit)
+        r'\bच\b.*\bच\b',  # "cha...cha" (Sanskrit conjunction pattern)
+    ]
+    
+    sanskrit_score = sum(
+        len(re.findall(pattern, text)) 
+        for pattern in sanskrit_markers
+    )
+    
+    # If high density of Sanskrit markers, classify as Sanskrit
+    words = len(text.split())
+    if words > 0 and sanskrit_score / words > 0.1:
+        return 'sanskrit'
+    return 'hindi'
+
+
+def split_by_language(text: str) -> dict:
+    """Split a document into language-specific segments."""
+    paragraphs = text.split('\n\n')
+    result = {'hindi': [], 'sanskrit': [], 'english': []}
+    
+    for para in paragraphs:
+        if not para.strip():
+            continue
+        
+        script = detect_script(para)
+        
+        if script == 'devanagari':
+            lang = classify_devanagari(para)
+            result[lang].append(para)
+        elif script == 'latin':
+            result['english'].append(para)
+        else:
+            # Mixed — try langdetect
+            try:
+                lang = detect(para)
+                if lang == 'hi':
+                    result['hindi'].append(para)
+                elif lang == 'sa':
+                    result['sanskrit'].append(para)
+                else:
+                    result['english'].append(para)
+            except:
+                result['english'].append(para)  # default fallback
+    
+    return result</code></pre>
+
+            <!-- SECTION: Deduplication -->
+            <h2 id="deduplication">🔄 Deduplication</h2>
+            <p>Many public domain texts appear in multiple collections. Duplicate data wastes compute and can cause the model to memorize instead of generalize.</p>
+
+            <pre><code>"""
+Deduplication using MinHash + LSH (Locality-Sensitive Hashing).
+Efficiently finds near-duplicate documents in large corpora.
+"""
+from datasketch import MinHash, MinHashLSH
+from typing import List, Set
+import hashlib
+
+class ScriptureDeduplicator:
+    """Remove duplicate and near-duplicate documents."""
+    
+    def __init__(self, threshold: float = 0.8, num_perm: int = 128):
+        """
+        Args:
+            threshold: Jaccard similarity threshold (0.8 = 80% similar = duplicate)
+            num_perm: Number of permutations for MinHash (higher = more accurate)
+        """
+        self.threshold = threshold
+        self.num_perm = num_perm
+        self.lsh = MinHashLSH(threshold=threshold, num_perm=num_perm)
+        self.minhashes = {}
+    
+    def _get_shingles(self, text: str, k: int = 5) -> Set[str]:
+        """Create character-level k-shingles from text."""
+        text = text.lower().strip()
+        return set(text[i:i+k] for i in range(len(text) - k + 1))
+    
+    def _create_minhash(self, text: str) -> MinHash:
+        """Create MinHash signature for a document."""
+        m = MinHash(num_perm=self.num_perm)
+        shingles = self._get_shingles(text)
+        for shingle in shingles:
+            m.update(shingle.encode('utf-8'))
+        return m
+    
+    def deduplicate(self, documents: List[dict]) -> List[dict]:
+        """
+        Remove near-duplicates from a list of documents.
+        
+        Args:
+            documents: List of dicts with 'id' and 'text' keys
+            
+        Returns:
+            Deduplicated list of documents
+        """
+        unique_docs = []
+        
+        for doc in documents:
+            doc_id = doc['id']
+            text = doc['text']
+            
+            # Skip very short documents
+            if len(text) < 100:
+                continue
+            
+            minhash = self._create_minhash(text)
+            
+            # Check if similar document already exists
+            duplicates = self.lsh.query(minhash)
+            
+            if not duplicates:
+                # No duplicates found — add to index
+                self.lsh.insert(doc_id, minhash)
+                self.minhashes[doc_id] = minhash
+                unique_docs.append(doc)
+            else:
+                print(f"  Duplicate found: '{doc_id}' similar to {duplicates[0]}")
+        
+        print(f"\n  Deduplication: {len(documents)} → {len(unique_docs)} documents")
+        print(f"  Removed {len(documents) - len(unique_docs)} duplicates")
+        
+        return unique_docs
+
+
+# Also: Exact deduplication using hashing
+def exact_dedup_by_hash(documents: List[dict]) -> List[dict]:
+    """Remove exact duplicates using SHA-256 hash."""
+    seen_hashes = set()
+    unique = []
+    
+    for doc in documents:
+        text_hash = hashlib.sha256(doc['text'].encode()).hexdigest()
+        if text_hash not in seen_hashes:
+            seen_hashes.add(text_hash)
+            unique.append(doc)
+    
+    return unique
+
+
+# Usage
+deduplicator = ScriptureDeduplicator(threshold=0.8)
+
+documents = [
+    {"id": "gita_v1", "text": "धर्मक्षेत्रे कुरुक्षेत्रे..."},
+    {"id": "gita_v2", "text": "धर्मक्षेत्रे कुरुक्षेत्रे..."},  # duplicate
+    {"id": "upanishad_1", "text": "ॐ पूर्णमदः पूर्णमिदम्..."},
+]
+
+unique = deduplicator.deduplicate(documents)
+# Output: Deduplication: 3 → 2 documents</code></pre>
+
+            <!-- SECTION: Quality Filtering -->
+            <h2 id="quality-filtering">✅ Quality Filtering</h2>
+            <pre><code>"""
+Quality filtering pipeline for scripture corpus.
+Removes low-quality text that would hurt model training.
+"""
+import re
+from typing import Tuple
+
+class QualityFilter:
+    """Filter out low-quality text from the corpus."""
+    
+    def __init__(self):
+        self.min_length = 100           # Minimum characters
+        self.max_repetition_ratio = 0.3  # Max repeated n-gram ratio
+        self.min_alpha_ratio = 0.5       # Min ratio of alphabetic chars
+    
+    def check_length(self, text: str) -> bool:
+        """Reject too-short documents (likely extraction errors)."""
+        return len(text.strip()) >= self.min_length
+    
+    def check_repetition(self, text: str) -> bool:
+        """
+        Detect repetitive text (OCR artifacts, repeated headers).
+        Uses trigram repetition as a heuristic.
+        """
+        words = text.split()
+        if len(words) < 10:
+            return True
+        
+        # Count unique trigrams vs total trigrams
+        trigrams = [' '.join(words[i:i+3]) for i in range(len(words)-2)]
+        unique_ratio = len(set(trigrams)) / max(len(trigrams), 1)
+        
+        return unique_ratio > (1 - self.max_repetition_ratio)
+    
+    def check_alphabet_ratio(self, text: str) -> bool:
+        """
+        Ensure text is mostly readable characters.
+        Catches garbled OCR output (random symbols).
+        """
+        # Count Devanagari + Latin alphabetic characters
+        alpha_chars = len(re.findall(r'[\u0900-\u097F\u0A00-\u0A7Fa-zA-Z]', text))
+        total_chars = len(text.replace(' ', '').replace('\n', ''))
+        
+        if total_chars == 0:
+            return False
+        
+        return alpha_chars / total_chars >= self.min_alpha_ratio
+    
+    def check_no_garbage(self, text: str) -> bool:
+        """Detect garbled/corrupted text."""
+        # High ratio of unusual Unicode characters = likely corrupted
+        unusual = len(re.findall(r'[\ufffd\u0000-\u001f]', text))
+        return unusual < len(text) * 0.01
+    
+    def filter(self, text: str) -> Tuple[bool, str]:
+        """
+        Apply all quality checks.
+        Returns (passed: bool, reason: str)
+        """
+        if not self.check_length(text):
+            return False, "too_short"
+        if not self.check_repetition(text):
+            return False, "too_repetitive"
+        if not self.check_alphabet_ratio(text):
+            return False, "low_alpha_ratio"
+        if not self.check_no_garbage(text):
+            return False, "corrupted"
+        
+        return True, "passed"
+
+
+# Usage
+qf = QualityFilter()
+
+texts = [
+    "धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः। मामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय॥",
+    "!@#$%^&*()!@#$%^&*()",  # Garbage
+    "a",  # Too short
+]
+
+for t in texts:
+    passed, reason = qf.filter(t)
+    status = "✓" if passed else "✗"
+    print(f"  {status} [{reason}] {t[:50]}...")</code></pre>
+
+            <!-- SECTION: Full Pipeline -->
+            <h2 id="full-pipeline">🔗 Complete Data Pipeline</h2>
+            <pre><code>"""
+Complete end-to-end data pipeline:
+PDF Collection → Extraction → Cleaning → Dedup → Quality Filter → Output
+"""
+import os
+import json
+from pathlib import Path
+from datetime import datetime
+
+class ScriptureDataPipeline:
+    """End-to-end pipeline for processing Hindu scripture PDFs."""
+    
+    def __init__(self, input_dir: str, output_dir: str):
+        self.input_dir = Path(input_dir)
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        
+        self.cleaner = ScriptureTextCleaner()
+        self.quality_filter = QualityFilter()
+        self.deduplicator = ScriptureDeduplicator(threshold=0.8)
+        
+        self.stats = {
+            'total_pdfs': 0,
+            'successful_extractions': 0,
+            'failed_extractions': 0,
+            'total_chars_raw': 0,
+            'total_chars_cleaned': 0,
+            'documents_after_dedup': 0,
+            'documents_after_quality': 0,
+        }
+    
+    def run(self):
+        """Execute the full pipeline."""
+        print("=" * 60)
+        print("🙏 Hindu Scripture Data Pipeline")
+        print("=" * 60)
+        
+        # Step 1: Extract text from all PDFs
+        print("\n📄 Step 1: Extracting text from PDFs...")
+        documents = self._extract_all()
+        
+        # Step 2: Clean text
+        print("\n🧹 Step 2: Cleaning extracted text...")
+        documents = self._clean_all(documents)
+        
+        # Step 3: Deduplicate
+        print("\n🔄 Step 3: Removing duplicates...")
+        documents = self.deduplicator.deduplicate(documents)
+        self.stats['documents_after_dedup'] = len(documents)
+        
+        # Step 4: Quality filter
+        print("\n✅ Step 4: Quality filtering...")
+        documents = self._quality_filter_all(documents)
+        self.stats['documents_after_quality'] = len(documents)
+        
+        # Step 5: Save output
+        print("\n💾 Step 5: Saving processed corpus...")
+        self._save_output(documents)
+        
+        # Print stats
+        self._print_stats()
+    
+    def _extract_all(self):
+        documents = []
+        pdf_files = list(self.input_dir.glob("**/*.pdf"))
+        self.stats['total_pdfs'] = len(pdf_files)
+        
+        for pdf_path in pdf_files:
+            try:
+                text = smart_extract(str(pdf_path))
+                self.stats['total_chars_raw'] += len(text)
+                documents.append({
+                    'id': pdf_path.stem,
+                    'text': text,
+                    'source': str(pdf_path),
+                    'language': detect_script(text),
+                })
+                self.stats['successful_extractions'] += 1
+            except Exception as e:
+                print(f"  ✗ Failed: {pdf_path.name} — {e}")
+                self.stats['failed_extractions'] += 1
+        
+        return documents
+    
+    def _clean_all(self, documents):
+        for doc in documents:
+            doc['text'] = self.cleaner.clean(doc['text'])
+            self.stats['total_chars_cleaned'] += len(doc['text'])
+        return documents
+    
+    def _quality_filter_all(self, documents):
+        filtered = []
+        for doc in documents:
+            passed, reason = self.quality_filter.filter(doc['text'])
+            if passed:
+                filtered.append(doc)
+        return filtered
+    
+    def _save_output(self, documents):
+        # Save as JSONL (one JSON per line — standard for LLM training)
+        output_path = self.output_dir / "corpus.jsonl"
+        with open(output_path, 'w', encoding='utf-8') as f:
+            for doc in documents:
+                f.write(json.dumps(doc, ensure_ascii=False) + '\n')
+        
+        # Also save metadata
+        meta_path = self.output_dir / "metadata.json"
+        with open(meta_path, 'w', encoding='utf-8') as f:
+            json.dump({
+                'created': datetime.now().isoformat(),
+                'stats': self.stats,
+                'num_documents': len(documents),
+                'total_chars': sum(len(d['text']) for d in documents),
+            }, f, indent=2)
+    
+    def _print_stats(self):
+        print("\n" + "=" * 60)
+        print("📊 Pipeline Statistics")
+        print("=" * 60)
+        for key, value in self.stats.items():
+            print(f"  {key}: {value:,}")
+
+
+# Run the pipeline
+if __name__ == "__main__":
+    pipeline = ScriptureDataPipeline(
+        input_dir="./raw_pdfs/",
+        output_dir="./processed_corpus/"
+    )
+    pipeline.run()</code></pre>
+
+            <!-- SECTION: Data Requirements -->
+            <h2 id="data-requirements">📊 How Much Data Do You Need?</h2>
+            
+            <div class="data-highlight">
+                <h3 style="margin-top: 0;">Data Requirements by Training Stage</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Data Type</th>
+                            <th>Minimum</th>
+                            <th>Recommended</th>
+                            <th>Ideal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>CPT</strong> (Continued Pre-Training)</td>
+                            <td>Raw text corpus</td>
+                            <td>100 MB (~50M tokens)</td>
+                            <td>1-5 GB (~500M-2B tokens)</td>
+                            <td>10+ GB (~5B+ tokens)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SFT</strong> (Supervised Fine-Tuning)</td>
+                            <td>Instruction-response pairs</td>
+                            <td>1,000 pairs</td>
+                            <td>10,000-50,000 pairs</td>
+                            <td>100,000+ pairs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DPO</strong> (Preference Alignment)</td>
+                            <td>Chosen/rejected pairs</td>
+                            <td>1,000 pairs</td>
+                            <td>5,000-20,000 pairs</td>
+                            <td>50,000+ pairs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ Good News for This Project</div>
+                <p>Hindu scriptures are vast — the Mahabharata alone is ~1.8M words, and the 18 Puranas contain millions more. With Vedas, Upanishads, commentaries, and modern works, reaching 5-10 GB of high-quality text is very achievable. This puts us well within the "recommended" range for CPT.</p>
+            </div>
+
+            <!-- Page Navigation -->
+            <nav class="page-nav">
+                <a href="01-introduction.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Introduction & Overview</span>
+                </a>
+                <a href="03-dataset-formats.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Dataset Format Requirements</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

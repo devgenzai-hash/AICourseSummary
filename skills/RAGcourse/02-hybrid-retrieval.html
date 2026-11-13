@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid Retrieval - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Hybrid Retrieval
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 2: Hybrid Retrieval (BM25 + Embeddings)</h1>
+                <p class="subtitle">Neither keyword search nor semantic search alone is good enough at 10M docs. You need both working together.</p>
+                <div class="tag-row">
+                    <span class="tag tag-beginner">Beginner</span>
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-scale">10M Scale</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: Finding a Book in a Library</div>
+                <p>Imagine you need to find information about "machine learning for cancer detection." You have two helpers:</p>
+                <p><strong>Helper 1 (BM25 / Keyword Search):</strong> This person is like a librarian who looks at the exact words on book spines and in indexes. They'll find every book that literally contains "machine learning" AND "cancer detection." Super precise, but they'll miss a book titled "AI-powered tumor diagnosis" because it uses different words for the same thing.</p>
+                <p><strong>Helper 2 (Embeddings / Semantic Search):</strong> This person actually understands meaning. They know "AI-powered tumor diagnosis" is about the same topic. But they might also grab books about "AI in healthcare" that are only loosely related — they understand meaning but can be too broad.</p>
+                <p><strong>Hybrid = Both helpers working together.</strong> Helper 1 finds exact matches. Helper 2 finds meaning matches. Together, you get the best of both worlds.</p>
+            </div>
+
+            <!-- ===== WHAT IS IT ===== -->
+            <h2>What Is Hybrid Retrieval?</h2>
+            <p><strong>Hybrid retrieval</strong> means combining two different search methods — keyword matching (BM25) and meaning matching (embeddings) — and merging their results to get better answers than either could produce alone.</p>
+
+            <p>Think of it as having two different search strategies and picking the best results from both:</p>
+            <ul>
+                <li><strong>BM25</strong> = "Find documents containing these exact words" (precise but limited)</li>
+                <li><strong>Embeddings</strong> = "Find documents about this concept" (flexible but sometimes too broad)</li>
+                <li><strong>Hybrid</strong> = "Give me the best from both approaches" (precise AND flexible)</li>
+            </ul>
+
+            <!-- ===== BM25 DEEP DIVE ===== -->
+            <h2>Understanding BM25 (Keyword Search)</h2>
+
+            <h3>What is BM25?</h3>
+            <p><strong>BM25</strong> stands for "Best Matching 25" — it's a mathematical formula that ranks documents by how well they match your search keywords. It's been the backbone of search engines (Google, Bing, Elasticsearch) for decades.</p>
+
+            <p><strong>In plain English:</strong> BM25 counts how many times your search words appear in a document, but with two smart adjustments:</p>
+            <ol>
+                <li><strong>Rare words matter more:</strong> If you search for "quantum entanglement," the word "quantum" is more useful than "the" because "the" appears everywhere</li>
+                <li><strong>Repetition has diminishing returns:</strong> A document mentioning "cancer" 50 times isn't 50x more relevant than one mentioning it 5 times</li>
+            </ol>
+
+            <h4>The BM25 Formula (Simplified)</h4>
+<pre><code><span class="token-comment"># BM25 scoring (simplified concept)</span>
+<span class="token-comment"># Score = sum of (word_importance × word_frequency_factor) for each query word</span>
+
+<span class="token-comment"># Word importance (IDF - Inverse Document Frequency):</span>
+<span class="token-comment"># "the" appears in 99% of docs → very LOW importance</span>
+<span class="token-comment"># "quantum" appears in 0.1% of docs → very HIGH importance</span>
+
+<span class="token-comment"># Word frequency factor (TF - Term Frequency):</span>
+<span class="token-comment"># Appears 1 time → good</span>
+<span class="token-comment"># Appears 5 times → better, but not 5x better</span>
+<span class="token-comment"># Appears 50 times → barely better than 5 times (diminishing returns)</span>
+
+<span class="token-keyword">import</span> math
+
+<span class="token-keyword">def</span> <span class="token-function">bm25_score</span>(query_terms, document, corpus_stats, k1=<span class="token-number">1.5</span>, b=<span class="token-number">0.75</span>):
+    <span class="token-string">"""
+    Calculate BM25 relevance score.
+    
+    k1: controls how much term frequency matters (1.2-2.0 typical)
+    b: controls document length normalization (0.75 typical)
+    """</span>
+    score = <span class="token-number">0.0</span>
+    doc_len = <span class="token-builtin">len</span>(document.split())
+    avg_doc_len = corpus_stats[<span class="token-string">"avg_length"</span>]
+    total_docs = corpus_stats[<span class="token-string">"total_docs"</span>]
+    
+    <span class="token-keyword">for</span> term <span class="token-keyword">in</span> query_terms:
+        <span class="token-comment"># How many docs contain this term?</span>
+        docs_with_term = corpus_stats[<span class="token-string">"doc_freq"</span>].get(term, <span class="token-number">0</span>)
+        
+        <span class="token-comment"># IDF: rare terms get higher scores</span>
+        idf = math.log((total_docs - docs_with_term + <span class="token-number">0.5</span>) / 
+                       (docs_with_term + <span class="token-number">0.5</span>) + <span class="token-number">1</span>)
+        
+        <span class="token-comment"># Term frequency in this document</span>
+        tf = document.lower().split().count(term.lower())
+        
+        <span class="token-comment"># BM25 term frequency factor (with diminishing returns)</span>
+        tf_factor = (tf * (k1 + <span class="token-number">1</span>)) / (
+            tf + k1 * (<span class="token-number">1</span> - b + b * (doc_len / avg_doc_len))
+        )
+        
+        score += idf * tf_factor
+    
+    <span class="token-keyword">return</span> score</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 When BM25 Shines</div>
+                <p><strong>Exact term matching:</strong> Product names ("iPhone 15 Pro Max"), error codes ("ERR_CONNECTION_REFUSED"), policy numbers ("Policy #A-2024-0892"), people names, acronyms, and technical identifiers.</p>
+                <p>Semantic search would match "smartphone" or "mobile device" — but when someone wants exactly "iPhone 15 Pro Max," BM25 gets it right instantly.</p>
+            </div>
+
+            <!-- ===== EMBEDDINGS DEEP DIVE ===== -->
+            <h2>Understanding Embeddings (Semantic Search)</h2>
+
+            <h3>What are Embeddings?</h3>
+            <p><strong>Simple explanation:</strong> An embedding is a way to convert text into a list of numbers that captures its <em>meaning</em>. Similar meanings = similar numbers.</p>
+
+            <p>Imagine you could place every sentence on a map. Sentences with similar meanings would be placed close together, and sentences with different meanings would be far apart. Embeddings are that map — but in mathematical space (hundreds of dimensions instead of 2).</p>
+
+            <h4>How it works:</h4>
+            <ol>
+                <li>Feed your text into an embedding model (like OpenAI's text-embedding-3-large or open-source models like BGE)</li>
+                <li>The model outputs a vector — a list of numbers like [0.023, -0.156, 0.891, ...] — usually 768 to 3072 numbers long</li>
+                <li>Store these vectors in a vector database</li>
+                <li>When a query comes in, embed the query the same way, then find the stored vectors that are closest to it</li>
+            </ol>
+
+<pre><code><span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+
+client = OpenAI()
+
+<span class="token-keyword">def</span> <span class="token-function">get_embedding</span>(text: <span class="token-builtin">str</span>, model=<span class="token-string">"text-embedding-3-large"</span>) -> List[<span class="token-builtin">float</span>]:
+    <span class="token-string">"""Convert text into a semantic vector (embedding)."""</span>
+    response = client.embeddings.create(
+        input=text,
+        model=model
+    )
+    <span class="token-keyword">return</span> response.data[<span class="token-number">0</span>].embedding  <span class="token-comment"># e.g., [0.023, -0.156, ...]  (3072 numbers)</span>
+
+<span class="token-comment"># Example: these would be close in vector space</span>
+vec1 = get_embedding(<span class="token-string">"How to treat a headache"</span>)
+vec2 = get_embedding(<span class="token-string">"Remedies for head pain"</span>)
+vec3 = get_embedding(<span class="token-string">"Python programming basics"</span>)
+
+<span class="token-comment"># Cosine similarity: 1.0 = identical meaning, 0.0 = unrelated</span>
+<span class="token-keyword">def</span> <span class="token-function">cosine_similarity</span>(a, b):
+    <span class="token-keyword">return</span> np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+print(cosine_similarity(vec1, vec2))  <span class="token-comment"># ~0.89 (very similar!)</span>
+print(cosine_similarity(vec1, vec3))  <span class="token-comment"># ~0.12 (totally different)</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 When Embeddings Shine</div>
+                <p><strong>Meaning matching across different words:</strong> "How to fix a broken relationship" will match documents about "repairing trust between partners" even though they share almost no words.</p>
+                <p>BM25 would FAIL here because the words are completely different. Embeddings understand the concepts are the same.</p>
+            </div>
+
+            <!-- ===== COMPARISON ===== -->
+            <h2>BM25 vs. Embeddings: Head-to-Head</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>BM25 (Keyword)</th>
+                        <th>Embeddings (Semantic)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Matches on</strong></td>
+                        <td>Exact words/terms</td>
+                        <td>Meaning/concepts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Speed at 10M</strong></td>
+                        <td>Very fast (inverted index)</td>
+                        <td>Needs ANN index (Stage 3)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Precision</strong></td>
+                        <td>High for exact matches</td>
+                        <td>Can be noisy at scale</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recall</strong></td>
+                        <td>Misses synonyms/paraphrases</td>
+                        <td>Catches meaning variations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Good for</strong></td>
+                        <td>Names, codes, identifiers, exact phrases</td>
+                        <td>Concepts, questions, fuzzy matching</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bad at</strong></td>
+                        <td>Understanding synonyms/context</td>
+                        <td>Exact identifiers, short codes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Infrastructure</strong></td>
+                        <td>Elasticsearch, Solr, Meilisearch</td>
+                        <td>Pinecone, Weaviate, Qdrant, Milvus</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Compute cost</strong></td>
+                        <td>Low (just text matching)</td>
+                        <td>Higher (embedding generation + vector search)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== WHY HYBRID ===== -->
+            <h2>Why You Need Both (Hybrid)</h2>
+
+            <p>Here's a real example that shows why neither alone is enough:</p>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Real-World Failure Cases</div>
+                <p><strong>BM25 alone fails:</strong> User asks "What's our remote work policy?" but the actual document is titled "Flexible Working Arrangements Guidelines." BM25 misses it because the words don't overlap enough.</p>
+                <p><strong>Embeddings alone fail:</strong> User asks "What's in Policy #HR-2024-042?" Embeddings match documents about HR policies in general, but miss the exact document because they don't understand that "#HR-2024-042" is a specific identifier requiring exact matching.</p>
+                <p><strong>Hybrid gets both right:</strong> BM25 catches the exact policy number. Embeddings catch the concept match. Together, you get precise AND comprehensive results.</p>
+            </div>
+
+            <!-- ===== IMPLEMENTATION ===== -->
+            <h2>How to Implement Hybrid Retrieval</h2>
+
+            <h3>Strategy 1: Separate Search + Merge (Reciprocal Rank Fusion)</h3>
+            <p>Run BM25 and embedding search separately, then merge results using a scoring method called <strong>Reciprocal Rank Fusion (RRF)</strong>.</p>
+
+            <p><strong>RRF in plain English:</strong> If a document appears as result #1 in BM25 and result #3 in embeddings, it gets a high combined score. If it only appears in one search, it gets a lower score. Documents that BOTH methods agree are relevant get boosted to the top.</p>
+
+<pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict, Tuple
+
+<span class="token-keyword">def</span> <span class="token-function">reciprocal_rank_fusion</span>(
+    bm25_results: List[Dict],
+    embedding_results: List[Dict],
+    k: <span class="token-builtin">int</span> = <span class="token-number">60</span>,
+    bm25_weight: <span class="token-builtin">float</span> = <span class="token-number">0.4</span>,
+    embedding_weight: <span class="token-builtin">float</span> = <span class="token-number">0.6</span>
+) -> List[Dict]:
+    <span class="token-string">"""
+    Merge BM25 and embedding search results using RRF.
+    
+    k: smoothing constant (60 is standard, prevents top results
+       from dominating too heavily)
+    weights: how much to trust each method
+    """</span>
+    scores = {}  <span class="token-comment"># chunk_id → combined_score</span>
+    chunk_map = {}  <span class="token-comment"># chunk_id → chunk data</span>
+    
+    <span class="token-comment"># Score BM25 results by their rank position</span>
+    <span class="token-keyword">for</span> rank, result <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(bm25_results):
+        chunk_id = result[<span class="token-string">"chunk_id"</span>]
+        rrf_score = bm25_weight * (<span class="token-number">1.0</span> / (k + rank + <span class="token-number">1</span>))
+        scores[chunk_id] = scores.get(chunk_id, <span class="token-number">0</span>) + rrf_score
+        chunk_map[chunk_id] = result
+    
+    <span class="token-comment"># Score embedding results by their rank position</span>
+    <span class="token-keyword">for</span> rank, result <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(embedding_results):
+        chunk_id = result[<span class="token-string">"chunk_id"</span>]
+        rrf_score = embedding_weight * (<span class="token-number">1.0</span> / (k + rank + <span class="token-number">1</span>))
+        scores[chunk_id] = scores.get(chunk_id, <span class="token-number">0</span>) + rrf_score
+        chunk_map[chunk_id] = result
+    
+    <span class="token-comment"># Sort by combined score (highest first)</span>
+    ranked = sorted(scores.items(), key=<span class="token-keyword">lambda</span> x: x[<span class="token-number">1</span>], reverse=<span class="token-keyword">True</span>)
+    
+    <span class="token-comment"># Return top results with their scores</span>
+    results = []
+    <span class="token-keyword">for</span> chunk_id, score <span class="token-keyword">in</span> ranked:
+        result = chunk_map[chunk_id].copy()
+        result[<span class="token-string">"hybrid_score"</span>] = score
+        result[<span class="token-string">"retrieval_method"</span>] = <span class="token-string">"hybrid_rrf"</span>
+        results.append(result)
+    
+    <span class="token-keyword">return</span> results</code></pre>
+
+            <h3>Strategy 2: Single Index with Both Capabilities</h3>
+            <p>Some modern vector databases (like Weaviate, Qdrant, Elasticsearch 8+) support hybrid search natively — you send one query and get fused results back.</p>
+
+<pre><code><span class="token-comment"># Using Weaviate's built-in hybrid search</span>
+<span class="token-keyword">import</span> weaviate
+
+client = weaviate.Client(<span class="token-string">"http://localhost:8080"</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">hybrid_search</span>(query: <span class="token-builtin">str</span>, top_k: <span class="token-builtin">int</span> = <span class="token-number">20</span>, alpha: <span class="token-builtin">float</span> = <span class="token-number">0.6</span>):
+    <span class="token-string">"""
+    Native hybrid search in Weaviate.
+    
+    alpha: balance between keyword (0.0) and semantic (1.0)
+    alpha=0.6 means 60% semantic, 40% keyword
+    """</span>
+    results = (
+        client.query
+        .get(<span class="token-string">"Document"</span>, [<span class="token-string">"content"</span>, <span class="token-string">"metadata"</span>, <span class="token-string">"chunk_id"</span>])
+        .with_hybrid(
+            query=query,
+            alpha=alpha  <span class="token-comment"># 0.0 = pure BM25, 1.0 = pure semantic</span>
+        )
+        .with_limit(top_k)
+        .do()
+    )
+    <span class="token-keyword">return</span> results[<span class="token-string">"data"</span>][<span class="token-string">"Get"</span>][<span class="token-string">"Document"</span>]
+
+<span class="token-comment"># Example usage</span>
+results = hybrid_search(
+    query=<span class="token-string">"What is the vacation policy for remote employees?"</span>,
+    top_k=<span class="token-number">20</span>,
+    alpha=<span class="token-number">0.6</span>  <span class="token-comment"># Lean slightly toward semantic</span>
+)</code></pre>
+
+            <h3>Strategy 3: Query-Adaptive Hybrid</h3>
+            <p>The smartest approach: <strong>automatically decide how much to weight BM25 vs embeddings based on the query type</strong>.</p>
+
+<pre><code><span class="token-keyword">def</span> <span class="token-function">adaptive_hybrid_search</span>(query: <span class="token-builtin">str</span>, top_k: <span class="token-builtin">int</span> = <span class="token-number">20</span>):
+    <span class="token-string">"""
+    Automatically adjust BM25/embedding balance 
+    based on query characteristics.
+    """</span>
+    <span class="token-comment"># Detect if query has specific identifiers</span>
+    has_identifiers = bool(re.search(
+        <span class="token-string">r'[A-Z]{2,}-\d+|#\w+|v\d+\.\d+|"[^"]+"'</span>, query
+    ))
+    
+    <span class="token-comment"># Detect if query is conceptual/natural language</span>
+    is_question = query.strip().endswith(<span class="token-string">"?"</span>)
+    word_count = <span class="token-builtin">len</span>(query.split())
+    
+    <span class="token-keyword">if</span> has_identifiers:
+        <span class="token-comment"># Exact identifiers → lean toward BM25</span>
+        bm25_weight = <span class="token-number">0.7</span>
+        embed_weight = <span class="token-number">0.3</span>
+    <span class="token-keyword">elif</span> is_question <span class="token-keyword">and</span> word_count > <span class="token-number">5</span>:
+        <span class="token-comment"># Natural language question → lean toward embeddings</span>
+        bm25_weight = <span class="token-number">0.3</span>
+        embed_weight = <span class="token-number">0.7</span>
+    <span class="token-keyword">else</span>:
+        <span class="token-comment"># Default: balanced</span>
+        bm25_weight = <span class="token-number">0.5</span>
+        embed_weight = <span class="token-number">0.5</span>
+    
+    <span class="token-comment"># Run both searches</span>
+    bm25_results = bm25_search(query, top_k=top_k)
+    embed_results = embedding_search(query, top_k=top_k)
+    
+    <span class="token-comment"># Fuse with adaptive weights</span>
+    <span class="token-keyword">return</span> reciprocal_rank_fusion(
+        bm25_results, embed_results,
+        bm25_weight=bm25_weight,
+        embedding_weight=embed_weight
+    )</code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Documents Scale</div>
+                <p><strong>Key insight:</strong> Semantic search alone usually struggles with precision at massive scale. Here's why:</p>
+                <ul>
+                    <li><strong>Embedding space gets crowded:</strong> With 100M chunks, many will have similar embeddings even if they're about different subtopics. False positives increase.</li>
+                    <li><strong>BM25 stays precise:</strong> It doesn't matter if you have 100M or 1B documents — if a term appears in only 50 docs, BM25 finds exactly those 50.</li>
+                    <li><strong>Hybrid reduces noise:</strong> By requiring agreement between both methods, you filter out false positives from either side.</li>
+                    <li><strong>Infrastructure split:</strong> BM25 index (Elasticsearch: ~2TB for 10M docs) + Vector index (Qdrant: ~50GB for 100M vectors) = both run in parallel.</li>
+                </ul>
+            </div>
+
+            <!-- ===== PRACTICAL ARCHITECTURE ===== -->
+            <h2>Production Architecture</h2>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">HybridRetriever</span>:
+    <span class="token-string">"""
+    Production hybrid retrieval system for 10M+ documents.
+    Combines Elasticsearch (BM25) + Qdrant (vectors).
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, es_client, qdrant_client, embedding_model):
+        self.es = es_client           <span class="token-comment"># Elasticsearch for BM25</span>
+        self.qdrant = qdrant_client    <span class="token-comment"># Qdrant for vector search</span>
+        self.embedder = embedding_model
+    
+    <span class="token-keyword">def</span> <span class="token-function">search</span>(self, query: <span class="token-builtin">str</span>, top_k: <span class="token-builtin">int</span> = <span class="token-number">20</span>, filters: Dict = <span class="token-keyword">None</span>) -> List[Dict]:
+        <span class="token-string">"""
+        Execute hybrid search with optional metadata filters.
+        
+        filters example: {"doc_type": "policy", "created_after": "2024-01-01"}
+        """</span>
+        <span class="token-keyword">import</span> asyncio
+        
+        <span class="token-comment"># Run BM25 and vector search IN PARALLEL (crucial for latency)</span>
+        bm25_results, vector_results = asyncio.gather(
+            self._bm25_search(query, top_k * <span class="token-number">2</span>, filters),
+            self._vector_search(query, top_k * <span class="token-number">2</span>, filters)
+        )
+        
+        <span class="token-comment"># Fuse results</span>
+        hybrid_results = reciprocal_rank_fusion(
+            bm25_results, vector_results,
+            bm25_weight=<span class="token-number">0.4</span>, embedding_weight=<span class="token-number">0.6</span>
+        )
+        
+        <span class="token-keyword">return</span> hybrid_results[:top_k]
+    
+    <span class="token-keyword">async def</span> <span class="token-function">_bm25_search</span>(self, query, top_k, filters):
+        <span class="token-string">"""BM25 search via Elasticsearch."""</span>
+        body = {
+            <span class="token-string">"query"</span>: {
+                <span class="token-string">"bool"</span>: {
+                    <span class="token-string">"must"</span>: [{<span class="token-string">"match"</span>: {<span class="token-string">"content"</span>: query}}],
+                    <span class="token-string">"filter"</span>: self._build_filters(filters)
+                }
+            },
+            <span class="token-string">"size"</span>: top_k
+        }
+        response = self.es.search(index=<span class="token-string">"documents"</span>, body=body)
+        <span class="token-keyword">return</span> self._parse_es_results(response)
+    
+    <span class="token-keyword">async def</span> <span class="token-function">_vector_search</span>(self, query, top_k, filters):
+        <span class="token-string">"""Semantic search via Qdrant."""</span>
+        query_vector = self.embedder.embed(query)
+        results = self.qdrant.search(
+            collection_name=<span class="token-string">"document_chunks"</span>,
+            query_vector=query_vector,
+            limit=top_k,
+            query_filter=self._build_qdrant_filter(filters)
+        )
+        <span class="token-keyword">return</span> self._parse_qdrant_results(results)</code></pre>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>Perplexity AI</strong> — Uses hybrid retrieval (keyword + semantic) before feeding results to LLMs</li>
+                    <li><strong>Elasticsearch 8+</strong> — Now supports native vector search alongside BM25 (hybrid in one system)</li>
+                    <li><strong>Pinecone</strong> — Offers sparse+dense vectors for hybrid search in one index</li>
+                    <li><strong>Cohere Rerank</strong> — Often used as a second-pass ranker after hybrid retrieval</li>
+                    <li><strong>Most production RAG systems</strong> at scale use alpha between 0.5-0.7 (slightly favoring semantic)</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>BM25 finds exact word matches — great for identifiers, names, codes</li>
+                    <li>Embeddings find meaning matches — great for questions, concepts, paraphrases</li>
+                    <li>Neither alone is sufficient at 10M docs — you need BOTH working together</li>
+                    <li>Reciprocal Rank Fusion (RRF) is the standard way to merge results from both</li>
+                    <li>Run both searches in parallel to keep latency low</li>
+                    <li>Consider query-adaptive weighting — exact searches lean BM25, questions lean semantic</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+User Query: "What's Policy #HR-2024-042 about vacation?"
+
+BM25 Search (Keywords):                 Embedding Search (Meaning):
+├── ✅ Policy #HR-2024-042              ├── ✅ Vacation leave guidelines
+├── ✅ HR-2024-042 amendment            ├── ✅ PTO and time-off rules
+├── ❌ HR-2024-043 (wrong number)      ├── ⚠️ General HR overview
+└── ❌ (misses "time off" docs)         └── ⚠️ Employee benefits (too broad)
+
+              ↓ Reciprocal Rank Fusion ↓
+
+Hybrid Results (Best of both):
+├── ✅ Policy #HR-2024-042 (exact + meaning match)
+├── ✅ HR-2024-042 amendment (exact match)
+├── ✅ Vacation leave guidelines (meaning match)
+└── ✅ PTO and time-off rules (meaning match)
+                </div>
+                <p><strong>Think of it as:</strong> Two detectives working the same case — one follows the paper trail (BM25), the other reads body language (embeddings). Together they solve it faster.</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>Using only embeddings:</strong> "Semantic search is newer so it must be better" — WRONG at scale. BM25 catches what embeddings miss.</li>
+                    <li><strong>Fixed alpha forever:</strong> Don't hardcode 0.5/0.5 weights. Different query types need different balances.</li>
+                    <li><strong>Sequential not parallel:</strong> Running BM25 THEN embeddings doubles latency. Always run them simultaneously.</li>
+                    <li><strong>Too few initial candidates:</strong> Retrieve 2-3x more than you need, then let the reranker (Stage 3) pick the best.</li>
+                    <li><strong>Ignoring metadata filters:</strong> Always filter by metadata FIRST (date range, doc type) to reduce the search space before scoring.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Hybrid Search</h3>
+                <ol>
+                    <li>Take 100 text chunks (from Stage 1 exercise or sample data)</li>
+                    <li>Index them in Elasticsearch (or use a simple Python BM25 library like <code>rank_bm25</code>)</li>
+                    <li>Generate embeddings using a free model (sentence-transformers or OpenAI)</li>
+                    <li>Store embeddings in a simple NumPy array or use ChromaDB</li>
+                    <li>Implement Reciprocal Rank Fusion to merge both result sets</li>
+                    <li>Test with 3 queries: one with exact terms, one conceptual, one mixed</li>
+                    <li>Compare results: BM25-only vs embedding-only vs hybrid</li>
+                    <li><strong>Bonus:</strong> Implement adaptive weighting based on query analysis</li>
+                </ol>
+                <p><strong>Success criteria:</strong> For each of the 3 test queries, hybrid should outperform either method alone (measured by whether the correct document appears in top-5).</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="01-ingest-normalize.html" class="prev">Ingest &amp; Normalize</a>
+                <a href="03-ann-reranking.html" class="next">ANN &amp; Reranking</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

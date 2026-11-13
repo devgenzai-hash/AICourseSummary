@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthetic Data Generation — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 2</a> <span>›</span> Synthetic Data</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Synthetic Data Generation</h1>
+                <p>Don't have enough training data? Generate it! Learn how to use AI to create high-quality training datasets — the technique behind models like Phi, Orca, and WizardLM.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Synthetic data = Practice exam questions written by a teacher.</strong> A teacher (GPT-4) creates practice problems and model answers. Students (your model) learn from these. The practice problems aren't "real" exam questions, but they teach the same skills.</p>
+                <p><strong>Seed data + Variations = One recipe → a whole cookbook.</strong> You start with 10 real customer support tickets, then generate 10,000 variations covering different products, issues, and tones.</p>
+            </div>
+
+            <h2 id="why">Why Synthetic Data?</h2>
+
+            <table>
+                <thead><tr><th>Problem</th><th>Synthetic Solution</th><th>Real-World Example</th></tr></thead>
+                <tbody>
+                    <tr><td>Not enough data</td><td>Generate thousands of examples from a few seeds</td><td>Startup with 50 customer emails → 5,000 training pairs</td></tr>
+                    <tr><td>Privacy concerns</td><td>Generate similar-but-fake data</td><td>Medical records → synthetic patient conversations</td></tr>
+                    <tr><td>Expensive labeling</td><td>AI labels instead of humans ($0.001 vs $1 per example)</td><td>Annotation that would cost $100K → $100</td></tr>
+                    <tr><td>Domain gaps</td><td>Generate edge cases that rarely occur naturally</td><td>Creating adversarial/tricky examples</td></tr>
+                    <tr><td>Bootstrapping new tasks</td><td>Create training data for tasks with no existing dataset</td><td>Training a model for your custom API documentation</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="techniques">Synthetic Data Techniques</h2>
+
+            <h3>1. Seed-and-Expand (Most Common)</h3>
+            <p>Start with a few real examples, use a strong model to generate more:</p>
+            <pre><code><span class="token-comment"># Seed-and-Expand: Generate training data from a few examples</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> json
+
+client = OpenAI()
+
+<span class="token-comment"># Your seed examples (real data you have)</span>
+seed_examples = [
+    {
+        <span class="token-string">"instruction"</span>: <span class="token-string">"How do I reset my password?"</span>,
+        <span class="token-string">"response"</span>: <span class="token-string">"Go to Settings > Security > Reset Password. Enter your current password, then type your new password twice. Click Save."</span>
+    },
+    {
+        <span class="token-string">"instruction"</span>: <span class="token-string">"My payment failed, what do I do?"</span>,
+        <span class="token-string">"response"</span>: <span class="token-string">"Payment failures usually happen due to insufficient funds or expired cards. Please check your card details in Settings > Billing and try again."</span>
+    }
+]
+
+<span class="token-keyword">def</span> <span class="token-function">generate_synthetic_examples</span>(seeds, num_to_generate=<span class="token-number">20</span>, domain=<span class="token-string">"customer support for a SaaS product"</span>):
+    <span class="token-string">"""Generate new training examples based on seed data."""</span>
+
+    prompt = <span class="token-string">f"""You are a dataset generator. Based on these example Q&A pairs from {domain}, 
+generate {num_to_generate} NEW, diverse examples in the same style and format.
+
+SEED EXAMPLES:
+{json.dumps(seeds, indent=2)}
+
+REQUIREMENTS:
+- Cover different topics/scenarios within the domain
+- Vary difficulty levels (simple to complex)
+- Keep responses helpful, accurate, and professional
+- Include edge cases and unusual scenarios
+- Format: JSON array of {{"instruction": "...", "response": "..."}}
+
+Generate exactly {num_to_generate} examples:"""</span>
+
+    response = client.chat.completions.create(
+        model=<span class="token-string">"gpt-4o"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: prompt}],
+        temperature=<span class="token-number">0.9</span>,  <span class="token-comment"># Higher = more diverse</span>
+        max_tokens=<span class="token-number">4000</span>
+    )
+
+    <span class="token-comment"># Parse the generated examples</span>
+    generated = json.loads(response.choices[<span class="token-number">0</span>].message.content)
+    <span class="token-keyword">return</span> generated
+
+<span class="token-comment"># Generate!</span>
+synthetic_data = generate_synthetic_examples(seed_examples, num_to_generate=<span class="token-number">20</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Generated {len(synthetic_data)} examples"</span>)
+<span class="token-builtin">print</span>(json.dumps(synthetic_data[<span class="token-number">0</span>], indent=<span class="token-number">2</span>))</code></pre>
+
+            <h3>2. Self-Instruct Method (Used by Alpaca)</h3>
+            <pre><code><span class="token-comment"># Self-Instruct: Model generates both instructions AND responses</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> random
+
+client = OpenAI()
+
+<span class="token-comment"># Categories to ensure diversity</span>
+categories = [
+    <span class="token-string">"coding"</span>, <span class="token-string">"math"</span>, <span class="token-string">"creative writing"</span>, <span class="token-string">"analysis"</span>,
+    <span class="token-string">"explanation"</span>, <span class="token-string">"summarization"</span>, <span class="token-string">"translation"</span>,
+    <span class="token-string">"brainstorming"</span>, <span class="token-string">"debugging"</span>, <span class="token-string">"planning"</span>
+]
+
+<span class="token-keyword">def</span> <span class="token-function">self_instruct_batch</span>(category: str, n: int = <span class="token-number">5</span>):
+    <span class="token-string">"""Generate instruction-response pairs for a category."""</span>
+    prompt = <span class="token-string">f"""Generate {n} diverse instruction-response pairs for the category: {category}
+
+Each pair should:
+- Have a clear, specific instruction
+- Have a detailed, high-quality response  
+- Vary in complexity (some easy, some hard)
+- Be self-contained (no external context needed)
+
+Return as JSON array: [{{"instruction": "...", "response": "..."}}]"""</span>
+
+    response = client.chat.completions.create(
+        model=<span class="token-string">"gpt-4o"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: prompt}],
+        temperature=<span class="token-number">1.0</span>,
+        max_tokens=<span class="token-number">4000</span>
+    )
+
+    <span class="token-keyword">return</span> json.loads(response.choices[<span class="token-number">0</span>].message.content)
+
+<span class="token-comment"># Generate across all categories</span>
+all_data = []
+<span class="token-keyword">for</span> category <span class="token-keyword">in</span> categories:
+    batch = self_instruct_batch(category, n=<span class="token-number">10</span>)
+    all_data.extend(batch)
+    <span class="token-builtin">print</span>(<span class="token-string">f"✓ {category}: {len(batch)} examples"</span>)
+
+<span class="token-builtin">print</span>(<span class="token-string">f"\nTotal: {len(all_data)} examples across {len(categories)} categories"</span>)</code></pre>
+
+            <h3>3. Evol-Instruct (Used by WizardLM)</h3>
+            <pre><code><span class="token-comment"># Evol-Instruct: Progressively make instructions more complex</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> json
+
+client = OpenAI()
+
+<span class="token-keyword">def</span> <span class="token-function">evolve_instruction</span>(simple_instruction: str, method: str = <span class="token-string">"deepen"</span>) -> str:
+    <span class="token-string">"""Make an instruction more complex using evolution strategies."""</span>
+    
+    evolution_prompts = {
+        <span class="token-string">"deepen"</span>: <span class="token-string">f"Make this instruction more complex by adding constraints, requiring deeper reasoning, or asking for more detailed output:\n\nOriginal: {simple_instruction}\n\nEvolved (more complex version):"</span>,
+        <span class="token-string">"broaden"</span>: <span class="token-string">f"Expand this instruction to cover a wider scope or combine multiple related tasks:\n\nOriginal: {simple_instruction}\n\nEvolved (broader version):"</span>,
+        <span class="token-string">"concretize"</span>: <span class="token-string">f"Make this instruction more specific with concrete details, real-world context, and specific constraints:\n\nOriginal: {simple_instruction}\n\nEvolved (more specific version):"</span>,
+    }
+
+    response = client.chat.completions.create(
+        model=<span class="token-string">"gpt-4o"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: evolution_prompts[method]}],
+        temperature=<span class="token-number">0.8</span>,
+        max_tokens=<span class="token-number">500</span>
+    )
+    <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.content.strip()
+
+<span class="token-comment"># Example: Evolve a simple instruction through 3 levels</span>
+simple = <span class="token-string">"Write a Python function to sort a list"</span>
+
+level1 = evolve_instruction(simple, <span class="token-string">"deepen"</span>)
+<span class="token-comment"># → "Write a Python function that implements merge sort, handles lists with mixed types,</span>
+<span class="token-comment">#    and returns both the sorted list and the number of comparisons made"</span>
+
+level2 = evolve_instruction(level1, <span class="token-string">"concretize"</span>)
+<span class="token-comment"># → "Write a production-ready Python function for a e-commerce platform that sorts</span>
+<span class="token-comment">#    products by price, with tie-breaking by rating, handling None values..."</span>
+
+<span class="token-builtin">print</span>(<span class="token-string">f"Original: {simple}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Level 1: {level1}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Level 2: {level2}"</span>)</code></pre>
+
+            <h3>4. Generating Preference Pairs for DPO</h3>
+            <pre><code><span class="token-comment"># Generate preference data: good answer vs bad answer</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> json
+
+client = OpenAI()
+
+<span class="token-keyword">def</span> <span class="token-function">generate_preference_pair</span>(instruction: str) -> dict:
+    <span class="token-string">"""Generate a chosen (good) and rejected (bad) response pair."""</span>
+
+    <span class="token-comment"># Generate a GOOD response</span>
+    good_prompt = <span class="token-string">f"Answer this question with a helpful, detailed, accurate response:\n\n{instruction}"</span>
+    good_response = client.chat.completions.create(
+        model=<span class="token-string">"gpt-4o"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: good_prompt}],
+        temperature=<span class="token-number">0.3</span>
+    ).choices[<span class="token-number">0</span>].message.content
+
+    <span class="token-comment"># Generate a BAD response (intentionally flawed)</span>
+    bad_prompt = <span class="token-string">f"""Answer this question, but make the response have these flaws:
+- Be somewhat vague and unhelpful  
+- Include minor inaccuracies
+- Be overly brief or miss key details
+- Use a slightly dismissive tone
+
+Question: {instruction}"""</span>
+    bad_response = client.chat.completions.create(
+        model=<span class="token-string">"gpt-4o"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: bad_prompt}],
+        temperature=<span class="token-number">0.7</span>
+    ).choices[<span class="token-number">0</span>].message.content
+
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"prompt"</span>: instruction,
+        <span class="token-string">"chosen"</span>: good_response,
+        <span class="token-string">"rejected"</span>: bad_response
+    }
+
+<span class="token-comment"># Generate preference pairs</span>
+questions = [
+    <span class="token-string">"How do I handle errors in Python?"</span>,
+    <span class="token-string">"What's the difference between SQL and NoSQL?"</span>,
+    <span class="token-string">"How do I improve my public speaking?"</span>,
+]
+
+dpo_dataset = [generate_preference_pair(q) <span class="token-keyword">for</span> q <span class="token-keyword">in</span> questions]
+
+<span class="token-comment"># Save for DPO training</span>
+<span class="token-keyword">with</span> <span class="token-builtin">open</span>(<span class="token-string">"dpo_data.jsonl"</span>, <span class="token-string">"w"</span>) <span class="token-keyword">as</span> f:
+    <span class="token-keyword">for</span> pair <span class="token-keyword">in</span> dpo_dataset:
+        f.write(json.dumps(pair) + <span class="token-string">"\n"</span>)</code></pre>
+
+            <h2 id="pipeline">Production Data Pipeline</h2>
+
+            <pre><code><span class="token-comment"># Full production pipeline for synthetic data generation</span>
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> Dataset
+<span class="token-keyword">from</span> concurrent.futures <span class="token-keyword">import</span> ThreadPoolExecutor
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional
+<span class="token-keyword">import</span> time
+
+client = OpenAI()
+
+<span class="token-keyword">class</span> <span class="token-class">SyntheticDataPipeline</span>:
+    <span class="token-string">"""Production-grade synthetic data generation pipeline."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, model=<span class="token-string">"gpt-4o-mini"</span>, max_workers=<span class="token-number">5</span>):
+        self.model = model
+        self.max_workers = max_workers
+        self.generated = []
+        self.seen_hashes = <span class="token-builtin">set</span>()  <span class="token-comment"># Deduplication</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_hash_text</span>(self, text: str) -> str:
+        <span class="token-keyword">return</span> hashlib.md5(text.lower().strip().encode()).hexdigest()
+
+    <span class="token-keyword">def</span> <span class="token-function">generate_batch</span>(self, prompt: str, n: int = <span class="token-number">10</span>) -> list:
+        <span class="token-string">"""Generate a batch of examples with deduplication."""</span>
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: prompt}],
+            temperature=<span class="token-number">0.9</span>,
+            max_tokens=<span class="token-number">4000</span>
+        )
+
+        <span class="token-keyword">try</span>:
+            examples = json.loads(response.choices[<span class="token-number">0</span>].message.content)
+        <span class="token-keyword">except</span> json.JSONDecodeError:
+            <span class="token-keyword">return</span> []
+
+        <span class="token-comment"># Deduplicate</span>
+        unique = []
+        <span class="token-keyword">for</span> ex <span class="token-keyword">in</span> examples:
+            h = self._hash_text(str(ex.get(<span class="token-string">"instruction"</span>, ex.get(<span class="token-string">"messages"</span>, <span class="token-string">""</span>))))
+            <span class="token-keyword">if</span> h <span class="token-keyword">not</span> <span class="token-keyword">in</span> self.seen_hashes:
+                self.seen_hashes.add(h)
+                unique.append(ex)
+        <span class="token-keyword">return</span> unique
+
+    <span class="token-keyword">def</span> <span class="token-function">validate_example</span>(self, example: dict) -> bool:
+        <span class="token-string">"""Basic quality checks."""</span>
+        instruction = example.get(<span class="token-string">"instruction"</span>, <span class="token-string">""</span>)
+        response = example.get(<span class="token-string">"response"</span>, <span class="token-string">""</span>)
+
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(instruction) < <span class="token-number">10</span>:  <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(response) < <span class="token-number">50</span>:  <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        <span class="token-keyword">if</span> instruction == response:  <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">run</span>(self, seed_data: list, target_count: int = <span class="token-number">1000</span>, domain: str = <span class="token-string">"general"</span>):
+        <span class="token-string">"""Run the full pipeline."""</span>
+        <span class="token-builtin">print</span>(<span class="token-string">f"🚀 Generating {target_count} examples for domain: {domain}"</span>)
+
+        <span class="token-keyword">while</span> <span class="token-builtin">len</span>(self.generated) < target_count:
+            prompt = <span class="token-string">f"""Generate 10 diverse instruction-response pairs for: {domain}
+Based on these seed examples: {json.dumps(seed_data[:3])}
+Return JSON array: [{{"instruction": "...", "response": "..."}}]"""</span>
+
+            batch = self.generate_batch(prompt)
+            valid = [ex <span class="token-keyword">for</span> ex <span class="token-keyword">in</span> batch <span class="token-keyword">if</span> self.validate_example(ex)]
+            self.generated.extend(valid)
+            <span class="token-builtin">print</span>(<span class="token-string">f"  Progress: {len(self.generated)}/{target_count}"</span>)
+            time.sleep(<span class="token-number">0.5</span>)  <span class="token-comment"># Rate limiting</span>
+
+        <span class="token-comment"># Convert to HuggingFace Dataset</span>
+        dataset = Dataset.from_list(self.generated[:target_count])
+        <span class="token-builtin">print</span>(<span class="token-string">f"✅ Generated {len(dataset)} validated examples"</span>)
+        <span class="token-keyword">return</span> dataset
+
+<span class="token-comment"># Usage</span>
+pipeline = SyntheticDataPipeline(model=<span class="token-string">"gpt-4o-mini"</span>)
+seeds = [{<span class="token-string">"instruction"</span>: <span class="token-string">"How do I deploy a Flask app?"</span>, <span class="token-string">"response"</span>: <span class="token-string">"..."</span>}]
+dataset = pipeline.run(seeds, target_count=<span class="token-number">100</span>, domain=<span class="token-string">"web development"</span>)
+dataset.save_to_disk(<span class="token-string">"./my_synthetic_dataset"</span>)</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Microsoft's Phi models</strong> — Trained almost entirely on synthetic data. Proves synthetic data works at scale.</li>
+                    <li><strong>Orca method</strong> — Use GPT-4 to generate detailed reasoning traces, then train smaller models on them.</li>
+                    <li><strong>WizardLM's Evol-Instruct</strong> — Progressively evolve simple instructions into complex ones for better training.</li>
+                    <li><strong>Always use the best model available as teacher</strong> — GPT-4o or Claude as teacher, train your 8B student model.</li>
+                    <li><strong>Validate before training</strong> — Run quality checks, remove duplicates, check for hallucinated "facts".</li>
+                    <li><strong>Mix synthetic + real data</strong> — Best results come from 80% synthetic + 20% real human-written data.</li>
+                    <li><strong>Cost: ~$50-200 for 10K high-quality examples</strong> using GPT-4o-mini as generator.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Synthetic data</strong> = using a strong AI model to generate training data for a smaller model</li>
+                    <li><strong>Seed-and-Expand</strong>: Start with real examples, generate variations</li>
+                    <li><strong>Self-Instruct</strong>: Model generates both questions and answers</li>
+                    <li><strong>Evol-Instruct</strong>: Progressively increase instruction complexity</li>
+                    <li>Always deduplicate, validate quality, and mix with real data</li>
+                    <li>Cost-effective: $50-200 for a usable dataset vs $10,000+ for human annotation</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    Teacher (GPT-4) → Generates training examples → Student (your 8B model) learns<br><br>
+                    Real data (seeds) → Expand → Validate → Deduplicate → Final dataset<br>
+                    [10 examples] → [10,000 examples] → [8,000 pass QA] → [7,500 unique] → TRAIN!
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Not deduplicating</strong> — AI generators often repeat patterns. Always hash and deduplicate.</li>
+                    <li><strong>Using a weak teacher model</strong> — Don't generate data with GPT-3.5 if you can afford GPT-4. Quality flows downhill.</li>
+                    <li><strong>No validation step</strong> — Generated data often has errors. Spot-check at least 5% manually.</li>
+                    <li><strong>Temperature too low</strong> — Use 0.8-1.0 for diversity. Low temp = repetitive data.</li>
+                    <li><strong>Ignoring ToS</strong> — Some API providers restrict using outputs to train competing models. Check terms.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Generate a Mini Dataset</h4>
+                <ol>
+                    <li>Pick a niche domain (e.g., cooking advice, fitness coaching, git commands)</li>
+                    <li>Write 5 seed examples manually (instruction + response)</li>
+                    <li>Use the Seed-and-Expand method to generate 50 more examples</li>
+                    <li>Implement the quality validation function</li>
+                    <li>Deduplicate and save as JSONL</li>
+                    <li>Manually review 10 random examples — are they good enough to train on?</li>
+                    <li><strong>Bonus:</strong> Try the Evol-Instruct method on 5 of your examples and observe how complexity increases</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="07-datasets-overview.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Dataset Types</span>
+                </a>
+                <a href="09-data-cleaning-formatting.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Cleaning & Formatting</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

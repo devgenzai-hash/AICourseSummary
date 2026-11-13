@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResizeObserver Loop Limits - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> ResizeObserver Loop Limits
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>ResizeObserver Loop Limits</h1>
+                <p class="subtitle">Why ResizeObserver can trigger infinite layout loops, how the browser's "loop limit" prevents them, and the cryptic "ResizeObserver loop completed with undelivered notifications" error explained.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-concept">Observer API</span>
+                    <span class="tag tag-browser">Browser Internals</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">♻️ Daily-Life Analogy: Hall of Mirrors Feedback</div>
+                <p>Imagine a room where resizing a mirror causes the adjacent mirror to resize, which causes the first mirror to resize again... infinitely. <strong>ResizeObserver's loop limit</strong> is the building inspector who says "you get 4 resize rounds maximum per frame. After that, I stop delivering notifications to prevent the building from shaking itself apart."</p>
+            </div>
+
+            <h2>The Problem: Why Infinite Loops Are Possible</h2>
+<pre><code><span class="token-comment">// The dangerous pattern: observing an element and changing its size in the callback</span>
+<span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> ResizeObserver((entries) => {
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry of entries) {
+        <span class="token-comment">// ❌ INFINITE LOOP: Changing size triggers another observation</span>
+        entry.target.style.width = (entry.contentRect.width + 1) + <span class="token-string">'px'</span>;
+        <span class="token-comment">// This resize triggers the observer again → which adds 1px → triggers again → ...</span>
+    }
+});
+</code></pre>
+            <p>Unlike MutationObserver (which delivers all mutations after the microtask), ResizeObserver integrates with the <strong>layout phase</strong>. If your callback changes layout, it can trigger another resize observation in the same frame.</p>
+
+            <h2>How the Browser Prevents Infinite Loops</h2>
+            <ol>
+                <li><strong>Process ResizeObserver notifications after layout</strong></li>
+                <li><strong>If callbacks change layout, re-run layout</strong></li>
+                <li><strong>Check for new resize observations</strong></li>
+                <li><strong>Repeat up to a DEPTH LIMIT (typically 4 iterations per frame)</strong></li>
+                <li><strong>After limit: deliver remaining notifications in the NEXT frame and fire an error event</strong></li>
+            </ol>
+
+<pre><code><span class="token-comment">// The browser's internal frame loop (simplified):</span>
+<span class="token-keyword">function</span> <span class="token-function">renderFrame</span>() {
+    runJavaScript();           <span class="token-comment">// Event handlers, timers, etc.</span>
+    recalcStyles();
+    runLayout();               <span class="token-comment">// Calculate geometry</span>
+    
+    <span class="token-comment">// --- ResizeObserver integration point ---</span>
+    <span class="token-keyword">let</span> depth = 0;
+    <span class="token-keyword">while</span> (hasResizeObservations() && depth &lt; MAX_DEPTH) {
+        deliverResizeObservations(); <span class="token-comment">// Your callback runs here</span>
+        recalcStyles();             <span class="token-comment">// Callback may have changed styles</span>
+        runLayout();                <span class="token-comment">// Recalculate layout</span>
+        depth++;
+    }
+    
+    <span class="token-keyword">if</span> (hasResizeObservations()) {
+        <span class="token-comment">// Still have undelivered observations after max depth!</span>
+        <span class="token-comment">// Schedule them for next frame and fire error event</span>
+        reportError(<span class="token-string">"ResizeObserver loop completed with undelivered notifications"</span>);
+    }
+    <span class="token-comment">// --- End ResizeObserver ---</span>
+    
+    paint();
+    composite();
+}
+</code></pre>
+
+            <h2>The "Loop Limit Exceeded" Error</h2>
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ "ResizeObserver loop completed with undelivered notifications"</div>
+                <p>This error means: your ResizeObserver callback caused a layout change that triggered more observations, and this repeated until the browser hit its depth limit. The browser DROPPED some notifications to prevent freezing. This doesn't crash the page but means some resize callbacks were skipped — potentially leaving your UI in an inconsistent state.</p>
+            </div>
+
+            <h2>Code: Safe Patterns That Avoid Loops</h2>
+<pre><code><span class="token-comment">// ✅ SAFE: Read size, update a DIFFERENT element</span>
+<span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> ResizeObserver((entries) => {
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry of entries) {
+        <span class="token-comment">// Reading the observed element's size and writing to a DIFFERENT element</span>
+        <span class="token-comment">// doesn't create a loop (the other element isn't observed)</span>
+        <span class="token-keyword">const</span> { width } = entry.contentRect;
+        otherElement.style.fontSize = (width / 20) + <span class="token-string">'px'</span>;
+    }
+});
+
+<span class="token-comment">// ✅ SAFE: Use requestAnimationFrame to defer writes</span>
+<span class="token-keyword">const</span> safeObserver = <span class="token-keyword">new</span> ResizeObserver((entries) => {
+    <span class="token-comment">// Read now, write next frame — breaks the synchronous loop</span>
+    requestAnimationFrame(() => {
+        <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry of entries) {
+            entry.target.style.fontSize = (entry.contentRect.width / 10) + <span class="token-string">'px'</span>;
+        }
+    });
+});
+
+<span class="token-comment">// ✅ SAFE: Converging logic (change gets smaller each iteration)</span>
+<span class="token-keyword">const</span> convergingObserver = <span class="token-keyword">new</span> ResizeObserver((entries) => {
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry of entries) {
+        <span class="token-keyword">const</span> { width, height } = entry.contentRect;
+        <span class="token-comment">// This converges: once aspect ratio is correct, no more changes</span>
+        <span class="token-keyword">const</span> targetHeight = width * 0.5625; <span class="token-comment">// 16:9 ratio</span>
+        <span class="token-keyword">if</span> (Math.abs(height - targetHeight) > 1) {
+            entry.target.style.height = targetHeight + <span class="token-string">'px'</span>;
+        }
+    }
+});
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Container Queries (polyfills)</strong> — Before native container queries, polyfills used ResizeObserver to detect container size and apply conditional styles.</li>
+                <li><strong>Chart libraries (D3, Chart.js)</strong> — Observe chart container resize to redraw at new dimensions. The loop error is common here when chart rendering itself changes container size.</li>
+                <li><strong>Virtual scrollers</strong> — Observe item size changes to update scroll calculations (items might have dynamic content heights).</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Changing the observed element's size in the callback</strong> — The #1 cause of the loop error. If you must do it, ensure convergence.</li>
+                <li><strong>Ignoring the error in error monitoring</strong> — Many teams filter this out as "harmless." But it means UI inconsistency — some callbacks were dropped.</li>
+                <li><strong>Not cleaning up observers</strong> — <code>observer.disconnect()</code> or <code>observer.unobserve(el)</code> when elements are removed. Otherwise the observer holds references preventing GC.</li>
+                <li><strong>Creating many observers instead of one</strong> — One ResizeObserver can observe many elements. Creating one per element adds overhead.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand ResizeObserver Loop Limits When...</h3>
+                <p>You can explain the exact browser frame sequence that causes the loop error (layout → deliver RO → callback changes size → re-layout → deliver RO → ... → depth limit), and design a callback pattern that converges without hitting it.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Intentionally trigger the "loop completed with undelivered notifications" error by having a ResizeObserver callback that non-convergently modifies the observed element. Then fix it using either: (1) convergence logic, or (2) requestAnimationFrame deferral.</p>
+                <h3>🔗 Connect It</h3>
+                <p>ResizeObserver connects to: <strong>Layout Thrashing</strong> (RO callbacks can cause forced layouts), <strong>CSS Containment</strong> (containment prevents size changes from propagating, reducing RO triggers), and <strong>MutationObserver</strong> (similar observer pattern, different trigger mechanism).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="37-intersection-observer.html" class="nav-btn nav-btn-prev">← IntersectionObserver</a>
+                <a href="39-mutation-observer.html" class="nav-btn nav-btn-next">MutationObserver Cost →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

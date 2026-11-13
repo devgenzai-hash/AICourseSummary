@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indexing Internals - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Database Engineering &rarr; Indexing Internals</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Advanced</span>
+                <span class="tag">Database</span>
+                <span class="tag">Concept</span>
+            </div>
+            <h1>Indexing Internals</h1>
+            <p class="hero-subtitle">Understanding how databases organize data for fast retrieval &mdash; the internal structures that turn O(n) full table scans into O(log n) lookups and the trade-offs every index imposes on write performance.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Imagine a <strong>textbook with 1000 pages</strong>. Without an index, finding &ldquo;B-Tree&rdquo; means reading every page from start to finish (sequential scan). With the <strong>index at the back</strong>, you look up &ldquo;B-Tree &rarr; pages 142, 305, 718&rdquo; and jump directly there. The index itself takes space (extra pages), and every time you add content, you must update the index too &mdash; but the lookup speedup is worth it for frequently searched terms. You wouldn&rsquo;t index every single word though &mdash; that would make the index bigger than the book.</p>
+        </div>
+
+        <h2>Why Indexes Exist</h2>
+        <p>Without an index, every query requires a <strong>sequential scan</strong> &mdash; reading every row in the table to find matches. For a table with 10 million rows, that means 10 million row comparisons for a single lookup:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Access Method</th>
+                        <th>Time Complexity</th>
+                        <th>10M Rows</th>
+                        <th>100M Rows</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Sequential Scan</strong></td>
+                        <td>O(n)</td>
+                        <td>~10M comparisons</td>
+                        <td>~100M comparisons</td>
+                        <td>No index, or query returns most rows</td>
+                    </tr>
+                    <tr>
+                        <td><strong>B-Tree Index Scan</strong></td>
+                        <td>O(log n)</td>
+                        <td>~23 comparisons</td>
+                        <td>~27 comparisons</td>
+                        <td>Equality, range queries, ORDER BY</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hash Index</strong></td>
+                        <td>O(1)</td>
+                        <td>~1 lookup</td>
+                        <td>~1 lookup</td>
+                        <td>Exact equality only (no ranges)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bitmap Index Scan</strong></td>
+                        <td>O(n/page_size)</td>
+                        <td>Scan matching pages</td>
+                        <td>Scan matching pages</td>
+                        <td>Low-cardinality columns, OR conditions</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>B-Tree / B+Tree Structure</h2>
+        <p>The B+Tree is the <strong>dominant index structure</strong> in relational databases (PostgreSQL, MySQL, SQL Server, Oracle). It&rsquo;s a balanced tree where:</p>
+        <ul>
+            <li>All data lives in <strong>leaf nodes</strong> (linked in order for range scans)</li>
+            <li>Internal nodes contain only keys and child pointers (maximizing fanout)</li>
+            <li>The tree stays balanced &mdash; all leaves are at the same depth</li>
+            <li>Typical fanout of 100-500 means 3-4 levels handles billions of rows</li>
+        </ul>
+
+        <h3>B+Tree Properties</h3>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>B-Tree</th>
+                        <th>B+Tree</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Data location</strong></td>
+                        <td>Any node (internal + leaf)</td>
+                        <td>Leaf nodes only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Leaf linking</strong></td>
+                        <td>No sibling pointers</td>
+                        <td>Doubly-linked list of leaves</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Range scans</strong></td>
+                        <td>Requires tree traversal</td>
+                        <td>Follow leaf pointers (sequential)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Internal node size</strong></td>
+                        <td>Larger (holds data)</td>
+                        <td>Smaller (keys only &rarr; higher fanout)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Used by</strong></td>
+                        <td>MongoDB (WiredTiger)</td>
+                        <td>PostgreSQL, MySQL InnoDB, SQL Server</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Hash Indexes</h2>
+        <p>Hash indexes provide O(1) lookup for <strong>exact equality</strong> only. They cannot support range queries, ORDER BY, or partial matching:</p>
+        <ul>
+            <li>Key is hashed to a bucket number</li>
+            <li>Bucket contains pointers to matching rows</li>
+            <li>Collisions handled via chaining or linear probing</li>
+            <li>PostgreSQL supports hash indexes (crash-safe since v10)</li>
+            <li>Ideal for: join keys, exact lookups where ranges are never needed</li>
+        </ul>
+
+        <h2>LSM Trees (Log-Structured Merge Trees)</h2>
+        <p>LSM trees optimize for <strong>write-heavy workloads</strong> by buffering writes in memory and flushing sorted runs to disk:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>B+Tree</th>
+                        <th>LSM Tree</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Write pattern</strong></td>
+                        <td>Random I/O (update page in place)</td>
+                        <td>Sequential I/O (append to log)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Write throughput</strong></td>
+                        <td>Moderate</td>
+                        <td>High (10-100x for writes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read performance</strong></td>
+                        <td>Fast (single tree traversal)</td>
+                        <td>Slower (check multiple levels)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Space amplification</strong></td>
+                        <td>Low (update in place)</td>
+                        <td>Higher (duplicate keys across levels)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Background work</strong></td>
+                        <td>Minimal</td>
+                        <td>Compaction (merging sorted runs)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Used by</strong></td>
+                        <td>PostgreSQL, MySQL, SQL Server</td>
+                        <td>RocksDB, LevelDB, Cassandra, ScyllaDB</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Index Scan vs Sequential Scan</h2>
+        <p>The query planner decides whether to use an index based on <strong>selectivity</strong> &mdash; what fraction of rows the query returns:</p>
+        <ul>
+            <li><strong>&lt;5-10% of rows:</strong> Index scan wins (few random I/Os beat full scan)</li>
+            <li><strong>&gt;10-20% of rows:</strong> Sequential scan wins (sequential I/O is faster than many random reads)</li>
+            <li><strong>Covering index:</strong> Always wins if all needed columns are in the index (no heap lookup)</li>
+        </ul>
+
+        <h2>Covering Indexes</h2>
+        <p>A covering index includes all columns needed by a query, eliminating the need to fetch the actual row from the heap/clustered index:</p>
+        <pre><code><span class="token-comment">-- Regular index: must fetch row for 'email'</span>
+<span class="token-comment">-- CREATE INDEX idx_users_name ON users(name);</span>
+<span class="token-comment">-- SELECT name, email FROM users WHERE name = 'Alice';</span>
+<span class="token-comment">--   Index scan on idx_users_name → heap fetch for email</span>
+
+<span class="token-comment">-- Covering index: all data in the index itself</span>
+<span class="token-comment">-- CREATE INDEX idx_users_name_email ON users(name) INCLUDE (email);</span>
+<span class="token-comment">-- SELECT name, email FROM users WHERE name = 'Alice';</span>
+<span class="token-comment">--   Index-only scan → no heap fetch needed</span></code></pre>
+
+        <h2>When NOT to Index</h2>
+        <ul>
+            <li><strong>Small tables:</strong> Sequential scan of 1000 rows is faster than index overhead</li>
+            <li><strong>Low selectivity:</strong> Boolean columns, status fields with 2-3 values &mdash; index returns too many rows</li>
+            <li><strong>Write-heavy tables:</strong> Each index adds overhead to every INSERT/UPDATE/DELETE</li>
+            <li><strong>Frequently updated columns:</strong> Index must be reorganized on every change</li>
+            <li><strong>Wide indexes:</strong> If the index is as large as the table, it provides no benefit</li>
+        </ul>
+
+        <h2>B-Tree Node Implementation</h2>
+        <p>A simplified B-Tree node class showing the core insertion and search logic:</p>
+
+        <pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Optional, Any
+<span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> random
+<span class="token-keyword">import</span> bisect
+
+<span class="token-keyword">class</span> <span class="token-class">BTreeNode</span>:
+    <span class="token-string">"""A node in a B-Tree index structure.
+
+    Each node holds up to (2*t - 1) keys and (2*t) children.
+    When full, it splits into two nodes and pushes the
+    median key up to the parent.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, t: int, leaf: bool = <span class="token-keyword">True</span>):
+        self.t = t          <span class="token-comment"># Minimum degree</span>
+        self.leaf = leaf    <span class="token-comment"># True if leaf node</span>
+        self.keys: List[int] = []
+        self.children: List[<span class="token-string">'BTreeNode'</span>] = []
+        self.values: List[Any] = []  <span class="token-comment"># Data pointers (leaf only)</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">is_full</span>(self) -> bool:
+        <span class="token-keyword">return</span> len(self.keys) == <span class="token-number">2</span> * self.t - <span class="token-number">1</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">search</span>(self, key: int) -> Optional[Any]:
+        <span class="token-string">"""Search for a key in O(log n) time.
+
+        Uses binary search within each node, then
+        descends to the appropriate child.
+        """</span>
+        idx = bisect.bisect_left(self.keys, key)
+
+        <span class="token-comment"># Found in current node</span>
+        <span class="token-keyword">if</span> idx &lt; len(self.keys) <span class="token-keyword">and</span> self.keys[idx] == key:
+            <span class="token-keyword">return</span> self.values[idx] <span class="token-keyword">if</span> self.leaf <span class="token-keyword">else</span> key
+
+        <span class="token-comment"># Leaf node -- key not found</span>
+        <span class="token-keyword">if</span> self.leaf:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+
+        <span class="token-comment"># Descend to child</span>
+        <span class="token-keyword">return</span> self.children[idx].search(key)
+
+
+<span class="token-keyword">class</span> <span class="token-class">BTree</span>:
+    <span class="token-string">"""B-Tree implementation for demonstrating index behavior.
+
+    Minimum degree t=3 means each node holds 2-5 keys
+    and 3-6 children (except root which can have fewer).
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, t: int = <span class="token-number">3</span>):
+        self.t = t
+        self.root = BTreeNode(t, leaf=<span class="token-keyword">True</span>)
+        self.height = <span class="token-number">0</span>
+        self.node_count = <span class="token-number">1</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">search</span>(self, key: int) -> Optional[Any]:
+        <span class="token-keyword">return</span> self.root.search(key)
+
+    <span class="token-keyword">def</span> <span class="token-function">insert</span>(self, key: int, value: Any = <span class="token-keyword">None</span>):
+        <span class="token-string">"""Insert a key-value pair into the B-Tree.
+
+        If root is full, split it first (tree grows upward).
+        """</span>
+        root = self.root
+
+        <span class="token-keyword">if</span> root.is_full():
+            <span class="token-comment"># Root is full -- create new root and split</span>
+            new_root = BTreeNode(self.t, leaf=<span class="token-keyword">False</span>)
+            new_root.children.append(self.root)
+            self._split_child(new_root, <span class="token-number">0</span>)
+            self.root = new_root
+            self.height += <span class="token-number">1</span>
+            self.node_count += <span class="token-number">2</span>
+
+        self._insert_non_full(self.root, key, value)
+
+    <span class="token-keyword">def</span> <span class="token-function">_split_child</span>(self, parent: BTreeNode, idx: int):
+        <span class="token-string">"""Split a full child node at position idx."""</span>
+        t = self.t
+        child = parent.children[idx]
+        new_node = BTreeNode(t, leaf=child.leaf)
+
+        <span class="token-comment"># Move upper half of keys to new node</span>
+        mid = t - <span class="token-number">1</span>
+        parent.keys.insert(idx, child.keys[mid])
+        parent.values.insert(idx, child.values[mid] <span class="token-keyword">if</span> child.leaf <span class="token-keyword">else</span> <span class="token-keyword">None</span>)
+        parent.children.insert(idx + <span class="token-number">1</span>, new_node)
+
+        new_node.keys = child.keys[mid + <span class="token-number">1</span>:]
+        new_node.values = child.values[mid + <span class="token-number">1</span>:] <span class="token-keyword">if</span> child.leaf <span class="token-keyword">else</span> []
+        child.keys = child.keys[:mid]
+        child.values = child.values[:mid] <span class="token-keyword">if</span> child.leaf <span class="token-keyword">else</span> []
+
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> child.leaf:
+            new_node.children = child.children[mid + <span class="token-number">1</span>:]
+            child.children = child.children[:mid + <span class="token-number">1</span>]
+
+        self.node_count += <span class="token-number">1</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_insert_non_full</span>(self, node: BTreeNode, key: int, value: Any):
+        <span class="token-string">"""Insert into a node that is guaranteed not full."""</span>
+        idx = bisect.bisect_left(node.keys, key)
+
+        <span class="token-keyword">if</span> node.leaf:
+            node.keys.insert(idx, key)
+            node.values.insert(idx, value)
+        <span class="token-keyword">else</span>:
+            <span class="token-keyword">if</span> node.children[idx].is_full():
+                self._split_child(node, idx)
+                <span class="token-keyword">if</span> key &gt; node.keys[idx]:
+                    idx += <span class="token-number">1</span>
+            self._insert_non_full(node.children[idx], key, value)
+
+
+<span class="token-comment"># --- Performance comparison: indexed vs sequential ---</span>
+
+<span class="token-keyword">def</span> <span class="token-function">benchmark_lookup</span>(n: int = <span class="token-number">100000</span>, searches: int = <span class="token-number">1000</span>):
+    <span class="token-string">"""Compare B-Tree index lookup vs linear scan.
+
+    Demonstrates why indexes exist: O(log n) vs O(n).
+    """</span>
+    <span class="token-comment"># Build dataset</span>
+    data = list(range(n))
+    random.shuffle(data)
+
+    <span class="token-comment"># Build B-Tree index</span>
+    tree = BTree(t=<span class="token-number">50</span>)
+    <span class="token-keyword">for</span> i, key <span class="token-keyword">in</span> enumerate(data):
+        tree.insert(key, f<span class="token-string">"row_{key}"</span>)
+
+    search_keys = random.sample(range(n), searches)
+
+    <span class="token-comment"># B-Tree indexed lookup</span>
+    start = time.perf_counter()
+    <span class="token-keyword">for</span> key <span class="token-keyword">in</span> search_keys:
+        result = tree.search(key)
+    indexed_time = time.perf_counter() - start
+
+    <span class="token-comment"># Linear scan (no index)</span>
+    start = time.perf_counter()
+    <span class="token-keyword">for</span> key <span class="token-keyword">in</span> search_keys:
+        <span class="token-keyword">for</span> row <span class="token-keyword">in</span> data:
+            <span class="token-keyword">if</span> row == key:
+                <span class="token-keyword">break</span>
+    scan_time = time.perf_counter() - start
+
+    print(f<span class="token-string">"Dataset size: </span>{n:,}<span class="token-string"> rows"</span>)
+    print(f<span class="token-string">"Searches: </span>{searches:,}<span class="token-string">"</span>)
+    print(f<span class="token-string">"B-Tree height: </span>{tree.height}<span class="token-string"> levels"</span>)
+    print(f<span class="token-string">"B-Tree nodes: </span>{tree.node_count:,}<span class="token-string">"</span>)
+    print(f<span class="token-string">"Indexed lookup: </span>{indexed_time:<span class="token-number">.4</span>f}<span class="token-string">s"</span>)
+    print(f<span class="token-string">"Sequential scan: </span>{scan_time:<span class="token-number">.4</span>f}<span class="token-string">s"</span>)
+    print(f<span class="token-string">"Speedup: </span>{scan_time / indexed_time:<span class="token-number">.1</span>f}<span class="token-string">x faster with index"</span>)
+
+
+<span class="token-keyword">if</span> __name__ == <span class="token-string">"__main__"</span>:
+    benchmark_lookup(n=<span class="token-number">100000</span>, searches=<span class="token-number">500</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>PostgreSQL B-Tree:</strong> Default index type. Pages are 8KB. A typical 3-level B-Tree with fanout ~300 indexes ~27 million keys. Supports <code>INCLUDE</code> columns for covering indexes since v11. Uses the buffer pool &mdash; hot index pages stay in RAM. <code>EXPLAIN (ANALYZE, BUFFERS)</code> shows actual page hits.</p>
+            <p><strong>MySQL InnoDB Clustered Index:</strong> The primary key <em>is</em> the table. Data rows are stored in primary key order inside the B+Tree leaf pages. Secondary indexes store the primary key as their row pointer, meaning secondary lookups require a second B-Tree traversal (bookmark lookup). This is why InnoDB strongly favors short integer primary keys.</p>
+            <p><strong>RocksDB LSM Tree:</strong> Used by CockroachDB, TiKV, and MyRocks. Writes go to an in-memory MemTable (skip list), then flush to sorted SSTable files on disk. Compaction merges levels: L0 &rarr; L1 &rarr; L2. Bloom filters on each level skip unnecessary reads. Write amplification is the key tuning challenge.</p>
+            <p><strong>MongoDB Indexes:</strong> WiredTiger storage engine uses B-Trees. Supports compound indexes, multikey indexes (for arrays), text indexes, and geospatial (2dsphere). The <code>_id</code> field always has a unique index. <code>.explain("executionStats")</code> shows if an index was used and how many documents were examined.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>B+Trees provide O(log n) lookups with high fanout &mdash; 3-4 levels handles billions of rows</li>
+                <li>Leaf nodes are linked for efficient range scans without revisiting internal nodes</li>
+                <li>Hash indexes give O(1) equality lookups but cannot support ranges or ordering</li>
+                <li>LSM trees trade read performance for write throughput via sequential I/O and background compaction</li>
+                <li>Covering indexes eliminate heap fetches &mdash; the fastest possible read path</li>
+                <li>Don&rsquo;t index everything &mdash; each index slows writes and consumes storage</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>A database index is a pre-sorted shortcut structure. The fundamental trade-off: spend storage and write-time maintaining sorted order so that read-time can binary search instead of scanning. Every index is a bet that &ldquo;reads on this column will be frequent enough to justify the write overhead.&rdquo;</p>
+            <div class="model-visual">
+                <pre>
+  B+TREE INDEX STRUCTURE (fanout = 4):
+
+  Level 0 (Root):         [  30  |  60  |  90  ]
+                          /    |      |      \
+  Level 1 (Internal): [10|20] [40|50] [70|80] [95|99]
+                       / | \   / | \   / | \    / | \
+  Level 2 (Leaves): [1-9][11-19][21-29] ... [91-94][96-99]
+                      ↔      ↔      ↔           ↔      ↔
+                    (leaves linked for range scans)
+
+  LOOKUP "key = 42":
+  Root:  30 &lt; 42 &lt; 60  →  go to second child
+  L1:    40 &lt; 42 &lt; 50  →  go to second child
+  Leaf:  scan [41,42,43] →  found! Return row pointer
+
+  Total I/Os: 3 (one per level) regardless of table size
+
+  WITHOUT INDEX:
+  ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+  │1│2│3│4│...scanning every row...│41│42│✓│
+  └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+  Must read all rows until match found: O(n)
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Indexing every column:</strong> Each index must be updated on every INSERT/UPDATE/DELETE. A table with 10 indexes means 10 additional writes per row modification. Only index columns that appear in WHERE, JOIN, or ORDER BY clauses of frequent queries. Use <code>pg_stat_user_indexes</code> to find unused indexes.</li>
+                <li><strong>Ignoring index selectivity:</strong> An index on a boolean <code>is_active</code> column (50% true) is nearly useless &mdash; the database will prefer a sequential scan. Indexes shine when they narrow results to &lt;5% of rows. Check cardinality before creating indexes.</li>
+                <li><strong>Forgetting write amplification:</strong> B-Tree updates cause random I/O and page splits. For write-heavy workloads (IoT, logging, time-series), LSM-tree databases (RocksDB, Cassandra) provide 10-100x better write throughput by converting random writes to sequential appends.</li>
+                <li><strong>Not using covering indexes:</strong> A query that uses an index but still fetches rows from the heap (bookmark lookup) can be slower than a sequential scan if it hits many rows. Adding <code>INCLUDE</code> columns to make the index covering eliminates the second I/O entirely &mdash; index-only scan is the fastest path.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a complete B-Tree:</strong> Extend the BTreeNode class with deletion (merge underflowing nodes, borrow from siblings). Insert keys 1-1000 in random order, delete 200 random keys, and verify the tree remains balanced with correct search results.</li>
+                <li><strong>Measure index overhead:</strong> In PostgreSQL, create a table with 1M rows. Benchmark INSERT throughput with 0, 1, 3, and 5 indexes. Measure how each additional index degrades write performance and quantify the storage overhead.</li>
+                <li><strong>Covering index optimization:</strong> Write a query that performs a bookmark lookup (uses index + heap fetch). Create a covering index with <code>INCLUDE</code> and verify using <code>EXPLAIN (ANALYZE, BUFFERS)</code> that it becomes an index-only scan with fewer buffer hits.</li>
+                <li><strong>LSM vs B-Tree benchmark:</strong> Using RocksDB (via python-rocksdb) and SQLite, insert 1M random keys and measure write throughput. Then perform 10K random point lookups and measure read latency. Compare the read/write trade-off between the two storage engines.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="40-isolation-levels.html" class="prev">&larr; Isolation Levels</a>
+            <a href="42-write-read-amplification.html" class="next">Write/Read Amplification &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

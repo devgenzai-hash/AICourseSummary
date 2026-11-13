@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Stampede - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Database Engineering &rarr; Cache Stampede</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Advanced</span>
+                <span class="tag">Database</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Cache Stampede</h1>
+            <p class="hero-subtitle">When a popular cache entry expires and dozens (or thousands) of concurrent requests all race to regenerate it simultaneously &mdash; overwhelming the database with duplicate work.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Imagine a <strong>popular restaurant with a single bathroom</strong>. While it&rsquo;s occupied, a queue of 50 people forms. The moment the door opens, all 50 people rush for it at once &mdash; they shove, push, and jam the doorway. Only one person can use it at a time, but the surge itself causes chaos. A <strong>cache stampede</strong> works the same way: a hot cache key expires, and hundreds of concurrent requests all see the miss simultaneously. They all hit the database at once to regenerate the same value, creating a thundering herd that can crash the backend.</p>
+        </div>
+
+        <h2>What Is Cache Stampede?</h2>
+        <p>Also known as the <strong>thundering herd problem</strong>, a cache stampede occurs when:</p>
+        <ol>
+            <li>A frequently-accessed cache entry expires (or is invalidated)</li>
+            <li>Many concurrent requests arrive and all see a cache miss</li>
+            <li>All requests simultaneously query the database to regenerate the value</li>
+            <li>The database is overwhelmed with N identical queries instead of 1</li>
+            <li>Response times spike, timeouts cascade, and the system may crash</li>
+        </ol>
+
+        <h2>Why It Happens</h2>
+        <ul>
+            <li><strong>Hot keys with fixed TTL:</strong> A key accessed 10,000 times/second expires &mdash; all 10,000 requests hit DB in the next second</li>
+            <li><strong>Synchronized expiration:</strong> Many keys set with the same TTL expire at the same instant (e.g., all cached at startup)</li>
+            <li><strong>Slow regeneration:</strong> If the DB query takes 500ms to rebuild the cache, 500+ requests pile up during that window</li>
+            <li><strong>Cold cache after restart:</strong> A fresh cache node receives full production traffic with 0% hit rate</li>
+        </ul>
+
+        <h2>Solution 1: Mutex / Lock Approach</h2>
+        <p>Only one request regenerates the cache; others wait for it or get a stale value:</p>
+        <ul>
+            <li>On cache miss, try to acquire a lock (e.g., Redis <code>SETNX</code>)</li>
+            <li>If lock acquired &rarr; query DB, populate cache, release lock</li>
+            <li>If lock not acquired &rarr; wait briefly and retry (or return stale data)</li>
+            <li><strong>Advantage:</strong> Database sees exactly 1 query regardless of concurrency</li>
+            <li><strong>Risk:</strong> Lock holder crashes &rarr; set a TTL on the lock itself as a safety valve</li>
+        </ul>
+
+        <h2>Solution 2: Probabilistic Early Expiration</h2>
+        <p>Instead of all requests seeing the miss at the same instant, each request has a small random chance of refreshing the cache <em>before</em> it actually expires:</p>
+        <ul>
+            <li>Formula: <code>should_refresh = random() &lt; (time_since_set / ttl) * beta</code></li>
+            <li>As the entry ages, the probability of early refresh increases</li>
+            <li>On average, exactly one request triggers a refresh just before expiry</li>
+            <li><strong>Advantage:</strong> No locks, no coordination, statistically prevents stampede</li>
+            <li><strong>Trade-off:</strong> Slight increase in DB queries (occasional early refreshes)</li>
+        </ul>
+
+        <h2>Solution 3: Request Coalescing</h2>
+        <p>Multiple concurrent requests for the same key are collapsed into a single backend call. All waiters receive the same result:</p>
+        <ul>
+            <li>First request initiates the DB query and registers a &ldquo;pending&rdquo; future</li>
+            <li>Subsequent requests for the same key await the existing future (no new DB query)</li>
+            <li>When the first request completes, all waiters are notified with the result</li>
+            <li><strong>Also known as:</strong> Single-flight, request deduplication, in-flight coalescing</li>
+            <li><strong>Used by:</strong> nginx <code>proxy_cache_lock</code>, Go&rsquo;s <code>singleflight</code> package</li>
+        </ul>
+
+        <h2>Solution 4: Cache Warming</h2>
+        <p>Proactively refresh cache entries before they expire, ensuring they never actually go stale:</p>
+        <ul>
+            <li>Background worker monitors hot keys and refreshes them at 80% of their TTL</li>
+            <li>After deployments, warm the cache from access logs before routing traffic</li>
+            <li>Gradual traffic ramp: new cache node gets 5% &rarr; 25% &rarr; 100% of traffic</li>
+            <li><strong>Advantage:</strong> Zero stampede risk for known hot keys</li>
+            <li><strong>Limitation:</strong> Only works for predictable access patterns</li>
+        </ul>
+
+        <h2>Solution 5: Stale-While-Revalidate</h2>
+        <p>Keep serving the expired (stale) value while one request refreshes in the background:</p>
+        <ul>
+            <li>Cache stores both the value AND a &ldquo;soft expiry&rdquo; timestamp</li>
+            <li>After soft expiry: serve stale data, trigger exactly one background refresh</li>
+            <li>After hard expiry (much later): force a synchronous refresh</li>
+            <li><strong>Advantage:</strong> Zero latency impact on users, no stampede</li>
+            <li><strong>Trade-off:</strong> One request cycle sees slightly stale data</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Solution</th>
+                        <th>DB Queries on Expiry</th>
+                        <th>Latency Impact</th>
+                        <th>Complexity</th>
+                        <th>Failure Mode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>No Protection</strong></td>
+                        <td>N (all concurrent requests)</td>
+                        <td>Spike for all</td>
+                        <td>None</td>
+                        <td>DB overwhelmed</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mutex/Lock</strong></td>
+                        <td>1</td>
+                        <td>Wait for lock holder</td>
+                        <td>Medium</td>
+                        <td>Lock holder crash</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Probabilistic Early</strong></td>
+                        <td>~1 (statistical)</td>
+                        <td>None</td>
+                        <td>Low</td>
+                        <td>Rare double-refresh</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Request Coalescing</strong></td>
+                        <td>1</td>
+                        <td>Wait for first request</td>
+                        <td>Medium</td>
+                        <td>Memory (pending futures)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cache Warming</strong></td>
+                        <td>0 (proactive)</td>
+                        <td>None</td>
+                        <td>High</td>
+                        <td>Missed hot keys</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stale-While-Revalidate</strong></td>
+                        <td>1 (background)</td>
+                        <td>None (serves stale)</td>
+                        <td>Low</td>
+                        <td>Brief staleness</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementations</h2>
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> random
+<span class="token-keyword">import</span> asyncio
+<span class="token-keyword">import</span> threading
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Any, Optional, Callable, Dict
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># SOLUTION 1: Mutex/Lock-Based Protection</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">MutexCache</span>:
+    <span class="token-string">"""Cache with lock-based stampede protection.
+
+    Only one thread regenerates a cache entry on miss.
+    Others wait for the lock holder to finish.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, ttl: int = <span class="token-number">300</span>):
+        self._store: Dict[str, Any] = {}
+        self._expiry: Dict[str, float] = {}
+        self._locks: Dict[str, threading.Lock] = {}
+        self._lock_guard = threading.Lock()
+        self.ttl = ttl
+        self.db_queries = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_get_lock</span>(self, key: str) -> threading.Lock:
+        <span class="token-keyword">with</span> self._lock_guard:
+            <span class="token-keyword">if</span> key <span class="token-keyword">not in</span> self._locks:
+                self._locks[key] = threading.Lock()
+            <span class="token-keyword">return</span> self._locks[key]
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str, loader: Callable) -> Any:
+        <span class="token-comment"># Check cache first</span>
+        <span class="token-keyword">if</span> key <span class="token-keyword">in</span> self._store:
+            <span class="token-keyword">if</span> time.time() < self._expiry.get(key, <span class="token-number">0</span>):
+                <span class="token-keyword">return</span> self._store[key]  <span class="token-comment"># Cache HIT</span>
+
+        <span class="token-comment"># Cache MISS — acquire lock for this key</span>
+        lock = self._get_lock(key)
+        <span class="token-keyword">with</span> lock:
+            <span class="token-comment"># Double-check after acquiring lock</span>
+            <span class="token-keyword">if</span> key <span class="token-keyword">in</span> self._store:
+                <span class="token-keyword">if</span> time.time() < self._expiry.get(key, <span class="token-number">0</span>):
+                    <span class="token-keyword">return</span> self._store[key]
+
+            <span class="token-comment"># Only ONE thread reaches here — load from DB</span>
+            self.db_queries += <span class="token-number">1</span>
+            value = loader()
+            self._store[key] = value
+            self._expiry[key] = time.time() + self.ttl
+            <span class="token-keyword">return</span> value
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># SOLUTION 2: Probabilistic Early Expiration</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">ProbabilisticCache</span>:
+    <span class="token-string">"""Cache with probabilistic early refresh to prevent stampede.
+
+    As entries age toward their TTL, random requests trigger
+    early refresh — statistically one request refreshes just
+    before the actual expiry.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, ttl: int = <span class="token-number">300</span>, beta: float = <span class="token-number">1.0</span>):
+        self._store: Dict[str, Any] = {}
+        self._expiry: Dict[str, float] = {}
+        self._set_time: Dict[str, float] = {}
+        self.ttl = ttl
+        self.beta = beta  <span class="token-comment"># Controls eagerness (higher = more early refreshes)</span>
+        self.db_queries = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_should_early_refresh</span>(self, key: str) -> bool:
+        <span class="token-string">"""Probabilistic check — higher chance as entry ages."""</span>
+        <span class="token-keyword">if</span> key <span class="token-keyword">not in</span> self._set_time:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        age = time.time() - self._set_time[key]
+        probability = (age / self.ttl) * self.beta
+        <span class="token-keyword">return</span> random.random() < probability
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str, loader: Callable) -> Any:
+        now = time.time()
+
+        <span class="token-comment"># Hard expiry — must refresh</span>
+        <span class="token-keyword">if</span> key <span class="token-keyword">not in</span> self._store <span class="token-keyword">or</span> now > self._expiry.get(key, <span class="token-number">0</span>):
+            self.db_queries += <span class="token-number">1</span>
+            value = loader()
+            self._store[key] = value
+            self._expiry[key] = now + self.ttl
+            self._set_time[key] = now
+            <span class="token-keyword">return</span> value
+
+        <span class="token-comment"># Probabilistic early refresh</span>
+        <span class="token-keyword">if</span> self._should_early_refresh(key):
+            self.db_queries += <span class="token-number">1</span>
+            value = loader()
+            self._store[key] = value
+            self._expiry[key] = now + self.ttl
+            self._set_time[key] = now
+            <span class="token-keyword">return</span> value
+
+        <span class="token-keyword">return</span> self._store[key]  <span class="token-comment"># Serve cached value</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># SOLUTION 3: Request Coalescing (Single-Flight)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">CoalescingCache</span>:
+    <span class="token-string">"""Async cache with request coalescing.
+
+    Multiple concurrent requests for the same key are collapsed
+    into a single backend call. All waiters get the same result.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, ttl: int = <span class="token-number">300</span>):
+        self._store: Dict[str, Any] = {}
+        self._expiry: Dict[str, float] = {}
+        self._in_flight: Dict[str, asyncio.Future] = {}
+        self.ttl = ttl
+        self.db_queries = <span class="token-number">0</span>
+
+    <span class="token-keyword">async def</span> <span class="token-function">get</span>(self, key: str, loader: Callable) -> Any:
+        now = time.time()
+
+        <span class="token-comment"># Cache hit</span>
+        <span class="token-keyword">if</span> key <span class="token-keyword">in</span> self._store <span class="token-keyword">and</span> now < self._expiry.get(key, <span class="token-number">0</span>):
+            <span class="token-keyword">return</span> self._store[key]
+
+        <span class="token-comment"># Check if another request is already fetching</span>
+        <span class="token-keyword">if</span> key <span class="token-keyword">in</span> self._in_flight:
+            <span class="token-comment"># Wait for the existing request to finish</span>
+            <span class="token-keyword">return await</span> self._in_flight[key]
+
+        <span class="token-comment"># First request — create a future for others to wait on</span>
+        loop = asyncio.get_event_loop()
+        future = loop.create_future()
+        self._in_flight[key] = future
+
+        <span class="token-keyword">try</span>:
+            <span class="token-comment"># Only ONE request hits the database</span>
+            self.db_queries += <span class="token-number">1</span>
+            value = <span class="token-keyword">await</span> asyncio.to_thread(loader)
+            self._store[key] = value
+            self._expiry[key] = time.time() + self.ttl
+            future.set_result(value)
+            <span class="token-keyword">return</span> value
+        <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+            future.set_exception(e)
+            <span class="token-keyword">raise</span>
+        <span class="token-keyword">finally</span>:
+            <span class="token-keyword">del</span> self._in_flight[key]
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Mutex-based stampede protection</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+print(<span class="token-string">"=== Cache Stampede Protection ==="</span>)
+print()
+
+<span class="token-keyword">def</span> <span class="token-function">expensive_db_query</span>():
+    <span class="token-string">"""Simulates a slow database query."""</span>
+    time.sleep(<span class="token-number">0.1</span>)  <span class="token-comment"># 100ms query</span>
+    <span class="token-keyword">return</span> {<span class="token-string">"product"</span>: <span class="token-string">"Widget"</span>, <span class="token-string">"price"</span>: <span class="token-number">29.99</span>}
+
+<span class="token-comment"># Without protection: N threads = N DB queries</span>
+print(<span class="token-string">"--- Without Protection (stampede!) ---"</span>)
+unprotected_queries = <span class="token-number">0</span>
+
+<span class="token-keyword">def</span> <span class="token-function">unprotected_fetch</span>():
+    <span class="token-keyword">global</span> unprotected_queries
+    unprotected_queries += <span class="token-number">1</span>
+    expensive_db_query()
+
+threads = [threading.Thread(target=unprotected_fetch) <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">20</span>)]
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.start()
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.join()
+print(f<span class="token-string">"  20 concurrent requests → {unprotected_queries} DB queries"</span>)
+print()
+
+<span class="token-comment"># With mutex protection: only 1 DB query</span>
+print(<span class="token-string">"--- With Mutex Protection ---"</span>)
+mutex_cache = MutexCache(ttl=<span class="token-number">60</span>)
+results = []
+
+<span class="token-keyword">def</span> <span class="token-function">protected_fetch</span>():
+    result = mutex_cache.get(<span class="token-string">"product:1"</span>, expensive_db_query)
+    results.append(result)
+
+threads = [threading.Thread(target=protected_fetch) <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">20</span>)]
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.start()
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.join()
+print(f<span class="token-string">"  20 concurrent requests → {mutex_cache.db_queries} DB query"</span>)
+print(f<span class="token-string">"  All 20 got result: {all(r is not None for r in results)}"</span>)
+print()
+
+<span class="token-comment"># Probabilistic early refresh</span>
+print(<span class="token-string">"--- Probabilistic Early Expiration ---"</span>)
+prob_cache = ProbabilisticCache(ttl=<span class="token-number">10</span>, beta=<span class="token-number">2.0</span>)
+<span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">100</span>):
+    prob_cache.get(<span class="token-string">"hot_key"</span>, expensive_db_query)
+print(f<span class="token-string">"  100 requests, DB queries: {prob_cache.db_queries}"</span>)
+print(f<span class="token-string">"  (Early refreshes prevented a single expiry spike)"</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Facebook Memcached Leases:</strong> Facebook&rsquo;s paper &ldquo;Scaling Memcache at Facebook&rdquo; introduced <em>leases</em> to prevent stampedes. On a cache miss, Memcached issues a lease token to the first requester. Other requests for the same key get a &ldquo;wait&rdquo; signal. Only the lease holder can write back to cache, preventing thundering herd at scale across billions of requests per second.</p>
+            <p><strong>Redis SETNX for Stampede Protection:</strong> <code>SET lock:key NX EX 10</code> acts as a distributed mutex. The first request that wins the SETNX loads from DB and populates cache. Others either spin-wait or return stale data. The <code>EX 10</code> provides automatic lock expiry if the holder crashes.</p>
+            <p><strong>nginx proxy_cache_lock:</strong> nginx&rsquo;s reverse proxy has built-in stampede protection. When <code>proxy_cache_lock on;</code> is set, only the first request for an expired cache entry is forwarded to the backend. All others wait up to <code>proxy_cache_lock_timeout</code> for the first response to populate the cache.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Cache stampede occurs when a hot key expires and N concurrent requests all hit the database simultaneously</li>
+                <li>The mutex/lock approach guarantees exactly 1 DB query but adds wait time for other requests</li>
+                <li>Probabilistic early expiration prevents stampedes without coordination &mdash; statistically elegant</li>
+                <li>Request coalescing collapses duplicate in-flight requests into a single backend call</li>
+                <li>Stale-while-revalidate provides zero-latency responses while refreshing in the background</li>
+                <li>Combine strategies: TTL jitter + probabilistic refresh + stale-while-revalidate for maximum protection</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Cache stampede is a concurrency problem at the application layer. The solutions mirror classic concurrency patterns: mutual exclusion (locks), optimistic approaches (probabilistic), and batching (coalescing).</p>
+            <div class="model-visual">
+                <pre>
+  STAMPEDE SCENARIO:
+  ══════════════════════════════════════════════════════
+
+  Time ──────────────────────────────────────────────►
+
+  Cache:  [████████ VALID ████████]|EXPIRED|
+                                    │
+  Requests:                         ▼
+  ─────── req1 ──────────────→ DB ──→ set cache
+  ─────── req2 ──────────────→ DB ──→ set cache (wasted!)
+  ─────── req3 ──────────────→ DB ──→ set cache (wasted!)
+  ─────── req4 ──────────────→ DB ──→ set cache (wasted!)
+  ─────── req5 ──────────────→ DB ──→ set cache (wasted!)
+             └── ALL see miss, ALL hit DB ──┘
+
+  WITH MUTEX PROTECTION:
+  ══════════════════════════════════════════════════════
+
+  Cache:  [████████ VALID ████████]|EXPIRED|
+                                    │
+  ─────── req1 ──── LOCK ─────→ DB ──→ set cache ── UNLOCK
+  ─────── req2 ──── WAIT... ────────────────────→ read cache ✓
+  ─────── req3 ──── WAIT... ────────────────────→ read cache ✓
+  ─────── req4 ──── WAIT... ────────────────────→ read cache ✓
+             └── Only 1 DB query, others wait ──┘
+
+  WITH PROBABILISTIC EARLY REFRESH:
+  ══════════════════════════════════════════════════════
+
+  Cache:  [████████ VALID ████████████████████]
+                          ▲
+                          │ random early refresh
+                    ─── req47 ──→ DB ──→ refresh cache
+                                          │
+  Cache:  [████████████████ FRESH █████████████████]
+             └── Never actually expires! ──┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Locks without TTL (deadlock risk):</strong> If the lock holder crashes or times out, the lock is held forever and all subsequent requests block indefinitely. Always set a TTL on the lock itself (e.g., <code>SET lock:key NX EX 10</code>) so it auto-expires and another request can take over.</li>
+                <li><strong>Fixed TTL without jitter:</strong> Setting all cache entries to exactly the same TTL (e.g., 300 seconds) means they all expire at the same instant, causing a mass stampede. Add random jitter: <code>ttl = base_ttl + random(0, base_ttl * 0.2)</code> to spread expirations over time.</li>
+                <li><strong>Ignoring stampede for &ldquo;small&rdquo; traffic:</strong> Stampede doesn&rsquo;t require massive scale. Even 50 concurrent requests hitting a slow 2-second DB query creates 50 connections and 100 seconds of total DB time. At moderate traffic, a single hot key expiry during a spike can saturate your connection pool.</li>
+                <li><strong>Stale-while-revalidate without a hard expiry cap:</strong> If the background refresh keeps failing silently, you serve increasingly stale data forever. Always pair stale-while-revalidate with a hard expiry (e.g., serve stale for 5 minutes max, then force a synchronous refresh or return an error).</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Stampede simulator:</strong> Build a load test that demonstrates cache stampede. Use 100 threads hitting the same cache key that expires. Measure DB queries without protection vs. with mutex protection. Graph the database load over time for both scenarios.</li>
+                <li><strong>Implement request coalescing with asyncio:</strong> Build an async cache that uses <code>asyncio.Future</code> for in-flight deduplication. Test with 50 concurrent <code>await cache.get("key")</code> calls and verify only 1 DB query executes. Handle the error case where the loader throws an exception.</li>
+                <li><strong>Probabilistic refresh tuning:</strong> Implement probabilistic early expiration with configurable beta. Test with beta values 0.5, 1.0, 2.0, and 5.0. For each, run 10,000 requests and measure: total DB queries, number of actual expiry stampedes (>1 concurrent miss), and average staleness.</li>
+                <li><strong>Combined defense strategy:</strong> Build a production-grade cache that combines: TTL with jitter, stale-while-revalidate, and mutex protection as a fallback. Test under realistic traffic patterns (Zipfian key distribution, bursty arrivals) and measure p99 latency and DB query count.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="46-cache-invalidation.html" class="prev">&larr; Cache Invalidation</a>
+            <a href="48-event-driven-vs-request-response.html" class="next">Event-Driven vs Req/Res &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

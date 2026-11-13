@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hallucination Fallback Layer - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Hallucination Fallback
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 7: Hallucination Fallback Layer</h1>
+                <p class="subtitle">If retrieval confidence drops below a threshold: "Insufficient evidence found." It's better to say nothing than to say something wrong.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-production">Production</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: A Doctor Saying "I Need More Tests"</div>
+                <p>Imagine you go to a doctor with a strange symptom. A bad doctor might guess: "It's probably just stress, take some vitamins." A good doctor says: <strong>"I'm not sure what's causing this. I need to run more tests before I can give you a diagnosis."</strong></p>
+                <p>The good doctor would rather say "I don't know yet" than risk giving you wrong medical advice.</p>
+                <p><strong>The hallucination fallback layer is your system's "good doctor."</strong> When the evidence isn't strong enough to give a confident answer, it says so — instead of making something up.</p>
+            </div>
+
+            <!-- ===== WHAT IS IT ===== -->
+            <h2>What Is the Hallucination Fallback?</h2>
+            <p>The hallucination fallback is a <strong>safety net</strong> that activates when your system detects it cannot produce a reliable answer. It checks multiple signals and decides: "Should I answer, or should I refuse?"</p>
+
+            <p><strong>When it triggers:</strong></p>
+            <ul>
+                <li>Retrieval confidence is too low (no good sources found)</li>
+                <li>Source chunks contradict each other with no clear winner</li>
+                <li>The generated answer failed grounding verification (Stage 5)</li>
+                <li>Citation coverage is too low (claims without sources)</li>
+                <li>The query is outside the scope of available documents</li>
+            </ul>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ The Core Philosophy</div>
+                <p><strong>"I don't have sufficient information"</strong> is ALWAYS better than a confidently wrong answer. In enterprise, medical, legal, and financial contexts, a hallucination can be catastrophic. Saying "I don't know" is safe. Making stuff up is dangerous.</p>
+            </div>
+
+            <!-- ===== THRESHOLD SYSTEM ===== -->
+            <h2>The Threshold System</h2>
+
+            <h3>Multiple Checkpoints</h3>
+            <p>The fallback isn't a single check — it's multiple checkpoints throughout the pipeline:</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Checkpoint</th>
+                        <th>What It Checks</th>
+                        <th>Threshold</th>
+                        <th>Action If Failed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Retrieval confidence</strong></td>
+                        <td>Avg confidence of top-k chunks</td>
+                        <td>&lt; 0.4</td>
+                        <td>Refuse to answer</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rerank score</strong></td>
+                        <td>Best reranker score for any chunk</td>
+                        <td>&lt; 0.3</td>
+                        <td>Refuse to answer</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Source agreement</strong></td>
+                        <td>Do sources agree or contradict?</td>
+                        <td>Contradiction detected</td>
+                        <td>Present both views with caveat</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Grounding score</strong></td>
+                        <td>% of answer supported by context</td>
+                        <td>&lt; 0.8</td>
+                        <td>Regenerate or refuse</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Citation coverage</strong></td>
+                        <td>% of claims with valid citations</td>
+                        <td>&lt; 0.85</td>
+                        <td>Remove uncited claims or refuse</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Implementation</h3>
+<pre><code><span class="token-keyword">from</span> enum <span class="token-keyword">import</span> Enum
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+
+<span class="token-keyword">class</span> <span class="token-class">FallbackDecision</span>(Enum):
+    ANSWER = <span class="token-string">"answer"</span>              <span class="token-comment"># Confident, proceed normally</span>
+    ANSWER_WITH_CAVEAT = <span class="token-string">"caveat"</span>  <span class="token-comment"># Answer but warn about uncertainty</span>
+    PARTIAL_ANSWER = <span class="token-string">"partial"</span>     <span class="token-comment"># Provide what we can, flag gaps</span>
+    REFUSE = <span class="token-string">"refuse"</span>              <span class="token-comment"># Don't answer, explain why</span>
+    ESCALATE = <span class="token-string">"escalate"</span>          <span class="token-comment"># Route to human expert</span>
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">ConfidenceSignals</span>:
+    retrieval_confidence: <span class="token-builtin">float</span>    <span class="token-comment"># 0-1: avg confidence of retrieved chunks</span>
+    best_rerank_score: <span class="token-builtin">float</span>      <span class="token-comment"># 0-1: top reranker score</span>
+    grounding_score: <span class="token-builtin">float</span>        <span class="token-comment"># 0-1: % answer supported by context</span>
+    citation_coverage: <span class="token-builtin">float</span>      <span class="token-comment"># 0-1: % claims with citations</span>
+    source_agreement: <span class="token-builtin">float</span>       <span class="token-comment"># 0-1: do sources agree?</span>
+    num_relevant_chunks: <span class="token-builtin">int</span>      <span class="token-comment"># How many chunks passed confidence threshold</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HallucinationFallback</span>:
+    <span class="token-string">"""
+    Decision engine that determines whether to answer,
+    caveat, partially answer, or refuse.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, config: Dict = <span class="token-keyword">None</span>):
+        self.config = config <span class="token-keyword">or</span> {
+            <span class="token-string">"min_retrieval_confidence"</span>: <span class="token-number">0.4</span>,
+            <span class="token-string">"min_rerank_score"</span>: <span class="token-number">0.3</span>,
+            <span class="token-string">"min_grounding_score"</span>: <span class="token-number">0.8</span>,
+            <span class="token-string">"min_citation_coverage"</span>: <span class="token-number">0.85</span>,
+            <span class="token-string">"min_source_agreement"</span>: <span class="token-number">0.6</span>,
+            <span class="token-string">"min_relevant_chunks"</span>: <span class="token-number">2</span>,
+            <span class="token-string">"caveat_threshold"</span>: <span class="token-number">0.6</span>,  <span class="token-comment"># Below this: caveat warning</span>
+        }
+    
+    <span class="token-keyword">def</span> <span class="token-function">decide</span>(self, signals: ConfidenceSignals) -> FallbackDecision:
+        <span class="token-string">"""
+        Determine what action to take based on confidence signals.
+        
+        Decision tree:
+        1. If any CRITICAL signal is below threshold → REFUSE
+        2. If multiple signals are borderline → CAVEAT
+        3. If only partial info available → PARTIAL
+        4. Otherwise → ANSWER
+        """</span>
+        
+        <span class="token-comment"># CRITICAL FAILURES: Immediate refusal</span>
+        <span class="token-keyword">if</span> signals.num_relevant_chunks == <span class="token-number">0</span>:
+            <span class="token-keyword">return</span> FallbackDecision.REFUSE
+        
+        <span class="token-keyword">if</span> signals.retrieval_confidence < self.config[<span class="token-string">"min_retrieval_confidence"</span>]:
+            <span class="token-keyword">return</span> FallbackDecision.REFUSE
+        
+        <span class="token-keyword">if</span> signals.best_rerank_score < self.config[<span class="token-string">"min_rerank_score"</span>]:
+            <span class="token-keyword">return</span> FallbackDecision.REFUSE
+        
+        <span class="token-comment"># POST-GENERATION CHECKS</span>
+        <span class="token-keyword">if</span> signals.grounding_score < self.config[<span class="token-string">"min_grounding_score"</span>]:
+            <span class="token-keyword">if</span> signals.grounding_score > <span class="token-number">0.5</span>:
+                <span class="token-keyword">return</span> FallbackDecision.PARTIAL_ANSWER
+            <span class="token-keyword">return</span> FallbackDecision.REFUSE
+        
+        <span class="token-comment"># BORDERLINE: Answer with warning</span>
+        borderline_count = <span class="token-number">0</span>
+        <span class="token-keyword">if</span> signals.retrieval_confidence < self.config[<span class="token-string">"caveat_threshold"</span>]:
+            borderline_count += <span class="token-number">1</span>
+        <span class="token-keyword">if</span> signals.source_agreement < self.config[<span class="token-string">"min_source_agreement"</span>]:
+            borderline_count += <span class="token-number">1</span>
+        <span class="token-keyword">if</span> signals.citation_coverage < self.config[<span class="token-string">"min_citation_coverage"</span>]:
+            borderline_count += <span class="token-number">1</span>
+        
+        <span class="token-keyword">if</span> borderline_count >= <span class="token-number">2</span>:
+            <span class="token-keyword">return</span> FallbackDecision.ANSWER_WITH_CAVEAT
+        
+        <span class="token-comment"># ALL GOOD: Confident answer</span>
+        <span class="token-keyword">return</span> FallbackDecision.ANSWER</code></pre>
+
+            <!-- ===== RESPONSE TEMPLATES ===== -->
+            <h2>Fallback Response Templates</h2>
+
+<pre><code>FALLBACK_RESPONSES = {
+    FallbackDecision.REFUSE: <span class="token-string">"""
+I don't have sufficient information in the available documents 
+to answer this question reliably.
+
+**What I searched:** {search_summary}
+**Why I can't answer:** {refusal_reason}
+**Suggestion:** {suggested_action}
+"""</span>,
+
+    FallbackDecision.ANSWER_WITH_CAVEAT: <span class="token-string">"""
+⚠️ **Note: This answer has moderate confidence.** Some sources are 
+older or unverified. Please verify critical details.
+
+{answer}
+
+**Confidence:** {confidence_level}
+**Limitations:** {limitations}
+"""</span>,
+
+    FallbackDecision.PARTIAL_ANSWER: <span class="token-string">"""
+I can partially answer your question based on available documents, 
+but some aspects are not covered:
+
+**What I found:**
+{partial_answer}
+
+**What I could NOT find information about:**
+{gaps}
+
+**Sources used:** {sources}
+"""</span>,
+
+    FallbackDecision.ESCALATE: <span class="token-string">"""
+This question requires expert verification that goes beyond 
+the available documentation.
+
+**What I found (unverified):** {tentative_info}
+**Recommended:** Please consult {escalation_target} for a verified answer.
+"""</span>
+}</code></pre>
+
+            <!-- ===== FULL INTEGRATION ===== -->
+            <h2>Full Pipeline Integration</h2>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">RAGPipelineWithFallback</span>:
+    <span class="token-string">"""Complete RAG pipeline with hallucination safety net."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, retriever, generator, fallback):
+        self.retriever = retriever
+        self.generator = generator
+        self.fallback = fallback
+    
+    <span class="token-keyword">def</span> <span class="token-function">answer_query</span>(self, query: <span class="token-builtin">str</span>) -> Dict:
+        <span class="token-string">"""End-to-end query answering with fallback safety."""</span>
+        
+        <span class="token-comment"># Step 1: Retrieve and score</span>
+        chunks = self.retriever.retrieve(query, top_k=<span class="token-number">10</span>)
+        
+        <span class="token-comment"># Step 2: Pre-generation confidence check</span>
+        pre_signals = ConfidenceSignals(
+            retrieval_confidence=avg_confidence(chunks),
+            best_rerank_score=chunks[<span class="token-number">0</span>][<span class="token-string">"rerank_score"</span>] <span class="token-keyword">if</span> chunks <span class="token-keyword">else</span> <span class="token-number">0</span>,
+            grounding_score=<span class="token-number">1.0</span>,  <span class="token-comment"># Unknown yet</span>
+            citation_coverage=<span class="token-number">1.0</span>,  <span class="token-comment"># Unknown yet</span>
+            source_agreement=compute_agreement(chunks),
+            num_relevant_chunks=<span class="token-builtin">len</span>(chunks)
+        )
+        
+        pre_decision = self.fallback.decide(pre_signals)
+        
+        <span class="token-keyword">if</span> pre_decision == FallbackDecision.REFUSE:
+            <span class="token-keyword">return</span> self._format_refusal(query, pre_signals)
+        
+        <span class="token-comment"># Step 3: Generate answer</span>
+        result = self.generator.generate(query, chunks)
+        
+        <span class="token-comment"># Step 4: Post-generation confidence check</span>
+        post_signals = ConfidenceSignals(
+            retrieval_confidence=pre_signals.retrieval_confidence,
+            best_rerank_score=pre_signals.best_rerank_score,
+            grounding_score=result[<span class="token-string">"grounding_score"</span>],
+            citation_coverage=result[<span class="token-string">"citation_coverage"</span>],
+            source_agreement=pre_signals.source_agreement,
+            num_relevant_chunks=pre_signals.num_relevant_chunks
+        )
+        
+        final_decision = self.fallback.decide(post_signals)
+        
+        <span class="token-comment"># Step 5: Apply decision</span>
+        <span class="token-keyword">if</span> final_decision == FallbackDecision.ANSWER:
+            <span class="token-keyword">return</span> {<span class="token-string">"answer"</span>: result[<span class="token-string">"answer"</span>], <span class="token-string">"confidence"</span>: <span class="token-string">"high"</span>}
+        <span class="token-keyword">elif</span> final_decision == FallbackDecision.ANSWER_WITH_CAVEAT:
+            <span class="token-keyword">return</span> self._format_caveat(result, post_signals)
+        <span class="token-keyword">elif</span> final_decision == FallbackDecision.PARTIAL_ANSWER:
+            <span class="token-keyword">return</span> self._format_partial(result, post_signals)
+        <span class="token-keyword">else</span>:
+            <span class="token-keyword">return</span> self._format_refusal(query, post_signals)</code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Documents Scale</div>
+                <ul>
+                    <li><strong>Fallback rate matters:</strong> If your system refuses too often (>20% of queries), your retrieval is probably broken. If it never refuses (<1%), your thresholds are too lenient.</li>
+                    <li><strong>Target fallback rate:</strong> 5-15% depending on domain. Legal/medical: higher refusal is acceptable. Customer support: lower refusal needed.</li>
+                    <li><strong>Monitor and tune:</strong> Track refusal reasons over time. If most refusals are "no relevant documents found," you may have a coverage gap in your index.</li>
+                    <li><strong>User feedback loop:</strong> When users disagree with a refusal ("but the info IS in the system!"), log it as a retrieval failure for investigation.</li>
+                </ul>
+            </div>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>ChatGPT Enterprise</strong> — Trained to say "I'm not sure about that based on your documents" rather than guessing</li>
+                    <li><strong>Legal AI tools</strong> — Strict refusal with "No relevant precedent found" messages + human escalation</li>
+                    <li><strong>Financial RAG systems</strong> — Dual-threshold: soft (warning) and hard (refusal) with automatic audit log</li>
+                    <li><strong>Best practice:</strong> Every refusal is logged with full context for weekly review meetings</li>
+                    <li><strong>Smart routing:</strong> Refused queries automatically routed to specialized retrieval or human experts</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>The fallback layer is your last line of defense against hallucination</li>
+                    <li>Multiple checkpoints: retrieval confidence, rerank scores, grounding verification, citation coverage</li>
+                    <li>Four response levels: confident answer → caveat → partial answer → refuse</li>
+                    <li>"I don't know" is ALWAYS better than a wrong answer in production</li>
+                    <li>Monitor fallback rates — too high means bad retrieval, too low means bad thresholds</li>
+                    <li>Every refusal should suggest next steps (search differently, ask human, etc.)</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+Query enters pipeline:
+  ↓
+[Retrieve] → Got good chunks? 
+  │            NO → ❌ REFUSE: "No relevant documents found"
+  │            YES ↓
+[Score confidence] → Confidence above threshold?
+  │                   NO → ❌ REFUSE: "Sources too unreliable"
+  │                   YES ↓
+[Generate answer] → Answer grounded in context?
+  │                  NO → 🔄 Retry once, then ❌ REFUSE
+  │                  PARTIAL → ⚠️ PARTIAL ANSWER + gaps listed
+  │                  YES ↓
+[Verify citations] → Claims properly cited?
+  │                   SOME ISSUES → ⚠️ CAVEAT warning
+  │                   ALL GOOD ↓
+✅ SERVE CONFIDENT ANSWER
+                </div>
+                <p><strong>Think of it as:</strong> A security checkpoint with multiple guards. Each guard checks a different thing. You only pass if ALL guards approve.</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>No fallback at all:</strong> "The model is good enough" — it's NOT. Even GPT-4 hallucinates. Always have a safety net.</li>
+                    <li><strong>Binary threshold:</strong> Don't just have answer/refuse. Gradual degradation (caveat → partial → refuse) gives users more value.</li>
+                    <li><strong>Unhelpful refusals:</strong> "I can't answer that" is bad UX. Always explain WHY and suggest WHAT the user can do next.</li>
+                    <li><strong>Not tuning thresholds:</strong> Default thresholds won't work for every domain. A/B test and adjust based on actual refusal quality.</li>
+                    <li><strong>Ignoring refusal analytics:</strong> Refusals are a gold mine of insight. Every refusal tells you where your system has gaps.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Fallback Decision Engine</h3>
+                <ol>
+                    <li>Define a ConfidenceSignals dataclass with 5 signal fields</li>
+                    <li>Implement the decision tree with configurable thresholds</li>
+                    <li>Create test scenarios for each decision path (ANSWER, CAVEAT, PARTIAL, REFUSE)</li>
+                    <li>Write response templates for each fallback type</li>
+                    <li>Simulate 20 queries: 10 answerable, 5 partially answerable, 5 out-of-scope</li>
+                    <li>Verify your system correctly categorizes each one</li>
+                    <li>Calculate and report the fallback rate</li>
+                    <li><strong>Bonus:</strong> Add an escalation path that routes refused queries to a mock "human expert" queue</li>
+                </ol>
+                <p><strong>Success criteria:</strong> System correctly refuses out-of-scope queries, partially answers borderline ones, and confidently answers well-supported ones.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="06-citation-responses.html" class="prev">Citation Responses</a>
+                <a href="08-continuous-evals.html" class="next">Continuous Evals</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

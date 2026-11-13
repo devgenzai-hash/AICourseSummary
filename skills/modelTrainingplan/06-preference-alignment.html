@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 6: Preference Alignment (DPO) — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> Preference Alignment (DPO)</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 6: Stage 3 — Preference Alignment (DPO)</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Teaching the model to prefer accurate, nuanced, respectful responses over shallow or incorrect ones using Direct Preference Optimization.</p>
+
+            <h2 id="why-dpo">🤔 Why Do We Need Preference Alignment?</h2>
+            
+            <h3>The Problem After SFT</h3>
+            <p>After SFT, the model can answer questions about scriptures. But it may:</p>
+            <ul>
+                <li>Give oversimplified answers when depth is needed</li>
+                <li>Hallucinate verses that don't exist</li>
+                <li>Present one school's interpretation as universal truth</li>
+                <li>Be disrespectful to certain traditions</li>
+                <li>Give verbose answers when conciseness is preferred</li>
+            </ul>
+            <p>Preference alignment teaches the model <em>which style of response is better</em> — it learns to self-correct toward higher quality.</p>
+
+            <h2 id="dpo-math">📐 How DPO Works (The Math)</h2>
+            
+            <div class="collapsible open">
+                <div class="collapsible-header">🧮 DPO Mathematical Foundation</div>
+                <div class="collapsible-content">
+                    <p><strong>The DPO Loss Function:</strong></p>
+                    <pre><code># DPO Loss (simplified mathematical form):
+# L_DPO = -E[log σ(β × (log π_θ(y_w|x)/π_ref(y_w|x) - log π_θ(y_l|x)/π_ref(y_l|x)))]
+
+# Where:
+#   x = prompt
+#   y_w = preferred (chosen) response  
+#   y_l = dispreferred (rejected) response
+#   π_θ = our model (being trained)
+#   π_ref = reference model (frozen copy of model before DPO)
+#   β = temperature parameter (controls how much to deviate from reference)
+#   σ = sigmoid function</code></pre>
+                    
+                    <p><strong>Intuitive Explanation:</strong></p>
+                    <ol>
+                        <li>The model computes how likely it would generate both the chosen and rejected response</li>
+                        <li>It compares this to how likely the <em>reference model</em> (itself before training) would generate them</li>
+                        <li>The loss pushes the model to increase probability of chosen responses and decrease probability of rejected ones</li>
+                        <li>β controls conservatism: higher β = less deviation from original behavior</li>
+                    </ol>
+                    
+                    <p><strong>Why DPO > RLHF:</strong></p>
+                    <table>
+                        <thead><tr><th>Aspect</th><th>RLHF</th><th>DPO</th></tr></thead>
+                        <tbody>
+                            <tr><td>Reward model needed?</td><td>Yes (separate model)</td><td>No</td></tr>
+                            <tr><td>Training stability</td><td>Unstable (RL issues)</td><td>Stable (supervised loss)</td></tr>
+                            <tr><td>Hyperparameters</td><td>Many (PPO has ~15)</td><td>Few (mainly β)</td></tr>
+                            <tr><td>Compute cost</td><td>High (4 models in memory)</td><td>Low (2 models)</td></tr>
+                            <tr><td>Quality</td><td>Excellent</td><td>Excellent (often equal/better)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h2 id="dpo-code">💻 Complete DPO Training Code</h2>
+            
+            <pre><code>"""
+Direct Preference Optimization (DPO) for Hindu Scripture Model
+===============================================================
+Aligns the SFT-trained model with human quality preferences.
+Uses TRL's DPOTrainer with LoRA for memory efficiency.
+
+Usage:
+    python dpo_train.py
+
+Hardware: 1x A100 40GB
+Time: ~4-8 hours for 10K preference pairs
+"""
+import torch
+from datasets import load_dataset
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
+from trl import DPOTrainer, DPOConfig
+
+# ============================================
+# CONFIGURATION
+# ============================================
+BASE_MODEL = "google/gemma-3-27b-it"
+SFT_ADAPTER = "./checkpoints/sft_lora/final"  # Our SFT-trained adapter
+DPO_DATASET = "./datasets/dpo_preference_data.jsonl"
+OUTPUT_DIR = "./checkpoints/dpo_lora"
+
+# DPO Hyperparameters
+BETA = 0.1              # KL penalty coefficient (0.05-0.5, lower = more change)
+LEARNING_RATE = 5e-7    # Very low LR for DPO (model is already good from SFT)
+NUM_EPOCHS = 1          # Usually 1 epoch is enough for DPO
+BATCH_SIZE = 2
+GRADIENT_ACCUMULATION = 4
+MAX_LENGTH = 2048
+
+# ============================================
+# STEP 1: Load Model (SFT checkpoint)
+# ============================================
+print("📦 Loading SFT model...")
+
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+tokenizer.padding_side = "left"  # Required for DPO
+
+# Load in 4-bit
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_use_double_quant=True,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL,
+    quantization_config=bnb_config,
+    device_map="auto",
+    torch_dtype=torch.bfloat16,
+    attn_implementation="flash_attention_2",
+)
+
+# Load SFT adapter and merge
+print(f"📎 Loading SFT adapter: {SFT_ADAPTER}")
+model = PeftModel.from_pretrained(model, SFT_ADAPTER)
+model = model.merge_and_unload()
+model = prepare_model_for_kbit_training(model)
+
+# ============================================
+# STEP 2: Configure LoRA for DPO
+# ============================================
+lora_config = LoraConfig(
+    r=16,                    # Lower rank for DPO (smaller adjustments)
+    lora_alpha=16,
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM",
+    target_modules=[
+        "q_proj", "k_proj", "v_proj", "o_proj",
+        "gate_proj", "up_proj", "down_proj",
+    ],
+)
+
+# ============================================
+# STEP 3: Load DPO Dataset
+# ============================================
+print("📊 Loading preference dataset...")
+
+dataset = load_dataset("json", data_files=DPO_DATASET, split="train")
+split = dataset.train_test_split(test_size=0.05, seed=42)
+
+print(f"  Train: {len(split['train'])} preference pairs")
+print(f"  Eval:  {len(split['test'])} preference pairs")
+
+# Preview
+example = split['train'][0]
+print(f"\n  Example prompt: {str(example['prompt'])[:100]}...")
+print(f"  Chosen (first 100): {str(example['chosen'])[:100]}...")
+print(f"  Rejected (first 100): {str(example['rejected'])[:100]}...")
+
+# ============================================
+# STEP 4: DPO Training Configuration
+# ============================================
+training_args = DPOConfig(
+    output_dir=OUTPUT_DIR,
+    
+    # DPO-specific
+    beta=BETA,                          # KL penalty (how much to deviate from ref)
+    loss_type=["sigmoid"],              # Standard DPO loss
+    
+    # Training
+    num_train_epochs=NUM_EPOCHS,
+    per_device_train_batch_size=BATCH_SIZE,
+    per_device_eval_batch_size=BATCH_SIZE,
+    gradient_accumulation_steps=GRADIENT_ACCUMULATION,
+    
+    # Optimizer (very conservative for DPO)
+    learning_rate=LEARNING_RATE,
+    lr_scheduler_type="cosine",
+    warmup_ratio=0.1,
+    weight_decay=0.01,
+    max_grad_norm=1.0,
+    optim="paged_adamw_8bit",
+    
+    # Precision & Memory
+    bf16=True,
+    gradient_checkpointing=True,
+    max_length=MAX_LENGTH,
+    
+    # The reference model is automatically created from initial model state
+    # No need to load separately when using LoRA
+    
+    # Logging
+    logging_steps=10,
+    report_to="wandb",
+    run_name="gemma-scripture-dpo",
+    
+    # Saving
+    eval_strategy="steps",
+    eval_steps=100,
+    save_strategy="steps",
+    save_steps=100,
+    save_total_limit=3,
+    load_best_model_at_end=True,
+    metric_for_best_model="eval_loss",
+    
+    seed=42,
+)
+
+# ============================================
+# STEP 5: Train DPO
+# ============================================
+print("\n🚀 Starting DPO training...")
+
+trainer = DPOTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=split["train"],
+    eval_dataset=split["test"],
+    processing_class=tokenizer,
+    peft_config=lora_config,
+)
+
+# Train
+result = trainer.train()
+
+# Save
+print("\n💾 Saving DPO model...")
+trainer.save_model(f"{OUTPUT_DIR}/final")
+tokenizer.save_pretrained(f"{OUTPUT_DIR}/final")
+
+print(f"\n{'='*50}")
+print(f"✅ DPO Training Complete!")
+print(f"   Final Loss: {result.training_loss:.4f}")
+print(f"   Saved to: {OUTPUT_DIR}/final")
+print(f"{'='*50}")</code></pre>
+
+            <h2 id="preference-criteria">📋 Preference Criteria for Hindu Scriptures</h2>
+            
+            <p>When creating preference data, what makes a response "chosen" vs "rejected"?</p>
+            
+            <table>
+                <thead>
+                    <tr><th>Criterion</th><th>Chosen Response</th><th>Rejected Response</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Accuracy</strong></td>
+                        <td>Correct verse numbers, proper attribution</td>
+                        <td>Wrong references, misattributed quotes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Depth</strong></td>
+                        <td>Multiple perspectives, commentaries cited</td>
+                        <td>Surface-level, Wikipedia-like summary</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Respectfulness</strong></td>
+                        <td>Honors all traditions equally</td>
+                        <td>Dismissive of certain schools/traditions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sanskrit inclusion</strong></td>
+                        <td>Provides original Sanskrit with translation</td>
+                        <td>Only paraphrases, no original text</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nuance</strong></td>
+                        <td>Acknowledges multiple interpretations</td>
+                        <td>Presents one view as absolute truth</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Structure</strong></td>
+                        <td>Well-organized, headers, numbered points</td>
+                        <td>Wall of text, no formatting</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Honesty</strong></td>
+                        <td>Admits uncertainty where applicable</td>
+                        <td>Makes up information confidently</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="alternatives">🔄 Alternative Alignment Methods</h2>
+            
+            <div class="collapsible">
+                <div class="collapsible-header">📊 KTO (Kahneman-Tversky Optimization) — For Unpaired Data</div>
+                <div class="collapsible-content">
+                    <pre><code>"""
+KTO: When you only have thumbs-up/thumbs-down labels (not paired preferences).
+Useful if you have user feedback data but not side-by-side comparisons.
+"""
+from trl import KTOTrainer, KTOConfig
+
+# KTO dataset format: just label each response as good/bad
+# {"prompt": "...", "completion": "...", "label": true/false}
+
+kto_config = KTOConfig(
+    output_dir="./checkpoints/kto",
+    learning_rate=5e-7,
+    beta=0.1,
+    num_train_epochs=1,
+    bf16=True,
+    gradient_checkpointing=True,
+)
+
+trainer = KTOTrainer(
+    model=model,
+    args=kto_config,
+    train_dataset=kto_dataset,
+    processing_class=tokenizer,
+    peft_config=lora_config,
+)
+trainer.train()</code></pre>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">🎯 ORPO (Odds Ratio Preference Optimization) — Combined SFT+DPO</div>
+                <div class="collapsible-content">
+                    <pre><code>"""
+ORPO: Combines SFT and preference alignment in a single training step.
+Simpler pipeline — no need for separate SFT then DPO stages.
+Good for: When you want to skip the two-stage process.
+"""
+from trl import ORPOTrainer, ORPOConfig
+
+orpo_config = ORPOConfig(
+    output_dir="./checkpoints/orpo",
+    learning_rate=8e-6,
+    beta=0.1,           # Relative weight of preference loss
+    num_train_epochs=2,
+    bf16=True,
+    gradient_checkpointing=True,
+    max_length=2048,
+)
+
+# Uses same format as DPO (prompt, chosen, rejected)
+trainer = ORPOTrainer(
+    model=model,
+    args=orpo_config,
+    train_dataset=preference_dataset,
+    processing_class=tokenizer,
+    peft_config=lora_config,
+)
+trainer.train()</code></pre>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">⚡ SimPO (Simple Preference Optimization) — No Reference Model</div>
+                <div class="collapsible-content">
+                    <pre><code>"""
+SimPO: Eliminates the reference model entirely.
+Uses length-normalized sequence probabilities as implicit reward.
+Simpler and often equally effective as standard DPO.
+"""
+from trl import DPOTrainer, DPOConfig
+
+# SimPO is accessed via DPO trainer with loss_type="sigmoid_norm"
+simpo_config = DPOConfig(
+    output_dir="./checkpoints/simpo",
+    loss_type=["sigmoid_norm"],  # Length-normalized loss (SimPO)
+    beta=2.0,                    # Higher beta for SimPO (recommended: 2.0-2.5)
+    learning_rate=1e-6,
+    num_train_epochs=1,
+    bf16=True,
+    gradient_checkpointing=True,
+)
+
+trainer = DPOTrainer(
+    model=model,
+    ref_model=None,  # No reference model needed!
+    args=simpo_config,
+    train_dataset=preference_dataset,
+    processing_class=tokenizer,
+    peft_config=lora_config,
+)
+trainer.train()</code></pre>
+                </div>
+            </div>
+
+            <h2 id="monitoring-dpo">📊 DPO Training Metrics to Watch</h2>
+            <pre><code>"""
+Key metrics during DPO training and what they mean:
+"""
+# rewards/chosen    — Average reward for preferred responses (should INCREASE)
+# rewards/rejected  — Average reward for rejected responses (should DECREASE)
+# rewards/margins   — Gap between chosen and rejected rewards (should INCREASE)
+# rewards/accuracies — % of pairs where chosen reward > rejected (should be > 0.5)
+# loss             — DPO loss (should decrease)
+
+# Good training signs:
+# ✅ rewards/margins increasing steadily
+# ✅ rewards/accuracies > 0.7 by end of training  
+# ✅ loss decreasing
+# ✅ rewards/chosen going up while rewards/rejected going down
+
+# Bad signs:
+# ❌ rewards/accuracies stuck at 0.5 (model not learning preferences)
+# ❌ rewards/margins negative (model is INVERTED — preferring rejected!)
+# ❌ Loss increasing (learning rate too high, or data quality issue)</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 How Many Preference Pairs Do You Need?</div>
+                <table>
+                    <thead><tr><th>Dataset Size</th><th>Expected Quality</th><th>Use Case</th></tr></thead>
+                    <tbody>
+                        <tr><td>1,000 pairs</td><td>Noticeable improvement</td><td>Quick experiment</td></tr>
+                        <tr><td>5,000 pairs</td><td>Good alignment</td><td>Minimum for production</td></tr>
+                        <tr><td>10,000-20,000 pairs</td><td>Strong alignment</td><td>Recommended</td></tr>
+                        <tr><td>50,000+ pairs</td><td>Excellent</td><td>If budget allows</td></tr>
+                    </tbody>
+                </table>
+                <p>Quality matters more than quantity. 5,000 high-quality expert-annotated pairs > 50,000 noisy auto-generated pairs.</p>
+            </div>
+
+            <nav class="page-nav">
+                <a href="05-supervised-finetuning.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Supervised Fine-Tuning (SFT)</span>
+                </a>
+                <a href="07-reinforcement-learning.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Reinforcement Learning</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 7: Reinforcement Learning (GRPO/PPO) — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> Reinforcement Learning</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 7: Advanced — Reinforcement Learning (GRPO & PPO)</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Going beyond DPO with reward-model-based training. Use custom reward functions to verify scriptural accuracy, and GRPO for scalable RL without a critic model.</p>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ When Do You Need This Chapter?</div>
+                <p>Most projects can stop at DPO (Chapter 6) and get excellent results. Use RL methods when:</p>
+                <ul>
+                    <li>You have a verifiable reward signal (e.g., checking if cited verses actually exist)</li>
+                    <li>DPO isn't improving specific behaviors you care about</li>
+                    <li>You want to optimize for multiple objectives simultaneously</li>
+                    <li>You have compute budget for the extra complexity</li>
+                </ul>
+            </div>
+
+            <h2 id="grpo-concept">🎯 GRPO: Group Relative Policy Optimization</h2>
+            
+            <h3>Non-Technical Explanation</h3>
+            <p>GRPO is like having the model take a test multiple times, then comparing which attempts got the best grades. Instead of needing a separate "teacher" (critic model), it uses its own multiple attempts to figure out what works better. This makes it simpler and cheaper than PPO.</p>
+
+            <h3>Technical Explanation</h3>
+            <p>GRPO (from DeepSeek-R1) generates <strong>G</strong> responses per prompt, scores them with a reward function, normalizes rewards within the group (z-score), and uses the relative rankings to compute a policy gradient. No value/critic model needed.</p>
+
+            <h2 id="grpo-code">💻 Complete GRPO Training Code</h2>
+            
+            <pre><code>"""
+GRPO Training for Hindu Scripture Model
+=========================================
+Group Relative Policy Optimization — the method behind DeepSeek-R1.
+Uses custom reward functions to verify scriptural accuracy.
+
+Usage:
+    python grpo_train.py
+
+Hardware: 2x A100 40GB (need to generate multiple responses per prompt)
+Time: ~12-24 hours
+"""
+import torch
+import re
+from datasets import load_dataset
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
+from trl import GRPOTrainer, GRPOConfig
+
+# ============================================
+# CONFIGURATION
+# ============================================
+BASE_MODEL = "google/gemma-3-27b-it"
+SFT_ADAPTER = "./checkpoints/sft_lora/final"
+OUTPUT_DIR = "./checkpoints/grpo"
+PROMPT_DATASET = "./datasets/grpo_prompts.jsonl"
+
+# GRPO Hyperparameters
+NUM_GENERATIONS = 8       # Generate G responses per prompt (higher = better signal, more compute)
+LEARNING_RATE = 1e-6
+NUM_EPOCHS = 1
+BATCH_SIZE = 1
+GRADIENT_ACCUMULATION = 8
+MAX_COMPLETION_LENGTH = 1024
+TEMPERATURE = 0.8         # Higher temp → more diverse generations → better signal
+
+# ============================================
+# STEP 1: Load Model
+# ============================================
+print("📦 Loading SFT model for GRPO...")
+
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+tokenizer.padding_side = "left"
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_use_double_quant=True,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL,
+    quantization_config=bnb_config,
+    device_map="auto",
+    torch_dtype=torch.bfloat16,
+    attn_implementation="flash_attention_2",
+)
+
+# Load and merge SFT adapter
+model = PeftModel.from_pretrained(model, SFT_ADAPTER)
+model = model.merge_and_unload()
+model = prepare_model_for_kbit_training(model)
+
+# ============================================
+# STEP 2: Define Reward Functions
+# ============================================
+"""
+Reward functions are the KEY innovation in RL for domain-specific models.
+They encode what "good" means for your specific use case.
+"""
+
+# Known valid verse references (load from your database)
+VALID_GITA_VERSES = set()
+for ch in range(1, 19):
+    for v in range(1, 79):
+        VALID_GITA_VERSES.add(f"{ch}.{v}")
+
+VALID_REFERENCES = {
+    "bhagavad gita": VALID_GITA_VERSES,
+    "yoga sutras": {f"{ch}.{v}" for ch in range(1, 5) for v in range(1, 56)},
+}
+
+def reward_citation_accuracy(completions: list[str], **kwargs) -> list[float]:
+    """
+    Reward: Check if verse citations are valid.
+    +1.0 for each valid citation, -1.0 for each hallucinated citation.
+    """
+    rewards = []
+    
+    for completion in completions:
+        score = 0.0
+        # Find patterns like "Gita 2.47" or "Bhagavad Gita 18.66"
+        citations = re.findall(
+            r'(?:bhagavad\s*)?gita\s+(\d+\.\d+)', 
+            completion.lower()
+        )
+        
+        if citations:
+            for cite in citations:
+                if cite in VALID_GITA_VERSES:
+                    score += 1.0   # Valid reference
+                else:
+                    score -= 2.0   # Penalty for hallucination (higher penalty)
+            score = score / len(citations)  # Normalize
+        else:
+            score = 0.0  # No citations = neutral
+        
+        rewards.append(max(-1.0, min(1.0, score)))  # Clamp to [-1, 1]
+    
+    return rewards
+
+
+def reward_sanskrit_inclusion(completions: list[str], **kwargs) -> list[float]:
+    """
+    Reward: Does the response include original Sanskrit text?
+    Checks for Devanagari script presence.
+    """
+    rewards = []
+    
+    for completion in completions:
+        # Check for Devanagari characters (Unicode range)
+        devanagari_chars = len(re.findall(r'[\u0900-\u097F]', completion))
+        
+        if devanagari_chars > 20:
+            rewards.append(1.0)   # Good Sanskrit inclusion
+        elif devanagari_chars > 5:
+            rewards.append(0.5)   # Some inclusion
+        else:
+            rewards.append(-0.5)  # No Sanskrit when topic likely requires it
+    
+    return rewards
+
+
+def reward_structure_quality(completions: list[str], **kwargs) -> list[float]:
+    """
+    Reward: Is the response well-structured?
+    Checks for headers, lists, logical organization.
+    """
+    rewards = []
+    
+    for completion in completions:
+        score = 0.0
+        
+        # Check for structured elements
+        if re.search(r'\*\*[^*]+\*\*', completion):  # Bold headers
+            score += 0.3
+        if re.search(r'^\d+\.', completion, re.MULTILINE):  # Numbered lists
+            score += 0.3
+        if len(completion.split('\n\n')) >= 3:  # Multiple paragraphs
+            score += 0.2
+        
+        # Length penalty (too short or too long)
+        words = len(completion.split())
+        if words < 50:
+            score -= 0.5  # Too short
+        elif words > 1000:
+            score -= 0.3  # Too verbose
+        else:
+            score += 0.2
+        
+        rewards.append(max(-1.0, min(1.0, score)))
+    
+    return rewards
+
+
+def reward_multi_perspective(completions: list[str], **kwargs) -> list[float]:
+    """
+    Reward: Does the response present multiple philosophical perspectives?
+    """
+    schools = ["advaita", "vishishtadvaita", "dvaita", "yoga", "samkhya", 
+               "nyaya", "vaisheshika", "mimamsa", "shaiva", "shakta", "vaishnava"]
+    
+    rewards = []
+    for completion in completions:
+        text_lower = completion.lower()
+        mentioned = sum(1 for s in schools if s in text_lower)
+        
+        if mentioned >= 3:
+            rewards.append(1.0)
+        elif mentioned >= 2:
+            rewards.append(0.5)
+        elif mentioned >= 1:
+            rewards.append(0.0)
+        else:
+            rewards.append(-0.3)
+    
+    return rewards
+
+
+# Combined reward function
+def combined_reward(completions: list[str], **kwargs) -> list[float]:
+    """
+    Weighted combination of all reward signals.
+    """
+    r_citation = reward_citation_accuracy(completions, **kwargs)
+    r_sanskrit = reward_sanskrit_inclusion(completions, **kwargs)
+    r_structure = reward_structure_quality(completions, **kwargs)
+    r_perspective = reward_multi_perspective(completions, **kwargs)
+    
+    # Weighted sum
+    weights = {
+        'citation': 0.35,     # Accuracy is most important
+        'sanskrit': 0.25,     # Sanskrit inclusion
+        'structure': 0.20,    # Good formatting
+        'perspective': 0.20,  # Multiple viewpoints
+    }
+    
+    combined = []
+    for i in range(len(completions)):
+        score = (
+            weights['citation'] * r_citation[i] +
+            weights['sanskrit'] * r_sanskrit[i] +
+            weights['structure'] * r_structure[i] +
+            weights['perspective'] * r_perspective[i]
+        )
+        combined.append(score)
+    
+    return combined
+
+# ============================================
+# STEP 3: Load Prompt Dataset
+# ============================================
+print("📊 Loading prompts for GRPO...")
+
+# Format: each item has a "prompt" field (list of messages)
+dataset = load_dataset("json", data_files=PROMPT_DATASET, split="train")
+print(f"  {len(dataset)} prompts loaded")
+
+# ============================================
+# STEP 4: GRPO Configuration
+# ============================================
+training_args = GRPOConfig(
+    output_dir=OUTPUT_DIR,
+    
+    # GRPO-specific
+    num_generations=NUM_GENERATIONS,       # G responses per prompt
+    max_completion_length=MAX_COMPLETION_LENGTH,
+    temperature=TEMPERATURE,
+    
+    # Training
+    num_train_epochs=NUM_EPOCHS,
+    per_device_train_batch_size=BATCH_SIZE,
+    gradient_accumulation_steps=GRADIENT_ACCUMULATION,
+    
+    # Optimizer
+    learning_rate=LEARNING_RATE,
+    lr_scheduler_type="cosine",
+    warmup_ratio=0.1,
+    max_grad_norm=0.5,                    # Lower for RL stability
+    
+    # Precision
+    bf16=True,
+    gradient_checkpointing=True,
+    
+    # Logging
+    logging_steps=5,
+    report_to="wandb",
+    run_name="gemma-scripture-grpo",
+    
+    # Saving
+    save_strategy="steps",
+    save_steps=50,
+    save_total_limit=3,
+    
+    seed=42,
+)
+
+# ============================================
+# STEP 5: LoRA config for GRPO
+# ============================================
+lora_config = LoraConfig(
+    r=16,
+    lora_alpha=16,
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM",
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                    "gate_proj", "up_proj", "down_proj"],
+)
+
+# ============================================
+# STEP 6: Train!
+# ============================================
+print("\n🚀 Starting GRPO training...")
+
+trainer = GRPOTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    processing_class=tokenizer,
+    reward_funcs=[combined_reward],     # Our custom reward function!
+    peft_config=lora_config,
+)
+
+result = trainer.train()
+
+# Save
+trainer.save_model(f"{OUTPUT_DIR}/final")
+tokenizer.save_pretrained(f"{OUTPUT_DIR}/final")
+
+print(f"\n✅ GRPO Training Complete! → {OUTPUT_DIR}/final")</code></pre>
+
+            <h2 id="ppo">💻 PPO Training (Traditional RLHF)</h2>
+            
+            <div class="collapsible">
+                <div class="collapsible-header">🎮 Full PPO Training Code (Advanced)</div>
+                <div class="collapsible-content">
+                    <pre><code>"""
+PPO (Proximal Policy Optimization) — Traditional RLHF approach.
+Requires a trained reward model. More complex but well-established.
+
+Architecture: 4 models in memory:
+  1. Policy model (being trained)
+  2. Reference model (frozen copy)
+  3. Reward model (scores responses)  
+  4. Value/Critic model (estimates future rewards)
+
+Hardware: 4x A100 80GB or 8x A100 40GB
+"""
+from trl import PPOTrainer, PPOConfig, AutoModelForCausalLMWithValueHead
+from transformers import pipeline
+import torch
+
+# ============================================
+# STEP 1: Train Reward Model
+# ============================================
+"""
+The reward model is trained on preference data (same as DPO).
+It outputs a scalar score for any (prompt, response) pair.
+"""
+from trl import RewardTrainer, RewardConfig
+from transformers import AutoModelForSequenceClassification
+
+# Load a smaller model as reward model (can be different from policy)
+reward_model = AutoModelForSequenceClassification.from_pretrained(
+    "google/gemma-3-4b-it",  # Smaller model for reward
+    num_labels=1,
+    torch_dtype=torch.bfloat16,
+)
+
+reward_config = RewardConfig(
+    output_dir="./checkpoints/reward_model",
+    num_train_epochs=2,
+    per_device_train_batch_size=8,
+    learning_rate=1e-5,
+    bf16=True,
+    logging_steps=10,
+    eval_strategy="steps",
+    eval_steps=100,
+)
+
+# Train on same preference data as DPO
+reward_trainer = RewardTrainer(
+    model=reward_model,
+    args=reward_config,
+    train_dataset=preference_train,
+    eval_dataset=preference_eval,
+    processing_class=tokenizer,
+)
+reward_trainer.train()
+reward_trainer.save_model("./checkpoints/reward_model/final")
+
+# ============================================
+# STEP 2: PPO Training
+# ============================================
+# Load policy model with value head
+policy_model = AutoModelForCausalLMWithValueHead.from_pretrained(
+    BASE_MODEL,
+    peft_config=lora_config,
+    torch_dtype=torch.bfloat16,
+)
+
+# Load trained reward model as scoring pipeline
+reward_pipe = pipeline(
+    "text-classification",
+    model="./checkpoints/reward_model/final",
+    device_map="auto",
+)
+
+ppo_config = PPOConfig(
+    output_dir="./checkpoints/ppo",
+    learning_rate=1e-6,
+    batch_size=16,
+    mini_batch_size=4,
+    ppo_epochs=4,              # PPO updates per batch
+    gradient_accumulation_steps=4,
+    
+    # PPO-specific
+    kl_penalty="kl",           # KL divergence penalty type
+    init_kl_coef=0.2,         # Initial KL coefficient
+    target_kl=6.0,            # Target KL — training stops if exceeded
+    clip_range=0.2,           # PPO clip range
+    vf_coef=0.1,             # Value function loss coefficient
+    
+    # Generation during training
+    max_new_tokens=512,
+    temperature=0.7,
+)
+
+ppo_trainer = PPOTrainer(
+    config=ppo_config,
+    model=policy_model,
+    ref_model=None,           # Auto-creates reference from initial weights
+    tokenizer=tokenizer,
+)
+
+# PPO Training Loop
+for epoch in range(1):
+    for batch in prompt_dataloader:
+        # 1. Generate responses
+        query_tensors = [tokenizer.encode(q, return_tensors="pt").squeeze() 
+                        for q in batch["prompt"]]
+        response_tensors = ppo_trainer.generate(query_tensors)
+        
+        # 2. Decode responses
+        responses = [tokenizer.decode(r.squeeze(), skip_special_tokens=True) 
+                    for r in response_tensors]
+        
+        # 3. Score with reward model
+        texts = [q + r for q, r in zip(batch["prompt"], responses)]
+        rewards = [torch.tensor(reward_pipe(t)[0]["score"]) for t in texts]
+        
+        # 4. PPO update
+        stats = ppo_trainer.step(query_tensors, response_tensors, rewards)
+        
+        # Log
+        ppo_trainer.log_stats(stats, batch, rewards)</code></pre>
+                </div>
+            </div>
+
+            <h2 id="reward-design">🏆 Designing Reward Functions for Scriptures</h2>
+            
+            <pre><code>"""
+Advanced reward functions specific to Hindu scripture domain.
+These encode domain expertise into trainable signals.
+"""
+import json
+
+# ============================================
+# Verse Existence Verification
+# ============================================
+class VerseDatabase:
+    """
+    Database of known valid verse references.
+    Load from your curated scripture collection.
+    """
+    def __init__(self, db_path: str):
+        with open(db_path, 'r') as f:
+            self.verses = json.load(f)
+        # Format: {"bhagavad_gita": {"2.47": "कर्मण्येवाधिकारस्ते...", ...}}
+    
+    def exists(self, scripture: str, reference: str) -> bool:
+        """Check if a verse reference actually exists."""
+        scripture_key = scripture.lower().replace(" ", "_")
+        return reference in self.verses.get(scripture_key, {})
+    
+    def get_verse(self, scripture: str, reference: str) -> str | None:
+        """Get the actual verse text."""
+        scripture_key = scripture.lower().replace(" ", "_")
+        return self.verses.get(scripture_key, {}).get(reference)
+
+
+# ============================================
+# Factual Accuracy Reward
+# ============================================
+def reward_factual_accuracy(
+    completions: list[str], 
+    prompts: list[str] = None,
+    verse_db: VerseDatabase = None,
+    **kwargs
+) -> list[float]:
+    """
+    Checks:
+    1. Are cited verse numbers valid?
+    2. If Sanskrit text is quoted, does it match the actual verse?
+    3. Are attributions correct (not attributing Gita verses to Upanishads)?
+    """
+    rewards = []
+    
+    for completion in completions:
+        score = 0.0
+        checks = 0
+        
+        # Pattern: "Bhagavad Gita 2.47" or "BG 2.47"
+        gita_refs = re.findall(
+            r'(?:bhagavad\s*gita|BG|गीता)\s*(\d+)[\.:]\s*(\d+)', 
+            completion, re.IGNORECASE
+        )
+        
+        for ch, v in gita_refs:
+            ref = f"{ch}.{v}"
+            checks += 1
+            if verse_db and verse_db.exists("bhagavad_gita", ref):
+                score += 1.0
+            else:
+                score -= 2.0  # Heavy penalty for hallucinated references
+        
+        # Pattern: "Yoga Sutra 1.2"
+        yoga_refs = re.findall(
+            r'(?:yoga\s*sutra|YS|योगसूत्र)\s*(\d+)[\.:]\s*(\d+)',
+            completion, re.IGNORECASE
+        )
+        
+        for ch, v in yoga_refs:
+            ref = f"{ch}.{v}"
+            checks += 1
+            if verse_db and verse_db.exists("yoga_sutras", ref):
+                score += 1.0
+            else:
+                score -= 2.0
+        
+        if checks > 0:
+            rewards.append(max(-1.0, min(1.0, score / checks)))
+        else:
+            rewards.append(0.0)  # No claims to verify
+    
+    return rewards
+
+
+# ============================================
+# Respectfulness Reward
+# ============================================
+DISRESPECTFUL_PATTERNS = [
+    r'(?:myth|superstition|primitive|outdated|irrational)',
+    r'(?:hinduism\s+(?:is|was)\s+(?:just|merely|nothing))',
+    r'(?:blind\s+faith)',
+]
+
+RESPECTFUL_PATTERNS = [
+    r'(?:according\s+to\s+the\s+tradition)',
+    r'(?:the\s+scriptures\s+teach|शास्त्र)',
+    r'(?:scholars\s+(?:interpret|understand|explain))',
+    r'(?:this\s+(?:teaching|wisdom|insight))',
+]
+
+def reward_respectfulness(completions: list[str], **kwargs) -> list[float]:
+    """Ensure the model is respectful toward all traditions."""
+    rewards = []
+    
+    for completion in completions:
+        score = 0.5  # Start neutral-positive
+        text = completion.lower()
+        
+        # Penalize disrespectful language
+        for pattern in DISRESPECTFUL_PATTERNS:
+            if re.search(pattern, text):
+                score -= 0.5
+        
+        # Reward respectful framing
+        for pattern in RESPECTFUL_PATTERNS:
+            if re.search(pattern, text):
+                score += 0.2
+        
+        rewards.append(max(-1.0, min(1.0, score)))
+    
+    return rewards</code></pre>
+
+            <h2 id="when-to-use">📊 When to Use Each Method</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Best For</th>
+                        <th>Compute</th>
+                        <th>Data Needed</th>
+                        <th>Complexity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>DPO</strong></td>
+                        <td>General quality, style, safety</td>
+                        <td>Low</td>
+                        <td>Preference pairs</td>
+                        <td>Low</td>
+                    </tr>
+                    <tr>
+                        <td><strong>KTO</strong></td>
+                        <td>When you only have good/bad labels</td>
+                        <td>Low</td>
+                        <td>Binary labels</td>
+                        <td>Low</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GRPO</strong></td>
+                        <td>Verifiable rewards, math-like tasks</td>
+                        <td>Medium</td>
+                        <td>Prompts + reward fn</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PPO</strong></td>
+                        <td>Maximum control, complex objectives</td>
+                        <td>High</td>
+                        <td>Reward model + prompts</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ORPO</strong></td>
+                        <td>Simplified pipeline (skip SFT)</td>
+                        <td>Low</td>
+                        <td>Preference pairs</td>
+                        <td>Low</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-success">
+                <div class="callout-title">🎯 Recommended Path for Scripture Model</div>
+                <ol>
+                    <li><strong>Start with DPO</strong> (Chapter 6) — easy, effective, low compute</li>
+                    <li><strong>Add GRPO</strong> if you want to enforce citation accuracy with reward functions</li>
+                    <li><strong>Skip PPO</strong> unless you have 4+ A100 GPUs and a specific need</li>
+                </ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="06-preference-alignment.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Preference Alignment (DPO)</span>
+                </a>
+                <a href="08-hardware-infrastructure.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Hardware & Infrastructure</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

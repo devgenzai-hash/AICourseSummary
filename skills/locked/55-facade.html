@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facade - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html" class="active"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Design Patterns &rarr; Facade</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Beginner</span>
+                <span class="tag">Pattern</span>
+                <span class="tag">Design Pattern</span>
+            </div>
+            <h1>Facade</h1>
+            <p class="hero-subtitle">Providing a <strong>simple unified interface</strong> to a complex subsystem &mdash; hiding internal complexity behind one easy-to-use entry point.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>hotel concierge</strong>. You want dinner, a taxi, and theater tickets. Instead of calling the restaurant, the cab company, and the box office yourself, you tell the concierge what you need &mdash; one person handles all three services behind the scenes. You don&rsquo;t deal with each service separately, you don&rsquo;t need to know their phone numbers or booking protocols. The concierge is the <em>facade</em> &mdash; a single, simple interface to a complex set of subsystems.</p>
+        </div>
+
+        <h2>What Is the Facade Pattern?</h2>
+        <ul>
+            <li><strong>Intent:</strong> Provide a unified interface to a set of interfaces in a subsystem &mdash; making the subsystem easier to use</li>
+            <li><strong>Classification:</strong> Structural pattern (GoF) &mdash; controls how classes and objects are <em>composed</em></li>
+            <li><strong>Key principle:</strong> Simplification through abstraction &mdash; hide complexity, expose simplicity</li>
+            <li><strong>Coupling reduction:</strong> Clients depend only on the facade, not on dozens of subsystem classes</li>
+            <li><strong>Not restrictive:</strong> The facade doesn&rsquo;t prevent direct subsystem access &mdash; it provides a convenient shortcut</li>
+        </ul>
+
+        <h2>When to Use Facade</h2>
+        <ul>
+            <li><strong>Wrapping complex libraries:</strong> When a third-party library has dozens of classes but you only need a subset of functionality</li>
+            <li><strong>Simplifying microservice calls:</strong> One facade method orchestrates calls to multiple services (inventory + payment + shipping)</li>
+            <li><strong>Legacy system integration:</strong> Hide messy legacy APIs behind a clean modern interface</li>
+            <li><strong>Layer boundaries:</strong> Each architectural layer exposes a facade to the layer above</li>
+            <li><strong>Reducing compile dependencies:</strong> Clients import only the facade, not the entire subsystem</li>
+        </ul>
+
+        <h2>Facade vs Adapter vs Proxy</h2>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Facade</th>
+                        <th>Adapter</th>
+                        <th>Proxy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Purpose</strong></td>
+                        <td>Simplify a complex subsystem</td>
+                        <td>Convert one interface to another</td>
+                        <td>Control access to an object</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scope</strong></td>
+                        <td>Wraps an entire subsystem</td>
+                        <td>Wraps a single class/interface</td>
+                        <td>Wraps a single object</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Interface</strong></td>
+                        <td>Defines a new simplified interface</td>
+                        <td>Matches an existing target interface</td>
+                        <td>Same interface as the wrapped object</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Client knows?</strong></td>
+                        <td>May not know subsystem exists</td>
+                        <td>Knows the target interface</td>
+                        <td>Thinks it&rsquo;s talking to the real object</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Direction</strong></td>
+                        <td>Simplifies (many &rarr; one)</td>
+                        <td>Converts (incompatible &rarr; compatible)</td>
+                        <td>Controls (add checks/lazy load)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Order Processing Facade &mdash; Orchestrating Subsystems</h2>
+        <pre><code><span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># SUBSYSTEM 1: Inventory Management</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">InventoryService</span>:
+    <span class="token-string">"""Complex inventory subsystem with many methods."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._stock = {<span class="token-string">"LAPTOP"</span>: <span class="token-number">10</span>, <span class="token-string">"MOUSE"</span>: <span class="token-number">50</span>, <span class="token-string">"KEYBOARD"</span>: <span class="token-number">30</span>}
+
+    <span class="token-keyword">def</span> <span class="token-function">check_availability</span>(self, item_id: str, qty: int) -> bool:
+        available = self._stock.get(item_id, <span class="token-number">0</span>) >= qty
+        print(f<span class="token-string">"  [Inventory] {item_id}: {'available' if available else 'OUT OF STOCK'}"</span>)
+        <span class="token-keyword">return</span> available
+
+    <span class="token-keyword">def</span> <span class="token-function">reserve_item</span>(self, item_id: str, qty: int) -> str:
+        self._stock[item_id] -= qty
+        reservation_id = f<span class="token-string">"RES-{item_id}-{qty}"</span>
+        print(f<span class="token-string">"  [Inventory] Reserved {qty}x {item_id} → {reservation_id}"</span>)
+        <span class="token-keyword">return</span> reservation_id
+
+    <span class="token-keyword">def</span> <span class="token-function">release_reservation</span>(self, reservation_id: str) -> <span class="token-keyword">None</span>:
+        print(f<span class="token-string">"  [Inventory] Released reservation {reservation_id}"</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># SUBSYSTEM 2: Payment Processing</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">PaymentService</span>:
+    <span class="token-string">"""Complex payment subsystem — fraud checks, authorization, capture."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">validate_card</span>(self, card_number: str) -> bool:
+        valid = len(card_number) == <span class="token-number">16</span>
+        print(f<span class="token-string">"  [Payment] Card validation: {'PASS' if valid else 'FAIL'}"</span>)
+        <span class="token-keyword">return</span> valid
+
+    <span class="token-keyword">def</span> <span class="token-function">authorize_payment</span>(self, amount: float, card: str) -> str:
+        auth_code = f<span class="token-string">"AUTH-{int(amount)}"</span>
+        print(f<span class="token-string">"  [Payment] Authorized ${amount:.2f} → {auth_code}"</span>)
+        <span class="token-keyword">return</span> auth_code
+
+    <span class="token-keyword">def</span> <span class="token-function">capture_payment</span>(self, auth_code: str) -> str:
+        txn_id = f<span class="token-string">"TXN-{auth_code}"</span>
+        print(f<span class="token-string">"  [Payment] Captured {auth_code} → {txn_id}"</span>)
+        <span class="token-keyword">return</span> txn_id
+
+    <span class="token-keyword">def</span> <span class="token-function">refund</span>(self, txn_id: str) -> <span class="token-keyword">None</span>:
+        print(f<span class="token-string">"  [Payment] Refunded {txn_id}"</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># SUBSYSTEM 3: Shipping</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">ShippingService</span>:
+    <span class="token-string">"""Complex shipping subsystem — rates, labels, tracking."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">calculate_shipping</span>(self, item_id: str, address: str) -> float:
+        rate = <span class="token-number">9.99</span>
+        print(f<span class="token-string">"  [Shipping] Rate for {item_id} → ${rate}"</span>)
+        <span class="token-keyword">return</span> rate
+
+    <span class="token-keyword">def</span> <span class="token-function">create_shipment</span>(self, item_id: str, address: str) -> str:
+        tracking = f<span class="token-string">"TRACK-{item_id[:4]}"</span>
+        print(f<span class="token-string">"  [Shipping] Shipment created → {tracking}"</span>)
+        <span class="token-keyword">return</span> tracking
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># THE FACADE — One simple method for the client</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-class">OrderResult</span>:
+    success: bool
+    order_id: str
+    tracking: str
+    message: str
+
+
+<span class="token-keyword">class</span> <span class="token-class">OrderFacade</span>:
+    <span class="token-string">"""Facade — simplifies the entire order process into one call."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._inventory = InventoryService()
+        self._payment = PaymentService()
+        self._shipping = ShippingService()
+
+    <span class="token-keyword">def</span> <span class="token-function">place_order</span>(self, item_id: str, qty: int,
+                     card: str, address: str) -> OrderResult:
+        <span class="token-string">"""One method to rule them all — orchestrates the entire flow."""</span>
+
+        <span class="token-comment"># Step 1: Check inventory</span>
+        <span class="token-keyword">if not</span> self._inventory.check_availability(item_id, qty):
+            <span class="token-keyword">return</span> OrderResult(<span class="token-keyword">False</span>, <span class="token-string">""</span>, <span class="token-string">""</span>, <span class="token-string">"Item out of stock"</span>)
+
+        <span class="token-comment"># Step 2: Reserve item</span>
+        reservation = self._inventory.reserve_item(item_id, qty)
+
+        <span class="token-comment"># Step 3: Validate and charge payment</span>
+        <span class="token-keyword">if not</span> self._payment.validate_card(card):
+            self._inventory.release_reservation(reservation)
+            <span class="token-keyword">return</span> OrderResult(<span class="token-keyword">False</span>, <span class="token-string">""</span>, <span class="token-string">""</span>, <span class="token-string">"Invalid card"</span>)
+
+        shipping_cost = self._shipping.calculate_shipping(item_id, address)
+        total = qty * <span class="token-number">99.99</span> + shipping_cost
+
+        auth = self._payment.authorize_payment(total, card)
+        txn = self._payment.capture_payment(auth)
+
+        <span class="token-comment"># Step 4: Ship it</span>
+        tracking = self._shipping.create_shipment(item_id, address)
+
+        order_id = f<span class="token-string">"ORD-{txn}"</span>
+        <span class="token-keyword">return</span> OrderResult(<span class="token-keyword">True</span>, order_id, tracking, <span class="token-string">"Order placed!"</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Client code — blissfully simple</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+facade = OrderFacade()
+print(<span class="token-string">"=== Place Order via Facade ==="</span>)
+result = facade.place_order(
+    item_id=<span class="token-string">"LAPTOP"</span>,
+    qty=<span class="token-number">1</span>,
+    card=<span class="token-string">"4111111111111111"</span>,
+    address=<span class="token-string">"123 Main St"</span>
+)
+print(f<span class="token-string">"\nResult: {result}"</span>)</code></pre>
+
+        <h2>Home Theater Facade &mdash; Classic Example</h2>
+        <pre><code><span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Complex subsystem classes</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Amplifier</span>:
+    <span class="token-keyword">def</span> <span class="token-function">on</span>(self): print(<span class="token-string">"  Amplifier ON"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">set_volume</span>(self, level: int): print(f<span class="token-string">"  Amplifier volume → {level}"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">set_surround</span>(self): print(<span class="token-string">"  Amplifier surround mode"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">off</span>(self): print(<span class="token-string">"  Amplifier OFF"</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">Projector</span>:
+    <span class="token-keyword">def</span> <span class="token-function">on</span>(self): print(<span class="token-string">"  Projector ON"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">set_input</span>(self, source: str): print(f<span class="token-string">"  Projector input → {source}"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">wide_screen</span>(self): print(<span class="token-string">"  Projector widescreen mode"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">off</span>(self): print(<span class="token-string">"  Projector OFF"</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">StreamingPlayer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">on</span>(self): print(<span class="token-string">"  StreamingPlayer ON"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">play</span>(self, movie: str): print(f<span class="token-string">"  Playing: {movie}"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">stop</span>(self): print(<span class="token-string">"  StreamingPlayer stopped"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">off</span>(self): print(<span class="token-string">"  StreamingPlayer OFF"</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">Lights</span>:
+    <span class="token-keyword">def</span> <span class="token-function">dim</span>(self, level: int): print(f<span class="token-string">"  Lights dimmed to {level}%"</span>)
+    <span class="token-keyword">def</span> <span class="token-function">on</span>(self): print(<span class="token-string">"  Lights ON (full)"</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># The Facade — two simple methods for movie night</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HomeTheaterFacade</span>:
+    <span class="token-string">"""One-click movie night — hides 10+ subsystem calls."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._amp = Amplifier()
+        self._projector = Projector()
+        self._player = StreamingPlayer()
+        self._lights = Lights()
+
+    <span class="token-keyword">def</span> <span class="token-function">watch_movie</span>(self, movie: str) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Start movie night with one call."""</span>
+        print(f<span class="token-string">"=== Starting Movie: {movie} ==="</span>)
+        self._lights.dim(<span class="token-number">10</span>)
+        self._projector.on()
+        self._projector.set_input(<span class="token-string">"streaming"</span>)
+        self._projector.wide_screen()
+        self._amp.on()
+        self._amp.set_surround()
+        self._amp.set_volume(<span class="token-number">7</span>)
+        self._player.on()
+        self._player.play(movie)
+
+    <span class="token-keyword">def</span> <span class="token-function">end_movie</span>(self) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Shut everything down with one call."""</span>
+        print(<span class="token-string">"=== Ending Movie Night ==="</span>)
+        self._player.stop()
+        self._player.off()
+        self._amp.off()
+        self._projector.off()
+        self._lights.on()
+
+
+<span class="token-comment"># Client — simple!</span>
+theater = HomeTheaterFacade()
+theater.watch_movie(<span class="token-string">"Inception"</span>)
+print()
+theater.end_movie()</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>AWS SDK (High-Level vs Low-Level):</strong> AWS provides both low-level clients (raw API calls with pagination, retries, serialization) and high-level resource objects like <code>s3.Bucket('my-bucket').upload_file('data.csv')</code>. The high-level API is a facade over dozens of low-level operations &mdash; multipart uploads, checksums, transfer acceleration &mdash; hidden behind one method call.</p>
+            <p><strong>jQuery as a DOM Facade:</strong> Before modern frameworks, jQuery&rsquo;s <code>$('#id').fadeIn().css({color: 'red'})</code> was a facade over verbose, browser-inconsistent DOM APIs. Instead of <code>document.getElementById</code> + checking IE quirks + manual animation loops, one clean interface handled it all.</p>
+            <p><strong>Logging Frameworks:</strong> Python&rsquo;s <code>logging.info("message")</code> is a facade over handlers, formatters, filters, log levels, rotation, and output destinations. You call one method; behind the scenes it routes to files, syslog, email, or monitoring services.</p>
+            <p><strong>ORMs as Database Facades:</strong> Django ORM, SQLAlchemy, and Prisma are facades over raw SQL. <code>User.objects.filter(age__gt=18)</code> hides query building, connection pooling, parameterization, and result mapping. One line replaces dozens of SQL + cursor operations.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Facade provides a simple interface to a complex subsystem &mdash; one entry point, many operations behind it</li>
+                <li>Reduces coupling &mdash; clients depend on the facade, not on subsystem internals</li>
+                <li>Does NOT restrict access &mdash; power users can still reach subsystem classes directly</li>
+                <li>Different from Adapter (converts interfaces) and Proxy (controls access to one object)</li>
+                <li>Common at layer boundaries &mdash; each layer exposes a facade to the layer above</li>
+                <li>Simplest of the structural patterns &mdash; if you&rsquo;re wrapping complexity, you&rsquo;re probably building a facade</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of the facade as a <strong>remote control for your entire home theater</strong>. The remote has two buttons: &ldquo;Watch Movie&rdquo; and &ldquo;End Movie.&rdquo; Behind those buttons, it sends IR signals to the projector, amplifier, streaming box, and lights. You <em>could</em> use each device&rsquo;s own remote, but the facade remote makes the common workflows trivial.</p>
+            <div class="model-visual">
+                <pre>
+  FACADE PATTERN STRUCTURE:
+  ══════════════════════════════════════════════════════
+
+  WITHOUT Facade (client talks to everything):
+
+  ┌──────────┐    ┌─────────────────┐
+  │  Client  │───→│ InventoryService │
+  │          │───→│ PaymentService   │
+  │          │───→│ ShippingService  │
+  │          │───→│ NotifyService    │
+  │          │───→│ FraudCheck       │
+  └──────────┘    └─────────────────┘
+  Client must know 5 APIs, handle errors, orchestrate order
+
+
+  WITH Facade (client talks to one thing):
+
+  ┌──────────┐    ┌─────────────┐    ┌─────────────────┐
+  │  Client  │───→│ OrderFacade │───→│ InventoryService │
+  │          │    │             │───→│ PaymentService   │
+  └──────────┘    │  place_order│───→│ ShippingService  │
+   one method     │  cancel     │───→│ NotifyService    │
+   one result     │             │───→│ FraudCheck       │
+                  └─────────────┘    └─────────────────┘
+                  Orchestration hidden inside facade
+
+
+  FACADE vs ADAPTER vs PROXY:
+  ══════════════════════════════════════════════════════
+
+  Facade:   [Client] → [Simple API] → [Complex Subsystem]
+            Purpose: Simplify (many → one)
+
+  Adapter:  [Client] → [Expected API] → [Incompatible API]
+            Purpose: Convert (interface A → interface B)
+
+  Proxy:    [Client] → [Same API + controls] → [Real Object]
+            Purpose: Control access (lazy load, auth, cache)
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>God facade that does everything:</strong> A facade should simplify common workflows, not become a massive class with 50 methods that duplicates the entire subsystem API. If your facade is growing unbounded, split it into multiple focused facades (OrderFacade, ReportFacade, AdminFacade).</li>
+                <li><strong>Hiding too much &mdash; no escape hatch:</strong> A good facade doesn&rsquo;t lock clients out of the subsystem. Power users may need direct access for edge cases. Don&rsquo;t make subsystem classes private/internal unless you&rsquo;re certain no one will ever need them.</li>
+                <li><strong>Facade with business logic:</strong> The facade should <em>orchestrate</em>, not <em>implement</em>. If you&rsquo;re putting validation rules, calculations, or transformations in the facade, that logic belongs in the subsystem services. The facade just calls them in the right order.</li>
+                <li><strong>Tight coupling inside the facade:</strong> If your facade directly instantiates all subsystems in its constructor, it becomes hard to test. Inject dependencies or use a service locator so you can mock subsystems in tests and swap implementations.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Travel booking facade:</strong> Build a <code>TravelFacade</code> that orchestrates FlightService, HotelService, and CarRentalService behind a single <code>book_trip(destination, dates, preferences)</code> method. Handle partial failures &mdash; if hotel booking fails after flight is booked, roll back the flight reservation.</li>
+                <li><strong>Cloud deployment facade:</strong> Create a <code>DeployFacade</code> that wraps DockerService, KubernetesService, DNSService, and MonitoringService. One <code>deploy(image, env)</code> call should build the image, push to registry, update k8s deployment, configure DNS, and set up alerts.</li>
+                <li><strong>Facade with dependency injection:</strong> Refactor the OrderFacade to accept subsystem instances via its constructor instead of creating them internally. Write unit tests that inject mock services and verify the facade calls them in the correct order with correct arguments.</li>
+                <li><strong>Layered facades:</strong> Design a two-level facade system: a <code>UserFacade</code> that uses an <code>AuthFacade</code> and a <code>ProfileFacade</code> internally. The top-level <code>register_user()</code> calls auth facade for account creation, then profile facade for setup. Demonstrate how facades can compose other facades.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="54-decorator.html" class="prev">&larr; Decorator</a>
+            <a href="56-observer.html" class="next">Observer &rarr;</a>
+        </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Critical Sections - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Critical Sections</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Critical Sections</h1>
+                <p class="subtitle">The danger zones in your code where only one thread should be allowed at a time. Master this and your concurrent code is safe.</p>
+                <div class="tag-row">
+                    <span class="tag tag-beginner">Beginner</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">The Single-Occupancy Bathroom</div>
+                <p>A critical section is like a <strong>single-occupancy bathroom</strong> in an office:</p>
+<ul><li>Only <strong>one person</strong> can be inside at a time</li>
+<li>When you go in, you <strong>lock the door</strong></li>
+<li>Others must <strong>wait outside</strong></li>
+<li>When you leave, you <strong>unlock</strong></li></ul>
+<p>The bathroom is the critical section. The lock on the door is the mutex. If two people could be in at the same time — chaos.</p>
+            </div>
+
+
+            <h2>What Is a Critical Section?</h2>
+            <p>A <strong>critical section</strong> is a piece of code that accesses a <strong>shared resource</strong> that must not be accessed by more than one thread at a time.</p>
+
+            <h3>Identifying Critical Sections</h3>
+            <p>Ask: "If two threads ran this code at the EXACT same time, could something go wrong?" If yes — it is a critical section.</p>
+
+<pre><code><span class="token-keyword">import</span> threading
+
+balance = <span class="token-number">1000</span>
+transaction_log = []
+
+<span class="token-keyword">def</span> <span class="token-function">transfer</span>(amount):
+    <span class="token-keyword">global</span> balance
+    <span class="token-comment"># --- CRITICAL SECTION START ---</span>
+    <span class="token-keyword">if</span> balance >= amount:
+        balance -= amount
+        transaction_log.append(<span class="token-string">f"Transferred {amount}"</span>)
+    <span class="token-comment"># --- CRITICAL SECTION END ---</span>
+
+    <span class="token-comment"># This is NOT critical (local variable only)</span>
+    receipt = <span class="token-string">f"Receipt: {amount}"</span>
+    print(receipt)</code></pre>
+
+            <h2>Four Requirements for Safe Critical Sections</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Requirement</th><th>Meaning</th><th>Analogy</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Mutual Exclusion</strong></td><td>Only one thread in CS at a time</td><td>One person in bathroom</td></tr>
+                    <tr><td><strong>Progress</strong></td><td>If CS is empty, waiting thread can enter</td><td>Empty bathroom = next person goes in</td></tr>
+                    <tr><td><strong>Bounded Waiting</strong></td><td>No thread waits forever</td><td>Everyone gets a turn eventually</td></tr>
+                    <tr><td><strong>No speed assumptions</strong></td><td>Works regardless of thread speed</td><td>Works whether 1 min or 30 min</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Implementation in Python</h2>
+<pre><code><span class="token-keyword">import</span> threading
+
+<span class="token-keyword">class</span> <span class="token-class">ThreadSafeCounter</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._count = <span class="token-number">0</span>
+        self._lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">increment</span>(self):
+        <span class="token-keyword">with</span> self._lock:  <span class="token-comment"># Critical section</span>
+            self._count += <span class="token-number">1</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self):
+        <span class="token-keyword">with</span> self._lock:  <span class="token-comment"># Even reads need protection!</span>
+            <span class="token-keyword">return</span> self._count
+
+counter = ThreadSafeCounter()
+threads = [threading.Thread(target=<span class="token-keyword">lambda</span>: [counter.increment() <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">10000</span>)])
+           <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">10</span>)]
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.start()
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.join()
+print(<span class="token-string">f"Count: {counter.get()}"</span>)  <span class="token-comment"># Always 100,000</span></code></pre>
+
+            <h2>Critical Section Size Matters</h2>
+            <div class="callout callout-warning">
+                <div class="callout-title">Keep Critical Sections SHORT</div>
+                <p>The longer a thread holds a lock, the longer others wait. Long critical sections destroy parallelism.</p>
+            </div>
+
+<pre><code><span class="token-comment"># BAD: Too much inside the critical section</span>
+<span class="token-keyword">def</span> <span class="token-function">process_bad</span>(data):
+    <span class="token-keyword">with</span> lock:
+        result = expensive_computation(data)  <span class="token-comment"># 100ms others wait!</span>
+        shared_list.append(result)
+
+<span class="token-comment"># GOOD: Minimize critical section</span>
+<span class="token-keyword">def</span> <span class="token-function">process_good</span>(data):
+    result = expensive_computation(data)  <span class="token-comment"># No lock needed</span>
+    <span class="token-keyword">with</span> lock:
+        shared_list.append(result)  <span class="token-comment"># Only this needs the lock</span></code></pre>
+
+            <div class="industry-box">
+                <h4>Industry Practice</h4>
+                <ul>
+                    <li><strong>Linux kernel</strong> — Moved from Big Kernel Lock (one giant CS) to fine-grained locks (many small CS).</li>
+                    <li><strong>Java ConcurrentHashMap</strong> — Locks individual buckets, not the whole map.</li>
+                    <li><strong>Database engines</strong> — Row-level vs table-level locking. Smaller CS = more concurrency.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>A critical section is code accessing shared mutable state</li>
+<li>Only one thread may be in a critical section at a time (mutual exclusion)</li>
+<li>Use locks to protect critical sections</li>
+<li>Always use context managers (with lock:) to ensure release</li>
+<li>Keep critical sections as SHORT as possible</li>
+<li>Move expensive computation OUTSIDE the critical section</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">Thread A: ---- [LOCK] --- critical section --- [UNLOCK] --------
+Thread B: ---- (waiting...) ---------------------- [LOCK] --- CS --- [UNLOCK]
+
+RULE: Keep the CS small!
+BAD:  [LOCK] ---- 100ms work ---- [UNLOCK]   (everyone waits)
+GOOD: -- 100ms work -- [LOCK] 1us [UNLOCK]   (minimal waiting)</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Forgetting to release the lock</strong> — Always use with lock: or try/finally.</li>
+<li><strong>Making critical sections too large</strong> — Only protect shared state access.</li>
+<li><strong>Not protecting reads</strong> — Reads of shared data need locks too.</li>
+<li><strong>Using different locks for the same data</strong> — All threads must use THE SAME lock.</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Write a thread-safe queue (push/pop) using a list and a lock.</li>
+<li>Have 5 producers and 5 consumers use it simultaneously.</li>
+<li>First without lock — show corruption. Then with lock — show correctness.</li>
+<li>Measure: what % of time do threads spend waiting vs doing useful work?</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="03-race-conditions.html" class="prev">Race Conditions</a>
+                <a href="05-mutex-locks.html" class="next">Mutex & Locks</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

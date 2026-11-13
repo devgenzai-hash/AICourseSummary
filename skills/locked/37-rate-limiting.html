@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Limiting - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Resilience Patterns &rarr; Rate Limiting</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Resilience</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Rate Limiting</h1>
+            <p class="hero-subtitle">Controlling the number of requests a client can make within a time window &mdash; protecting APIs from abuse, ensuring fair usage, and preventing resource exhaustion.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>bouncer at a nightclub</strong>. The club has a fire-code capacity of 200 people. The bouncer counts everyone entering &mdash; once 200 are inside, the next person in line is told &ldquo;you&rsquo;ll have to wait until someone leaves.&rdquo; VIP guests might get a higher limit (500 entries per night vs 100 for general admission). The bouncer doesn&rsquo;t care <em>who</em> you are after checking your tier &mdash; it&rsquo;s purely about the numbers within a time window.</p>
+        </div>
+
+        <h2>Rate Limiting Algorithms</h2>
+        <p>There are four primary algorithms for rate limiting, each with different trade-offs:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>How It Works</th>
+                        <th>Burst Handling</th>
+                        <th>Memory</th>
+                        <th>Precision</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Token Bucket</strong></td>
+                        <td>Tokens added at fixed rate; each request consumes one</td>
+                        <td>Allows bursts up to bucket capacity</td>
+                        <td>O(1)</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Leaky Bucket</strong></td>
+                        <td>Requests queued and processed at constant rate</td>
+                        <td>Smooths traffic; no bursts allowed</td>
+                        <td>O(1)</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fixed Window</strong></td>
+                        <td>Counter resets at fixed intervals (e.g., every minute)</td>
+                        <td>Allows 2x burst at window boundary</td>
+                        <td>O(1)</td>
+                        <td>Low</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sliding Window</strong></td>
+                        <td>Weighted combination of current and previous window</td>
+                        <td>Prevents boundary bursts</td>
+                        <td>O(1) to O(n)</td>
+                        <td>High</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Token Bucket Implementation</h2>
+        <p>The most widely used algorithm. Tokens are added at a steady rate; requests consume tokens. When the bucket is empty, requests are rejected.</p>
+
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> threading
+
+<span class="token-keyword">class</span> <span class="token-class">TokenBucket</span>:
+    <span class="token-string">"""Token bucket rate limiter.
+
+    Allows bursts up to max_tokens, refills at
+    refill_rate tokens per second.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, max_tokens: int,
+                 refill_rate: float):
+        self._max_tokens = max_tokens
+        self._refill_rate = refill_rate  <span class="token-comment"># tokens/sec</span>
+        self._tokens = float(max_tokens)
+        self._last_refill = time.monotonic()
+        self._lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">_refill</span>(self):
+        <span class="token-string">"""Add tokens based on elapsed time."""</span>
+        now = time.monotonic()
+        elapsed = now - self._last_refill
+        new_tokens = elapsed * self._refill_rate
+        self._tokens = min(
+            self._max_tokens,
+            self._tokens + new_tokens
+        )
+        self._last_refill = now
+
+    <span class="token-keyword">def</span> <span class="token-function">consume</span>(self, tokens: int = <span class="token-number">1</span>) -> bool:
+        <span class="token-string">"""Try to consume tokens. Returns True if allowed."""</span>
+        <span class="token-keyword">with</span> self._lock:
+            self._refill()
+            <span class="token-keyword">if</span> self._tokens >= tokens:
+                self._tokens -= tokens
+                <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">tokens_remaining</span>(self) -> float:
+        <span class="token-keyword">with</span> self._lock:
+            self._refill()
+            <span class="token-keyword">return</span> self._tokens
+
+    <span class="token-keyword">def</span> <span class="token-function">time_until_available</span>(self) -> float:
+        <span class="token-string">"""Seconds until at least 1 token is available."""</span>
+        <span class="token-keyword">with</span> self._lock:
+            self._refill()
+            <span class="token-keyword">if</span> self._tokens >= <span class="token-number">1</span>:
+                <span class="token-keyword">return</span> <span class="token-number">0.0</span>
+            deficit = <span class="token-number">1.0</span> - self._tokens
+            <span class="token-keyword">return</span> deficit / self._refill_rate
+
+
+<span class="token-comment"># Example: 100 requests per minute (burst of 10)</span>
+limiter = TokenBucket(max_tokens=<span class="token-number">10</span>, refill_rate=<span class="token-number">100</span>/<span class="token-number">60</span>)
+
+<span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">15</span>):
+    allowed = limiter.consume()
+    status = <span class="token-string">"&#x2713; allowed"</span> <span class="token-keyword">if</span> allowed <span class="token-keyword">else</span> <span class="token-string">"&#x2717; rejected"</span>
+    print(<span class="token-string">f"Request </span>{i+<span class="token-number">1</span>}<span class="token-string">: </span>{status}<span class="token-string">"</span>)</code></pre>
+
+        <h2>Sliding Window Rate Limiter</h2>
+        <p>Fixes the boundary burst problem of fixed windows by tracking individual request timestamps:</p>
+
+        <pre><code><span class="token-keyword">from</span> collections <span class="token-keyword">import</span> deque
+
+<span class="token-keyword">class</span> <span class="token-class">SlidingWindowRateLimiter</span>:
+    <span class="token-string">"""Sliding window log rate limiter.
+
+    Tracks exact timestamps of each request within
+    the window. Most precise but uses more memory.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, max_requests: int,
+                 window_seconds: float):
+        self._max_requests = max_requests
+        self._window = window_seconds
+        self._requests: deque = deque()
+        self._lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">_cleanup</span>(self, now: float):
+        <span class="token-string">"""Remove requests outside the window."""</span>
+        cutoff = now - self._window
+        <span class="token-keyword">while</span> self._requests <span class="token-keyword">and</span> self._requests[<span class="token-number">0</span>] &lt; cutoff:
+            self._requests.popleft()
+
+    <span class="token-keyword">def</span> <span class="token-function">allow</span>(self) -> bool:
+        <span class="token-string">"""Check if request is allowed under the limit."""</span>
+        <span class="token-keyword">with</span> self._lock:
+            now = time.monotonic()
+            self._cleanup(now)
+            <span class="token-keyword">if</span> len(self._requests) &lt; self._max_requests:
+                self._requests.append(now)
+                <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">remaining</span>(self) -> int:
+        <span class="token-keyword">with</span> self._lock:
+            self._cleanup(time.monotonic())
+            <span class="token-keyword">return</span> max(<span class="token-number">0</span>, self._max_requests - len(self._requests))
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">reset_time</span>(self) -> float:
+        <span class="token-string">"""Seconds until the oldest request expires."""</span>
+        <span class="token-keyword">with</span> self._lock:
+            <span class="token-keyword">if</span> <span class="token-keyword">not</span> self._requests:
+                <span class="token-keyword">return</span> <span class="token-number">0.0</span>
+            oldest = self._requests[<span class="token-number">0</span>]
+            <span class="token-keyword">return</span> max(<span class="token-number">0.0</span>,
+                (oldest + self._window) - time.monotonic())
+
+
+<span class="token-comment"># Example: 5 requests per 10-second window</span>
+window_limiter = SlidingWindowRateLimiter(
+    max_requests=<span class="token-number">5</span>, window_seconds=<span class="token-number">10.0</span>
+)</code></pre>
+
+        <h2>Distributed Rate Limiting with Redis</h2>
+        <p>In a multi-server deployment, rate limiting must be centralized. Redis is the standard choice due to atomic operations and sub-millisecond latency:</p>
+
+        <pre><code><span class="token-keyword">import</span> time
+
+<span class="token-keyword">class</span> <span class="token-class">RedisRateLimiter</span>:
+    <span class="token-string">"""Distributed sliding window using Redis sorted sets.
+
+    Each request is stored as a member with score = timestamp.
+    ZREMRANGEBYSCORE removes expired entries atomically.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, redis_client, key_prefix: str,
+                 max_requests: int, window_seconds: int):
+        self._redis = redis_client
+        self._prefix = key_prefix
+        self._max_requests = max_requests
+        self._window = window_seconds
+
+    <span class="token-keyword">def</span> <span class="token-function">_key</span>(self, client_id: str) -> str:
+        <span class="token-keyword">return</span> <span class="token-string">f"</span>{self._prefix}<span class="token-string">:</span>{client_id}<span class="token-string">"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">is_allowed</span>(self, client_id: str) -> dict:
+        <span class="token-string">"""Check if client_id can make a request.
+
+        Uses a Redis pipeline for atomicity:
+        1. Remove entries outside the window
+        2. Count remaining entries
+        3. If under limit, add new entry
+        4. Set TTL for automatic cleanup
+        """</span>
+        key = self._key(client_id)
+        now = time.time()
+        window_start = now - self._window
+
+        pipe = self._redis.pipeline()
+        <span class="token-comment"># Remove old entries</span>
+        pipe.zremrangebyscore(key, <span class="token-number">0</span>, window_start)
+        <span class="token-comment"># Count current entries</span>
+        pipe.zcard(key)
+        results = pipe.execute()
+
+        current_count = results[<span class="token-number">1</span>]
+
+        <span class="token-keyword">if</span> current_count &lt; self._max_requests:
+            <span class="token-comment"># Add this request</span>
+            pipe = self._redis.pipeline()
+            pipe.zadd(key, {str(now): now})
+            pipe.expire(key, self._window + <span class="token-number">1</span>)
+            pipe.execute()
+            <span class="token-keyword">return</span> {
+                <span class="token-string">"allowed"</span>: <span class="token-keyword">True</span>,
+                <span class="token-string">"remaining"</span>: self._max_requests - current_count - <span class="token-number">1</span>,
+                <span class="token-string">"reset_at"</span>: now + self._window
+            }
+
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"allowed"</span>: <span class="token-keyword">False</span>,
+            <span class="token-string">"remaining"</span>: <span class="token-number">0</span>,
+            <span class="token-string">"retry_after"</span>: self._window - (now - window_start)
+        }</code></pre>
+
+        <h2>HTTP Rate Limit Headers</h2>
+        <p>APIs communicate rate limit status via standard HTTP headers:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Header</th>
+                        <th>Meaning</th>
+                        <th>Example Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>X-RateLimit-Limit</code></td>
+                        <td>Maximum requests allowed in window</td>
+                        <td>100</td>
+                    </tr>
+                    <tr>
+                        <td><code>X-RateLimit-Remaining</code></td>
+                        <td>Requests remaining in current window</td>
+                        <td>67</td>
+                    </tr>
+                    <tr>
+                        <td><code>X-RateLimit-Reset</code></td>
+                        <td>Unix timestamp when window resets</td>
+                        <td>1716739200</td>
+                    </tr>
+                    <tr>
+                        <td><code>Retry-After</code></td>
+                        <td>Seconds to wait before retrying (on 429)</td>
+                        <td>30</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Fixed Window Boundary Problem</h2>
+        <p>The fixed window algorithm has a well-known flaw: a client can make 2x the limit at the boundary of two windows. If the limit is 100/minute and a client sends 100 requests at 0:59 and 100 at 1:00, they&rsquo;ve made 200 requests in 2 seconds while staying within the per-window limit.</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Fixed Window Count</th>
+                        <th>Sliding Window Count</th>
+                        <th>Allowed?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0:59.500</td>
+                        <td>100 (window 1)</td>
+                        <td>100 (last 60s)</td>
+                        <td>Fixed: Yes; Sliding: No</td>
+                    </tr>
+                    <tr>
+                        <td>1:00.000</td>
+                        <td>0 (new window!)</td>
+                        <td>100 (last 60s)</td>
+                        <td>Fixed: Yes; Sliding: No</td>
+                    </tr>
+                    <tr>
+                        <td>1:00.500</td>
+                        <td>100 (window 2)</td>
+                        <td>100 (last 60s)</td>
+                        <td>Fixed: Yes; Sliding: No</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Stripe API:</strong> 100 requests per second in live mode, 25 in test mode. Uses token bucket with per-key limits. Returns <code>429 Too Many Requests</code> with a <code>Retry-After</code> header. Differentiates between read and write rate limits.</p>
+            <p><strong>GitHub API:</strong> 5,000 requests per hour for authenticated users, 60 for unauthenticated. Uses fixed window with <code>X-RateLimit-*</code> headers. GraphQL API counts &ldquo;points&rdquo; per query complexity rather than raw request count.</p>
+            <p><strong>Cloudflare:</strong> Offers rate limiting at the edge (CDN layer) before requests reach origin servers. Supports IP-based, path-based, and header-based rules with configurable responses (block, challenge, JS challenge).</p>
+            <p><strong>nginx:</strong> Built-in <code>limit_req</code> module uses leaky bucket. Configured per-zone with burst capacity: <code>limit_req zone=api burst=20 nodelay;</code> allows 20 excess requests to be served immediately before enforcing the rate.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Token bucket is the most versatile &mdash; allows controlled bursts while enforcing average rate</li>
+                <li>Sliding window prevents the boundary burst problem but costs more memory</li>
+                <li>Distributed rate limiting requires centralized state (Redis, Memcached)</li>
+                <li>Always return rate limit headers so clients can self-regulate</li>
+                <li>Differentiate limits by tier (free/paid), endpoint (/search vs /profile), and method (GET vs POST)</li>
+                <li>Rate limiting protects against both abuse and accidental thundering herds</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of rate limiting as a water faucet with a meter. The meter counts gallons used this hour. Once you hit your allocation, the faucet shuts off until the meter resets. VIP customers get a bigger allocation. The token bucket adds a small tank (burst capacity) &mdash; you can use water quickly from the tank, but it refills slowly.</p>
+            <div class="model-visual">
+                <pre>
+  TOKEN BUCKET:
+                    ┌─────────┐
+  Refill rate ─────►│ ○ ○ ○ ○ │  max_tokens = 10
+  (tokens/sec)      │ ○ ○ ○ ○ │
+                    │ ○ ○     │  current = 8
+                    └────┬────┘
+                         │ consume(1)
+                         ▼
+              ┌──────────────────┐
+              │    Request OK    │  tokens left: 7
+              └──────────────────┘
+
+  SLIDING WINDOW:
+  ─────────────────────────────────────────► time
+  │  window (60s)                          │
+  │  [req][req][req]...[req]  count: 98    │
+  │                                        │
+  │  New request? 98 &lt; 100 ──► ALLOWED     │
+  ─────────────────────────────────────────►
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Rate limiting only at the application layer:</strong> If your rate limiter runs inside your app server, a DDoS attack still saturates your network and load balancer. Apply rate limiting at the edge (CDN, API gateway, load balancer) as the first line of defense.</li>
+                <li><strong>Using fixed windows without understanding boundary bursts:</strong> A &ldquo;100 requests per minute&rdquo; fixed window actually allows 200 requests in a 2-second span across window boundaries. Use sliding window or token bucket for accurate enforcement.</li>
+                <li><strong>Not differentiating by operation cost:</strong> A <code>GET /user</code> and a <code>POST /search?query=complex</code> have vastly different server costs. Use weighted rate limiting where expensive operations consume more tokens than cheap reads.</li>
+                <li><strong>Race conditions in distributed limiters:</strong> A naive &ldquo;read count, check, increment&rdquo; pattern in Redis allows race conditions. Always use atomic operations (Lua scripts or Redis transactions) for check-and-increment.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Implement all four algorithms:</strong> Build TokenBucket, LeakyBucket, FixedWindow, and SlidingWindow rate limiters. Benchmark each with a burst of 1000 requests and compare which ones allow boundary exploits.</li>
+                <li><strong>Build a multi-tier rate limiter:</strong> Create a limiter that enforces different rates per tier (free: 10/min, basic: 100/min, pro: 1000/min). Use a decorator that reads the user&rsquo;s tier from a request context.</li>
+                <li><strong>Distributed rate limiter with Redis:</strong> Implement the Redis sorted-set pattern. Test with multiple &ldquo;servers&rdquo; (threads) hitting the same Redis instance and verify the global limit is respected.</li>
+                <li><strong>Rate limit HTTP middleware:</strong> Build an HTTP middleware (Flask/FastAPI) that returns proper 429 responses with <code>X-RateLimit-*</code> headers. Test with concurrent requests and verify headers are accurate.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="36-circuit-breaker.html" class="prev">&larr; Circuit Breaker</a>
+            <a href="38-throttling.html" class="next">Throttling &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 11: Troubleshooting — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> Troubleshooting</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 11: Troubleshooting & Best Practices</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Common errors, their solutions, hyperparameter tuning guide, monitoring with W&B/TensorBoard, and a comprehensive best practices checklist.</p>
+
+            <h2 id="common-errors">🐛 Common Errors & Fixes</h2>
+            
+            <h3>Out of Memory (OOM) Errors</h3>
+            <div class="collapsible open">
+                <div class="collapsible-header">💥 CUDA out of memory</div>
+                <div class="collapsible-content">
+                    <pre><code># ERROR:
+# torch.cuda.OutOfMemoryError: CUDA out of memory. 
+# Tried to allocate 2.00 GiB (GPU 0; 24.00 GiB total capacity)
+
+# FIXES (apply in order until resolved):
+
+# Fix 1: Reduce batch size
+per_device_train_batch_size = 1  # Minimum
+gradient_accumulation_steps = 16  # Increase to maintain effective batch
+
+# Fix 2: Enable gradient checkpointing
+gradient_checkpointing = True  # Saves ~60% activation memory
+
+# Fix 3: Reduce sequence length
+max_seq_length = 1024  # Down from 4096
+
+# Fix 4: Lower LoRA rank
+r = 8  # Down from 32 or 64
+
+# Fix 5: Use CPU offloading
+optim = "paged_adamw_8bit"  # 8-bit optimizer
+# Or in DeepSpeed config:
+# "offload_optimizer": {"device": "cpu"}
+
+# Fix 6: Clear CUDA cache before training
+import torch
+torch.cuda.empty_cache()
+import gc
+gc.collect()
+
+# DEBUGGING: See what's using memory
+print(torch.cuda.memory_summary())  # Detailed breakdown</code></pre>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">💥 RuntimeError: Expected all tensors on same device</div>
+                <div class="collapsible-content">
+                    <pre><code># ERROR:
+# RuntimeError: Expected all tensors to be on the same device, 
+# but found at least two devices, cuda:0 and cpu
+
+# CAUSE: Mixed device placement with device_map="auto"
+
+# Fix 1: Ensure LoRA targets are on same device
+# This often happens with prepare_model_for_kbit_training
+model = prepare_model_for_kbit_training(model)  # Must be called BEFORE adding LoRA
+
+# Fix 2: Force single GPU
+device_map = {"": 0}  # Force everything to GPU 0
+
+# Fix 3: For multi-GPU, use device_map="auto" with proper offloading
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map="auto",
+    max_memory={0: "20GB", 1: "20GB", "cpu": "30GB"}
+)</code></pre>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">💥 ValueError: Tokenizer/Model mismatch</div>
+                <div class="collapsible-content">
+                    <pre><code># ERROR:
+# ValueError: The model's chat template expects certain special tokens
+# OR: Index out of range in embedding layer
+
+# CAUSE: Tokenizer has more tokens than model's embedding layer
+
+# Fix: Always load tokenizer from SAME path as model
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)  # Same as model!
+
+# If you added special tokens during training:
+# model.resize_token_embeddings(len(tokenizer))  # Match sizes
+
+# For Gemma specifically — DON'T add new tokens unless necessary
+# Gemma already has comprehensive token coverage</code></pre>
+                </div>
+            </div>
+
+            <h3>Training Issues</h3>
+            
+            <div class="collapsible">
+                <div class="collapsible-header">📉 Loss is NaN or exploding</div>
+                <div class="collapsible-content">
+                    <pre><code># SYMPTOMS: loss becomes NaN or spikes to very high values
+
+# Fix 1: Lower learning rate
+learning_rate = 1e-5  # Try 10× lower
+
+# Fix 2: Lower max_grad_norm
+max_grad_norm = 0.5  # Down from 1.0
+
+# Fix 3: Use BF16 instead of FP16
+bf16 = True   # ✅ More stable
+fp16 = False  # ❌ Can cause NaN with large models
+
+# Fix 4: Increase warmup
+warmup_ratio = 0.1  # Up from 0.03
+
+# Fix 5: Check for bad data
+# NaN can be caused by empty strings or corrupted examples
+def filter_bad_examples(dataset):
+    return dataset.filter(lambda x: 
+        len(x["messages"]) > 0 and
+        all(len(m["content"]) > 0 for m in x["messages"])
+    )
+
+# Fix 6: Disable Flash Attention (for debugging)
+attn_implementation = "eager"  # Instead of "flash_attention_2"</code></pre>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">📉 Loss not decreasing / model not learning</div>
+                <div class="collapsible-content">
+                    <pre><code># SYMPTOMS: Loss stays flat or decreases very slowly
+
+# Fix 1: Learning rate too LOW — increase it
+learning_rate = 2e-4  # For QLoRA SFT, this is usually good
+
+# Fix 2: LoRA rank too LOW — model can't learn enough
+r = 64  # Up from 16
+
+# Fix 3: Wrong target modules — make sure you're training the right layers
+target_modules = [
+    "q_proj", "k_proj", "v_proj", "o_proj",  # Attention
+    "gate_proj", "up_proj", "down_proj",      # MLP
+]
+
+# Fix 4: Data issue — verify your data is being tokenized correctly
+# Print what the model actually sees:
+example = dataset[0]
+tokens = tokenizer.apply_chat_template(example["messages"], return_tensors="pt")
+print(tokenizer.decode(tokens[0][:200]))  # Check it looks right
+
+# Fix 5: assistant_only_loss issue — make sure loss mask is correct
+# If loss is computed on the full sequence (including prompts),
+# it might be "learning" but not on the right tokens
+# Set: assistant_only_loss=True in SFTConfig</code></pre>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">📉 Model generating gibberish after training</div>
+                <div class="collapsible-content">
+                    <pre><code># SYMPTOMS: Model outputs random tokens or repetitive nonsense
+
+# CAUSE 1: Overfitting — trained too long
+# Fix: Reduce epochs (1-3 for SFT), use early stopping
+num_train_epochs = 1  # Start with 1 epoch
+
+# CAUSE 2: Learning rate too high — catastrophic forgetting
+# Fix: Lower LR significantly
+learning_rate = 5e-5  # Try much lower
+
+# CAUSE 3: Wrong chat template during inference
+# Fix: Use the EXACT same template as training
+messages = [
+    {"role": "system", "content": "..."},
+    {"role": "user", "content": "..."}
+]
+inputs = tokenizer.apply_chat_template(
+    messages, 
+    add_generation_prompt=True,  # IMPORTANT: adds model's turn start
+    return_tensors="pt"
+)
+
+# CAUSE 4: LoRA adapter not loaded correctly
+# Fix: Verify adapter loads
+from peft import PeftModel
+model = PeftModel.from_pretrained(base_model, adapter_path)
+print(model.print_trainable_parameters())  # Should show LoRA params
+
+# CAUSE 5: Quantization issue during inference
+# Fix: Match training quantization
+# If trained in 4-bit, inference should also use 4-bit (or merge and use BF16)</code></pre>
+                </div>
+            </div>
+
+            <h3>DPO-Specific Issues</h3>
+            
+            <div class="collapsible">
+                <div class="collapsible-header">📉 DPO rewards/accuracies stuck at 0.5</div>
+                <div class="collapsible-content">
+                    <pre><code># SYMPTOMS: Model not learning preferences — accuracy stays at 50%
+
+# Fix 1: Data quality — chosen and rejected must be CLEARLY different
+# Bad: slight wording differences
+# Good: one is accurate with citations, other is wrong/shallow
+
+# Fix 2: Beta too HIGH — model can't deviate from reference
+beta = 0.05  # Lower from 0.1 (allows more change)
+
+# Fix 3: Learning rate too LOW for DPO
+learning_rate = 1e-6  # Try slightly higher (but still conservative)
+
+# Fix 4: Prompt format mismatch
+# The prompt in DPO data must match how the model was trained in SFT
+# Include the same system prompt used during SFT
+
+# Fix 5: Check that chosen responses are actually better
+# Random spot-check: read 20 examples, verify chosen > rejected</code></pre>
+                </div>
+            </div>
+
+            <h2 id="hyperparameters">🎛️ Hyperparameter Tuning Guide</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hyperparameter</th>
+                        <th>CPT</th>
+                        <th>SFT</th>
+                        <th>DPO</th>
+                        <th>GRPO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Learning Rate</strong></td>
+                        <td>2e-4</td>
+                        <td>1e-4</td>
+                        <td>5e-7</td>
+                        <td>1e-6</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Epochs</strong></td>
+                        <td>1-2</td>
+                        <td>2-3</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA Rank (r)</strong></td>
+                        <td>64</td>
+                        <td>32</td>
+                        <td>16</td>
+                        <td>16</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA Alpha</strong></td>
+                        <td>32</td>
+                        <td>16</td>
+                        <td>16</td>
+                        <td>16</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Batch Size (effective)</strong></td>
+                        <td>32-64</td>
+                        <td>16-32</td>
+                        <td>8-16</td>
+                        <td>8</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Warmup</strong></td>
+                        <td>3-5%</td>
+                        <td>5%</td>
+                        <td>10%</td>
+                        <td>10%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Max Seq Length</strong></td>
+                        <td>2048-4096</td>
+                        <td>4096</td>
+                        <td>2048</td>
+                        <td>1024 (completion)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scheduler</strong></td>
+                        <td>Cosine</td>
+                        <td>Cosine</td>
+                        <td>Cosine</td>
+                        <td>Cosine</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Weight Decay</strong></td>
+                        <td>0.01</td>
+                        <td>0.01</td>
+                        <td>0.01</td>
+                        <td>0.01</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Beta (DPO/GRPO)</strong></td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>0.1</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="monitoring">📊 Monitoring Training with W&B</h2>
+            
+            <pre><code>"""
+Setting up Weights & Biases for training monitoring.
+Gives you real-time loss curves, gradient norms, learning rates, etc.
+"""
+import wandb
+
+# 1. Login (one-time)
+# wandb login YOUR_API_KEY
+
+# 2. Training args include W&B config
+training_args = SFTConfig(
+    ...
+    report_to="wandb",
+    run_name="gemma-scripture-sft-v2",  # Descriptive name
+    
+    # Optional: group related runs
+    # Set via environment variable:
+    # os.environ["WANDB_PROJECT"] = "hindu-scripture-model"
+    # os.environ["WANDB_ENTITY"] = "your-team"
+)
+
+# 3. Key metrics to watch during training:
+
+# FOR CPT:
+# - train/loss: Should decrease steadily (target: < 2.0 for domain text)
+# - eval/loss: Should track train loss (gap = overfitting)
+# - train/learning_rate: Verify warmup + cosine schedule
+
+# FOR SFT:
+# - train/loss: Should decrease to 0.5-1.5 range
+# - eval/loss: Watch for divergence from train (overfitting signal)
+# - generation_samples: Qualitative check every N steps
+
+# FOR DPO:
+# - rewards/margins: Should INCREASE (chosen - rejected gap)
+# - rewards/accuracies: Should be > 0.7 by end
+# - train/loss: Should decrease
+
+# FOR GRPO:
+# - reward/mean: Average reward should increase
+# - reward/std: Should decrease (model converging on good outputs)
+# - kl_divergence: Should stay bounded (not diverging too far)
+
+# 4. Custom logging
+class WandbGenerationCallback:
+    """Log sample generations to W&B for qualitative monitoring."""
+    
+    def __init__(self, tokenizer, test_prompts, log_every=500):
+        self.tokenizer = tokenizer
+        self.test_prompts = test_prompts
+        self.log_every = log_every
+    
+    def on_step_end(self, args, state, control, model=None, **kwargs):
+        if state.global_step % self.log_every != 0:
+            return
+        
+        table = wandb.Table(columns=["step", "prompt", "generation"])
+        
+        model.eval()
+        for prompt in self.test_prompts[:5]:
+            # Generate and log...
+            messages = [{"role": "user", "content": prompt}]
+            inputs = self.tokenizer.apply_chat_template(
+                messages, add_generation_prompt=True, return_tensors="pt"
+            ).to(model.device)
+            
+            import torch
+            with torch.no_grad():
+                outputs = model.generate(inputs, max_new_tokens=200, do_sample=False)
+            response = self.tokenizer.decode(outputs[0][inputs.shape[-1]:], skip_special_tokens=True)
+            
+            table.add_data(state.global_step, prompt, response)
+        
+        wandb.log({"generations": table}, step=state.global_step)
+        model.train()</code></pre>
+
+            <h2 id="checklist">✅ Production Readiness Checklist</h2>
+            
+            <div class="callout callout-success">
+                <div class="callout-title">Pre-Training Checklist</div>
+                <ul>
+                    <li>☐ Data cleaned and deduplicated</li>
+                    <li>☐ Data split into train/eval (no leakage)</li>
+                    <li>☐ Tested training script with 100 examples first (dry run)</li>
+                    <li>☐ W&B project set up for monitoring</li>
+                    <li>☐ GPU memory estimated and verified</li>
+                    <li>☐ Checkpoint saving configured (don't lose progress)</li>
+                </ul>
+            </div>
+
+            <div class="callout callout-success">
+                <div class="callout-title">Post-Training Checklist</div>
+                <ul>
+                    <li>☐ Eval loss lower than starting point</li>
+                    <li>☐ No training artifacts (repetition, mode collapse)</li>
+                    <li>☐ Generated outputs pass manual quality check (10+ examples)</li>
+                    <li>☐ Domain benchmark accuracy improved</li>
+                    <li>☐ Citation accuracy > 80%</li>
+                    <li>☐ No disrespectful or harmful outputs in stress testing</li>
+                    <li>☐ Performance in other languages (Hindi) maintained</li>
+                </ul>
+            </div>
+
+            <div class="callout callout-success">
+                <div class="callout-title">Pre-Deployment Checklist</div>
+                <ul>
+                    <li>☐ Model merged and tested (inference without errors)</li>
+                    <li>☐ Quantized version produces acceptable quality</li>
+                    <li>☐ API endpoint responds correctly</li>
+                    <li>☐ Rate limiting configured</li>
+                    <li>☐ Input validation (max length, encoding)</li>
+                    <li>☐ Monitoring/alerting set up</li>
+                    <li>☐ Fallback behavior for errors</li>
+                    <li>☐ Model card / documentation written</li>
+                </ul>
+            </div>
+
+            <h2 id="resources">📚 Further Resources</h2>
+            <ul>
+                <li><strong>TRL Documentation</strong>: https://huggingface.co/docs/trl</li>
+                <li><strong>PEFT Documentation</strong>: https://huggingface.co/docs/peft</li>
+                <li><strong>Gemma Documentation</strong>: https://ai.google.dev/gemma</li>
+                <li><strong>DeepSpeed</strong>: https://www.deepspeed.ai/</li>
+                <li><strong>vLLM</strong>: https://docs.vllm.ai/</li>
+                <li><strong>Axolotl</strong> (alternative training framework): https://github.com/OpenAccess-AI-Collective/axolotl</li>
+                <li><strong>Unsloth</strong> (2x faster fine-tuning): https://github.com/unslothai/unsloth</li>
+            </ul>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🎉 Congratulations!</div>
+                <p>You've completed the full fine-tuning guide! You now have the knowledge to:</p>
+                <ol>
+                    <li>Collect and process Hindu scripture data</li>
+                    <li>Format data for CPT, SFT, and DPO</li>
+                    <li>Train with QLoRA on consumer or cloud GPUs</li>
+                    <li>Align the model using DPO or GRPO with custom rewards</li>
+                    <li>Evaluate thoroughly with automated + human metrics</li>
+                    <li>Deploy with quantization and serve via API</li>
+                </ol>
+                <p><strong>Next step:</strong> Start with a small experiment (4B model, 1000 SFT examples) and iterate from there!</p>
+            </div>
+
+            <nav class="page-nav">
+                <a href="10-deployment.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Deployment</span>
+                </a>
+                <a href="index.html" style="text-align: right;">
+                    <span class="nav-label">Back to →</span>
+                    <span class="nav-title">Home</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

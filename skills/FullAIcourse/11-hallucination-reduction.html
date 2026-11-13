@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hallucination Reduction — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 2</a> <span>›</span> Hallucination Reduction</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Hallucination Reduction & Grounding</h1>
+                <p>AI models confidently say wrong things. This chapter covers why hallucination happens, how to detect it, and production techniques to minimize it — the #1 problem in deployed AI systems.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Hallucination = a confident person who makes stuff up.</strong> Imagine asking someone a question and they always give an answer — even when they have no idea. They never say "I don't know." They just confidently invent plausible-sounding facts.</p>
+                <p><strong>Grounding = requiring receipts.</strong> "Don't just tell me the answer — show me WHERE you found it." Like a student who must cite sources for every claim.</p>
+            </div>
+
+            <h2 id="what">What Is Hallucination?</h2>
+
+            <p><strong>Hallucination</strong> = when a model generates text that is fluent and confident but factually incorrect or completely fabricated.</p>
+
+            <h3>Types of Hallucination:</h3>
+            <table>
+                <thead><tr><th>Type</th><th>Example</th><th>Danger Level</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Factual</strong></td><td>"The Eiffel Tower is in London" (completely wrong fact)</td><td>High</td></tr>
+                    <tr><td><strong>Fabrication</strong></td><td>Inventing a research paper that doesn't exist</td><td>Very High</td></tr>
+                    <tr><td><strong>Conflation</strong></td><td>Mixing details from two different topics together</td><td>Medium</td></tr>
+                    <tr><td><strong>Outdated</strong></td><td>"The current president is..." (from training data cutoff)</td><td>Medium</td></tr>
+                    <tr><td><strong>Numeric</strong></td><td>Wrong statistics, dates, prices, measurements</td><td>High</td></tr>
+                    <tr><td><strong>Attribution</strong></td><td>"According to [source]..." when source doesn't say that</td><td>Very High</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="why">Why Models Hallucinate</h2>
+
+            <ul>
+                <li><strong>They predict likely tokens, not true tokens.</strong> "Paris is the capital of..." → model predicts next likely word based on training patterns.</li>
+                <li><strong>No connection to reality.</strong> Models don't "look up" facts. They pattern-match from training data.</li>
+                <li><strong>Training on the internet.</strong> Internet has wrong information too. The model learned some of it.</li>
+                <li><strong>Pressure to always answer.</strong> Models are trained to be helpful, not to say "I don't know."</li>
+                <li><strong>Rare topics = more hallucination.</strong> Less training data on a topic = model fills gaps with plausible guesses.</li>
+            </ul>
+
+            <h2 id="techniques">Reduction Techniques</h2>
+
+            <h3>1. RAG (Retrieval-Augmented Generation)</h3>
+            <p>The most effective technique. Give the model actual documents to reference.</p>
+            <pre><code><span class="token-comment"># RAG: Ground answers in retrieved documents</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI()
+
+<span class="token-keyword">def</span> <span class="token-function">answer_with_rag</span>(question: str, retrieved_docs: list[str]) -> str:
+    <span class="token-string">"""Answer a question using only the provided documents."""</span>
+
+    context = <span class="token-string">"\n\n---\n\n"</span>.join(retrieved_docs)
+
+    response = client.chat.completions.create(
+        model=<span class="token-string">"gpt-4o"</span>,
+        messages=[
+            {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"""You are a helpful assistant. Answer questions based ONLY on the provided context.
+
+RULES:
+- If the answer is in the context, provide it with a citation [Doc X].
+- If the answer is NOT in the context, say "I don't have enough information to answer this."
+- NEVER make up information not found in the context.
+- Quote relevant passages when possible."""</span>},
+            {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"Context:\n{context}\n\nQuestion: {question}"</span>}
+        ],
+        temperature=<span class="token-number">0.1</span>  <span class="token-comment"># Low temperature = less creative = less hallucination</span>
+    )
+    <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.content
+
+<span class="token-comment"># Example usage</span>
+docs = [
+    <span class="token-string">"Our refund policy allows returns within 30 days of purchase."</span>,
+    <span class="token-string">"Shipping takes 3-5 business days for domestic orders."</span>
+]
+answer = answer_with_rag(<span class="token-string">"What is the refund policy?"</span>, docs)
+<span class="token-builtin">print</span>(answer)</code></pre>
+
+            <h3>2. Prompt Engineering for Factuality</h3>
+            <pre><code><span class="token-comment"># Prompting techniques that reduce hallucination</span>
+
+factual_system_prompt = <span class="token-string">"""You are a factual assistant. Follow these rules strictly:
+
+1. ONLY state facts you are highly confident about.
+2. If you're unsure, say "I'm not certain about this, but..."
+3. If you don't know, say "I don't have reliable information about this."
+4. Distinguish between facts and opinions clearly.
+5. When providing statistics or dates, qualify with "approximately" if unsure.
+6. Never invent citations, URLs, or paper titles.
+7. If asked about events after your training cutoff, state your limitations."""</span>
+
+<span class="token-comment"># Chain-of-thought prompting (reduces hallucination by making model "think")</span>
+cot_prompt = <span class="token-string">"""Before answering, think through this step by step:
+1. What do I know about this topic from my training?
+2. How confident am I (high/medium/low)?  
+3. Are there aspects I'm uncertain about?
+
+Then provide your answer, clearly marking any uncertain parts."""</span></code></pre>
+
+            <h3>3. Self-Consistency Check</h3>
+            <pre><code><span class="token-comment"># Generate multiple answers and check if they agree</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">from</span> collections <span class="token-keyword">import</span> Counter
+
+client = OpenAI()
+
+<span class="token-keyword">def</span> <span class="token-function">self_consistency_check</span>(question: str, n_samples: int = <span class="token-number">5</span>) -> dict:
+    <span class="token-string">"""Generate multiple answers and check agreement."""</span>
+    answers = []
+
+    <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> <span class="token-builtin">range</span>(n_samples):
+        response = client.chat.completions.create(
+            model=<span class="token-string">"gpt-4o-mini"</span>,
+            messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: question}],
+            temperature=<span class="token-number">0.7</span>  <span class="token-comment"># Some variation to get different answers</span>
+        )
+        answers.append(response.choices[<span class="token-number">0</span>].message.content)
+
+    <span class="token-comment"># Check agreement using another LLM call</span>
+    check_prompt = <span class="token-string">f"""Given these {n_samples} answers to the question "{question}":
+
+{chr(10).join(f'Answer {i+1}: {a}' for i, a in enumerate(answers))}
+
+Do all answers agree on the key facts? 
+Respond with:
+- CONSISTENT: if all answers agree on the main facts
+- INCONSISTENT: if answers contradict each other (likely hallucination)
+- PARTIALLY CONSISTENT: if they mostly agree but differ on details"""</span>
+
+    check = client.chat.completions.create(
+        model=<span class="token-string">"gpt-4o-mini"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: check_prompt}],
+        temperature=<span class="token-number">0</span>
+    )
+
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"answers"</span>: answers,
+        <span class="token-string">"consistency"</span>: check.choices[<span class="token-number">0</span>].message.content,
+        <span class="token-string">"best_answer"</span>: answers[<span class="token-number">0</span>]  <span class="token-comment"># Use first answer if consistent</span>
+    }
+
+result = self_consistency_check(<span class="token-string">"When was the Treaty of Westphalia signed?"</span>)
+<span class="token-builtin">print</span>(result[<span class="token-string">"consistency"</span>])</code></pre>
+
+            <h3>4. Hallucination Detection</h3>
+            <pre><code><span class="token-comment"># Detect if a model response contains hallucinations</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI()
+
+<span class="token-keyword">def</span> <span class="token-function">detect_hallucination</span>(question: str, answer: str, context: str = <span class="token-string">""</span>) -> dict:
+    <span class="token-string">"""Check if an answer contains hallucinated content."""</span>
+
+    prompt = <span class="token-string">f"""Analyze this AI response for potential hallucinations.
+
+Question: {question}
+AI Response: {answer}
+{"Reference Context: " + context if context else "No reference context provided."}
+
+Check for:
+1. Factual claims that seem incorrect or unverifiable
+2. Invented names, dates, statistics, or citations
+3. Claims that contradict the provided context
+4. Overly specific details that seem fabricated (exact percentages, fake URLs)
+
+Rate the response:
+- RELIABLE: No obvious hallucinations detected
+- SUSPICIOUS: Contains claims that may be hallucinated  
+- HALLUCINATED: Contains clearly false or fabricated information
+
+Provide your rating and explain which specific claims are concerning."""</span>
+
+    response = client.chat.completions.create(
+        model=<span class="token-string">"gpt-4o"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: prompt}],
+        temperature=<span class="token-number">0</span>
+    )
+
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"analysis"</span>: response.choices[<span class="token-number">0</span>].message.content,
+        <span class="token-string">"question"</span>: question,
+        <span class="token-string">"answer"</span>: answer
+    }
+
+<span class="token-comment"># Example: Check a potentially hallucinated response</span>
+result = detect_hallucination(
+    question=<span class="token-string">"Who invented the telephone?"</span>,
+    answer=<span class="token-string">"The telephone was invented by Alexander Graham Bell in 1876, based on his earlier research published in the Journal of Acoustic Sciences (1874)."</span>
+)
+<span class="token-builtin">print</span>(result[<span class="token-string">"analysis"</span>])
+<span class="token-comment"># The "Journal of Acoustic Sciences" doesn't exist — this is a hallucination!</span></code></pre>
+
+            <h2 id="prevention">Prevention Strategies Summary</h2>
+
+            <table>
+                <thead><tr><th>Strategy</th><th>Effectiveness</th><th>Implementation Effort</th><th>When to Use</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>RAG (grounding in documents)</strong></td><td>Very High</td><td>Medium</td><td>When you have a knowledge base</td></tr>
+                    <tr><td><strong>Low temperature (0.0-0.3)</strong></td><td>Medium</td><td>Zero (just a parameter)</td><td>Always for factual tasks</td></tr>
+                    <tr><td><strong>System prompt rules</strong></td><td>Medium</td><td>Low</td><td>Always</td></tr>
+                    <tr><td><strong>Self-consistency</strong></td><td>High</td><td>Medium (multiple calls)</td><td>High-stakes answers</td></tr>
+                    <tr><td><strong>Citation requirements</strong></td><td>High</td><td>Low</td><td>When sources are available</td></tr>
+                    <tr><td><strong>Fine-tuning on factual data</strong></td><td>High</td><td>High</td><td>Domain-specific accuracy needed</td></tr>
+                    <tr><td><strong>Post-generation fact-check</strong></td><td>Very High</td><td>High (extra API call)</td><td>Critical applications</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>RAG is mandatory for production</strong> — No serious enterprise deploys LLMs without grounding in real data.</li>
+                    <li><strong>Temperature 0.0-0.3 for factual tasks</strong> — Only use higher temperature for creative generation.</li>
+                    <li><strong>Dual LLM pattern</strong> — One model generates, another validates. Catches most hallucinations.</li>
+                    <li><strong>"I don't know" training</strong> — Fine-tune your model to say "I don't know" by including examples in training data.</li>
+                    <li><strong>Guardrails</strong> — Tools like NeMo Guardrails add safety layers between LLM and user.</li>
+                    <li><strong>Human-in-the-loop</strong> — For high-stakes domains (medical, legal), always have human review before action.</li>
+                    <li><strong>Structured output</strong> — JSON mode with schemas prevents many hallucination types (e.g., invalid dates).</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Hallucination</strong> = model confidently outputs incorrect/fabricated information</li>
+                    <li>Happens because models predict likely text, not true text</li>
+                    <li><strong>RAG</strong> is the most effective prevention (ground in real documents)</li>
+                    <li><strong>Low temperature + strict system prompt</strong> = easy wins</li>
+                    <li><strong>Self-consistency + fact-checking</strong> = catch remaining issues</li>
+                    <li>For production: combine multiple techniques in layers</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    Hallucination Prevention Stack:<br>
+                    Layer 1: RAG (ground in documents)<br>
+                    Layer 2: Low temperature + structured output<br>
+                    Layer 3: System prompt with "say I don't know" rules<br>
+                    Layer 4: Self-consistency check (multiple generations)<br>
+                    Layer 5: Post-generation fact-checking LLM<br>
+                    Layer 6: Human review (for critical decisions)
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Trusting model output as fact</strong> — NEVER deploy an LLM that makes claims without verification in high-stakes domains.</li>
+                    <li><strong>Using high temperature for factual queries</strong> — Temperature 0.7+ massively increases hallucination rate.</li>
+                    <li><strong>Thinking bigger models don't hallucinate</strong> — GPT-4 hallucinates less but still hallucinates. All models do.</li>
+                    <li><strong>Not testing for hallucination</strong> — Include "unanswerable" questions in your eval set to test if the model says "I don't know."</li>
+                    <li><strong>Skipping RAG because "the model should know this"</strong> — Even if trained on the info, retrieval is more reliable than memory.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build a Hallucination-Resistant System</h4>
+                <ol>
+                    <li>Ask GPT-4o-mini 5 factual questions about your company/school — identify any hallucinations</li>
+                    <li>Now implement the RAG function above with real document context and re-ask the same questions</li>
+                    <li>Compare accuracy: bare LLM vs RAG-augmented</li>
+                    <li>Implement the self-consistency check for a factual question</li>
+                    <li>Build the hallucination detector and test it on known hallucinated text</li>
+                    <li><strong>Bonus:</strong> Create a "grounded Q&A" system that always cites its sources and refuses to answer when docs don't contain the answer</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="10-finetuning-basics.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Fine-Tuning Basics</span>
+                </a>
+                <a href="12-lora-qlora.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">LoRA & QLoRA</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

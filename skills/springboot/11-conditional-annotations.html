@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditional Annotations Deep Dive - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html" class="active"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html"><span class="nav-number">14</span> Profiles & Environment</a></li>
+            <li><a href="15-custom-auto-configuration.html"><span class="nav-number">15</span> Custom Auto-Configuration</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Auto-Configuration → Conditional Annotations Deep Dive</div>
+        <div class="topic-number">Topic 11 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Conditional Annotations Deep Dive</h1>
+            <p class="subtitle-description">The gatekeepers of bean creation — how Spring evaluates conditions to decide whether a bean should exist in the current environment.</p>
+
+            <div class="tags">
+                <span class="tag tag-intermediate">intermediate</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-concept">concept</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🚦 The Bouncer Analogy</div>
+                <p>Conditional annotations are like bouncers at different VIP sections of a club. Each bouncer checks different criteria: one checks your outfit (<code>@ConditionalOnClass</code> — do you have the right library?), another checks the guest list (<code>@ConditionalOnBean</code> — is a required bean already registered?), another checks your invitation code (<code>@ConditionalOnProperty</code> — is the right config set?). A bean only gets "in" if ALL its bouncers say yes. And crucially — the class-level bouncer checks first: if you fail at the door, none of the room-level bouncers even look at you.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: The Complete Conditional Family -->
+            <!-- ============================================ -->
+            <h2>1. The Complete @Conditional Family</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Annotation</th>
+                        <th>Condition Checks</th>
+                        <th>Typical Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>@ConditionalOnClass</code></td>
+                        <td>Class exists on classpath (checked via ASM, not Class.forName)</td>
+                        <td>Gate entire auto-config on library presence</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnMissingClass</code></td>
+                        <td>Class does NOT exist on classpath</td>
+                        <td>Provide fallback when library absent</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnBean</code></td>
+                        <td>Bean of type/name already registered</td>
+                        <td>Add supplemental beans when primary exists</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnMissingBean</code></td>
+                        <td>Bean of type/name NOT registered</td>
+                        <td>Provide default that user can override</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnProperty</code></td>
+                        <td>Property has specific value (or exists/not exists)</td>
+                        <td>Feature toggles, environment-specific beans</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnResource</code></td>
+                        <td>Resource (file) exists on classpath</td>
+                        <td>Load config only when config file present</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnWebApplication</code></td>
+                        <td>Running in a web context (SERVLET or REACTIVE)</td>
+                        <td>Web-only beans (filters, interceptors)</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnNotWebApplication</code></td>
+                        <td>NOT running in a web context</td>
+                        <td>CLI or batch-only beans</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnExpression</code></td>
+                        <td>SpEL expression evaluates to true</td>
+                        <td>Complex conditional logic</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnJava</code></td>
+                        <td>JVM version matches range</td>
+                        <td>Version-specific optimizations</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnCloudPlatform</code></td>
+                        <td>Running on specific cloud (K8s, Cloud Foundry, etc.)</td>
+                        <td>Cloud-native integrations</td>
+                    </tr>
+                    <tr>
+                        <td><code>@ConditionalOnSingleCandidate</code></td>
+                        <td>Exactly one bean of type (or one @Primary)</td>
+                        <td>Avoid ambiguity errors</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: The Condition Interface -->
+            <!-- ============================================ -->
+            <h2>2. The Condition Interface & SpringBootCondition</h2>
+
+            <p>Every conditional annotation is backed by a class implementing the <code><span class="token-type">Condition</span></code> interface:</p>
+
+            <pre><code><span class="token-comment">// The core interface (from Spring Framework)</span>
+<span class="token-annotation">@FunctionalInterface</span>
+<span class="token-keyword">public interface</span> <span class="token-type">Condition</span> {
+    <span class="token-keyword">boolean</span> <span class="token-function">matches</span>(
+        <span class="token-type">ConditionContext</span> context,
+        <span class="token-type">AnnotatedTypeMetadata</span> metadata);
+}
+
+<span class="token-comment">// Spring Boot's enhanced base class (adds logging & reporting)</span>
+<span class="token-keyword">public abstract class</span> <span class="token-class">SpringBootCondition</span> <span class="token-keyword">implements</span> <span class="token-type">Condition</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public final boolean</span> <span class="token-function">matches</span>(
+            <span class="token-type">ConditionContext</span> context,
+            <span class="token-type">AnnotatedTypeMetadata</span> metadata) {
+
+        <span class="token-type">String</span> classOrMethodName = <span class="token-function">getClassOrMethodName</span>(metadata);
+        <span class="token-type">ConditionOutcome</span> outcome = <span class="token-function">getMatchOutcome</span>(context, metadata);
+
+        <span class="token-comment">// Record in ConditionEvaluationReport (for --debug output)</span>
+        <span class="token-function">recordConditionEvaluation</span>(context, classOrMethodName, outcome);
+
+        <span class="token-keyword">return</span> outcome.<span class="token-function">isMatch</span>();
+    }
+
+    <span class="token-comment">// Subclasses implement this</span>
+    <span class="token-keyword">public abstract</span> <span class="token-type">ConditionOutcome</span> <span class="token-function">getMatchOutcome</span>(
+        <span class="token-type">ConditionContext</span> context,
+        <span class="token-type">AnnotatedTypeMetadata</span> metadata);
+}</code></pre>
+
+            <h3>ConditionContext — What's Available During Evaluation</h3>
+
+            <pre><code><span class="token-keyword">public interface</span> <span class="token-type">ConditionContext</span> {
+    <span class="token-type">BeanDefinitionRegistry</span> <span class="token-function">getRegistry</span>();       <span class="token-comment">// Check registered BeanDefinitions</span>
+    <span class="token-type">ConfigurableListableBeanFactory</span> <span class="token-function">getBeanFactory</span>(); <span class="token-comment">// Full bean factory access</span>
+    <span class="token-type">Environment</span> <span class="token-function">getEnvironment</span>();             <span class="token-comment">// Properties & profiles</span>
+    <span class="token-type">ResourceLoader</span> <span class="token-function">getResourceLoader</span>();       <span class="token-comment">// Load classpath resources</span>
+    <span class="token-type">ClassLoader</span> <span class="token-function">getClassLoader</span>();             <span class="token-comment">// Check class presence</span>
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: @ConditionalOnClass Internals -->
+            <!-- ============================================ -->
+            <h2>3. @ConditionalOnClass — The ASM Trick</h2>
+
+            <p>The most subtle aspect of <code>@ConditionalOnClass</code>: it checks class presence <strong>without loading the class</strong>. This avoids <code>ClassNotFoundException</code> at evaluation time.</p>
+
+            <pre><code><span class="token-comment">// How @ConditionalOnClass is declared</span>
+<span class="token-annotation">@Conditional</span>(<span class="token-type">OnClassCondition</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public @interface</span> <span class="token-annotation">ConditionalOnClass</span> {
+    <span class="token-comment">// These class references are read as STRINGS from bytecode</span>
+    <span class="token-type">Class</span>&lt;?&gt;[] value() <span class="token-keyword">default</span> {};
+    <span class="token-type">String</span>[] name() <span class="token-keyword">default</span> {};
+}
+
+<span class="token-comment">// Inside OnClassCondition (simplified)</span>
+<span class="token-keyword">class</span> <span class="token-class">OnClassCondition</span> <span class="token-keyword">extends</span> <span class="token-type">FilteringSpringBootCondition</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">ConditionOutcome</span> <span class="token-function">getMatchOutcome</span>(
+            <span class="token-type">ConditionContext</span> context, <span class="token-type">AnnotatedTypeMetadata</span> metadata) {
+
+        <span class="token-type">ClassLoader</span> classLoader = context.<span class="token-function">getClassLoader</span>();
+        <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; onClasses = <span class="token-function">getCandidates</span>(metadata, <span class="token-type">ConditionalOnClass</span>.<span class="token-keyword">class</span>);
+
+        <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; missing = <span class="token-function">filter</span>(onClasses, <span class="token-type">ClassNameFilter</span>.MISSING, classLoader);
+
+        <span class="token-keyword">if</span> (!missing.<span class="token-function">isEmpty</span>()) {
+            <span class="token-keyword">return</span> <span class="token-type">ConditionOutcome</span>.<span class="token-function">noMatch</span>(
+                <span class="token-string">"@ConditionalOnClass did not find: "</span> + missing);
+        }
+        <span class="token-keyword">return</span> <span class="token-type">ConditionOutcome</span>.<span class="token-function">match</span>();
+    }
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ The ASM Reading Detail</div>
+                <p>When you write <code>@ConditionalOnClass(DataSource.class)</code>, the <code>DataSource.class</code> literal is compiled into bytecode as the string <code>"javax.sql.DataSource"</code>. Spring reads this string from annotation metadata using ASM — it NEVER resolves the class reference. This means the annotation can reference classes that don't exist on the classpath without causing a <code>ClassNotFoundException</code> during metadata reading.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: Evaluation Order -->
+            <!-- ============================================ -->
+            <h2>4. Condition Evaluation Ordering</h2>
+
+            <p>Conditions are evaluated in a specific, optimized order to fail fast on the cheapest checks:</p>
+
+            <pre><code><span class="token-comment">// FilteringSpringBootCondition processing order:</span>
+
+<span class="token-comment">// 1. OnClassCondition (CHEAPEST — ASM string check, no reflection)</span>
+<span class="token-comment">//    → If class not on classpath, skip immediately</span>
+
+<span class="token-comment">// 2. OnWebApplicationCondition (CHEAP — one check against context type)</span>
+<span class="token-comment">//    → If not a web app and condition requires web, skip</span>
+
+<span class="token-comment">// 3. OnBeanCondition (MODERATE — searches BeanDefinitionRegistry)</span>
+<span class="token-comment">//    → @ConditionalOnBean, @ConditionalOnMissingBean, @ConditionalOnSingleCandidate</span>
+
+<span class="token-comment">// 4. OnPropertyCondition (MODERATE — Environment lookup)</span>
+<span class="token-comment">//    → @ConditionalOnProperty</span>
+
+<span class="token-comment">// 5. OnResourceCondition (MODERATE — classpath resource check)</span>
+<span class="token-comment">//    → @ConditionalOnResource</span>
+
+<span class="token-comment">// 6. OnExpressionCondition (EXPENSIVE — SpEL evaluation)</span>
+<span class="token-comment">//    → @ConditionalOnExpression</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>The pre-filter stage (<code>AutoConfigurationImportFilter</code>) evaluates ONLY class conditions and web application conditions during import selection — before the full auto-config class is even parsed. This eliminates ~60% of candidates without loading their bytecode, making startup significantly faster.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: @ConditionalOnProperty -->
+            <!-- ============================================ -->
+            <h2>5. @ConditionalOnProperty — Feature Toggles</h2>
+
+            <pre><code><span class="token-comment">// Basic usage: bean only created if property matches</span>
+<span class="token-annotation">@Bean</span>
+<span class="token-annotation">@ConditionalOnProperty</span>(
+    prefix = <span class="token-string">"myapp.feature"</span>,
+    name = <span class="token-string">"cache"</span>,
+    havingValue = <span class="token-string">"true"</span>,
+    matchIfMissing = <span class="token-keyword">false</span>  <span class="token-comment">// default: don't match if property absent</span>
+)
+<span class="token-keyword">public</span> <span class="token-type">CacheManager</span> <span class="token-function">cacheManager</span>() {
+    <span class="token-keyword">return new</span> <span class="token-type">ConcurrentMapCacheManager</span>();
+}
+
+<span class="token-comment">// application.properties</span>
+myapp.feature.cache=<span class="token-keyword">true</span>   <span class="token-comment">// → bean IS created</span>
+myapp.feature.cache=<span class="token-keyword">false</span>  <span class="token-comment">// → bean NOT created</span>
+<span class="token-comment">// (property absent)         // → bean NOT created (matchIfMissing=false)</span>
+
+<span class="token-comment">// Industry pattern: feature toggle system</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-annotation">@ConditionalOnProperty</span>(prefix = <span class="token-string">"features"</span>, name = <span class="token-string">"new-checkout"</span>, havingValue = <span class="token-string">"true"</span>)
+<span class="token-keyword">public class</span> <span class="token-class">NewCheckoutConfig</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-keyword">public</span> <span class="token-type">CheckoutService</span> <span class="token-function">checkoutService</span>() {
+        <span class="token-keyword">return new</span> <span class="token-type">NewCheckoutService</span>();
+    }
+}
+
+<span class="token-annotation">@Configuration</span>
+<span class="token-annotation">@ConditionalOnProperty</span>(prefix = <span class="token-string">"features"</span>, name = <span class="token-string">"new-checkout"</span>, havingValue = <span class="token-string">"false"</span>, matchIfMissing = <span class="token-keyword">true</span>)
+<span class="token-keyword">public class</span> <span class="token-class">LegacyCheckoutConfig</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-keyword">public</span> <span class="token-type">CheckoutService</span> <span class="token-function">checkoutService</span>() {
+        <span class="token-keyword">return new</span> <span class="token-type">LegacyCheckoutService</span>();
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Creating Custom Conditionals -->
+            <!-- ============================================ -->
+            <h2>6. Creating a Custom @Conditional</h2>
+
+            <pre><code><span class="token-comment">// Step 1: Define the annotation</span>
+<span class="token-annotation">@Target</span>({ <span class="token-type">ElementType</span>.TYPE, <span class="token-type">ElementType</span>.METHOD })
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Conditional</span>(<span class="token-type">OnLinuxCondition</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public @interface</span> <span class="token-annotation">ConditionalOnLinux</span> { }
+
+<span class="token-comment">// Step 2: Implement the Condition</span>
+<span class="token-keyword">public class</span> <span class="token-class">OnLinuxCondition</span> <span class="token-keyword">extends</span> <span class="token-type">SpringBootCondition</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">ConditionOutcome</span> <span class="token-function">getMatchOutcome</span>(
+            <span class="token-type">ConditionContext</span> context,
+            <span class="token-type">AnnotatedTypeMetadata</span> metadata) {
+
+        <span class="token-type">String</span> os = context.<span class="token-function">getEnvironment</span>()
+            .<span class="token-function">getProperty</span>(<span class="token-string">"os.name"</span>, <span class="token-string">""</span>).<span class="token-function">toLowerCase</span>();
+
+        <span class="token-keyword">if</span> (os.<span class="token-function">contains</span>(<span class="token-string">"linux"</span>)) {
+            <span class="token-keyword">return</span> <span class="token-type">ConditionOutcome</span>.<span class="token-function">match</span>(
+                <span class="token-string">"Running on Linux: "</span> + os);
+        }
+        <span class="token-keyword">return</span> <span class="token-type">ConditionOutcome</span>.<span class="token-function">noMatch</span>(
+            <span class="token-string">"Not running on Linux: "</span> + os);
+    }
+}
+
+<span class="token-comment">// Step 3: Use it</span>
+<span class="token-annotation">@Bean</span>
+<span class="token-annotation">@ConditionalOnLinux</span>
+<span class="token-keyword">public</span> <span class="token-type">FileWatcher</span> <span class="token-function">inotifyFileWatcher</span>() {
+    <span class="token-keyword">return new</span> <span class="token-type">InotifyFileWatcher</span>(); <span class="token-comment">// Uses Linux inotify API</span>
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>Extending <code>SpringBootCondition</code> instead of implementing <code>Condition</code> directly gives you automatic logging and registration in the <code>ConditionEvaluationReport</code>. Your custom condition will appear in <code>--debug</code> output and the <code>/actuator/conditions</code> endpoint just like built-in conditions.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: @ConditionalOnBean Gotchas -->
+            <!-- ============================================ -->
+            <h2>7. @ConditionalOnBean / @ConditionalOnMissingBean Gotchas</h2>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Evaluation Timing is Everything</div>
+                <p>Bean conditions check the <code>BeanDefinitionRegistry</code>, not instantiated beans. This means they depend on <strong>processing order</strong>. If your <code>@Configuration</code> class hasn't been processed yet when the condition evaluates, <code>@ConditionalOnBean</code> will say "bean not found" even though it will be registered later. This is why auto-configs use <code>DeferredImportSelector</code> — to run AFTER user configs.</p>
+            </div>
+
+            <pre><code><span class="token-comment">// DANGEROUS: Using @ConditionalOnBean in user code</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-keyword">public class</span> <span class="token-class">ConfigA</span> {
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnBean</span>(<span class="token-type">DataSource</span>.<span class="token-keyword">class</span>)
+    <span class="token-keyword">public</span> <span class="token-type">JdbcTemplate</span> <span class="token-function">jdbcTemplate</span>(<span class="token-type">DataSource</span> ds) {
+        <span class="token-keyword">return new</span> <span class="token-type">JdbcTemplate</span>(ds);
+    }
+}
+
+<span class="token-comment">// If DataSourceAutoConfiguration hasn't run yet → condition FAILS</span>
+<span class="token-comment">// This is unpredictable in user code — use @ConditionalOnBean only in auto-configs</span>
+
+<span class="token-comment">// SAFE: Using @ConditionalOnMissingBean in auto-configuration</span>
+<span class="token-annotation">@AutoConfiguration</span>
+<span class="token-keyword">public class</span> <span class="token-class">MyAutoConfig</span> {
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>
+    <span class="token-keyword">public</span> <span class="token-type">MyService</span> <span class="token-function">myService</span>() {
+        <span class="token-keyword">return new</span> <span class="token-type">DefaultMyService</span>();
+    }
+}
+<span class="token-comment">// Auto-config runs AFTER user code → safely checks if user defined MyService</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>12+ built-in conditionals</strong> cover class presence, bean existence, property values, resources, web context, JVM version, and cloud platform</li>
+                    <li><strong>Condition interface</strong> has a single <code>matches()</code> method; <code>SpringBootCondition</code> adds logging and reporting</li>
+                    <li><strong>ConditionContext</strong> provides access to BeanFactory, Environment, ResourceLoader, ClassLoader — everything needed for evaluation</li>
+                    <li><strong>@ConditionalOnClass uses ASM</strong> to check class names as strings — never loads the class, avoiding ClassNotFoundException</li>
+                    <li><strong>Evaluation order is optimized:</strong> class conditions (cheapest) → web conditions → bean conditions → property conditions → expression conditions (most expensive)</li>
+                    <li><strong>@ConditionalOnBean/@ConditionalOnMissingBean are order-dependent</strong> — safe in auto-configs (deferred), dangerous in user code</li>
+                    <li><strong>Custom conditionals</strong> extend SpringBootCondition to get automatic report integration</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>Why can <code>@ConditionalOnClass(SomeClass.class)</code> safely reference a class that doesn't exist on the classpath?</li>
+                    <li>What's the difference between <code>@ConditionalOnBean</code> and <code>@ConditionalOnSingleCandidate</code>?</li>
+                    <li>Write a custom <code>@ConditionalOnWeekday</code> annotation that only creates a bean on business days (Mon-Fri).</li>
+                    <li>Why is <code>@ConditionalOnBean</code> unsafe to use in regular <code>@Configuration</code> classes but safe in auto-configs?</li>
+                    <li>How does the pre-filter mechanism (<code>AutoConfigurationImportFilter</code>) differ from full condition evaluation?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"You have a multi-module project where Module A defines a @Bean of type CacheManager, and Module B has @ConditionalOnMissingBean(CacheManager.class) to provide a default. Sometimes Module B's default wins even though Module A's bean exists. Diagnose and fix."</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Root cause</strong> — <code>@ConditionalOnMissingBean</code> in Module B is evaluating before Module A's configuration is parsed. This happens when Module B is a regular @Configuration (not auto-config) and processing order isn't guaranteed.</li>
+                    <li><strong>Diagnosis</strong> — Run with <code>--debug</code> and check the conditions report for Module B's bean. It will show "OnMissingBean: no bean of type CacheManager found" even though Module A defines one.</li>
+                    <li><strong>Fix</strong> — Move Module B's conditional bean into an auto-configuration class (so it runs after all user configs via DeferredImportSelector). Or use <code>@DependsOn</code> / <code>@AutoConfigureAfter</code> if it's already an auto-config.</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 10 (Auto-Configuration)</strong> — Auto-configs are gated by these conditionals; they're the mechanism that makes auto-config "smart"</li>
+                    <li><strong>Topic 8 (SpEL)</strong> — @ConditionalOnExpression evaluates SpEL expressions for complex conditions</li>
+                    <li><strong>Topic 12 (spring.factories)</strong> — AutoConfigurationImportFilter uses class conditions to pre-filter candidates before full parsing</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="10-auto-configuration.html" class="nav-btn nav-btn-prev">← Auto-Configuration Mechanism</a>
+                <a href="12-spring-factories.html" class="nav-btn nav-btn-next">spring.factories & META-INF →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

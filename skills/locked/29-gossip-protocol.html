@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gossip Protocol - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Gossip Protocol</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Gossip Protocol</h1>
+                <p class="subtitle">Letting nodes spread cluster state gradually without a central machine knowing everything. Decentralized, resilient, and surprisingly fast.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-distributed">Distributed</span>
+                    <span class="tag tag-concept">Concept</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">&#127968; Daily-Life Analogy: How Rumors Spread</div>
+                <p>You hear a rumor. You don't announce it to everyone &mdash; you tell 2-3 friends. Each tells 2-3 of THEIR friends. Within an hour, everyone knows.</p>
+                <p>Nobody coordinated this. There's no "rumor leader." It spreads <strong>exponentially</strong> through random peer-to-peer communication. That's exactly how gossip protocols work.</p>
+            </div>
+
+            <h2>What Is a Gossip Protocol?</h2>
+            <p>A gossip protocol (epidemic protocol) is a communication method where each node periodically shares information with a <strong>random subset of peers</strong>. Information spreads exponentially until all nodes converge to the same state.</p>
+
+            <h3>Key Properties</h3>
+            <table class="comparison-table">
+                <thead><tr><th>Property</th><th>Meaning</th><th>Why It Matters</th></tr></thead>
+                <tbody>
+                    <tr><td>Decentralized</td><td>No central coordinator</td><td>No single point of failure</td></tr>
+                    <tr><td>Scalable</td><td>O(log N) rounds to reach all nodes</td><td>Works with thousands of nodes</td></tr>
+                    <tr><td>Fault tolerant</td><td>Works even if nodes fail</td><td>Redundant message paths</td></tr>
+                    <tr><td>Eventually consistent</td><td>All nodes converge over time</td><td>Not instant, but guaranteed</td></tr>
+                </tbody>
+            </table>
+
+<pre><code><span class="token-keyword">import</span> random
+
+<span class="token-keyword">class</span> <span class="token-class">GossipNode</span>:
+    <span class="token-string">"""A node that participates in gossip protocol"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, node_id, cluster):
+        self.id = node_id
+        self.cluster = cluster
+        self.state = {}
+        self.version = {}
+        self.heartbeat = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">update_local</span>(self, key, value):
+        <span class="token-string">"""Update local state (will be gossiped to others)"""</span>
+        self.state[key] = value
+        self.version[key] = self.version.get(key, <span class="token-number">0</span>) + <span class="token-number">1</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">gossip_round</span>(self):
+        <span class="token-string">"""Pick random peers and exchange state"""</span>
+        self.heartbeat += <span class="token-number">1</span>
+        peers = random.sample(
+            [n <span class="token-keyword">for</span> n <span class="token-keyword">in</span> self.cluster <span class="token-keyword">if</span> n.id != self.id],
+            min(<span class="token-number">3</span>, len(self.cluster) - <span class="token-number">1</span>)  <span class="token-comment"># fanout = 3</span>
+        )
+        <span class="token-keyword">for</span> peer <span class="token-keyword">in</span> peers:
+            self._exchange(peer)
+
+    <span class="token-keyword">def</span> <span class="token-function">_exchange</span>(self, peer):
+        <span class="token-string">"""Bidirectional state exchange with peer"""</span>
+        <span class="token-comment"># Send my newer data to peer</span>
+        <span class="token-keyword">for</span> key, value <span class="token-keyword">in</span> self.state.items():
+            <span class="token-keyword">if</span> self.version.get(key, <span class="token-number">0</span>) > peer.version.get(key, <span class="token-number">0</span>):
+                peer.state[key] = value
+                peer.version[key] = self.version[key]
+        <span class="token-comment"># Receive peer's newer data</span>
+        <span class="token-keyword">for</span> key, value <span class="token-keyword">in</span> peer.state.items():
+            <span class="token-keyword">if</span> peer.version.get(key, <span class="token-number">0</span>) > self.version.get(key, <span class="token-number">0</span>):
+                self.state[key] = value
+                self.version[key] = peer.version[key]
+
+
+<span class="token-comment"># Simulation: 10 nodes, watch information spread</span>
+cluster = [GossipNode(i, <span class="token-keyword">None</span>) <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">10</span>)]
+<span class="token-keyword">for</span> node <span class="token-keyword">in</span> cluster:
+    node.cluster = cluster
+
+<span class="token-comment"># Node 0 learns something</span>
+cluster[<span class="token-number">0</span>].update_local(<span class="token-string">"alert"</span>, <span class="token-string">"node-5 is DOWN"</span>)
+
+<span class="token-comment"># Run gossip rounds</span>
+<span class="token-keyword">for</span> round_num <span class="token-keyword">in</span> range(<span class="token-number">5</span>):
+    <span class="token-keyword">for</span> node <span class="token-keyword">in</span> cluster:
+        node.gossip_round()
+    informed = sum(<span class="token-number">1</span> <span class="token-keyword">for</span> n <span class="token-keyword">in</span> cluster <span class="token-keyword">if</span> <span class="token-string">"alert"</span> <span class="token-keyword">in</span> n.state)
+    <span class="token-keyword">print</span>(<span class="token-string">f"Round {round_num+1}: {informed}/10 nodes informed"</span>)
+<span class="token-comment"># Round 1: ~4, Round 2: ~8, Round 3: 10/10</span></code></pre>
+
+            <h2>Convergence Speed</h2>
+            <p>With fanout k, information reaches all N nodes in ~<strong>O(log N / log k)</strong> rounds. For 1000 nodes with fanout 3: about 6 rounds!</p>
+
+            <h2>Types of Gossip</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Type</th><th>What's Shared</th><th>Use Case</th></tr></thead>
+                <tbody>
+                    <tr><td>Anti-entropy</td><td>Full state comparison</td><td>Ensuring all replicas converge</td></tr>
+                    <tr><td>Rumor mongering</td><td>Only new updates</td><td>Fast propagation of changes</td></tr>
+                    <tr><td>Aggregation</td><td>Computed values (avg, count)</td><td>Distributed monitoring</td></tr>
+                </tbody>
+            </table>
+
+            <h2>SWIM: Failure Detection via Gossip</h2>
+            <p>The SWIM protocol (Consul, Serf) combines gossip with failure detection:</p>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">SWIMNode</span>:
+    <span class="token-keyword">def</span> <span class="token-function">probe_cycle</span>(self):
+        <span class="token-comment"># 1. Pick a random peer and ping it</span>
+        target = random.choice(self.peers)
+        <span class="token-keyword">if</span> self.ping(target):
+            <span class="token-keyword">return</span>  <span class="token-comment"># alive!</span>
+
+        <span class="token-comment"># 2. No response? Ask others to ping it (indirect probe)</span>
+        witnesses = random.sample(self.peers, <span class="token-number">3</span>)
+        <span class="token-keyword">for</span> w <span class="token-keyword">in</span> witnesses:
+            <span class="token-keyword">if</span> w.ping(target):
+                <span class="token-keyword">return</span>  <span class="token-comment"># alive via indirect path</span>
+
+        <span class="token-comment"># 3. Still no response? Mark as SUSPECTED</span>
+        self.suspect(target)
+
+        <span class="token-comment"># 4. After timeout, if still suspected: declare DEAD</span>
+        <span class="token-comment"># 5. Gossip the failure to the rest of the cluster</span>
+        self.gossip_event(<span class="token-string">f"{target.id} is DEAD"</span>)</code></pre>
+
+            <div class="industry-box">
+                <h4>Real-World Gossip</h4>
+                <ul>
+                    <li><strong>Cassandra</strong> &mdash; Gossip for cluster membership, schema changes, token awareness</li>
+                    <li><strong>Consul</strong> &mdash; SWIM-based gossip (Serf) for service discovery and health</li>
+                    <li><strong>Redis Cluster</strong> &mdash; Nodes gossip cluster topology and failures</li>
+                    <li><strong>Amazon S3</strong> &mdash; Internal gossip for server coordination</li>
+                    <li><strong>Bitcoin/Ethereum</strong> &mdash; Transaction and block propagation via gossip</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+                    <li>Gossip = each node randomly tells a few peers, info spreads exponentially</li>
+                    <li>Decentralized, scalable (O(log N)), fault-tolerant</li>
+                    <li>Used for membership, failure detection, state dissemination</li>
+                    <li>SWIM = gossip + failure detection (Consul)</li>
+                    <li>Trade-off: eventual consistency, some bandwidth overhead</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">
+    Round 0: Only A knows
+    [A*] [B] [C] [D] [E] [F] [G] [H]
+
+    Round 1: A tells B, C
+    [A*] [B*] [C*] [D] [E] [F] [G] [H]
+
+    Round 2: A,B,C each tell 2 more
+    [A*] [B*] [C*] [D*] [E*] [F*] [G] [H]
+
+    Round 3: Full convergence!
+    [A*] [B*] [C*] [D*] [E*] [F*] [G*] [H*]
+
+    log2(8) = 3 rounds for 8 nodes
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+                    <li><strong>Expecting instant propagation</strong> &mdash; Gossip is eventually consistent. Takes a few rounds.</li>
+                    <li><strong>Too low fanout</strong> &mdash; Fanout of 1 is a chain (slow). Use 2-3 for fast convergence.</li>
+                    <li><strong>Gossiping bulk data</strong> &mdash; Gossip is for metadata (membership, health), not large payloads.</li>
+                    <li><strong>Not handling node churn</strong> &mdash; Nodes joining/leaving must be handled or state fragments.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+                    <li>Implement GossipNode with 20 nodes. Measure convergence rounds with fanouts of 1, 2, 3, 5.</li>
+                    <li>Simulate node failure: remove a node after round 2. Verify gossip still converges.</li>
+                    <li>Add version vectors for detecting conflicting concurrent updates.</li>
+                    <li>Research: How does Cassandra gossip detect which nodes own which token ranges?</li>
+                </ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="28-quorum-reads-writes.html" class="prev">Quorum Reads/Writes</a>
+                <a href="30-failure-detection.html" class="next">Failure Detection</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

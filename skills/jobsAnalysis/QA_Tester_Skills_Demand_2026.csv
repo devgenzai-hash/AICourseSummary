@@ -1,0 +1,26 @@
+skill,mentions_in_sample,share_of_sample_percent,segment
+Selenium,19,39.6,Core Automation
+Jira,16,33.3,Tooling
+CI/CD,13,27.1,DevOps QA
+SQL,12,25.0,Data/API Validation
+Java,12,25.0,Automation Language
+API Testing / APIs,11,22.9,API QA
+Manual Testing,8,16.7,Core QA
+TestNG,7,14.6,Automation Framework
+Cucumber / BDD,7,14.6,Automation Framework
+Agile / Scrum,7,14.6,Delivery Model
+Performance Testing,6,12.5,Non-Functional QA
+Azure / Azure DevOps,6,12.5,Cloud / DevOps
+Git,6,12.5,Versioning
+UAT,4,8.3,Business Validation
+Playwright,3,6.3,Modern Web Automation
+Jenkins,3,6.3,CI Tooling
+Python,3,6.3,Automation Language
+Appium,2,4.2,Mobile Automation
+LoadRunner,3,6.3,Performance Tool
+JUnit,4,8.3,Test Framework
+HP ALM,3,6.3,Legacy Test Mgmt
+PostgreSQL,1,2.1,Database
+REST,1,2.1,API Stack
+Cypress,2,4.2,Web Automation
+SDLC/STLC,3,6.3,QA Process

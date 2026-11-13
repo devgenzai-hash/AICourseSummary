@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANN & Reranking - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> ANN &amp; Reranking
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 3: ANN Retrieval + Reranking</h1>
+                <p class="subtitle">Quickly pull top candidates from millions of docs, then deeply compare query vs retrieved chunks for precision.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-scale">10M Scale</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: Hiring Process</div>
+                <p>Imagine you're hiring one developer from <strong>10 million resumes</strong>. You can't read all 10 million carefully.</p>
+                <p><strong>Stage 1 (ANN):</strong> Your HR software quickly scans all 10 million resumes and pulls out the top 100 that roughly match your requirements. It's fast but imperfect — maybe 20 of those 100 aren't great fits.</p>
+                <p><strong>Stage 2 (Reranker):</strong> Now a senior hiring manager carefully reads those 100 resumes, comparing each one deeply against the job description. They reorder the list so the truly best 10 candidates are at the top.</p>
+                <p><strong>Together:</strong> ANN handles speed (100M → 100), reranker handles precision (100 → top 10).</p>
+            </div>
+
+            <!-- ===== WHAT IS ANN ===== -->
+            <h2>What Is ANN (Approximate Nearest Neighbor)?</h2>
+            <p><strong>The problem:</strong> You have 100 million vectors (one per chunk). A user asks a question. You need to find the 20 most similar vectors. Comparing against ALL 100 million would take too long.</p>
+
+            <p><strong>ANN solution:</strong> Instead of checking every single vector (exact search), use clever data structures that find "approximately" the closest vectors in a fraction of the time. You trade a tiny bit of accuracy for massive speed gains.</p>
+
+            <p><strong>In numbers:</strong></p>
+            <ul>
+                <li><strong>Exact search (brute force):</strong> Compare query against ALL 100M vectors → 100% accurate but takes 5-10 seconds</li>
+                <li><strong>ANN search:</strong> Use smart shortcuts → 95-99% accurate but takes 5-50 milliseconds</li>
+            </ul>
+
+            <p>That 95-99% accuracy is fine because the reranker fixes any mistakes in the next step.</p>
+
+            <h3>How ANN Works (The Intuition)</h3>
+            <div class="analogy-box">
+                <div class="analogy-title">📍 Analogy: Finding the Nearest Coffee Shop</div>
+                <p>Imagine finding the nearest coffee shop in a city of 10 million buildings. You wouldn't check the distance to EVERY building.</p>
+                <p>Instead, you'd: (1) Know which neighborhood you're in, (2) Only check coffee shops in nearby neighborhoods. That's essentially what ANN does — it organizes vectors into "neighborhoods" so you only search the relevant ones.</p>
+            </div>
+
+            <h3>Popular ANN Algorithms</h3>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>How It Works (Simple)</th>
+                        <th>Speed</th>
+                        <th>Accuracy</th>
+                        <th>Memory</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>HNSW</strong></td>
+                        <td>Builds a network of "shortcuts" between similar vectors (like highway system)</td>
+                        <td>Very Fast</td>
+                        <td>~98%</td>
+                        <td>High</td>
+                        <td>General purpose, best quality</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IVF</strong></td>
+                        <td>Groups vectors into clusters, searches only nearest clusters</td>
+                        <td>Fast</td>
+                        <td>~95%</td>
+                        <td>Medium</td>
+                        <td>Large scale, memory-constrained</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ScaNN</strong></td>
+                        <td>Google's method: quantizes vectors + smart scoring</td>
+                        <td>Very Fast</td>
+                        <td>~97%</td>
+                        <td>Low</td>
+                        <td>Very large scale (Google-level)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>FAISS IVF-PQ</strong></td>
+                        <td>Clusters + compresses vectors (lossy compression)</td>
+                        <td>Fastest</td>
+                        <td>~93%</td>
+                        <td>Very Low</td>
+                        <td>Billion+ vectors, cost-sensitive</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>HNSW Deep Dive (Most Popular Choice)</h4>
+            <p><strong>HNSW</strong> = Hierarchical Navigable Small World. Think of it like a city with multiple layers:</p>
+            <ul>
+                <li><strong>Top layer (highway):</strong> A few "landmark" vectors connected across long distances — gets you to the right neighborhood fast</li>
+                <li><strong>Middle layers (main roads):</strong> More vectors, shorter connections — narrows down the area</li>
+                <li><strong>Bottom layer (streets):</strong> ALL vectors with local connections — finds the exact closest ones</li>
+            </ul>
+            <p>Search starts at the top (fast, rough) and descends to the bottom (slow, precise). Total time: milliseconds.</p>
+
+<pre><code><span class="token-keyword">import</span> faiss
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+
+<span class="token-comment"># Build an HNSW index for 100M vectors of dimension 1024</span>
+dimension = <span class="token-number">1024</span>
+num_vectors = <span class="token-number">100_000_000</span>  <span class="token-comment"># 100M chunks</span>
+
+<span class="token-comment"># HNSW parameters</span>
+M = <span class="token-number">32</span>          <span class="token-comment"># Number of connections per node (higher = better recall, more memory)</span>
+ef_construction = <span class="token-number">200</span>  <span class="token-comment"># Build-time quality (higher = slower build, better index)</span>
+ef_search = <span class="token-number">128</span>       <span class="token-comment"># Search-time quality (higher = slower search, better recall)</span>
+
+<span class="token-comment"># Create the index</span>
+index = faiss.IndexHNSWFlat(dimension, M)
+index.hnsw.efConstruction = ef_construction
+index.hnsw.efSearch = ef_search
+
+<span class="token-comment"># Add vectors (in production, do this in batches)</span>
+<span class="token-comment"># index.add(all_vectors)  # numpy array of shape (100M, 1024)</span>
+
+<span class="token-comment"># Search</span>
+<span class="token-keyword">def</span> <span class="token-function">ann_search</span>(query_vector, top_k=<span class="token-number">100</span>):
+    <span class="token-string">"""Find approximate nearest neighbors in milliseconds."""</span>
+    query = np.array([query_vector]).astype(<span class="token-string">'float32'</span>)
+    distances, indices = index.search(query, top_k)
+    <span class="token-keyword">return</span> indices[<span class="token-number">0</span>], distances[<span class="token-number">0</span>]  <span class="token-comment"># chunk IDs + distances</span></code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 Memory Math at 10M Docs</div>
+                <p>10M docs × 10 chunks each = 100M vectors. Each vector is 1024 dimensions × 4 bytes = 4KB.</p>
+                <ul>
+                    <li><strong>Brute force:</strong> 100M × 4KB = ~400GB RAM (impossible for most)</li>
+                    <li><strong>HNSW:</strong> ~400GB + ~100GB graph overhead = ~500GB (need big machines)</li>
+                    <li><strong>IVF-PQ (compressed):</strong> ~25-50GB (affordable, slight accuracy loss)</li>
+                    <li><strong>Solution:</strong> Use IVF-PQ for initial recall, then re-score top candidates with full vectors</li>
+                </ul>
+            </div>
+
+            <!-- ===== RERANKING ===== -->
+            <h2>What Is Reranking?</h2>
+            <p><strong>Simple explanation:</strong> After ANN gives you the top 100 candidates (rough ranking), a reranker carefully reads each candidate alongside the original query and produces a precise relevance score.</p>
+
+            <p><strong>Why is it needed?</strong></p>
+            <ul>
+                <li>ANN uses simple distance between vectors — fast but shallow understanding</li>
+                <li>A reranker uses a full neural network (cross-encoder) that reads BOTH the query AND the document together — slow but deep understanding</li>
+                <li>Think of ANN as a "glance" and reranking as a "careful read"</li>
+            </ul>
+
+            <h3>Bi-Encoder vs Cross-Encoder</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Bi-Encoder (ANN stage)</th>
+                        <th>Cross-Encoder (Reranking stage)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>How it works</strong></td>
+                        <td>Encodes query and document SEPARATELY, then compares vectors</td>
+                        <td>Encodes query and document TOGETHER, understanding their relationship</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Analogy</strong></td>
+                        <td>Comparing two photos side by side</td>
+                        <td>Having two people sit in the same room and talk</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Speed</strong></td>
+                        <td>Super fast (vectors pre-computed)</td>
+                        <td>Slow (must process each pair fresh)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Accuracy</strong></td>
+                        <td>Good (~85-90%)</td>
+                        <td>Excellent (~95-99%)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Can handle</strong></td>
+                        <td>Millions of candidates</td>
+                        <td>Only 20-100 candidates (too slow for more)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Used for</strong></td>
+                        <td>Initial retrieval (Stage 2-3)</td>
+                        <td>Final ranking (after ANN)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Implementing a Reranker</h3>
+
+<pre><code><span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> CrossEncoder
+
+<span class="token-comment"># Load a cross-encoder reranking model</span>
+reranker = CrossEncoder(<span class="token-string">'cross-encoder/ms-marco-MiniLM-L-12-v2'</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">rerank_results</span>(
+    query: <span class="token-builtin">str</span>,
+    candidates: List[Dict],
+    top_k: <span class="token-builtin">int</span> = <span class="token-number">10</span>
+) -> List[Dict]:
+    <span class="token-string">"""
+    Rerank candidate chunks using a cross-encoder.
+    
+    Takes top ~100 candidates from ANN and produces 
+    a precise top-10 ranking.
+    """</span>
+    <span class="token-comment"># Create query-document pairs for the cross-encoder</span>
+    pairs = [(query, chunk[<span class="token-string">"content"</span>]) <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> candidates]
+    
+    <span class="token-comment"># Score all pairs (cross-encoder reads both together)</span>
+    scores = reranker.predict(pairs)
+    
+    <span class="token-comment"># Attach scores and sort</span>
+    <span class="token-keyword">for</span> chunk, score <span class="token-keyword">in</span> <span class="token-builtin">zip</span>(candidates, scores):
+        chunk[<span class="token-string">"rerank_score"</span>] = <span class="token-builtin">float</span>(score)
+    
+    <span class="token-comment"># Sort by rerank score (highest = most relevant)</span>
+    reranked = sorted(candidates, key=<span class="token-keyword">lambda</span> x: x[<span class="token-string">"rerank_score"</span>], reverse=<span class="token-keyword">True</span>)
+    
+    <span class="token-keyword">return</span> reranked[:top_k]</code></pre>
+
+            <h3>Using Cohere Rerank (Production API)</h3>
+<pre><code><span class="token-keyword">import</span> cohere
+
+co = cohere.Client(<span class="token-string">"your-api-key"</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">cohere_rerank</span>(query: <span class="token-builtin">str</span>, documents: List[<span class="token-builtin">str</span>], top_k: <span class="token-builtin">int</span> = <span class="token-number">10</span>):
+    <span class="token-string">"""Use Cohere's production reranking API."""</span>
+    response = co.rerank(
+        model=<span class="token-string">"rerank-english-v3.0"</span>,
+        query=query,
+        documents=documents,
+        top_n=top_k
+    )
+    
+    <span class="token-keyword">return</span> [
+        {
+            <span class="token-string">"index"</span>: result.index,
+            <span class="token-string">"relevance_score"</span>: result.relevance_score,
+            <span class="token-string">"document"</span>: documents[result.index]
+        }
+        <span class="token-keyword">for</span> result <span class="token-keyword">in</span> response.results
+    ]</code></pre>
+
+            <!-- ===== TWO-STAGE PIPELINE ===== -->
+            <h2>The Complete Two-Stage Pipeline</h2>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">TwoStageRetriever</span>:
+    <span class="token-string">"""
+    Production retrieval: ANN for speed → Reranker for precision.
+    
+    Stage A: ANN pulls top 100 from 100M chunks (~20ms)
+    Stage B: Cross-encoder reranks 100 → top 10 (~200ms)
+    Total: ~220ms for precise retrieval from 100M chunks
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, ann_index, reranker, embedding_model):
+        self.ann_index = ann_index
+        self.reranker = reranker
+        self.embedding_model = embedding_model
+        self.chunk_store = {}  <span class="token-comment"># chunk_id → chunk content + metadata</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">retrieve</span>(self, query: <span class="token-builtin">str</span>, initial_k: <span class="token-builtin">int</span> = <span class="token-number">100</span>, final_k: <span class="token-builtin">int</span> = <span class="token-number">10</span>) -> List[Dict]:
+        <span class="token-string">"""Full two-stage retrieval pipeline."""</span>
+        
+        <span class="token-comment"># Stage A: Fast ANN retrieval (100M → 100)</span>
+        query_vector = self.embedding_model.embed(query)
+        ann_ids, ann_distances = self.ann_index.search(query_vector, initial_k)
+        
+        <span class="token-comment"># Load full chunk content for reranking</span>
+        candidates = []
+        <span class="token-keyword">for</span> chunk_id, distance <span class="token-keyword">in</span> <span class="token-builtin">zip</span>(ann_ids, ann_distances):
+            chunk = self.chunk_store.get(chunk_id)
+            <span class="token-keyword">if</span> chunk:
+                chunk[<span class="token-string">"ann_distance"</span>] = <span class="token-builtin">float</span>(distance)
+                candidates.append(chunk)
+        
+        <span class="token-comment"># Stage B: Precise reranking (100 → 10)</span>
+        reranked = self.reranker.rerank(query, candidates, top_k=final_k)
+        
+        <span class="token-comment"># Add retrieval metadata for observability (Stage 10)</span>
+        <span class="token-keyword">for</span> i, result <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(reranked):
+            result[<span class="token-string">"final_rank"</span>] = i + <span class="token-number">1</span>
+            result[<span class="token-string">"retrieval_stages"</span>] = [<span class="token-string">"ann"</span>, <span class="token-string">"rerank"</span>]
+        
+        <span class="token-keyword">return</span> reranked</code></pre>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ Why Two Stages Work Better Than One</div>
+                <p><strong>ANN alone (100 results):</strong> Maybe 60-70% of your top 10 are truly relevant</p>
+                <p><strong>ANN + Reranker (reranked to 10):</strong> 90-95% of your top 10 are truly relevant</p>
+                <p>The reranker's deep understanding catches the subtle differences that vector distance misses — like understanding that "annual leave policy" is more relevant to "vacation rules" than "annual performance review" even though both contain "annual."</p>
+            </div>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>FAISS (Meta)</strong> — Most popular open-source ANN library. Supports HNSW, IVF, PQ. Used by most RAG systems.</li>
+                    <li><strong>Qdrant</strong> — Production vector DB with built-in HNSW, filtering, and payload storage</li>
+                    <li><strong>Cohere Rerank</strong> — Most popular reranking API. Drop-in improvement for any retrieval system.</li>
+                    <li><strong>ColBERT</strong> — Late-interaction model that's faster than cross-encoders but nearly as accurate</li>
+                    <li><strong>Typical pipeline:</strong> Retrieve 100-200 candidates → Rerank to top 5-20 → Feed to LLM</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>Brute-force search at 100M vectors is too slow — ANN makes it milliseconds</li>
+                    <li>HNSW is the most popular ANN algorithm — best balance of speed and accuracy</li>
+                    <li>ANN gives rough candidates; reranking gives precise relevance ordering</li>
+                    <li>Cross-encoders deeply compare query+document together for superior accuracy</li>
+                    <li>Two-stage pipeline: ANN (100M→100, 20ms) + Rerank (100→10, 200ms) = fast AND precise</li>
+                    <li>At 10M docs, this two-stage approach is non-negotiable for quality</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+100,000,000 chunks (all your documents)
+         ↓
+    [ANN Search] — ~20ms
+    "Give me roughly the best 100"
+         ↓
+       100 candidates
+         ↓
+    [Cross-Encoder Reranker] — ~200ms
+    "Now carefully read each one vs the query"
+         ↓
+     Top 10 precise results
+         ↓
+   → Feed to LLM (Stage 5)
+
+Think: FUNNEL
+Wide at top (fast, rough) → Narrow at bottom (slow, precise)
+                </div>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>Skipping reranking:</strong> "ANN results are good enough" — they're NOT. At 10M docs, ANN noise is significant. Reranking improves precision by 20-40%.</li>
+                    <li><strong>Reranking too many:</strong> Don't rerank 1000 candidates — cross-encoders are slow. 50-200 is the sweet spot.</li>
+                    <li><strong>Wrong ANN parameters:</strong> Setting ef_search too low saves time but misses relevant results. Benchmark to find your sweet spot.</li>
+                    <li><strong>Ignoring memory limits:</strong> HNSW for 100M 1024-dim vectors needs ~500GB RAM. Plan for IVF-PQ or disk-based indices if budget-constrained.</li>
+                    <li><strong>Not using metadata pre-filtering:</strong> Filter by metadata BEFORE ANN search to reduce the candidate space dramatically.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Two-Stage Retriever</h3>
+                <ol>
+                    <li>Install FAISS: <code>pip install faiss-cpu</code></li>
+                    <li>Generate 10,000 random vectors (simulating embeddings) of dimension 384</li>
+                    <li>Build an HNSW index and measure search time vs brute force</li>
+                    <li>Install sentence-transformers: <code>pip install sentence-transformers</code></li>
+                    <li>Load a cross-encoder: <code>cross-encoder/ms-marco-MiniLM-L-6-v2</code></li>
+                    <li>Implement the two-stage pipeline: ANN retrieves 50 → Reranker picks top 5</li>
+                    <li>Compare retrieval quality: ANN-only top 5 vs reranked top 5</li>
+                    <li><strong>Bonus:</strong> Benchmark latency at different initial_k values (50, 100, 200)</li>
+                </ol>
+                <p><strong>Success criteria:</strong> Demonstrate that reranked top-5 has better relevance than ANN-only top-5 for at least 3 sample queries.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="02-hybrid-retrieval.html" class="prev">Hybrid Retrieval</a>
+                <a href="04-source-confidence.html" class="next">Source Confidence</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

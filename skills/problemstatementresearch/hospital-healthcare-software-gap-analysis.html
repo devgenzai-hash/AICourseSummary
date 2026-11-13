@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital & Healthcare Software — Gap Analysis Report</title>
+  <style>
+    :root {
+      --primary: #1a6eb5;
+      --primary-dark: #0f4c81;
+      --accent: #e8f4fd;
+      --danger: #c0392b;
+      --warning: #e67e22;
+      --success: #27ae60;
+      --gray: #6c757d;
+      --light: #f8f9fa;
+      --dark: #1a1a2e;
+      --border: #dee2e6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f4f8;
+      color: #222;
+      line-height: 1.7;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0f4c81 0%, #1a6eb5 60%, #2196f3 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: .25rem 1rem;
+      font-size: .85rem;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+    header h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: .5rem; }
+    header p  { font-size: 1.1rem; opacity: .88; max-width: 700px; margin: 0 auto; }
+    header .meta { margin-top: 1.2rem; font-size: .85rem; opacity: .7; }
+
+    /* ── NAV ── */
+    nav {
+      background: white;
+      border-bottom: 2px solid var(--border);
+      padding: .75rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 600;
+      padding: .3rem .8rem;
+      border-radius: 20px;
+      transition: background .2s;
+    }
+    nav a:hover { background: var(--accent); }
+
+    /* ── MAIN ── */
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── SECTION ── */
+    section { margin-bottom: 3rem; }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-title .icon {
+      background: var(--primary);
+      color: white;
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .section-title h2 { font-size: 1.6rem; color: var(--dark); }
+
+    /* ── STAT CARDS ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      border-top: 4px solid var(--primary);
+    }
+    .stat-card .number { font-size: 2rem; font-weight: 700; color: var(--primary); }
+    .stat-card .label  { font-size: .85rem; color: var(--gray); margin-top: .25rem; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07);
+      font-size: .9rem;
+    }
+    thead { background: var(--primary); color: white; }
+    thead th { padding: .9rem 1rem; text-align: left; font-weight: 600; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:hover { background: var(--accent); }
+    tbody td { padding: .8rem 1rem; vertical-align: top; }
+    .tag {
+      display: inline-block;
+      background: #e3f2fd;
+      color: var(--primary);
+      border-radius: 4px;
+      padding: .1rem .5rem;
+      font-size: .75rem;
+      font-weight: 600;
+      margin: .1rem;
+    }
+    .tag.red   { background: #fde8e8; color: var(--danger); }
+    .tag.green { background: #e8f8ef; color: var(--success); }
+    .tag.orange{ background: #fef3e8; color: var(--warning); }
+
+    /* ── CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.2rem;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    }
+    .card h3 {
+      font-size: 1.05rem;
+      color: var(--primary-dark);
+      margin-bottom: .6rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .card p  { font-size: .9rem; color: #444; }
+    .card ul { padding-left: 1.2rem; margin-top: .5rem; }
+    .card ul li { font-size: .88rem; margin-bottom: .3rem; }
+
+    /* ── PROBLEM CARDS ── */
+    .problem-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      border-left: 5px solid var(--danger);
+    }
+    .problem-card.orange { border-left-color: var(--warning); }
+    .problem-card.blue   { border-left-color: var(--primary); }
+    .problem-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+      color: var(--dark);
+    }
+    .problem-card p { font-size: .88rem; color: #555; }
+
+    /* ── OPPORTUNITY CARDS ── */
+    .opp-card {
+      background: linear-gradient(135deg, #f0f9ff, #e8f4fd);
+      border: 1px solid #b3d9f5;
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .opp-card .priority {
+      display: inline-block;
+      font-size: .75rem;
+      font-weight: 700;
+      padding: .2rem .6rem;
+      border-radius: 4px;
+      margin-bottom: .6rem;
+    }
+    .opp-card .priority.high   { background: #fde8e8; color: #c0392b; }
+    .opp-card .priority.medium { background: #fef3e8; color: #d35400; }
+    .opp-card h3 { font-size: 1.05rem; color: var(--primary-dark); margin-bottom: .5rem; }
+    .opp-card p  { font-size: .88rem; color: #444; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: .93rem;
+    }
+    .callout.info    { background: #e8f4fd; border-left: 4px solid var(--primary); }
+    .callout.warning { background: #fef3e8; border-left: 4px solid var(--warning); }
+    .callout.danger  { background: #fde8e8; border-left: 4px solid var(--danger); }
+    .callout.success { background: #e8f8ef; border-left: 4px solid var(--success); }
+    .callout strong  { display: block; margin-bottom: .3rem; }
+
+    /* ── TIMELINE ── */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: .7rem;
+      top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--primary), #64b5f6);
+      border-radius: 3px;
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 1.5rem;
+      background: white;
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,.06);
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -1.6rem;
+      top: 1.1rem;
+      width: 12px; height: 12px;
+      background: var(--primary);
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+    .tl-item h4 { color: var(--primary-dark); font-size: .95rem; margin-bottom: .3rem; }
+    .tl-item p  { font-size: .87rem; color: #555; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      padding: 2rem;
+      font-size: .85rem;
+      margin-top: 3rem;
+    }
+    footer strong { color: white; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<header>
+  <div class="badge">RESEARCH REPORT · MAY 2026</div>
+  <h1>Hospital & Healthcare Software<br>Gap Analysis Report</h1>
+  <p>An exhaustive research study of the current healthcare software landscape,
+     what existing solutions offer, what problems they fail to solve,
+     and where the biggest product opportunities lie.</p>
+  <div class="meta">Target Segments: Large Hospitals · Private Clinics · Specialty Practices · Developing-World Healthcare</div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════ NAV -->
+<nav>
+  <a href="#landscape">Market Landscape</a>
+  <a href="#software-catalog">Software Catalog</a>
+  <a href="#what-they-solve">What They Solve</a>
+  <a href="#problems">Problems & Gaps</a>
+  <a href="#clinic-gap">Private Clinic Gap</a>
+  <a href="#critical-gaps">Critical Gaps</a>
+  <a href="#opportunities">Opportunities</a>
+  <a href="#roadmap">Build Roadmap</a>
+  <a href="#summary">Executive Summary</a>
+</nav>
+
+<main>
+
+  <!-- ══════════════════════════════════════════════════════ STATS -->
+  <div class="stat-grid" style="margin-top:2rem">
+    <div class="stat-card">
+      <div class="number">$180B+</div>
+      <div class="label">Global Healthcare IT Market (2025)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">42%</div>
+      <div class="label">US EHR Market Owned by Epic Alone</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">70%+</div>
+      <div class="label">Doctors Report EHR-Driven Burnout</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">$8.3B</div>
+      <div class="label">Lost Annually to Billing Errors in US</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">40%</div>
+      <div class="label">Drop in Acute Care EHR Purchases (2025)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">&lt;5%</div>
+      <div class="label">Small/Rural Clinics with Full Digital Stack</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 1 -->
+  <section id="landscape">
+    <div class="section-title">
+      <div class="icon">🏥</div>
+      <h2>1. The Current Healthcare Software Landscape</h2>
+    </div>
+
+    <p>The healthcare software market is broadly split into several overlapping layers:</p>
+
+    <div class="card-grid" style="margin-top:1.2rem">
+      <div class="card">
+        <h3>🏛️ Enterprise EHR / EMR Platforms</h3>
+        <p>Large, monolithic systems used by major hospital networks and integrated delivery systems. Capture every aspect of the clinical encounter in a single system. Examples: Epic, Oracle Health (Cerner), MEDITECH.</p>
+      </div>
+      <div class="card">
+        <h3>🏠 Ambulatory / Practice Management Systems</h3>
+        <p>Designed for outpatient clinics, physician practices, and independent groups. Focus on scheduling, billing, and simpler clinical workflows. Examples: athenahealth, NextGen, DrChrono, Kareo/Tebra.</p>
+      </div>
+      <div class="card">
+        <h3>💰 Revenue Cycle Management (RCM)</h3>
+        <p>Standalone billing and claims management platforms often layered on top of EHRs or used independently. Examples: Waystar, Experian Health, R1 RCM, Change Healthcare (Optum).</p>
+      </div>
+      <div class="card">
+        <h3>🖼️ Imaging / PACS / Radiology</h3>
+        <p>Picture Archiving and Communication Systems for managing medical images. Examples: Sectra PACS, AGFA HealthCare, Fujifilm Synapse VNA, Nuance PowerShare.</p>
+      </div>
+      <div class="card">
+        <h3>💊 Pharmacy Management</h3>
+        <p>Handles medication dispensing, inventory, and drug-drug interactions. Examples: Epic Willow, BD Pyxis, Omnicell.</p>
+      </div>
+      <div class="card">
+        <h3>📊 Population Health & Analytics</h3>
+        <p>Tools for managing chronic disease populations, risk stratification, and outcomes reporting. Examples: Azara Healthcare, Health Catalyst, Innovaccer.</p>
+      </div>
+      <div class="card">
+        <h3>🤝 Care Coordination & Communication</h3>
+        <p>Secure messaging, handoff tools, and nurse/staff scheduling. Examples: TigerConnect, QGenda, PerfectServe Lightning Bolt.</p>
+      </div>
+      <div class="card">
+        <h3>📱 Patient Engagement & Portals</h3>
+        <p>Patient-facing apps, portals, remote monitoring, and telehealth. Examples: Epic MyChart, Doximity, Get Well, Relatient Dash.</p>
+      </div>
+      <div class="card">
+        <h3>🔐 Security & Compliance</h3>
+        <p>IoT security for medical devices, identity/access management, and privacy monitoring. Examples: Claroty Medigate, Protenus, SailPoint.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 2 -->
+  <section id="software-catalog">
+    <div class="section-title">
+      <div class="icon">📋</div>
+      <h2>2. Comprehensive Software Catalog — What Each Does</h2>
+    </div>
+
+    <div class="callout info">
+      <strong>Research Note</strong>
+      All findings sourced from KLAS Research 2024 Best in KLAS Awards, vendor websites, TechTarget/HealthIT, and real-world news coverage (2024–2026).
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Software / Vendor</th>
+            <th>Category</th>
+            <th>Target Customer</th>
+            <th>Core Capabilities</th>
+            <th>Market Position</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- EHR Tier 1 -->
+          <tr>
+            <td><strong>Epic EpicCare</strong></td>
+            <td><span class="tag">Inpatient EHR</span></td>
+            <td>Large hospital systems (400+ beds)</td>
+            <td>Clinical documentation, CPOE, medication management, scheduling, billing (Resolute), patient portal (MyChart), telehealth, population health, AI tools (DAX ambient scribe), interoperability (Care Everywhere, FHIR APIs)</td>
+            <td>42.3% of US acute care EHR market. Dominant player. KLAS score 88.2–91.9. Over 55% of US acute care beds.</td>
+          </tr>
+          <tr>
+            <td><strong>Oracle Health</strong><br/><small>(formerly Cerner)</small></td>
+            <td><span class="tag">Inpatient EHR</span></td>
+            <td>Large hospitals, government (VA, DoD)</td>
+            <td>Clinical data repository, CPOE, clinical documentation, revenue cycle, PowerChart workflow, CommunityWorks for critical-access hospitals</td>
+            <td>22.9% of US acute care EHR market. #2 behind Epic. Undergoing significant modernization under Oracle since 2022 acquisition.</td>
+          </tr>
+          <tr>
+            <td><strong>MEDITECH Expanse</strong></td>
+            <td><span class="tag">Inpatient EHR</span></td>
+            <td>Small–medium hospitals (1–400 beds), critical access</td>
+            <td>Acute care EHR, patient accounting, ambulatory care, long-term care, community health, mobile access</td>
+            <td>14.8% of US acute care EHR market. KLAS scores 75.3–80.4. Strongest in small/community hospitals.</td>
+          </tr>
+          <tr>
+            <td><strong>athenahealth</strong><br/><small>(athenaClinicals + athenaCollector)</small></td>
+            <td><span class="tag">Ambulatory EHR</span><span class="tag">RCM</span></td>
+            <td>Independent physician practices (1–75 physicians)</td>
+            <td>Cloud EHR, practice management, revenue cycle, patient communication, care coordination. Network-based real-time claim scrubbing.</td>
+            <td>Best in KLAS Ambulatory EHR (small independent) 80.9. Widely used by independent practices. Acquired by Veritas Capital/Virence/Athena.</td>
+          </tr>
+          <tr>
+            <td><strong>NextGen Healthcare</strong></td>
+            <td><span class="tag">Ambulatory EHR</span></td>
+            <td>Specialty practices, behavioral health, FQHC</td>
+            <td>EHR, practice management, behavioral health suite, patient engagement, population health, telehealth</td>
+            <td>KLAS Behavioral Health Suite 79.8. Strong in underserved behavioral health space.</td>
+          </tr>
+          <tr>
+            <td><strong>Veradigm</strong><br/><small>(formerly Allscripts)</small></td>
+            <td><span class="tag">Ambulatory EHR</span><span class="tag">Data</span></td>
+            <td>Physician offices, health systems</td>
+            <td>EHR, practice management, data/analytics, life sciences data marketplace, RCM services, e-prescribing</td>
+            <td>Mid-market ambulatory EHR. Growing focus on real-world data for pharma/life sciences.</td>
+          </tr>
+          <tr>
+            <td><strong>Practice Fusion</strong></td>
+            <td><span class="tag">Ambulatory EHR</span></td>
+            <td>Small independent practices (1–10 physicians)</td>
+            <td>Cloud-based EHR, e-prescribing, lab integration, basic scheduling, patient records</td>
+            <td>Budget-tier EHR. Limited advanced features. Part of Veradigm.</td>
+          </tr>
+          <tr>
+            <td><strong>Kareo / Tebra</strong></td>
+            <td><span class="tag">Practice Management</span></td>
+            <td>Independent private practices</td>
+            <td>EHR, billing, scheduling, patient communications, telehealth for small practices</td>
+            <td>Formed by Kareo + PatientPop merger. Targets independent practice growth and billing.</td>
+          </tr>
+          <!-- RCM -->
+          <tr>
+            <td><strong>Waystar</strong></td>
+            <td><span class="tag">RCM</span></td>
+            <td>Hospitals, health systems, medical groups</td>
+            <td>Claims management, clearinghouse, prior authorization automation, payment integrity, denial management, patient financial experience</td>
+            <td>KLAS Patient Financial Engagement 91.5. Publicly traded. End-to-end RCM platform.</td>
+          </tr>
+          <tr>
+            <td><strong>Experian Health</strong></td>
+            <td><span class="tag">RCM</span></td>
+            <td>Hospitals, health systems</td>
+            <td>Claims management (ClaimSource), contract management, patient access (AccuReg), identity verification, insurance discovery</td>
+            <td>KLAS Claims Management 89.3, Patient Access 91.8. Leverages Experian's consumer data for eligibility.</td>
+          </tr>
+          <tr>
+            <td><strong>R1 RCM</strong></td>
+            <td><span class="tag">RCM Services</span></td>
+            <td>Large hospital systems</td>
+            <td>End-to-end revenue cycle outsourcing, physician RCM services, government reimbursement services, underpayment recovery</td>
+            <td>KLAS Government Reimbursement 96.9, Underpayment Recovery 92.9. Major outsourced RCM player.</td>
+          </tr>
+          <!-- Imaging -->
+          <tr>
+            <td><strong>Sectra PACS</strong></td>
+            <td><span class="tag">Imaging</span></td>
+            <td>Hospitals, radiology departments</td>
+            <td>Picture archiving and communication, radiology workflow, enterprise imaging, zero-footprint viewer</td>
+            <td>Best in KLAS PACS (both large and small) 88.6–91.0. Swedish vendor with strong customer loyalty.</td>
+          </tr>
+          <tr>
+            <td><strong>Nuance (Microsoft)</strong></td>
+            <td><span class="tag">AI Scribe</span><span class="tag">CDI</span></td>
+            <td>Hospitals, health systems</td>
+            <td>Dragon Medical One (speech recognition), DAX Copilot (ambient AI scribe), clinical documentation integrity (CDI), PowerShare image exchange</td>
+            <td>KLAS CDI 91.1, Speech Recognition 91.3. Acquired by Microsoft in 2022. DAX Copilot is fastest-growing ambient AI scribe.</td>
+          </tr>
+          <!-- Pharmacy -->
+          <tr>
+            <td><strong>BD Pyxis</strong></td>
+            <td><span class="tag">Pharmacy</span></td>
+            <td>Hospital pharmacies</td>
+            <td>Automated dispensing cabinets, medication management, inventory tracking, narcotic diversion detection</td>
+            <td>KLAS Automated Dispensing Cabinets 84.9. Industry leader in automated dispensing.</td>
+          </tr>
+          <!-- Clinical Communications -->
+          <tr>
+            <td><strong>TigerConnect</strong></td>
+            <td><span class="tag">Clinical Comms</span></td>
+            <td>Hospitals, ambulatory</td>
+            <td>HIPAA-compliant secure messaging, care team collaboration, alarm management, nurse call integration, on-call scheduling</td>
+            <td>KLAS Clinical Comms (Ambulatory) 89.7. Market leader in clinical communications.</td>
+          </tr>
+          <!-- Patient Engagement -->
+          <tr>
+            <td><strong>Epic MyChart</strong></td>
+            <td><span class="tag">Patient Portal</span></td>
+            <td>Patients of Epic-using health systems</td>
+            <td>Patient portal, secure messaging with providers, test results, appointment scheduling, bill pay, virtual visits, after-visit summaries</td>
+            <td>KLAS Patient Portals 90.1. Used by 300M+ patients. Most widely adopted patient portal in the US.</td>
+          </tr>
+          <tr>
+            <td><strong>Doximity</strong></td>
+            <td><span class="tag">Provider Network</span><span class="tag">Telehealth</span></td>
+            <td>US physicians, NPs, PAs</td>
+            <td>Professional physician network, video calling (Dialer), fax replacement, e-signature, drug info, job board, clinical news</td>
+            <td>KLAS Video Conferencing 91.7. 80%+ of US physicians registered. Unique physician-only LinkedIn+telehealth combo.</td>
+          </tr>
+          <tr>
+            <td><strong>Abridge</strong></td>
+            <td><span class="tag">AI Scribe</span></td>
+            <td>Hospital systems, primarily Epic users</td>
+            <td>Generative AI ambient documentation, real-time conversation-to-note, multi-specialty support, EHR integration, NEJM/JAMA clinical decision support</td>
+            <td>Epic's first "pal" partner. Fastest-growing AI scribe startup. Raising hundreds of millions in venture funding.</td>
+          </tr>
+          <!-- Operations -->
+          <tr>
+            <td><strong>QGenda</strong></td>
+            <td><span class="tag">Staff Scheduling</span></td>
+            <td>Hospitals, health systems</td>
+            <td>Nurse and staff scheduling, provider scheduling, credentialing, workforce analytics</td>
+            <td>KLAS Nurse & Staff Scheduling 92.3. Strong in complex multi-unit hospital scheduling.</td>
+          </tr>
+          <tr>
+            <td><strong>TeleTracking</strong></td>
+            <td><span class="tag">Patient Flow</span></td>
+            <td>Large hospital systems</td>
+            <td>Real-time patient flow, capacity management, bed management, discharge planning, OR management</td>
+            <td>KLAS Patient Flow 88.9. Reduces boarding time and improves throughput.</td>
+          </tr>
+          <tr>
+            <td><strong>Workday</strong></td>
+            <td><span class="tag">ERP / HCM</span></td>
+            <td>Hospital systems (HR / Finance)</td>
+            <td>HCM, financial management, supply chain, payroll, workforce planning — not clinical</td>
+            <td>KLAS ERP 87.2. Displacing legacy Lawson/PeopleSoft in healthcare back-office.</td>
+          </tr>
+          <!-- Specialty -->
+          <tr>
+            <td><strong>PointClickCare</strong></td>
+            <td><span class="tag">Long-Term Care</span></td>
+            <td>Skilled nursing facilities, senior living</td>
+            <td>EHR for post-acute/long-term care, care planning, medication management, financial management, analytics</td>
+            <td>KLAS Long-Term Care 83.3. Dominant in skilled nursing facilities.</td>
+          </tr>
+          <tr>
+            <td><strong>WebPT</strong></td>
+            <td><span class="tag">Rehab / Therapy EHR</span></td>
+            <td>Physical/occupational/speech therapy outpatient clinics</td>
+            <td>Documentation templates, billing, scheduling, patient engagement, outcomes tracking, MIPS reporting</td>
+            <td>KLAS Outpatient Therapy/Rehab 80.8. Market leader for rehab therapy practices.</td>
+          </tr>
+          <tr>
+            <td><strong>Nextech</strong></td>
+            <td><span class="tag">Specialty EHR</span></td>
+            <td>Dermatology, plastic surgery, ophthalmology</td>
+            <td>Specialty-specific EHR, inventory management for aesthetics, patient marketing, telehealth, RCM</td>
+            <td>KLAS Ambulatory Specialty EHR 84.2. Strong in aesthetic/cosmetic specialties.</td>
+          </tr>
+          <!-- Security -->
+          <tr>
+            <td><strong>Claroty Medigate</strong></td>
+            <td><span class="tag">IoT Security</span></td>
+            <td>Hospitals with connected medical devices</td>
+            <td>IoMT (Internet of Medical Things) security, medical device visibility, network segmentation, vulnerability management, anomaly detection</td>
+            <td>KLAS Healthcare IoT Security 95.4. Critical as hospital devices face escalating ransomware attacks.</td>
+          </tr>
+          <tr>
+            <td><strong>Protenus</strong></td>
+            <td><span class="tag">Privacy Monitoring</span><span class="tag">Drug Diversion</span></td>
+            <td>Hospitals</td>
+            <td>AI-powered patient privacy monitoring (breach detection), drug diversion analytics for narcotic access</td>
+            <td>KLAS Drug Diversion 85.5, Patient Privacy Monitoring 93.2.</td>
+          </tr>
+          <!-- Interoperability -->
+          <tr>
+            <td><strong>Rhapsody (Corepoint)</strong></td>
+            <td><span class="tag">Integration Engine</span></td>
+            <td>Health systems, HIEs</td>
+            <td>HL7 v2/FHIR message routing, interface engine, data translation between disparate systems, cloud-based integration</td>
+            <td>KLAS Integration Engines 95.6. Core plumbing for healthcare data exchange.</td>
+          </tr>
+          <tr>
+            <td><strong>Innovaccer</strong></td>
+            <td><span class="tag">CRM</span><span class="tag">Population Health</span></td>
+            <td>Health systems, ACOs, payers</td>
+            <td>Healthcare data platform, CRM, care management, population health, network analytics, FHIR-native data integration</td>
+            <td>KLAS CRM 93.6. One of the fastest-growing health IT platforms. AI-native architecture.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 3 -->
+  <section id="what-they-solve">
+    <div class="section-title">
+      <div class="icon">✅</div>
+      <h2>3. What Current Software Does Solve (Strengths)</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>✅ Digital Record Storage</h3>
+        <p>Virtually all major hospitals have eliminated paper charts for core clinical data — lab results, vitals, medications, and problem lists exist digitally.</p>
+      </div>
+      <div class="card">
+        <h3>✅ Order Entry / e-Prescribing</h3>
+        <p>CPOE (Computerized Physician Order Entry) dramatically reduces handwriting-related medication errors. e-Prescribing is standard across all major EHRs.</p>
+      </div>
+      <div class="card">
+        <h3>✅ Basic Scheduling & Appointment Management</h3>
+        <p>Online booking, waitlist management, appointment reminders (SMS/email), and multi-provider calendar coordination are well-handled.</p>
+      </div>
+      <div class="card">
+        <h3>✅ Insurance Billing & Claims Submission</h3>
+        <p>Electronic claims filing (837/835 EDI), clearinghouse scrubbing, and ERA (Electronic Remittance Advice) are mature capabilities.</p>
+      </div>
+      <div class="card">
+        <h3>✅ Lab & Radiology Integration</h3>
+        <p>Results routing from labs (Quest, LabCorp, in-house) and radiology to the ordering provider's inbox is reliable and widely deployed.</p>
+      </div>
+      <div class="card">
+        <h3>✅ Drug Interaction Alerts</h3>
+        <p>Real-time drug-drug and drug-allergy interaction checking at the point of prescribing is embedded in all major EHRs.</p>
+      </div>
+      <div class="card">
+        <h3>✅ Intra-System Interoperability</h3>
+        <p>Within a single health system (e.g., all Epic), data flows seamlessly between departments, specialties, and care settings. Epic's Care Everywhere shares 27M+ charts daily.</p>
+      </div>
+      <div class="card">
+        <h3>✅ Basic Telehealth / Video Visits</h3>
+        <p>Post-COVID telehealth capabilities are available in Epic, Oracle Health, Doximity, and many ambulatory EHRs — though quality and integration depth vary.</p>
+      </div>
+      <div class="card">
+        <h3>✅ Regulatory Compliance Reporting</h3>
+        <p>MIPS/MACRA quality measure reporting, HIPAA audit logging, and CMS interoperability rule compliance are well-supported in enterprise platforms.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 4 -->
+  <section id="problems">
+    <div class="section-title">
+      <div class="icon">🚨</div>
+      <h2>4. Major Problems Current Software Fails to Solve</h2>
+    </div>
+
+    <div class="callout danger">
+      <strong>⚠️ Core Industry Crisis</strong>
+      Despite $180B+ in annual healthcare IT spending, clinician burnout is at an all-time high, medical errors persist, patients remain confused and underserved, and the fragmented technology ecosystem actively hinders coordinated care. The problems are deep, systemic, and largely unsolved.
+    </div>
+
+    <div class="card-grid">
+
+      <!-- PROBLEM 1 -->
+      <div class="problem-card">
+        <h3>🔥 Problem 1: Clinician Burnout from EHR Documentation Burden</h3>
+        <p>Physicians spend an average of <strong>2 hours on EHR work for every 1 hour of direct patient care</strong>. The AMA reports that EHR-related burnout persists acutely in emergency medicine, oncology, and urology. Massive amounts of time are lost to "note bloat" — copying forward old text, clicking through alert fatigue, and satisfying compliance checklists that have nothing to do with actual care.</p>
+        <p style="margin-top:.5rem"><strong>What exists:</strong> AI scribes (Nuance DAX, Abridge). <strong>What's still broken:</strong> AI scribe notes score lower in quality than clinician-written notes; subtle errors (wrong negations, false inferences from nonverbal cues) are common. Providers still spend significant time reviewing. No solution has truly eliminated the burden.</p>
+      </div>
+
+      <!-- PROBLEM 2 -->
+      <div class="problem-card">
+        <h3>🔥 Problem 2: Broken Cross-System Interoperability</h3>
+        <p>When a patient moves between a hospital that uses Epic and a community clinic that uses Oracle Health or an independent EHR, their records often do not follow them. The FHIR standard exists but implementation is patchy. Epic has been accused in federal antitrust lawsuits of acting as a "walled garden" that blocks competitor data access.</p>
+        <p style="margin-top:.5rem">The US Particle Health antitrust suit against Epic (filed 2024, still proceeding) and the Texas Attorney General's 2025 suit both allege Epic monopolizes data access and restricts parents from accessing minors' records — illustrating that interoperability is still fundamentally broken.</p>
+      </div>
+
+      <!-- PROBLEM 3 -->
+      <div class="problem-card orange">
+        <h3>⚠️ Problem 3: Alert Fatigue & Clinical Decision Support That Doesn't Work</h3>
+        <p>EHRs fire thousands of alerts per physician per day — drug interaction warnings, overdue labs, order checks. Studies show physicians override <strong>90%+ of alerts</strong> because they're irrelevant or poorly calibrated. Epic's own integrated clinical decision support tools (sepsis and readmission risk models) were found by a 2025 meta-analysis to show "limited achievement in real-world settings."</p>
+        <p style="margin-top:.5rem">No system has solved the signal-to-noise problem. The result: real dangerous alerts are buried in noise, and true actionable warnings are missed.</p>
+      </div>
+
+      <!-- PROBLEM 4 -->
+      <div class="problem-card">
+        <h3>🔥 Problem 4: Prior Authorization Hell</h3>
+        <p>Prior authorization — the requirement for insurers to approve treatments before they're given — consumes an estimated <strong>2 hours per physician per day</strong>. Despite the CMS Prior Authorization Final Rule (effective 2024) requiring insurers to implement FHIR APIs for prior auth, the majority of requests still happen via fax, phone, and web portals. Treatments are delayed, patients suffer, and physicians are furious.</p>
+        <p style="margin-top:.5rem">The CMS Health Tech Ecosystem and Epic are pledging electronic prior auth, but actual implementations lag years behind mandate timelines.</p>
+      </div>
+
+      <!-- PROBLEM 5 -->
+      <div class="problem-card orange">
+        <h3>⚠️ Problem 5: Patient Financial Experience is a Nightmare</h3>
+        <p>Patients receive incomprehensible Explanation of Benefits (EOBs), surprise bills months after discharge, and cannot get upfront cost estimates. Hospitals lose billions in bad debt, while patients avoid necessary care due to financial confusion. RCM software solves the hospital's billing problem — it does NOT solve the patient's confusion or anxiety.</p>
+      </div>
+
+      <!-- PROBLEM 6 -->
+      <div class="problem-card">
+        <h3>🔥 Problem 6: No Affordable Solution for Private Clinics & Small Hospitals</h3>
+        <p>Epic costs $1M+ to implement and hundreds of thousands annually in licensing. MEDITECH and Oracle Health are similarly priced for enterprise. Private clinics (dermatology, family medicine, dentistry, physiotherapy) in developing countries — India, Southeast Asia, Africa, Latin America — have ZERO access to enterprise-grade digital health tools. They manage patients in WhatsApp groups and paper ledgers. This represents <strong>billions of underserved patients</strong> globally.</p>
+      </div>
+
+      <!-- PROBLEM 7 -->
+      <div class="problem-card orange">
+        <h3>⚠️ Problem 7: Behavioral Health Data Exchange is Severely Broken</h3>
+        <p>Mental health and substance use records have extra-legal protections (42 CFR Part 2) that make them extremely difficult to share even with patient consent. Most behavioral health practices use outdated systems or none at all. The ONC documented in 2024/2025 that behavioral health EHR adoption lags by years compared to medical EHRs, and interoperability with medical records is nearly non-existent.</p>
+      </div>
+
+      <!-- PROBLEM 8 -->
+      <div class="problem-card">
+        <h3>🔥 Problem 8: Hospital Supply Chain & Inventory is Opaque</h3>
+        <p>Most hospitals cannot tell you in real-time how many units of a specific implant, surgical supply, or medication are on the shelf vs. in transit vs. on backorder. During COVID, this blind spot caused catastrophic shortages. ERP systems (Workday, Lawson) handle financial inventory — but clinical-grade, bedside-connected supply chain intelligence is largely missing.</p>
+      </div>
+
+      <!-- PROBLEM 9 -->
+      <div class="problem-card orange">
+        <h3>⚠️ Problem 9: Discharge Planning & Care Transitions Are Chaos</h3>
+        <p>When a patient is discharged from the hospital, the care transition to PCP, specialist, or skilled nursing facility is notoriously chaotic. Studies show <strong>20% of Medicare patients are readmitted within 30 days</strong>, often due to poor discharge planning, unclear medication instructions, or follow-up appointment failures. No software actually coordinates this end-to-end in a way that works for patients.</p>
+      </div>
+
+      <!-- PROBLEM 10 -->
+      <div class="problem-card">
+        <h3>🔥 Problem 10: Medical Device / IoT Security and Monitoring Gaps</h3>
+        <p>Hospitals have thousands of connected medical devices — infusion pumps, ventilators, imaging equipment, implantable monitors — that run outdated firmware, have no security patching, and often communicate on unencrypted protocols. The healthcare sector is the #1 target for ransomware. IoT security solutions exist (Claroty Medigate) but are expensive and address security only — NOT clinical telemetry integration or predictive maintenance.</p>
+      </div>
+
+      <!-- PROBLEM 11 -->
+      <div class="problem-card orange">
+        <h3>⚠️ Problem 11: Patient Scheduling Friction and No-Shows</h3>
+        <p>Despite "self-scheduling" features, most hospital appointment booking requires a phone call, a 10–15 minute wait, and navigating complex specialty referral rules. No-show rates are 10–30% at most facilities, costing the US healthcare system $150B+ annually. Current reminders are passive. No system does intelligent predictive no-show intervention with multi-channel re-engagement.</p>
+      </div>
+
+      <!-- PROBLEM 12 -->
+      <div class="problem-card">
+        <h3>🔥 Problem 12: Nurse Staffing and Workforce Crisis has No Tech Solution</h3>
+        <p>The US has a critical nursing shortage. Scheduling tools (QGenda) handle logistics but don't solve the deeper workforce intelligence problem: predicting staffing needs based on patient acuity, flagging early burnout indicators in staff, optimizing float pools dynamically, or connecting hospitals to PRN/agency nurses in real time. Travel nurse agencies profit enormously from this gap.</p>
+      </div>
+
+      <!-- PROBLEM 13 -->
+      <div class="problem-card orange">
+        <h3>⚠️ Problem 13: Social Determinants of Health (SDoH) Are Invisible to Clinicians</h3>
+        <p>A patient's housing instability, food insecurity, or inability to afford medications are far more predictive of health outcomes than their diagnosis — yet these "social determinants" are almost never captured in clinical systems. findhelp (formerly Aunt Bertha) exists for SDoH community referrals (KLAS 89.0) but is siloed from clinical decision-making workflows.</p>
+      </div>
+
+      <!-- PROBLEM 14 -->
+      <div class="problem-card">
+        <h3>🔥 Problem 14: Clinical Trials and Research Enrollment Gap</h3>
+        <p>Only ~3% of cancer patients participate in clinical trials, despite most wanting access. Matching patients to trials based on their complete medical record is extremely complex. Most EHRs do not proactively surface trial eligibility at the point of care. This leaves billions in research funding and potentially life-saving treatments inaccessible.</p>
+      </div>
+
+      <!-- PROBLEM 15 -->
+      <div class="problem-card orange">
+        <h3>⚠️ Problem 15: Language Barriers in AI Health Tools</h3>
+        <p>AI scribes perform significantly worse for patients who speak with an accent, are non-native English speakers, or communicate through interpreters. A 2025 study found AI-generated notes had measurably lower quality for these populations — which are already at-risk for care disparities. No AI scribe has adequately solved multilingual, multicultural clinical documentation.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 5 -->
+  <section id="clinic-gap">
+    <div class="section-title">
+      <div class="icon">🏪</div>
+      <h2>5. The Private Clinic Gap — A Massive Underserved Market</h2>
+    </div>
+
+    <div class="callout warning">
+      <strong>The Elephant in the Room</strong>
+      The entire healthcare software industry is built for large US hospital systems. The world's 500M+ private clinic visits per day — particularly in Asia, Africa, Latin America, and the Middle East — are almost completely unaddressed by software.
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>❌ No Affordable All-in-One Platform</h3>
+        <p>A family medicine clinic with 2 doctors and a receptionist cannot afford Epic or even athenahealth's per-visit fees. They need appointment booking + patient records + billing + prescription writing in a single, affordable, easy-to-use app.</p>
+      </div>
+      <div class="card">
+        <h3>❌ No Offline-First Capability</h3>
+        <p>In developing countries, internet connectivity is unreliable. All current cloud-first software fails when the connection drops. A clinic management app needs offline-first architecture that syncs when connected.</p>
+      </div>
+      <div class="card">
+        <h3>❌ No Multilingual Support</h3>
+        <p>Current software is 95%+ English. Clinics in India, Nigeria, Brazil, or Saudi Arabia need software that speaks their language, uses local drug databases, and understands local insurance schemes (NHIF, Ayushman Bharat, NHIS, etc.).</p>
+      </div>
+      <div class="card">
+        <h3>❌ No WhatsApp-Native Patient Communication</h3>
+        <p>In most developing countries, WhatsApp is the primary communication channel. Current practice management tools use email and SMS — both of which patients ignore. A WhatsApp-first patient communication system for appointment reminders, lab results, and prescription refills is completely missing.</p>
+      </div>
+      <div class="card">
+        <h3>❌ No Local Pharmacy / Drug Database Integration</h3>
+        <p>e-Prescribing tools in the US connect to US pharmacies (Surescripts network). In India, Nigeria, Brazil, etc., no equivalent integration exists. Doctors write paper prescriptions that are then lost or misread.</p>
+      </div>
+      <div class="card">
+        <h3>❌ No Simple Revenue Intelligence for Small Clinics</h3>
+        <p>Private clinic owners have no visibility into which services are most profitable, which days are over/under-booked, or where revenue is leaking. They're flying blind with a ledger book.</p>
+      </div>
+      <div class="card">
+        <h3>❌ No AI Triage for Walk-In Clinics</h3>
+        <p>Walk-in clinics serve patients with unknown urgency. No affordable AI triage tool exists to help a receptionist quickly categorize incoming patients (is this a 5-minute cold, or a chest pain that needs immediate escalation?).</p>
+      </div>
+      <div class="card">
+        <h3>❌ No Family Health History Tracking</h3>
+        <p>Family medicine clinics treat multiple members of the same family — but current software treats each patient as a silo. Connecting family members, tracking hereditary risk, and sending preventive care alerts based on family health patterns is essentially non-existent.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 6 -->
+  <section id="critical-gaps">
+    <div class="section-title">
+      <div class="icon">🎯</div>
+      <h2>6. Critical Technology Gaps — What No One Has Built Yet</h2>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <h4>Gap 1: Proactive Care Intelligence (not reactive data entry)</h4>
+        <p>Every EHR today is a passive data repository. You enter data, it stores it. What doesn't exist: a system that proactively surfaces "Patient A is overdue for a diabetic eye exam and their HbA1c has trended up for 3 quarters — auto-schedule them and alert their PCP." End-to-end proactive care management for individual patients at scale remains unsolved.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 2: Real Patient Journey Mapping Across All Settings</h4>
+        <p>No software gives a patient (or their care team) a true unified view of their care journey — ER visit (Epic) → specialist consult (NextGen) → home health (MatrixCare) → pharmacy fill (CVS) → wearable data (Apple Watch). Each silo has data. No one owns the whole journey.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 3: Intelligent, Contextual Prior Authorization Automation</h4>
+        <p>Prior auth is the most hated workflow in medicine. While CMS mandates are forcing APIs, no system has built a truly intelligent agent that reads the clinical note, understands insurer criteria, auto-populates the form, submits, and tracks — all within the clinical workflow. This is a massive AI automation opportunity.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 4: Real-Time Hospital Operational Intelligence</h4>
+        <p>Most hospital CEOs and CMOs cannot answer in real time: "How many avoidable days are there in-house right now?" "What's the bottleneck in our ED today — registration, labs, or beds?" "Which surgeries could be rescheduled to reduce weekend cost?" Operational analytics for real-time hospital management — beyond EHR data — is primitive.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 5: Predictive Patient No-Show &amp; Abandonment Prevention</h4>
+        <p>Using behavioral data (appointment history, demographic, distance from clinic, weather, time of day) to predict no-shows with 80%+ accuracy and automatically trigger proactive re-engagement (call, text, WhatsApp, rescheduling offer) doesn't exist as a mature, affordable product.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 6: Automated Medication Reconciliation on Transitions of Care</h4>
+        <p>When a patient is discharged, their medication list is often wrong — duplicate entries, discontinued drugs still listed, new drugs not added. Medication reconciliation errors are a leading cause of readmissions. No automated, AI-driven reconciliation system handles this reliably at discharge.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 7: Clinician Wellbeing Monitoring and Burnout Prevention</h4>
+        <p>No hospital system monitors clinician workload patterns, time-in-EHR metrics, after-hours chart activity, or self-reported stress signals and proactively intervenes. The data to detect burnout early exists in the EHR logs — but no product uses it.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 8: Transparent, Upfront Patient Cost Estimator</h4>
+        <p>The No Surprises Act requires hospitals to post prices, but actual patient-specific cost estimates (based on their specific insurance, deductible status, procedure codes) at the time of scheduling remain shockingly rare and inaccurate. A real-time, accurate, personalized cost estimate tool integrated into scheduling doesn't exist.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 9: Unified Wearable + Clinical Data Integration</h4>
+        <p>Patients wear Apple Watches, Fitbits, continuous glucose monitors, and blood pressure cuffs. This data is trapped in consumer apps. Clinical systems don't know what to do with 24/7 streams of wearable data. A system that meaningfully aggregates, filters, and presents wearable data in a clinical context — with actionable alerts — does not broadly exist.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Gap 10: AI-Driven Drug Dosing for Complex Patients</h4>
+        <p>For patients with multiple chronic diseases taking 10+ medications, optimal drug dosing requires considering kidney function, liver enzymes, drug-drug interactions, genetic variants (pharmacogenomics), and patient weight. Most systems check binary drug-drug interactions. Personalized, AI-driven dosing recommendations factoring in all patient parameters simultaneously are not available in routine clinical care.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 7 -->
+  <section id="opportunities">
+    <div class="section-title">
+      <div class="icon">💡</div>
+      <h2>7. Software Opportunity Areas — Where to Build</h2>
+    </div>
+
+    <div class="card-grid">
+
+      <div class="opp-card">
+        <span class="priority high">HIGH PRIORITY</span>
+        <h3>🌍 Global Clinic OS — All-in-One for Private Clinics (Developing World)</h3>
+        <p>Build an offline-first, multilingual, WhatsApp-integrated clinic management platform targeting private clinics in India, Africa, Middle East, and Southeast Asia. Features: patient records, appointments, billing, e-prescriptions, local pharmacy integration, SMS/WhatsApp reminders. Price: $10–50/month per clinic. TAM: 500M+ clinic visits per day in these regions.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority high">HIGH PRIORITY</span>
+        <h3>🤖 Prior Authorization AI Agent</h3>
+        <p>Build an autonomous AI agent that reads clinical notes, understands payer-specific coverage criteria (via fine-tuned LLMs trained on payer medical policies), auto-populates prior auth forms, submits electronically, tracks status, and escalates denials with supporting documentation — all without physician involvement. This saves 2 hours/physician/day. Addressable market: $15B+ in wasted PA labor costs in the US alone.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority high">HIGH PRIORITY</span>
+        <h3>📊 Real-Time Hospital Operations Intelligence Platform</h3>
+        <p>A real-time operational dashboard that ingests data from EHR, bed management, OR scheduling, staffing, supply chain, and lab — and surfaces actionable bottlenecks to the CMO/COO in plain language. "Your ED has a 3-hour bottleneck at radiology right now. Rerouting 4 non-urgent CTs to afternoon will clear it." AI-driven operational insight, not just dashboards.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority high">HIGH PRIORITY</span>
+        <h3>🧠 Proactive Patient Health Intelligence Engine</h3>
+        <p>A system that continuously monitors each patient's longitudinal record and proactively identifies care gaps, upcoming preventive screenings, medication refill needs, and chronic disease deterioration — then automatically triggers outreach (call, SMS, portal message). Not just population health dashboards — an autonomous outreach system per patient.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority medium">MEDIUM PRIORITY</span>
+        <h3>💊 Medication Reconciliation Intelligence at Discharge</h3>
+        <p>An AI-powered medication reconciliation tool that compares the EHR medication list, discharge prescription, and pharmacy fill records to identify discrepancies, flag high-risk drugs for elderly patients, and generate a patient-friendly "medication card" with clear instructions. Targets the leading cause of 30-day readmissions.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority medium">MEDIUM PRIORITY</span>
+        <h3>📅 Intelligent No-Show Prevention System</h3>
+        <p>Predictive no-show scoring (based on distance, time of day, weather, appointment type, patient history) with automated multi-channel outreach. For high-risk no-show appointments: auto-offer overbooking slot, send WhatsApp reminder, auto-offer telehealth alternative. Reduces revenue loss from no-shows by 40–60%.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority medium">MEDIUM PRIORITY</span>
+        <h3>💰 Patient-Centric Cost Transparency Engine</h3>
+        <p>Real-time, personalized cost estimates at point of scheduling — not posted chargemaster prices, but actual patient-specific out-of-pocket based on their plan, deductible status, and specific procedure codes. Integrates with payer real-time eligibility APIs. Reduces billing disputes and bad debt.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority medium">MEDIUM PRIORITY</span>
+        <h3>⌚ Wearable + EHR Fusion Platform</h3>
+        <p>A middleware platform that aggregates Apple Health, Google Fit, CGM, remote BP cuffs, and other wearable data — normalizes it using FHIR — and presents clinically meaningful summaries in the physician's EHR workflow. Not raw data dumps, but AI-synthesized clinical insight: "Patient's resting heart rate has elevated 15% over 30 days alongside declining sleep quality."</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority medium">MEDIUM PRIORITY</span>
+        <h3>🧬 Clinical Trial Match at Point of Care</h3>
+        <p>An EHR-embedded tool that checks every eligible patient against active clinical trials and surfaces trial opportunities to oncologists and specialists at the time of the clinic visit. Addresses the 97% of patients who never participate in trials. Integration with ClinicalTrials.gov + FHIR patient data.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority medium">MEDIUM PRIORITY</span>
+        <h3>🌐 Behavioral Health Interoperability Bridge</h3>
+        <p>A consent-management and data exchange platform specifically for behavioral health records, handling 42 CFR Part 2 compliance, enabling secure sharing between mental health, substance use treatment, and primary care providers when patients consent. No adequate solution exists in this critically underserved space.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority high">HIGH PRIORITY</span>
+        <h3>👩‍⚕️ Clinician Wellbeing Intelligence Dashboard</h3>
+        <p>An opt-in analytics platform that monitors EHR usage patterns (after-hours logins, time per note, alert override rates, in-basket volume) and generates early burnout risk scores. Provides department heads with aggregated (de-identified) insights to redistribute workload before burnout occurs. Directly addresses the healthcare workforce retention crisis.</p>
+      </div>
+
+      <div class="opp-card">
+        <span class="priority high">HIGH PRIORITY</span>
+        <h3>🏥 Post-Discharge Care Transition Coordinator (AI Agent)</h3>
+        <p>An autonomous AI agent that takes over discharge coordination: sends follow-up appointment reminders, checks medication adherence via pill-pack integration or pharmacy data, escalates early warning signs to care managers, coordinates with SNFs and home health agencies — reducing 30-day readmissions by 15–25%.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 8 -->
+  <section id="roadmap">
+    <div class="section-title">
+      <div class="icon">🗺️</div>
+      <h2>8. Recommended Build Roadmap</h2>
+    </div>
+
+    <div class="callout success">
+      <strong>Strategic Recommendation</strong>
+      The biggest whitespace with the least competition, lowest regulatory complexity, and highest global TAM is the <em>private clinic market in developing countries</em>. Combined with AI-native intelligence layers (prior auth, proactive care, no-show prevention), this is where a new entrant can win.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>What to Build</th>
+            <th>Target Segment</th>
+            <th>Competitive Moat</th>
+            <th>Revenue Model</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag green">Phase 1 — 0–12 months</span></td>
+            <td><strong>Global Clinic OS</strong><br/>Offline-first clinic management: patient records, appointments, billing, e-prescriptions, WhatsApp patient messaging</td>
+            <td>Private clinics in India, SEA, Africa (1–10 physician practices)</td>
+            <td>Offline-first architecture, WhatsApp integration, local language support, local payment integrations</td>
+            <td>SaaS: $15–50/month/clinic. Target 10,000 clinics in year 1.</td>
+          </tr>
+          <tr>
+            <td><span class="tag orange">Phase 2 — 12–24 months</span></td>
+            <td><strong>AI Intelligence Layer</strong><br/>Proactive patient care gap detection, no-show prediction &amp; prevention, automated appointment optimization</td>
+            <td>Clinics on Phase 1 platform + US ambulatory practices</td>
+            <td>Proprietary patient behavior models trained on clinic data network</td>
+            <td>Premium tier: $100–200/month/clinic. Also license API to EHR vendors.</td>
+          </tr>
+          <tr>
+            <td><span class="tag">Phase 3 — 24–36 months</span></td>
+            <td><strong>Hospital Operations Intelligence</strong><br/>Real-time operational dashboard for small-medium hospitals: ED flow, staffing, bed management, discharge planning</td>
+            <td>District hospitals (50–300 beds) in developing world + community hospitals in US/EU</td>
+            <td>Lower price point than TeleTracking, native AI insights vs. dashboards</td>
+            <td>Enterprise: $2,000–10,000/month/hospital. Partner with MEDITECH and Oracle Health.</td>
+          </tr>
+          <tr>
+            <td><span class="tag">Phase 4 — 36–60 months</span></td>
+            <td><strong>Prior Auth AI Agent</strong> (US-focused)<br/>Autonomous payer prior authorization handling embedded in EHR workflow</td>
+            <td>US medical practices, hospital outpatient departments</td>
+            <td>Trained LLMs on payer policy databases + FHIR native. Measure success by PA approval rate, time saved.</td>
+            <td>Per-authorization fee ($2–5) or SaaS per physician ($200–500/month).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION 9 -->
+  <section id="summary">
+    <div class="section-title">
+      <div class="icon">📌</div>
+      <h2>9. Executive Summary — Top 10 Findings</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>1. Epic dominates US hospitals (42% market share)</h3>
+        <p>But faces antitrust scrutiny, costs millions to implement, and is inaccessible to small/rural hospitals and virtually the entire non-US world.</p>
+      </div>
+      <div class="card">
+        <h3>2. EHR documentation burden is an unresolved crisis</h3>
+        <p>Physicians spend 2:1 hours on EHR vs. patient care. AI scribes help but introduce new quality/equity risks.</p>
+      </div>
+      <div class="card">
+        <h3>3. Interoperability is still broken</h3>
+        <p>Despite FHIR mandates, lawsuits, and billions spent, patients' records still don't follow them across health systems, care settings, or national borders.</p>
+      </div>
+      <div class="card">
+        <h3>4. Prior authorization wastes 2 hours/physician/day</h3>
+        <p>No software fully automates this workflow. An AI agent that handles prior auth end-to-end is worth $15B+ annually in the US alone.</p>
+      </div>
+      <div class="card">
+        <h3>5. 500M+ daily private clinic visits are unserved by software</h3>
+        <p>The developing world private clinic market is essentially unaddressed by current software vendors. This is the biggest global whitespace.</p>
+      </div>
+      <div class="card">
+        <h3>6. Clinical decision support that actually works is non-existent</h3>
+        <p>Epic's own CDS models show "limited achievement in real-world settings." 90%+ of alerts are overridden. This is a fundamental unsolved AI problem.</p>
+      </div>
+      <div class="card">
+        <h3>7. Behavioral health interoperability is years behind</h3>
+        <p>Mental health and substance use data cannot be effectively shared. Patients fall through care gaps between behavioral and physical health.</p>
+      </div>
+      <div class="card">
+        <h3>8. Patient financial experience is broken</h3>
+        <p>Patients get surprise bills, can't get upfront cost estimates, and avoid care due to financial confusion. No software has truly solved patient-centric financial transparency.</p>
+      </div>
+      <div class="card">
+        <h3>9. 30-day readmissions cost $26B+ annually in the US</h3>
+        <p>Driven by poor discharge planning and care transitions. An AI-driven post-discharge care coordinator could reduce readmissions by 15–25%.</p>
+      </div>
+      <div class="card">
+        <h3>10. Clinician burnout is a software-solvable problem</h3>
+        <p>The data to detect early burnout exists in EHR logs. No product monitors, flags, and helps address it before it becomes a workforce crisis.</p>
+      </div>
+    </div>
+
+    <div class="callout success" style="margin-top:2rem">
+      <strong>Final Verdict: Where to Build</strong>
+      <p>The highest-impact, least-contested opportunity is an <strong>AI-native, offline-capable, multilingual Clinic OS for private clinics in developing markets</strong> — packaged as an affordable SaaS, starting with the core clinic operations (records + scheduling + billing + prescriptions + patient messaging) and progressively layering on intelligence features (proactive care gaps, no-show prevention, revenue analytics). This addresses a market of hundreds of millions of patients that no current software vendor is seriously targeting.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>Hospital & Healthcare Software — Gap Analysis Report</strong><br/>
+  Compiled: May 2026 &nbsp;|&nbsp; Research sources: KLAS Research 2024, TechTarget HealthIT, Epic/Oracle/MEDITECH vendor websites,
+  AMA Physician Burnout Reports, CMS Health Tech Ecosystem, Federal antitrust filings (Particle Health v. Epic, Texas AG v. Epic),
+  JAMA Network Open AI Scribe Study (2025), WHO Digital Health, Deloitte Future of Health<br/>
+  <em>For internal strategic planning use only.</em>
+</footer>
+
+</body>
+</html>

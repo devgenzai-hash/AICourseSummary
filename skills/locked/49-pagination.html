@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagination - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html" class="active"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Architecture Patterns &rarr; Pagination</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Beginner</span>
+                <span class="tag">Architecture</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Pagination</h1>
+            <p class="hero-subtitle">Breaking large result sets into manageable chunks &mdash; the difference between returning 10 million rows at once (crash) and delivering them 25 at a time (smooth). Every API that returns lists needs a pagination strategy.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Imagine you want to read a novel. You could print the <strong>entire book on a single endless scroll</strong> of paper &mdash; good luck finding chapter 7 or carrying it around. Instead, books are divided into <strong>pages</strong>. You read page 1, flip to page 2, and so on. You can jump to any page number, bookmark your position, and carry a manageable chunk at a time. Pagination in APIs works the same way &mdash; instead of dumping an entire database table into one response, you serve it page by page, letting the client request exactly the slice they need.</p>
+        </div>
+
+        <h2>Why Pagination Matters</h2>
+        <ul>
+            <li><strong>Memory:</strong> Loading 10M rows into memory at once will OOM your server and the client</li>
+            <li><strong>Network:</strong> A 500MB JSON response takes forever to transfer and parse</li>
+            <li><strong>Database:</strong> Full table scans without LIMIT are expensive and block other queries</li>
+            <li><strong>UX:</strong> Users don&rsquo;t want to scroll through 10,000 results &mdash; they want the first 20</li>
+            <li><strong>Cost:</strong> Every byte transferred costs money at scale (bandwidth, CDN, egress fees)</li>
+        </ul>
+
+        <h2>Offset-Based Pagination (LIMIT/OFFSET)</h2>
+        <p>The simplest approach &mdash; skip N rows, then return the next M rows:</p>
+        <ul>
+            <li><strong>SQL:</strong> <code>SELECT * FROM posts ORDER BY created_at DESC LIMIT 20 OFFSET 40</code></li>
+            <li><strong>API:</strong> <code>GET /posts?page=3&amp;per_page=20</code></li>
+            <li>Easy to implement, easy to understand, supports jumping to arbitrary pages</li>
+            <li><strong>Problem:</strong> The database must still scan and discard the first N rows before returning results</li>
+        </ul>
+
+        <h3>Why OFFSET Is Slow for Large Datasets</h3>
+        <ul>
+            <li><code>OFFSET 1000000</code> means the DB reads 1,000,000 rows, throws them away, then returns the next 20</li>
+            <li>Performance degrades linearly &mdash; page 1 is fast, page 50,000 is painfully slow</li>
+            <li>If rows are inserted/deleted between requests, items shift &mdash; you see duplicates or miss entries</li>
+            <li>The DB cannot use an index efficiently when it must count rows to skip</li>
+        </ul>
+
+        <h2>Cursor-Based Pagination</h2>
+        <p>Instead of &ldquo;skip N rows,&rdquo; use a <strong>pointer to the last seen item</strong> and fetch the next batch after it:</p>
+        <ul>
+            <li><strong>SQL:</strong> <code>SELECT * FROM posts WHERE created_at &lt; :cursor ORDER BY created_at DESC LIMIT 20</code></li>
+            <li><strong>API:</strong> <code>GET /posts?after=2024-01-15T10:30:00Z&amp;limit=20</code></li>
+            <li>The cursor is typically a timestamp, an ID, or an encoded opaque token</li>
+            <li>Performance is constant regardless of how deep into the dataset you are &mdash; it&rsquo;s always an indexed seek</li>
+            <li><strong>Trade-off:</strong> You cannot jump to &ldquo;page 500&rdquo; &mdash; you must traverse sequentially</li>
+        </ul>
+
+        <h2>Keyset Pagination</h2>
+        <p>A specific form of cursor pagination using the <strong>sort key columns</strong> as the cursor:</p>
+        <ul>
+            <li>For unique sort keys: <code>WHERE id &gt; :last_id ORDER BY id LIMIT 20</code></li>
+            <li>For non-unique sort keys: <code>WHERE (created_at, id) &gt; (:last_time, :last_id) ORDER BY created_at, id LIMIT 20</code></li>
+            <li>Uses a composite condition to handle ties in the sort column</li>
+            <li>Requires a stable, unique tiebreaker column (usually the primary key)</li>
+        </ul>
+
+        <h2>The Total Count Problem</h2>
+        <ul>
+            <li>Users expect &ldquo;Showing 1&ndash;20 of 1,234,567 results&rdquo; but <code>COUNT(*)</code> on large tables is expensive</li>
+            <li><strong>Solutions:</strong> Cache the count, show &ldquo;1,000+ results&rdquo; with an estimate, or omit total entirely</li>
+            <li>PostgreSQL: <code>SELECT reltuples FROM pg_class WHERE relname = 'posts'</code> for a fast estimate</li>
+            <li>Cursor-based APIs often omit total count and just signal <code>has_next_page: true/false</code></li>
+        </ul>
+
+        <h2>Infinite Scroll vs Page Numbers</h2>
+        <ul>
+            <li><strong>Page numbers</strong> (Google search): User can jump to any page, requires knowing total pages &mdash; pairs with offset pagination</li>
+            <li><strong>Infinite scroll</strong> (Twitter, Instagram): Load more as user scrolls down &mdash; pairs perfectly with cursor pagination</li>
+            <li><strong>&ldquo;Load more&rdquo; button:</strong> A hybrid &mdash; cursor-based but user-initiated rather than scroll-triggered</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Offset (LIMIT/OFFSET)</th>
+                        <th>Cursor-Based</th>
+                        <th>Keyset</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Performance at Depth</strong></td>
+                        <td>Degrades linearly (O(n))</td>
+                        <td>Constant (O(1) seek)</td>
+                        <td>Constant (O(1) seek)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Random Page Access</strong></td>
+                        <td>Yes &mdash; jump to any page</td>
+                        <td>No &mdash; sequential only</td>
+                        <td>No &mdash; sequential only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consistency</strong></td>
+                        <td>Duplicates/gaps on insert/delete</td>
+                        <td>Stable &mdash; no duplicates</td>
+                        <td>Stable &mdash; no duplicates</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Implementation</strong></td>
+                        <td>Trivial</td>
+                        <td>Moderate (encode cursor)</td>
+                        <td>Moderate (composite WHERE)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Count</strong></td>
+                        <td>Easy (same query + COUNT)</td>
+                        <td>Expensive (separate query)</td>
+                        <td>Expensive (separate query)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Best For</strong></td>
+                        <td>Small datasets, admin panels</td>
+                        <td>APIs, infinite scroll, feeds</td>
+                        <td>Large sorted datasets</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cursor Opacity</strong></td>
+                        <td>N/A (page number)</td>
+                        <td>Opaque token (encoded)</td>
+                        <td>Transparent (column values)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python &amp; SQL Examples</h2>
+        <pre><code><span class="token-keyword">import</span> base64
+<span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Optional, Tuple
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Sample data (simulating database rows)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-class">Post</span>:
+    id: int
+    title: str
+    created_at: str  <span class="token-comment"># ISO timestamp</span>
+
+<span class="token-comment"># Simulated database of 100 posts</span>
+POSTS = [
+    Post(id=i, title=f<span class="token-string">"Post #{i}"</span>, created_at=f<span class="token-string">"2024-01-{i:02d}T12:00:00Z"</span>)
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">1</span>, <span class="token-number">101</span>)
+]
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># APPROACH 1: Offset-Based Pagination</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">def</span> <span class="token-function">paginate_offset</span>(page: int, per_page: int = <span class="token-number">20</span>) -> dict:
+    <span class="token-string">"""
+    Classic offset pagination.
+    SQL equivalent: SELECT * FROM posts
+                    ORDER BY id
+                    LIMIT :per_page OFFSET :offset
+    """</span>
+    offset = (page - <span class="token-number">1</span>) * per_page
+    <span class="token-comment"># Database scans ALL rows up to offset, then returns per_page</span>
+    results = POSTS[offset:offset + per_page]
+    total = len(POSTS)
+
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"data"</span>: [p.__dict__ <span class="token-keyword">for</span> p <span class="token-keyword">in</span> results],
+        <span class="token-string">"page"</span>: page,
+        <span class="token-string">"per_page"</span>: per_page,
+        <span class="token-string">"total"</span>: total,
+        <span class="token-string">"total_pages"</span>: (total + per_page - <span class="token-number">1</span>) // per_page,
+        <span class="token-string">"has_next"</span>: offset + per_page < total
+    }
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># APPROACH 2: Cursor-Based Pagination</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">def</span> <span class="token-function">encode_cursor</span>(post_id: int, created_at: str) -> str:
+    <span class="token-string">"""Encode cursor as opaque base64 token."""</span>
+    payload = json.dumps({<span class="token-string">"id"</span>: post_id, <span class="token-string">"ts"</span>: created_at})
+    <span class="token-keyword">return</span> base64.b64encode(payload.encode()).decode()
+
+<span class="token-keyword">def</span> <span class="token-function">decode_cursor</span>(cursor: str) -> dict:
+    <span class="token-string">"""Decode opaque cursor back to values."""</span>
+    payload = base64.b64decode(cursor.encode()).decode()
+    <span class="token-keyword">return</span> json.loads(payload)
+
+<span class="token-keyword">def</span> <span class="token-function">paginate_cursor</span>(after: Optional[str] = <span class="token-keyword">None</span>, limit: int = <span class="token-number">20</span>) -> dict:
+    <span class="token-string">"""
+    Cursor-based pagination using post ID as cursor.
+    SQL equivalent: SELECT * FROM posts
+                    WHERE id > :cursor_id
+                    ORDER BY id
+                    LIMIT :limit
+    """</span>
+    <span class="token-keyword">if</span> after:
+        cursor_data = decode_cursor(after)
+        last_id = cursor_data[<span class="token-string">"id"</span>]
+        <span class="token-comment"># Indexed seek — constant time regardless of position</span>
+        results = [p <span class="token-keyword">for</span> p <span class="token-keyword">in</span> POSTS <span class="token-keyword">if</span> p.id > last_id][:limit]
+    <span class="token-keyword">else</span>:
+        results = POSTS[:limit]
+
+    <span class="token-comment"># Build next cursor from last item</span>
+    next_cursor = <span class="token-keyword">None</span>
+    <span class="token-keyword">if</span> results <span class="token-keyword">and</span> len(results) == limit:
+        last = results[-<span class="token-number">1</span>]
+        next_cursor = encode_cursor(last.id, last.created_at)
+
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"data"</span>: [p.__dict__ <span class="token-keyword">for</span> p <span class="token-keyword">in</span> results],
+        <span class="token-string">"next_cursor"</span>: next_cursor,
+        <span class="token-string">"has_next"</span>: next_cursor <span class="token-keyword">is not None</span>
+    }
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># APPROACH 3: Keyset Pagination (composite key)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">def</span> <span class="token-function">paginate_keyset</span>(
+    after_ts: Optional[str] = <span class="token-keyword">None</span>,
+    after_id: Optional[int] = <span class="token-keyword">None</span>,
+    limit: int = <span class="token-number">20</span>
+) -> dict:
+    <span class="token-string">"""
+    Keyset pagination with composite sort (created_at, id).
+    SQL equivalent: SELECT * FROM posts
+                    WHERE (created_at, id) > (:after_ts, :after_id)
+                    ORDER BY created_at, id
+                    LIMIT :limit
+    """</span>
+    <span class="token-keyword">if</span> after_ts <span class="token-keyword">and</span> after_id:
+        results = [
+            p <span class="token-keyword">for</span> p <span class="token-keyword">in</span> POSTS
+            <span class="token-keyword">if</span> (p.created_at, p.id) > (after_ts, after_id)
+        ][:limit]
+    <span class="token-keyword">else</span>:
+        results = POSTS[:limit]
+
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"data"</span>: [p.__dict__ <span class="token-keyword">for</span> p <span class="token-keyword">in</span> results],
+        <span class="token-string">"next_after_ts"</span>: results[-<span class="token-number">1</span>].created_at <span class="token-keyword">if</span> results <span class="token-keyword">else</span> <span class="token-keyword">None</span>,
+        <span class="token-string">"next_after_id"</span>: results[-<span class="token-number">1</span>].id <span class="token-keyword">if</span> results <span class="token-keyword">else</span> <span class="token-keyword">None</span>,
+        <span class="token-string">"has_next"</span>: len(results) == limit
+    }
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Compare approaches</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+print(<span class="token-string">"=== Pagination Strategies ==="</span>)
+print()
+
+<span class="token-comment"># Offset-based: page 3</span>
+print(<span class="token-string">"--- Offset Pagination (page 3) ---"</span>)
+page3 = paginate_offset(page=<span class="token-number">3</span>, per_page=<span class="token-number">5</span>)
+print(f<span class="token-string">"  Items: {[d['id'] for d in page3['data']]}"</span>)
+print(f<span class="token-string">"  Total: {page3['total']}, Pages: {page3['total_pages']}"</span>)
+print()
+
+<span class="token-comment"># Cursor-based: first page, then next page</span>
+print(<span class="token-string">"--- Cursor Pagination ---"</span>)
+first_page = paginate_cursor(limit=<span class="token-number">5</span>)
+print(f<span class="token-string">"  Page 1: {[d['id'] for d in first_page['data']]}"</span>)
+print(f<span class="token-string">"  Next cursor: {first_page['next_cursor'][:20]}..."</span>)
+
+second_page = paginate_cursor(after=first_page[<span class="token-string">"next_cursor"</span>], limit=<span class="token-number">5</span>)
+print(f<span class="token-string">"  Page 2: {[d['id'] for d in second_page['data']]}"</span>)
+print()
+
+<span class="token-comment"># Keyset: traverse by (created_at, id)</span>
+print(<span class="token-string">"--- Keyset Pagination ---"</span>)
+ks_page1 = paginate_keyset(limit=<span class="token-number">5</span>)
+print(f<span class="token-string">"  Page 1: {[d['id'] for d in ks_page1['data']]}"</span>)
+
+ks_page2 = paginate_keyset(
+    after_ts=ks_page1[<span class="token-string">"next_after_ts"</span>],
+    after_id=ks_page1[<span class="token-string">"next_after_id"</span>],
+    limit=<span class="token-number">5</span>
+)
+print(f<span class="token-string">"  Page 2: {[d['id'] for d in ks_page2['data']]}"</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>GitHub API:</strong> Uses cursor-based pagination with opaque <code>after</code> cursors in its GraphQL API. The REST API uses <code>Link</code> headers with <code>rel="next"</code> URLs. GitHub chose cursors because repositories can have thousands of commits/issues where offset pagination would be too slow.</p>
+            <p><strong>Stripe API:</strong> Uses cursor-based pagination with <code>starting_after</code> and <code>ending_before</code> parameters. Each object&rsquo;s ID serves as the cursor. This provides stable pagination even as new charges/events are created in real-time. Example: <code>GET /v1/charges?limit=25&amp;starting_after=ch_abc123</code>.</p>
+            <p><strong>Twitter/X API:</strong> Uses cursor-based pagination with opaque <code>pagination_token</code> values. The timeline API returns a <code>next_token</code> in each response that encodes the position. This handles the extremely high write rate (thousands of tweets/second) without duplicates or gaps in user timelines.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Offset pagination is simple but degrades as OFFSET grows &mdash; the DB scans and discards all skipped rows</li>
+                <li>Cursor pagination uses a pointer to the last seen item &mdash; constant performance at any depth</li>
+                <li>Keyset pagination is cursor pagination using sort column values as the cursor (transparent, not encoded)</li>
+                <li>Use offset for small datasets or admin panels where random page access matters</li>
+                <li>Use cursor for APIs, feeds, infinite scroll, or any dataset over ~10,000 rows</li>
+                <li>Avoid expensive <code>COUNT(*)</code> on large tables &mdash; use estimates or omit totals entirely</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Offset is like telling a librarian &ldquo;skip the first 5,000 books, then give me the next 20.&rdquo; The librarian must walk past 5,000 shelves every time. Cursor is like leaving a bookmark &mdash; &ldquo;start from this bookmark and give me the next 20.&rdquo; The librarian goes directly to the bookmark.</p>
+            <div class="model-visual">
+                <pre>
+  OFFSET PAGINATION (page 5, per_page=20):
+  ══════════════════════════════════════════════════════
+
+  Row 1 ─┐
+  Row 2  │
+  ...    │  ← DB scans and DISCARDS these (OFFSET 80)
+  Row 79 │     Cost grows with page number!
+  Row 80 ─┘
+  Row 81 ─┐
+  Row 82  │
+  ...    │  ← Returns these 20 rows (LIMIT 20)
+  Row 99 │
+  Row 100─┘
+
+  SQL: SELECT * FROM posts ORDER BY id LIMIT 20 OFFSET 80
+
+
+  CURSOR PAGINATION (after=post_80):
+  ══════════════════════════════════════════════════════
+
+  [Index] ──► Row 80 (cursor)
+                │
+                ▼ (direct seek, no scanning!)
+  Row 81 ─┐
+  Row 82  │
+  ...    │  ← Returns these 20 rows immediately
+  Row 99 │
+  Row 100─┘
+
+  SQL: SELECT * FROM posts WHERE id > 80 ORDER BY id LIMIT 20
+
+
+  PERFORMANCE COMPARISON:
+  ══════════════════════════════════════════════════════
+
+  Page Number:    1    10   100  1000  10000
+  Offset Time:   1ms  3ms  20ms 180ms 1800ms  ← linear growth
+  Cursor Time:   1ms  1ms  1ms  1ms   1ms     ← constant!
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Using OFFSET for infinite scroll:</strong> As users scroll deeper, each subsequent page gets slower. After page 500, the query spends most of its time scanning rows it will discard. Switch to cursor-based pagination for any scroll-based UI &mdash; performance stays constant at any depth.</li>
+                <li><strong>Non-unique cursors:</strong> If your cursor is a timestamp and multiple rows share the same timestamp, you&rsquo;ll skip or duplicate rows at page boundaries. Always include a unique tiebreaker (usually the primary key) in your cursor: <code>WHERE (created_at, id) &gt; (:ts, :id)</code>.</li>
+                <li><strong>Exposing raw database IDs as cursors:</strong> If your cursor is just <code>?after_id=42</code>, clients can guess IDs and enumerate your data. Encode cursors as opaque tokens (base64) so they can&rsquo;t be manipulated. This also lets you change the underlying implementation without breaking clients.</li>
+                <li><strong>Running COUNT(*) on every paginated request:</strong> On a table with 50 million rows, <code>SELECT COUNT(*) FROM posts WHERE active = true</code> can take seconds. Cache the count, use an approximate count, or simply return <code>has_next_page</code> without a total. Most users never navigate past page 5 anyway.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Benchmark offset vs cursor:</strong> Create a table with 1 million rows. Query pages 1, 100, 1000, and 10000 using both OFFSET and cursor (WHERE id &gt; X). Measure and graph the query time for each approach. At what page number does OFFSET become unacceptably slow?</li>
+                <li><strong>Build a cursor-based API:</strong> Implement a REST endpoint that returns paginated results with opaque cursors. The response should include <code>data</code>, <code>next_cursor</code>, and <code>has_next</code>. Test it by fetching all pages sequentially and verifying no items are duplicated or skipped even when new rows are inserted mid-pagination.</li>
+                <li><strong>Handle the consistency problem:</strong> Simulate a feed where new items are inserted between paginated requests. Show that offset pagination produces duplicates (same item on page 2 and page 3). Then implement cursor pagination and prove it produces a consistent, gap-free traversal.</li>
+                <li><strong>Implement total count estimation:</strong> For a large table, implement three strategies: exact COUNT(*), cached count (refresh every 60s), and PostgreSQL reltuples estimate. Compare accuracy vs. performance for each. Build an API response that uses the fastest acceptable option based on table size.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="48-event-driven-vs-request-response.html" class="prev">&larr; Event-Driven vs Req/Res</a>
+            <a href="50-singleton.html" class="next">Singleton &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

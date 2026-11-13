@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Splitting Strategies - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing Complexity</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop (Macro vs Microta…</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interoperabil…</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver Internals</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver Loop Limits</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver Cost</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle Traps</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation Strategies</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preco…</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture & State Machines</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+            <li><a href="64-finite-state-modeling.html"><span class="nav-number">64</span> Finite State Modeling</a></li>
+            <li><a href="65-event-sourcing-frontend.html"><span class="nav-number">65</span> Event Sourcing in Frontend</a></li>
+            <li><a href="66-optimistic-ui-rollback.html"><span class="nav-number">66</span> Optimistic UI Rollback Strat…</a></li>
+            <li class="module-label">Offline & Collaboration</li>
+            <li><a href="67-offline-conflict-resolution.html"><span class="nav-number">67</span> Offline Conflict Resolution</a></li>
+            <li><a href="68-crdt-basics.html"><span class="nav-number">68</span> CRDT Basics for Collaboration</a></li>
+            <li><a href="69-webrtc.html"><span class="nav-number">69</span> WebRTC</a></li>
+            <li class="module-label">Streams & Async Patterns</li>
+            <li><a href="70-backpressure-streams.html"><span class="nav-number">70</span> Backpressure in Streams API</a></li>
+            <li><a href="71-abort-controller.html"><span class="nav-number">71</span> AbortController</a></li>
+            <li><a href="72-streaming-fetch.html"><span class="nav-number">72</span> Streaming Fetch Response Han…</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (I…</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async …</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/88 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Code Splitting Strategies
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Code Splitting Strategies</h1>
+                <p class="subtitle">How to break a monolithic JavaScript bundle into smaller chunks that load on demand — reducing initial page load time from seconds to milliseconds.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span> <span class="tag tag-concept">Concept</span> <span class="tag tag-performance">Performance</span>
+                </div>
+            </div>
+
+
+            <div class="analogy-box">
+                <div class="analogy-title">📦 Analogy: Moving Houses</div>
+                <p>Imagine moving into a new apartment. Without code splitting, the moving truck brings <strong>everything you own</strong> before you can sit down — furniture, winter clothes, holiday decorations, tools for projects you haven't started. With code splitting, the truck brings only what you need <strong>today</strong> (bed, desk, essentials) and the rest arrives when you actually need it. Your time-to-livable drops dramatically.</p>
+            </div>
+
+            <h2>The Problem: The Monolithic Bundle</h2>
+<pre><code><span class="token-comment">// Without code splitting, your bundler produces ONE massive file:</span>
+<span class="token-comment">// bundle.js → 2.4MB (all routes, all features, all libraries)</span>
+
+<span class="token-comment">// User visits your landing page → downloads 2.4MB before seeing anything</span>
+<span class="token-comment">// 90% of that code is for pages/features they haven't visited yet</span>
+
+<span class="token-comment">// On 3G connection: 2.4MB ≈ 8+ seconds of download + parse + execute</span>
+<span class="token-comment">// On 4G connection: 2.4MB ≈ 2-3 seconds — still too slow for FCP</span>
+
+<span class="token-comment">// The goal: initial bundle should be &lt; 100KB for fast First Contentful Paint</span>
+<span class="token-comment">// Everything else loads later, on demand</span>
+</code></pre>
+
+            <h2>How Code Splitting Works Internally</h2>
+            <p>Code splitting creates <strong>split points</strong> — boundaries where the bundler cuts the dependency graph into separate chunks. Each chunk is a separate HTTP-requestable file that loads independently.</p>
+
+<pre><code><span class="token-comment">// The bundler builds a dependency graph:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">//   entry.js</span>
+<span class="token-comment">//     ├── Header.js (always needed)</span>
+<span class="token-comment">//     ├── Footer.js (always needed)</span>
+<span class="token-comment">//     ├── HomePage.js (route: /)</span>
+<span class="token-comment">//     │     └── HeroAnimation.js</span>
+<span class="token-comment">//     ├── Dashboard.js (route: /dashboard)  ← SPLIT POINT</span>
+<span class="token-comment">//     │     ├── Chart.js</span>
+<span class="token-comment">//     │     ├── DataTable.js</span>
+<span class="token-comment">//     │     └── d3.js (180KB library)</span>
+<span class="token-comment">//     └── Settings.js (route: /settings)    ← SPLIT POINT</span>
+<span class="token-comment">//           └── FormBuilder.js</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Result: 3 chunks instead of 1 monolithic bundle</span>
+<span class="token-comment">// chunk-main.js    → entry + Header + Footer + HomePage (50KB)</span>
+<span class="token-comment">// chunk-dashboard.js → Dashboard + Chart + DataTable + d3 (200KB)</span>
+<span class="token-comment">// chunk-settings.js  → Settings + FormBuilder (15KB)</span>
+</code></pre>
+
+            <h2>Strategy 1: Route-Based Splitting</h2>
+            <p>The most common and highest-impact strategy. Each route/page becomes its own chunk. Users only download code for the page they're visiting.</p>
+
+<pre><code><span class="token-comment">// React with React.lazy() — route-level splitting</span>
+<span class="token-keyword">import</span> React, { Suspense, lazy } <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+<span class="token-keyword">import</span> { BrowserRouter, Routes, Route } <span class="token-keyword">from</span> <span class="token-string">'react-router-dom'</span>;
+
+<span class="token-comment">// Each lazy() call creates a split point</span>
+<span class="token-comment">// Webpack/Vite will create a separate chunk for each</span>
+<span class="token-keyword">const</span> Home = lazy(() => <span class="token-keyword">import</span>(<span class="token-string">'./pages/Home'</span>));
+<span class="token-keyword">const</span> Dashboard = lazy(() => <span class="token-keyword">import</span>(<span class="token-string">'./pages/Dashboard'</span>));
+<span class="token-keyword">const</span> Settings = lazy(() => <span class="token-keyword">import</span>(<span class="token-string">'./pages/Settings'</span>));
+<span class="token-keyword">const</span> AdminPanel = lazy(() => <span class="token-keyword">import</span>(<span class="token-string">'./pages/AdminPanel'</span>));
+
+<span class="token-comment">// Suspense provides a fallback while chunks load</span>
+<span class="token-keyword">function</span> <span class="token-function">App</span>() {
+  <span class="token-keyword">return</span> (
+    &lt;BrowserRouter&gt;
+      &lt;Suspense fallback={&lt;LoadingSpinner /&gt;}&gt;
+        &lt;Routes&gt;
+          &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
+          &lt;Route path="/dashboard" element={&lt;Dashboard /&gt;} /&gt;
+          &lt;Route path="/settings" element={&lt;Settings /&gt;} /&gt;
+          &lt;Route path="/admin" element={&lt;AdminPanel /&gt;} /&gt;
+        &lt;/Routes&gt;
+      &lt;/Suspense&gt;
+    &lt;/BrowserRouter&gt;
+  );
+}
+
+<span class="token-comment">// Result: navigating to /dashboard triggers a network request</span>
+<span class="token-comment">// for chunk-dashboard.js ONLY when the user actually goes there</span>
+</code></pre>
+
+            <h2>Strategy 2: Component-Based Splitting</h2>
+            <p>Split expensive components that aren't immediately visible — modals, dropdowns, heavy widgets, charts below the fold.</p>
+
+<pre><code><span class="token-comment">// Split a heavy modal that users rarely open</span>
+<span class="token-keyword">import</span> { lazy, Suspense, useState } <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+
+<span class="token-comment">// ExportModal contains xlsx library (300KB) — most users never open it</span>
+<span class="token-keyword">const</span> ExportModal = lazy(() => <span class="token-keyword">import</span>(<span class="token-string">'./ExportModal'</span>));
+
+<span class="token-keyword">function</span> <span class="token-function">DataPage</span>() {
+  <span class="token-keyword">const</span> [showExport, setShowExport] = useState(<span class="token-keyword">false</span>);
+
+  <span class="token-keyword">return</span> (
+    &lt;div&gt;
+      &lt;h1&gt;Data&lt;/h1&gt;
+      &lt;button onClick={() => setShowExport(<span class="token-keyword">true</span>)}&gt;Export&lt;/button&gt;
+
+      {showExport && (
+        &lt;Suspense fallback={&lt;p&gt;Loading export tool...&lt;/p&gt;}&gt;
+          &lt;ExportModal onClose={() => setShowExport(<span class="token-keyword">false</span>)} /&gt;
+        &lt;/Suspense&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+<span class="token-comment">// The xlsx library and ExportModal code only downloads when user</span>
+<span class="token-comment">// clicks "Export" — saving 300KB from initial load for 95% of users</span>
+</code></pre>
+
+            <h2>Strategy 3: Vendor Splitting</h2>
+            <p>Separate third-party libraries from your application code. Vendor code changes rarely, so it gets cached long-term while your app code can update without re-downloading all dependencies.</p>
+
+<pre><code><span class="token-comment">// webpack.config.js — Manual vendor splitting via optimization.splitChunks</span>
+module.exports = {
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        <span class="token-comment">// All node_modules code goes into vendor chunk</span>
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: <span class="token-string">'vendors'</span>,
+          chunks: <span class="token-string">'all'</span>,
+          <span class="token-comment">// This chunk changes ONLY when dependencies update</span>
+          <span class="token-comment">// → cached by browser for weeks/months between deploys</span>
+        },
+        <span class="token-comment">// Separate chunk for heavy libs that not all pages need</span>
+        heavyLibs: {
+          test: /[\\/]node_modules[\\/](d3|chart\.js|moment)[\\/]/,
+          name: <span class="token-string">'heavy-libs'</span>,
+          chunks: <span class="token-string">'all'</span>,
+          priority: 10, <span class="token-comment">// Higher priority = matched first</span>
+          <span class="token-comment">// Only pages using charts download this 200KB chunk</span>
+        },
+      },
+    },
+  },
+};
+
+<span class="token-comment">// Result:</span>
+<span class="token-comment">// vendors.abc123.js  → react, react-dom, router (80KB) — cached long-term</span>
+<span class="token-comment">// heavy-libs.def456.js → d3, chart.js (200KB) — only loaded by dashboard</span>
+<span class="token-comment">// app.ghi789.js → your code (40KB) — changes with each deploy</span>
+</code></pre>
+
+            <h2>Strategy 4: Conditional Feature Splitting</h2>
+            <p>Load code paths only when certain conditions are met — user roles, feature flags, A/B tests, device capabilities.</p>
+
+<pre><code><span class="token-comment">// Load admin tools only for admin users</span>
+<span class="token-keyword">async function</span> <span class="token-function">loadAdminTools</span>(user) {
+  <span class="token-keyword">if</span> (user.role !== <span class="token-string">'admin'</span>) <span class="token-keyword">return null</span>;
+
+  <span class="token-comment">// This import() only executes for admins</span>
+  <span class="token-comment">// Regular users never download admin-tools chunk (150KB)</span>
+  <span class="token-keyword">const</span> { AdminToolbar } = <span class="token-keyword">await import</span>(<span class="token-string">'./admin/AdminToolbar'</span>);
+  <span class="token-keyword">return</span> AdminToolbar;
+}
+
+<span class="token-comment">// Load polyfills only for browsers that need them</span>
+<span class="token-keyword">async function</span> <span class="token-function">loadPolyfills</span>() {
+  <span class="token-keyword">const</span> needsPolyfill = !(<span class="token-string">'IntersectionObserver'</span> <span class="token-keyword">in</span> window);
+
+  <span class="token-keyword">if</span> (needsPolyfill) {
+    <span class="token-comment">// Only old browsers download this 30KB polyfill bundle</span>
+    <span class="token-keyword">await import</span>(<span class="token-string">'./polyfills/intersection-observer'</span>);
+  }
+}
+
+<span class="token-comment">// Feature flag driven splitting</span>
+<span class="token-keyword">async function</span> <span class="token-function">loadExperiment</span>(flags) {
+  <span class="token-keyword">if</span> (flags.newCheckoutFlow) {
+    <span class="token-comment">// Only users in the experiment group download new checkout code</span>
+    <span class="token-keyword">return import</span>(<span class="token-string">'./checkout/NewCheckoutFlow'</span>);
+  }
+  <span class="token-keyword">return import</span>(<span class="token-string">'./checkout/ClassicCheckout'</span>);
+}
+</code></pre>
+
+            <h2>Strategy 5: Preloading & Prefetching Split Chunks</h2>
+            <p>Code splitting creates a latency cost when navigating. Prefetching eliminates this by loading chunks <strong>before</strong> the user needs them — during idle time or based on user intent signals.</p>
+
+<pre><code><span class="token-comment">// Webpack magic comments for prefetch/preload hints</span>
+<span class="token-keyword">const</span> Dashboard = lazy(() => <span class="token-keyword">import</span>(
+  <span class="token-comment">/* webpackPrefetch: true */</span>
+  <span class="token-string">'./pages/Dashboard'</span>
+));
+<span class="token-comment">// Adds &lt;link rel="prefetch" href="chunk-dashboard.js"&gt; to document head</span>
+<span class="token-comment">// Browser downloads it during idle time with lowest priority</span>
+<span class="token-comment">// When user navigates to /dashboard → chunk is already in cache!</span>
+
+<span class="token-comment">// Intent-based preloading — load on hover/focus (user is about to click)</span>
+<span class="token-keyword">function</span> <span class="token-function">NavLink</span>({ to, children }) {
+  <span class="token-keyword">const</span> preload = () => {
+    <span class="token-comment">// Trigger chunk download when user hovers over nav link</span>
+    <span class="token-comment">// Average hover-to-click time: 200-400ms — enough to start download</span>
+    <span class="token-keyword">if</span> (to === <span class="token-string">'/dashboard'</span>) <span class="token-keyword">import</span>(<span class="token-string">'./pages/Dashboard'</span>);
+    <span class="token-keyword">if</span> (to === <span class="token-string">'/settings'</span>) <span class="token-keyword">import</span>(<span class="token-string">'./pages/Settings'</span>);
+  };
+
+  <span class="token-keyword">return</span> (
+    &lt;Link to={to} onMouseEnter={preload} onFocus={preload}&gt;
+      {children}
+    &lt;/Link&gt;
+  );
+}
+
+<span class="token-comment">// Intersection Observer preloading — load when section comes into viewport</span>
+<span class="token-keyword">function</span> <span class="token-function">useVisibilityPreload</span>(importFn) {
+  <span class="token-keyword">const</span> ref = useRef(<span class="token-keyword">null</span>);
+  <span class="token-keyword">const</span> loaded = useRef(<span class="token-keyword">false</span>);
+
+  useEffect(() => {
+    <span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> IntersectionObserver(([entry]) => {
+      <span class="token-keyword">if</span> (entry.isIntersecting && !loaded.current) {
+        loaded.current = <span class="token-keyword">true</span>;
+        importFn(); <span class="token-comment">// Start loading chunk when element enters viewport</span>
+      }
+    }, { rootMargin: <span class="token-string">'200px'</span> }); <span class="token-comment">// 200px ahead of viewport</span>
+
+    <span class="token-keyword">if</span> (ref.current) observer.observe(ref.current);
+    <span class="token-keyword">return</span> () => observer.disconnect();
+  }, []);
+
+  <span class="token-keyword">return</span> ref;
+}
+</code></pre>
+
+            <h2>Strategy 6: Granularity Tuning with splitChunks</h2>
+<pre><code><span class="token-comment">// Too few chunks: large downloads, poor caching</span>
+<span class="token-comment">// Too many chunks: HTTP overhead, waterfall requests</span>
+<span class="token-comment">// The sweet spot depends on HTTP/2 multiplexing and bundle sizes</span>
+
+module.exports = {
+  optimization: {
+    splitChunks: {
+      chunks: <span class="token-string">'all'</span>,
+      <span class="token-comment">// Minimum size before a chunk is created (bytes)</span>
+      minSize: 20000, <span class="token-comment">// 20KB — below this, overhead of extra request isn't worth it</span>
+      <span class="token-comment">// Maximum size hint — try to split chunks larger than this</span>
+      maxSize: 244000, <span class="token-comment">// 244KB — keeps chunks under HTTP/2 initial congestion window</span>
+      <span class="token-comment">// Minimum number of chunks that share a module before it's split out</span>
+      minChunks: 2, <span class="token-comment">// Module must be used by 2+ chunks to be worth extracting</span>
+      <span class="token-comment">// Maximum parallel requests for on-demand loading</span>
+      maxAsyncRequests: 6, <span class="token-comment">// Limit waterfall depth on slower connections</span>
+    },
+  },
+};
+
+<span class="token-comment">// Vite equivalent (uses Rollup under the hood)</span>
+<span class="token-comment">// vite.config.js</span>
+<span class="token-keyword">export default</span> {
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          <span class="token-comment">// Explicit control over chunk composition</span>
+          <span class="token-string">'vendor-react'</span>: [<span class="token-string">'react'</span>, <span class="token-string">'react-dom'</span>, <span class="token-string">'react-router-dom'</span>],
+          <span class="token-string">'vendor-charts'</span>: [<span class="token-string">'d3'</span>, <span class="token-string">'recharts'</span>],
+          <span class="token-string">'vendor-utils'</span>: [<span class="token-string">'lodash-es'</span>, <span class="token-string">'date-fns'</span>],
+        },
+      },
+    },
+  },
+};
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Next.js</strong> — Automatic route-based code splitting. Every page in <code>pages/</code> or <code>app/</code> directory becomes its own chunk. Also splits shared modules used by 2+ pages into a commons chunk.</li>
+                <li><strong>Webpack (used by CRA, Next.js)</strong> — <code>optimization.splitChunks</code> with intelligent defaults. Uses the <a href="https://webpack.js.org/plugins/split-chunks-plugin/">SplitChunksPlugin</a> internally with size-based heuristics.</li>
+                <li><strong>Vite / Rollup</strong> — Uses <code>manualChunks</code> for explicit control or automatic splitting based on dynamic imports. Vite pre-bundles dependencies separately from source code.</li>
+                <li><strong>Shopify Storefront</strong> — Splits checkout flow from browsing flow. Users browsing products don't download checkout logic (saved ~400KB per session for non-buyers).</li>
+            </ul>
+
+            <h2>Trade-offs & Alternatives</h2>
+            <table>
+                <thead>
+                    <tr><th>Approach</th><th>Pros</th><th>Cons</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Route-based splitting</td>
+                        <td>Highest impact, simple to implement</td>
+                        <td>Latency on navigation if not prefetched</td>
+                    </tr>
+                    <tr>
+                        <td>Component-based splitting</td>
+                        <td>Fine-grained control over what loads when</td>
+                        <td>Complexity; too many chunks can hurt perf</td>
+                    </tr>
+                    <tr>
+                        <td>Vendor splitting</td>
+                        <td>Excellent caching; vendor chunk rarely changes</td>
+                        <td>All vendor code loads upfront (even unused libs)</td>
+                    </tr>
+                    <tr>
+                        <td>No splitting (monolithic)</td>
+                        <td>Simple; no loading states; no waterfall</td>
+                        <td>Terrible initial load; wastes bandwidth</td>
+                    </tr>
+                    <tr>
+                        <td>Module Federation</td>
+                        <td>Share code across separately deployed apps</td>
+                        <td>Complex setup; version mismatch risks</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Splitting too aggressively</strong> — Creating 50+ tiny chunks (2-5KB each) creates HTTP waterfall overhead. Each chunk has request latency + TCP setup cost, even with HTTP/2.</li>
+                <li><strong>Not providing loading feedback</strong> — Users click a link, nothing happens for 500ms while chunk loads. Always use Suspense boundaries or loading indicators at split points.</li>
+                <li><strong>Forgetting shared dependencies</strong> — If Route A and Route B both import a shared 100KB library, and you don't extract it into a common chunk, users download it twice (once per route chunk).</li>
+                <li><strong>Cache busting all chunks on deploy</strong> — Use content-hash filenames (<code>[name].[contenthash].js</code>) so unchanged chunks keep their cache across deploys.</li>
+                <li><strong>Not analyzing the result</strong> — Use <code>webpack-bundle-analyzer</code> or <code>rollup-plugin-visualizer</code> to see actual chunk sizes. Splitting without measuring is guessing.</li>
+                <li><strong>Dynamic imports in tight loops</strong> — <code>import()</code> inside render or frequently-called functions can trigger duplicate network requests or race conditions.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Code Splitting When...</h3>
+                <p>You can look at a webpack-bundle-analyzer treemap and immediately identify: which chunks are too large, which shared modules should be extracted, which routes could benefit from lazy loading, and why some chunks aren't being cached effectively between deploys.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Take a React app with 5+ routes. Implement route-based splitting with React.lazy(). Add prefetching on hover for the top 2 most-visited routes. Use webpack-bundle-analyzer to verify: (1) each route is a separate chunk, (2) shared vendor code is in a commons chunk, (3) the initial bundle is under 100KB gzipped. Measure TTI before and after.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Code Splitting connects to: <strong>Dynamic Import Chunking</strong> (the mechanism that enables split points), <strong>Tree Shaking</strong> (removes dead code within each chunk), and <strong>Critical Rendering Path</strong> (smaller initial JS = faster FCP/TTI).</p>
+            </div>
+
+
+            <div class="nav-footer">
+                <a href="20-tree-shaking-internals.html" class="nav-btn nav-btn-prev">← Tree Shaking Internals</a>
+                <a href="22-dynamic-import-chunking.html" class="nav-btn nav-btn-next">Dynamic Import Chunking →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

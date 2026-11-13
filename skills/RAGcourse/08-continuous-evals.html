@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuous Evaluations - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Continuous Evals
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 8: Continuous Evaluations</h1>
+                <p class="subtitle">Run adversarial queries, retrieval recall benchmarks, and hallucination tests continuously. Quality that isn't measured decays silently.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-production">Production</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: Factory Quality Control</div>
+                <p>Imagine a factory making car brakes. They don't just test the brakes once when they design them — they test <strong>every batch continuously</strong>:</p>
+                <ul>
+                    <li>Random samples tested every hour (regular evals)</li>
+                    <li>Stress tests: "What happens at extreme temperatures?" (adversarial queries)</li>
+                    <li>Comparison tests: "Are these as good as last month's batch?" (regression testing)</li>
+                    <li>Customer complaints investigated immediately (user feedback loop)</li>
+                </ul>
+                <p><strong>Your RAG system needs the same continuous quality control.</strong> Models drift. Documents change. New queries emerge. Without continuous testing, quality degrades silently until something breaks catastrophically.</p>
+            </div>
+
+            <!-- ===== WHAT IS IT ===== -->
+            <h2>What Are Continuous Evaluations?</h2>
+            <p><strong>Continuous evals</strong> = automated tests that run regularly (hourly/daily/weekly) to verify your RAG system still works correctly. They catch problems before users do.</p>
+
+            <h3>Three Types of Evaluation</h3>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Eval Type</th>
+                        <th>What It Tests</th>
+                        <th>How Often</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Retrieval Evals</strong></td>
+                        <td>Does the system find the right documents?</td>
+                        <td>Daily</td>
+                        <td>"For query X, is doc Y in top 5?"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Generation Evals</strong></td>
+                        <td>Is the generated answer correct and grounded?</td>
+                        <td>Daily</td>
+                        <td>"Does the answer match the expected answer?"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Adversarial Evals</strong></td>
+                        <td>Can we trick the system into hallucinating?</td>
+                        <td>Weekly</td>
+                        <td>"Query designed to confuse the system"</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== RETRIEVAL EVALS ===== -->
+            <h2>1. Retrieval Evaluation Metrics</h2>
+
+            <h3>Key Metrics Explained (Simple First)</h3>
+
+            <p><strong>Recall@K:</strong> "Out of all the relevant documents that exist, how many did we find in our top K results?"</p>
+            <p>If there are 5 relevant documents and our top-10 results contain 4 of them → Recall@10 = 80%</p>
+
+            <p><strong>Precision@K:</strong> "Out of the K results we returned, how many are actually relevant?"</p>
+            <p>If our top-10 results have 7 relevant and 3 irrelevant → Precision@10 = 70%</p>
+
+            <p><strong>MRR (Mean Reciprocal Rank):</strong> "On average, how high up is the first relevant result?"</p>
+            <p>If the first relevant result is at position 1 → RR = 1.0. At position 3 → RR = 0.33.</p>
+
+            <p><strong>NDCG:</strong> "Are the most relevant results ranked at the top?" (considers relevance ordering)</p>
+
+<pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict, Set
+
+<span class="token-keyword">class</span> <span class="token-class">RetrievalEvaluator</span>:
+    <span class="token-string">"""Evaluate retrieval quality using standard IR metrics."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">recall_at_k</span>(
+        self, 
+        retrieved_ids: List[<span class="token-builtin">str</span>], 
+        relevant_ids: Set[<span class="token-builtin">str</span>], 
+        k: <span class="token-builtin">int</span>
+    ) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""What fraction of relevant docs did we find in top-k?"""</span>
+        top_k = <span class="token-builtin">set</span>(retrieved_ids[:k])
+        found = top_k.intersection(relevant_ids)
+        <span class="token-keyword">return</span> <span class="token-builtin">len</span>(found) / <span class="token-builtin">len</span>(relevant_ids) <span class="token-keyword">if</span> relevant_ids <span class="token-keyword">else</span> <span class="token-number">0</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">precision_at_k</span>(
+        self, 
+        retrieved_ids: List[<span class="token-builtin">str</span>], 
+        relevant_ids: Set[<span class="token-builtin">str</span>], 
+        k: <span class="token-builtin">int</span>
+    ) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""What fraction of top-k results are actually relevant?"""</span>
+        top_k = retrieved_ids[:k]
+        relevant_in_top_k = sum(<span class="token-number">1</span> <span class="token-keyword">for</span> doc <span class="token-keyword">in</span> top_k <span class="token-keyword">if</span> doc <span class="token-keyword">in</span> relevant_ids)
+        <span class="token-keyword">return</span> relevant_in_top_k / k
+    
+    <span class="token-keyword">def</span> <span class="token-function">mrr</span>(self, retrieved_ids: List[<span class="token-builtin">str</span>], relevant_ids: Set[<span class="token-builtin">str</span>]) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""Mean Reciprocal Rank: how high is the first relevant result?"""</span>
+        <span class="token-keyword">for</span> rank, doc_id <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(retrieved_ids, <span class="token-number">1</span>):
+            <span class="token-keyword">if</span> doc_id <span class="token-keyword">in</span> relevant_ids:
+                <span class="token-keyword">return</span> <span class="token-number">1.0</span> / rank
+        <span class="token-keyword">return</span> <span class="token-number">0.0</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">evaluate_query</span>(
+        self, 
+        query: <span class="token-builtin">str</span>, 
+        retrieved: List[<span class="token-builtin">str</span>], 
+        relevant: Set[<span class="token-builtin">str</span>]
+    ) -> Dict:
+        <span class="token-string">"""Full evaluation for a single query."""</span>
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"recall@5"</span>: self.recall_at_k(retrieved, relevant, <span class="token-number">5</span>),
+            <span class="token-string">"recall@10"</span>: self.recall_at_k(retrieved, relevant, <span class="token-number">10</span>),
+            <span class="token-string">"precision@5"</span>: self.precision_at_k(retrieved, relevant, <span class="token-number">5</span>),
+            <span class="token-string">"precision@10"</span>: self.precision_at_k(retrieved, relevant, <span class="token-number">10</span>),
+            <span class="token-string">"mrr"</span>: self.mrr(retrieved, relevant)
+        }</code></pre>
+
+            <!-- ===== GENERATION EVALS ===== -->
+            <h2>2. Generation Evaluation</h2>
+
+            <h3>Automated Generation Metrics</h3>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">GenerationEvaluator</span>:
+    <span class="token-string">"""Evaluate generated answer quality."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, nli_model, llm_judge):
+        self.nli = nli_model
+        self.judge = llm_judge
+    
+    <span class="token-keyword">def</span> <span class="token-function">faithfulness_score</span>(
+        self, answer: <span class="token-builtin">str</span>, context: <span class="token-builtin">str</span>
+    ) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""
+        Is the answer faithful to (supported by) the context?
+        High score = answer only says things the context supports.
+        """</span>
+        sentences = answer.split(<span class="token-string">"."</span>)
+        supported = <span class="token-number">0</span>
+        total = <span class="token-number">0</span>
+        
+        <span class="token-keyword">for</span> sentence <span class="token-keyword">in</span> sentences:
+            <span class="token-keyword">if</span> <span class="token-builtin">len</span>(sentence.strip()) < <span class="token-number">10</span>:
+                <span class="token-keyword">continue</span>
+            total += <span class="token-number">1</span>
+            <span class="token-keyword">if</span> self.nli.entails(context, sentence):
+                supported += <span class="token-number">1</span>
+        
+        <span class="token-keyword">return</span> supported / total <span class="token-keyword">if</span> total > <span class="token-number">0</span> <span class="token-keyword">else</span> <span class="token-number">0</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">answer_relevance</span>(
+        self, query: <span class="token-builtin">str</span>, answer: <span class="token-builtin">str</span>
+    ) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""Does the answer actually address the query?"""</span>
+        prompt = <span class="token-string">f"""Rate how well this answer addresses the question.
+Score 0-1 (0=completely irrelevant, 1=perfectly addresses the question).
+Only output the number.
+
+Question: {query}
+Answer: {answer}
+Score:"""</span>
+        score = <span class="token-builtin">float</span>(self.judge.generate(prompt).strip())
+        <span class="token-keyword">return</span> <span class="token-builtin">min</span>(<span class="token-number">1.0</span>, <span class="token-builtin">max</span>(<span class="token-number">0.0</span>, score))
+    
+    <span class="token-keyword">def</span> <span class="token-function">hallucination_rate</span>(
+        self, answer: <span class="token-builtin">str</span>, context: <span class="token-builtin">str</span>
+    ) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""What % of the answer is NOT supported by context?"""</span>
+        <span class="token-keyword">return</span> <span class="token-number">1.0</span> - self.faithfulness_score(answer, context)</code></pre>
+
+            <!-- ===== ADVERSARIAL EVALS ===== -->
+            <h2>3. Adversarial Evaluation</h2>
+
+            <p><strong>Adversarial queries</strong> are questions specifically designed to trick the system into hallucinating. They test your system's weakest points.</p>
+
+<pre><code>ADVERSARIAL_TEST_CASES = [
+    <span class="token-comment"># Type 1: Questions about topics NOT in your documents</span>
+    {
+        <span class="token-string">"query"</span>: <span class="token-string">"What is the company's Mars colonization policy?"</span>,
+        <span class="token-string">"expected_behavior"</span>: <span class="token-string">"refuse"</span>,
+        <span class="token-string">"reasoning"</span>: <span class="token-string">"No such policy exists. System should refuse."</span>
+    },
+    
+    <span class="token-comment"># Type 2: Questions with false premises</span>
+    {
+        <span class="token-string">"query"</span>: <span class="token-string">"When did we change the vacation policy to 30 days?"</span>,
+        <span class="token-string">"expected_behavior"</span>: <span class="token-string">"correct_premise"</span>,
+        <span class="token-string">"reasoning"</span>: <span class="token-string">"Policy is 20 days. System should correct the false premise."</span>
+    },
+    
+    <span class="token-comment"># Type 3: Questions requiring inference beyond the text</span>
+    {
+        <span class="token-string">"query"</span>: <span class="token-string">"Will the CEO approve my request?"</span>,
+        <span class="token-string">"expected_behavior"</span>: <span class="token-string">"refuse"</span>,
+        <span class="token-string">"reasoning"</span>: <span class="token-string">"Requires prediction, not factual retrieval."</span>
+    },
+    
+    <span class="token-comment"># Type 4: Slightly modified facts (testing exact recall)</span>
+    {
+        <span class="token-string">"query"</span>: <span class="token-string">"The policy says 25 vacation days, right?"</span>,
+        <span class="token-string">"expected_behavior"</span>: <span class="token-string">"correct"</span>,
+        <span class="token-string">"reasoning"</span>: <span class="token-string">"Should correct: actual policy says 20, not 25."</span>
+    },
+    
+    <span class="token-comment"># Type 5: Ambiguous queries matching multiple conflicting docs</span>
+    {
+        <span class="token-string">"query"</span>: <span class="token-string">"What are the working hours?"</span>,
+        <span class="token-string">"expected_behavior"</span>: <span class="token-string">"present_multiple"</span>,
+        <span class="token-string">"reasoning"</span>: <span class="token-string">"Different departments have different hours. Should present all."</span>
+    },
+]
+
+<span class="token-keyword">class</span> <span class="token-class">AdversarialEvaluator</span>:
+    <span class="token-string">"""Run adversarial tests to find hallucination vulnerabilities."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">run_adversarial_suite</span>(
+        self, 
+        rag_pipeline,
+        test_cases: List[Dict]
+    ) -> Dict:
+        <span class="token-string">"""Run all adversarial test cases and report results."""</span>
+        results = []
+        
+        <span class="token-keyword">for</span> test <span class="token-keyword">in</span> test_cases:
+            response = rag_pipeline.answer_query(test[<span class="token-string">"query"</span>])
+            
+            <span class="token-comment"># Check if behavior matches expected</span>
+            actual_behavior = self._classify_behavior(response)
+            passed = actual_behavior == test[<span class="token-string">"expected_behavior"</span>]
+            
+            results.append({
+                <span class="token-string">"query"</span>: test[<span class="token-string">"query"</span>],
+                <span class="token-string">"expected"</span>: test[<span class="token-string">"expected_behavior"</span>],
+                <span class="token-string">"actual"</span>: actual_behavior,
+                <span class="token-string">"passed"</span>: passed,
+                <span class="token-string">"response"</span>: response
+            })
+        
+        pass_rate = sum(<span class="token-number">1</span> <span class="token-keyword">for</span> r <span class="token-keyword">in</span> results <span class="token-keyword">if</span> r[<span class="token-string">"passed"</span>]) / <span class="token-builtin">len</span>(results)
+        
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"pass_rate"</span>: pass_rate,
+            <span class="token-string">"total_tests"</span>: <span class="token-builtin">len</span>(results),
+            <span class="token-string">"failures"</span>: [r <span class="token-keyword">for</span> r <span class="token-keyword">in</span> results <span class="token-keyword">if not</span> r[<span class="token-string">"passed"</span>]],
+            <span class="token-string">"results"</span>: results
+        }</code></pre>
+
+            <!-- ===== CONTINUOUS PIPELINE ===== -->
+            <h2>The Continuous Evaluation Pipeline</h2>
+
+<pre><code><span class="token-keyword">import</span> schedule
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+
+<span class="token-keyword">class</span> <span class="token-class">ContinuousEvalPipeline</span>:
+    <span class="token-string">"""
+    Run evaluations on a schedule and alert on regressions.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, rag_pipeline, eval_dataset, alert_system):
+        self.rag = rag_pipeline
+        self.dataset = eval_dataset  <span class="token-comment"># query → expected answer/behavior</span>
+        self.alerts = alert_system
+        self.history = []  <span class="token-comment"># Track metrics over time</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">run_daily_eval</span>(self):
+        <span class="token-string">"""Daily evaluation: retrieval + generation metrics."""</span>
+        results = {
+            <span class="token-string">"timestamp"</span>: datetime.now(),
+            <span class="token-string">"retrieval"</span>: self._eval_retrieval(),
+            <span class="token-string">"generation"</span>: self._eval_generation(),
+            <span class="token-string">"hallucination_rate"</span>: self._eval_hallucination()
+        }
+        
+        self.history.append(results)
+        self._check_for_regressions(results)
+        
+        <span class="token-keyword">return</span> results
+    
+    <span class="token-keyword">def</span> <span class="token-function">run_weekly_adversarial</span>(self):
+        <span class="token-string">"""Weekly adversarial testing."""</span>
+        adversarial = AdversarialEvaluator()
+        results = adversarial.run_adversarial_suite(
+            self.rag, ADVERSARIAL_TEST_CASES
+        )
+        
+        <span class="token-keyword">if</span> results[<span class="token-string">"pass_rate"</span>] < <span class="token-number">0.9</span>:
+            self.alerts.send(
+                severity=<span class="token-string">"high"</span>,
+                message=<span class="token-string">f"Adversarial test pass rate dropped to {results['pass_rate']:.0%}"</span>,
+                details=results[<span class="token-string">"failures"</span>]
+            )
+        
+        <span class="token-keyword">return</span> results
+    
+    <span class="token-keyword">def</span> <span class="token-function">_check_for_regressions</span>(self, current):
+        <span class="token-string">"""Alert if metrics dropped compared to last run."""</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(self.history) < <span class="token-number">2</span>:
+            <span class="token-keyword">return</span>
+        
+        previous = self.history[-<span class="token-number">2</span>]
+        
+        <span class="token-comment"># Check retrieval regression</span>
+        recall_drop = (
+            previous[<span class="token-string">"retrieval"</span>][<span class="token-string">"recall@10"</span>] - 
+            current[<span class="token-string">"retrieval"</span>][<span class="token-string">"recall@10"</span>]
+        )
+        <span class="token-keyword">if</span> recall_drop > <span class="token-number">0.05</span>:  <span class="token-comment"># 5% drop</span>
+            self.alerts.send(
+                severity=<span class="token-string">"critical"</span>,
+                message=<span class="token-string">f"Retrieval recall dropped by {recall_drop:.0%}"</span>
+            )
+        
+        <span class="token-comment"># Check hallucination increase</span>
+        halluc_increase = (
+            current[<span class="token-string">"hallucination_rate"</span>] - 
+            previous[<span class="token-string">"hallucination_rate"</span>]
+        )
+        <span class="token-keyword">if</span> halluc_increase > <span class="token-number">0.02</span>:  <span class="token-comment"># 2% increase</span>
+            self.alerts.send(
+                severity=<span class="token-string">"critical"</span>,
+                message=<span class="token-string">f"Hallucination rate increased by {halluc_increase:.0%}"</span>
+            )</code></pre>
+
+            <!-- ===== EVAL DATASET ===== -->
+            <h2>Building Your Evaluation Dataset</h2>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Golden Rule of Eval Datasets</div>
+                <p>Your eval dataset should contain: (1) queries that users actually ask, (2) the correct answer for each query, (3) which documents should be retrieved. Without this ground truth, you can't measure anything.</p>
+            </div>
+
+<pre><code><span class="token-comment"># Example evaluation dataset structure</span>
+EVAL_DATASET = [
+    {
+        <span class="token-string">"query"</span>: <span class="token-string">"How many vacation days do employees get?"</span>,
+        <span class="token-string">"expected_answer"</span>: <span class="token-string">"Employees receive 20 vacation days per year."</span>,
+        <span class="token-string">"relevant_doc_ids"</span>: [<span class="token-string">"hr_policy_v3"</span>, <span class="token-string">"benefits_guide_2024"</span>],
+        <span class="token-string">"expected_behavior"</span>: <span class="token-string">"answer"</span>,
+        <span class="token-string">"difficulty"</span>: <span class="token-string">"easy"</span>
+    },
+    {
+        <span class="token-string">"query"</span>: <span class="token-string">"What's the difference between sick leave in US vs UK offices?"</span>,
+        <span class="token-string">"expected_answer"</span>: <span class="token-string">"US: 10 days. UK: statutory sick pay per government rules."</span>,
+        <span class="token-string">"relevant_doc_ids"</span>: [<span class="token-string">"us_benefits"</span>, <span class="token-string">"uk_benefits"</span>],
+        <span class="token-string">"expected_behavior"</span>: <span class="token-string">"answer"</span>,
+        <span class="token-string">"difficulty"</span>: <span class="token-string">"medium"</span>  <span class="token-comment"># Requires multi-doc synthesis</span>
+    },
+    {
+        <span class="token-string">"query"</span>: <span class="token-string">"Will the company go public next year?"</span>,
+        <span class="token-string">"expected_answer"</span>: <span class="token-keyword">None</span>,
+        <span class="token-string">"relevant_doc_ids"</span>: [],
+        <span class="token-string">"expected_behavior"</span>: <span class="token-string">"refuse"</span>,
+        <span class="token-string">"difficulty"</span>: <span class="token-string">"adversarial"</span>  <span class="token-comment"># Should refuse (speculation)</span>
+    }
+]</code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Documents Scale</div>
+                <ul>
+                    <li><strong>Eval dataset size:</strong> Minimum 200-500 queries covering diverse topics. Larger indexes need larger eval sets.</li>
+                    <li><strong>Eval cost:</strong> Running evals against an LLM-as-judge costs money. Budget $50-200/day for comprehensive evals at scale.</li>
+                    <li><strong>Regression risk:</strong> Ingesting new documents can break retrieval for existing queries. Always run evals after bulk ingestion.</li>
+                    <li><strong>Sampling:</strong> At 10M docs, you can't eval every possible query. Sample strategically: high-frequency queries + adversarial + edge cases.</li>
+                </ul>
+            </div>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>RAGAS framework</strong> — Open-source framework with faithfulness, relevance, and context recall metrics</li>
+                    <li><strong>LangSmith (LangChain)</strong> — Traces + automated evals integrated into deployment pipeline</li>
+                    <li><strong>Braintrust / Arize</strong> — Commercial eval platforms with drift detection and alerting</li>
+                    <li><strong>LLM-as-Judge</strong> — Using GPT-4 to grade answer quality (common in production)</li>
+                    <li><strong>CI/CD integration:</strong> Evals run in PR pipelines — code can't merge if eval scores drop</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>Quality unmeasured is quality that silently degrades — run evals continuously</li>
+                    <li>Three eval types: retrieval (did we find the right docs?), generation (is the answer good?), adversarial (can we break it?)</li>
+                    <li>Key metrics: Recall@K, Precision@K, MRR, Faithfulness, Hallucination Rate</li>
+                    <li>Build a golden eval dataset with queries, expected answers, and relevant doc IDs</li>
+                    <li>Alert immediately on regressions — a 5% recall drop or 2% hallucination increase is critical</li>
+                    <li>Run daily retrieval/generation evals + weekly adversarial testing</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+Daily Eval Pipeline:
+┌─────────────────────────────────────────────────┐
+│ 1. Run 200 standard queries through the system  │
+│ 2. Compare retrieval vs. ground truth           │
+│ 3. Check answer faithfulness + citations        │
+│ 4. Calculate: recall, precision, halluc rate    │
+│ 5. Compare vs. yesterday's metrics              │
+│ 6. If regression detected → ALERT 🚨           │
+│ 7. Log results to dashboard                     │
+└─────────────────────────────────────────────────┘
+
+Weekly Adversarial:
+┌─────────────────────────────────────────────────┐
+│ 1. Run 50 adversarial queries (trick questions) │
+│ 2. Check: did system correctly refuse/correct?  │
+│ 3. Any new hallucination patterns?              │
+│ 4. Report vulnerabilities found                 │
+└─────────────────────────────────────────────────┘
+                </div>
+                <p><strong>Think of it as:</strong> A fire alarm system. You don't wait for the building to burn down — you have sensors checking 24/7 and alerting at the first sign of smoke.</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>Only testing once:</strong> "We tested before launch" — not enough. Things break over time as documents change and models update.</li>
+                    <li><strong>No ground truth dataset:</strong> You can't measure quality without knowing the right answers. Build your eval dataset FIRST.</li>
+                    <li><strong>Ignoring edge cases:</strong> Standard queries work fine. It's the weird, adversarial, out-of-scope queries that expose hallucination.</li>
+                    <li><strong>No alerting:</strong> Metrics in a dashboard nobody checks are useless. Set up automatic alerts for regressions.</li>
+                    <li><strong>Eval dataset drift:</strong> If your documents change but your eval dataset doesn't, your evals become meaningless. Update them together.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Continuous Eval System</h3>
+                <ol>
+                    <li>Create an eval dataset with 20 queries: 10 answerable, 5 partially answerable, 5 adversarial</li>
+                    <li>Implement Recall@5, Precision@5, and MRR metrics</li>
+                    <li>Implement a faithfulness scorer (use NLI or LLM-as-judge)</li>
+                    <li>Run a full eval sweep against your RAG system (mock or real)</li>
+                    <li>Calculate a hallucination rate across all queries</li>
+                    <li>Implement regression detection: compare current run vs. previous run</li>
+                    <li>Set up an alert that fires if hallucination rate increases by >2%</li>
+                    <li><strong>Bonus:</strong> Implement an adversarial test generator that creates new trick questions automatically</li>
+                </ol>
+                <p><strong>Success criteria:</strong> Your eval pipeline runs end-to-end, produces a score report, and correctly alerts on a simulated regression.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="07-hallucination-fallback.html" class="prev">Hallucination Fallback</a>
+                <a href="09-caching-memory.html" class="next">Caching &amp; Memory</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

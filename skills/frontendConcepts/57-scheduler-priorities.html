@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheduler Priorities - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Scheduler Priorities
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Scheduler Priorities</h1>
+                <p class="subtitle">How React (and the browser) decide which work is urgent and which can wait — the priority system that makes concurrent rendering feel responsive even during heavy computation.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Advanced</span> <span class="tag tag-concept">React Internals</span> <span class="tag tag-browser">Performance</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏥 Analogy: Emergency Room Triage</div>
+                <p>An ER doesn't treat patients first-come-first-served. A heart attack (user typing in an input) gets immediate attention, while a sprained ankle (loading new search results) can wait. React's scheduler is the <strong>triage nurse</strong> — it assigns priority levels to work units and ensures the most urgent updates are processed first, even if it means pausing lower-priority work mid-way.</p>
+            </div>
+
+            <h2>The Problem: Not All Updates Are Equal</h2>
+            <p>In a complex app, many state updates happen simultaneously:</p>
+            <ul>
+                <li>User types in an input (must feel instant — 16ms budget)</li>
+                <li>Search results update (can take 200-500ms without feeling slow)</li>
+                <li>Analytics ping fires (user doesn't perceive at all)</li>
+                <li>Large list re-renders (acceptable to defer)</li>
+            </ul>
+            <p>Without priorities, all updates are synchronous and block each other. Typing feels sluggish because React is busy rendering 10,000 search results.</p>
+
+            <h2>React's Priority Levels</h2>
+<pre><code><span class="token-comment">// React's internal scheduler (packages/scheduler) defines priority lanes:</span>
+<span class="token-comment">// These map to how urgently work must be committed to the screen</span>
+
+<span class="token-comment">// Priority 1: Immediate / Sync (Discrete events)</span>
+<span class="token-comment">//   - Click, keydown, focus</span>
+<span class="token-comment">//   - Must commit in current frame (can't be interrupted)</span>
+<span class="token-comment">//   - Example: toggling a checkbox, closing a modal</span>
+
+<span class="token-comment">// Priority 2: User-blocking (Continuous events)</span>
+<span class="token-comment">//   - Input text, scroll, drag</span>
+<span class="token-comment">//   - Should commit quickly but can be batched across frames</span>
+<span class="token-comment">//   - Example: text input onChange, slider value</span>
+
+<span class="token-comment">// Priority 3: Normal (Transitions)</span>
+<span class="token-comment">//   - Non-urgent state updates, data fetching results</span>
+<span class="token-comment">//   - Can be interrupted by higher-priority work</span>
+<span class="token-comment">//   - Example: updating search results, navigation content</span>
+
+<span class="token-comment">// Priority 4: Low / Idle</span>
+<span class="token-comment">//   - Offscreen rendering, prefetching</span>
+<span class="token-comment">//   - Only processed when main thread is idle</span>
+<span class="token-comment">//   - Example: pre-rendering next page, analytics</span>
+</code></pre>
+
+            <h3>startTransition: Opting Into Low Priority</h3>
+<pre><code><span class="token-keyword">import</span> { useState, startTransition } <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+
+<span class="token-keyword">function</span> <span class="token-function">SearchPage</span>() {
+    <span class="token-keyword">const</span> [inputValue, setInputValue] = useState(<span class="token-string">''</span>);
+    <span class="token-keyword">const</span> [searchResults, setSearchResults] = useState([]);
+
+    <span class="token-keyword">function</span> <span class="token-function">handleChange</span>(e) {
+        <span class="token-keyword">const</span> value = e.target.value;
+        
+        <span class="token-comment">// HIGH PRIORITY: Update input immediately (user sees their keystrokes)</span>
+        setInputValue(value);
+        
+        <span class="token-comment">// LOW PRIORITY: Update results can be interrupted</span>
+        <span class="token-comment">// If user types again before results render, React abandons</span>
+        <span class="token-comment">// the in-progress results render and starts fresh</span>
+        startTransition(() =&gt; {
+            <span class="token-keyword">const</span> filtered = hugeList.filter(item =&gt; 
+                item.name.includes(value)
+            );
+            setSearchResults(filtered);
+        });
+    }
+
+    <span class="token-keyword">return</span> (
+        &lt;&gt;
+            <span class="token-comment">{/* Input always feels responsive */}</span>
+            &lt;input value={inputValue} onChange={handleChange} /&gt;
+            
+            <span class="token-comment">{/* Results may lag behind input — that's OK */}</span>
+            &lt;ResultsList items={searchResults} /&gt;
+        &lt;/&gt;
+    );
+}
+</code></pre>
+
+            <h2>How the Scheduler Works Internally</h2>
+<pre><code><span class="token-comment">// React's scheduler is a cooperative multi-tasking system</span>
+<span class="token-comment">// It works in 5ms time slices (configurable based on frame budget)</span>
+
+<span class="token-comment">// Simplified scheduler loop (actual code in packages/scheduler):</span>
+<span class="token-keyword">function</span> <span class="token-function">workLoop</span>(deadline) {
+    <span class="token-keyword">while</span> (workQueue.length &gt; 0) {
+        <span class="token-keyword">const</span> task = workQueue.peek(); <span class="token-comment">// Highest priority task</span>
+        
+        <span class="token-comment">// Should we yield to the browser?</span>
+        <span class="token-comment">// Yes if: we've used our 5ms slice AND there's pending user input</span>
+        <span class="token-keyword">if</span> (shouldYield()) {
+            <span class="token-keyword">break</span>; <span class="token-comment">// Give browser a chance to handle events, paint</span>
+        }
+        
+        <span class="token-comment">// Execute one unit of work (render one fiber/component)</span>
+        <span class="token-keyword">const</span> continuationTask = task.callback();
+        
+        <span class="token-keyword">if</span> (continuationTask) {
+            <span class="token-comment">// Task isn't done — put it back with same priority</span>
+            task.callback = continuationTask;
+        } <span class="token-keyword">else</span> {
+            <span class="token-comment">// Task complete — remove from queue</span>
+            workQueue.pop();
+        }
+    }
+    
+    <span class="token-comment">// Schedule next slice if work remains</span>
+    <span class="token-keyword">if</span> (workQueue.length &gt; 0) {
+        scheduleCallback(workLoop); <span class="token-comment">// Uses MessageChannel (not setTimeout)</span>
+    }
+}
+
+<span class="token-comment">// shouldYield() checks:</span>
+<span class="token-comment">// 1. Has 5ms elapsed since we started this slice?</span>
+<span class="token-comment">// 2. Is there pending user input (isInputPending API)?</span>
+<span class="token-comment">// 3. Is there a higher-priority task queued?</span>
+
+<span class="token-comment">// WHY MessageChannel instead of setTimeout?</span>
+<span class="token-comment">// setTimeout has a minimum 4ms delay (clamped by browsers)</span>
+<span class="token-comment">// MessageChannel fires at the start of next event loop turn (0ms delay)</span>
+<span class="token-comment">// This gives React sub-millisecond scheduling resolution</span>
+</code></pre>
+
+            <h3>The Lane System (React 18+)</h3>
+<pre><code><span class="token-comment">// React 18 replaced the old "expiration time" system with "Lanes"</span>
+<span class="token-comment">// Lanes are bitmasks — each bit represents a priority level</span>
+
+<span class="token-comment">// Lane definitions (simplified from ReactFiberLane.js):</span>
+<span class="token-keyword">const</span> SyncLane          = 0b0000000000000000000000000000001; <span class="token-comment">// Discrete</span>
+<span class="token-keyword">const</span> InputContinuous   = 0b0000000000000000000000000000100; <span class="token-comment">// Drag, scroll</span>
+<span class="token-keyword">const</span> DefaultLane       = 0b0000000000000000000000000010000; <span class="token-comment">// Normal</span>
+<span class="token-keyword">const</span> TransitionLanes   = 0b0000000001111111111111111000000; <span class="token-comment">// Transitions</span>
+<span class="token-keyword">const</span> IdleLane          = 0b0100000000000000000000000000000; <span class="token-comment">// Idle</span>
+
+<span class="token-comment">// WHY bitmasks? Efficient priority comparison:</span>
+<span class="token-comment">// - Check if update is included: (lanes &amp; updateLane) !== 0</span>
+<span class="token-comment">// - Merge priorities: lanes | newLane</span>
+<span class="token-comment">// - Find highest priority: lanes &amp; -lanes (lowest set bit)</span>
+<span class="token-comment">// - Multiple transition lanes allow concurrent transitions</span>
+
+<span class="token-comment">// Each transition gets its own lane — React can render multiple</span>
+<span class="token-comment">// transitions simultaneously and commit them independently</span>
+</code></pre>
+
+            <h2>Browser Scheduling APIs</h2>
+<pre><code><span class="token-comment">// The browser also has its own priority system:</span>
+
+<span class="token-comment">// 1. requestAnimationFrame — fires before next paint (visual updates)</span>
+requestAnimationFrame(() =&gt; {
+    <span class="token-comment">// Guaranteed to run before browser paints</span>
+    <span class="token-comment">// Use for: animations, layout reads, visual updates</span>
+    element.style.transform = <span class="token-string">`translateX(${x}px)`</span>;
+});
+
+<span class="token-comment">// 2. requestIdleCallback — fires when main thread is idle</span>
+requestIdleCallback((deadline) =&gt; {
+    <span class="token-comment">// Only runs when browser has nothing else to do</span>
+    <span class="token-comment">// deadline.timeRemaining() tells you how much time you have</span>
+    <span class="token-keyword">while</span> (deadline.timeRemaining() &gt; 0 &amp;&amp; tasks.length &gt; 0) {
+        doNonUrgentWork(tasks.pop());
+    }
+}, { timeout: 2000 }); <span class="token-comment">// Max wait before forced execution</span>
+
+<span class="token-comment">// 3. scheduler.postTask() — NEW Priority-aware scheduling API</span>
+<span class="token-comment">// Available in Chrome 94+, standardization in progress</span>
+scheduler.postTask(() =&gt; { <span class="token-comment">/* urgent UI work */</span> }, { priority: <span class="token-string">'user-blocking'</span> });
+scheduler.postTask(() =&gt; { <span class="token-comment">/* data processing */</span> }, { priority: <span class="token-string">'user-visible'</span> });
+scheduler.postTask(() =&gt; { <span class="token-comment">/* analytics */</span> }, { priority: <span class="token-string">'background'</span> });
+
+<span class="token-comment">// React's scheduler WILL eventually migrate to scheduler.postTask()</span>
+<span class="token-comment">// when it has broader browser support</span>
+</code></pre>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>React 18+</strong> — The entire concurrent features set (startTransition, useDeferredValue, Suspense) relies on the internal scheduler and lane system.</li>
+                <li><strong>Facebook/Meta</strong> — The scheduler was built for Facebook's news feed, which renders thousands of items while keeping typing responsive. Production-proven at billion-user scale.</li>
+                <li><strong>Chrome (scheduler.postTask)</strong> — Chrome ships the Prioritized Task Scheduling API, letting any code (not just React) benefit from priority scheduling.</li>
+                <li><strong>Angular (Signals + zoneless)</strong> — Angular 17+ with signals moves toward fine-grained reactivity with priority awareness, inspired by React's approach.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Wrapping everything in startTransition</strong> — Discrete interactions (checkbox, toggle) should NOT be transitions. Users expect instant feedback for click actions.</li>
+                <li><strong>Expecting transitions to debounce</strong> — <code>startTransition</code> doesn't delay execution. It just marks the update as interruptible. You still need debounce for reducing request frequency.</li>
+                <li><strong>Using setTimeout for scheduling</strong> — setTimeout has a 4ms floor and doesn't integrate with React's priority system. Use startTransition or useDeferredValue instead.</li>
+                <li><strong>Ignoring <code>isPending</code> from useTransition</strong> — Always show loading indicators for transitions. Users need feedback that something is happening, even if it's deferred.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Scheduler Priorities When...</h3>
+                <p>You can explain why React uses MessageChannel instead of setTimeout(0) for scheduling, why the lane system uses bitmasks instead of a simple priority number, and what happens to an in-progress transition render when a discrete event (click) fires.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a component that filters a 100,000-item list. Make typing always responsive (< 16ms per keystroke) by using startTransition for the filter. Add a visual pending indicator and measure the actual input latency with Performance Observer.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Connects to: <strong>Time Slicing</strong> (how work is chunked into 5ms slices), <strong>Fiber Architecture</strong> (fibers are the units of interruptible work), <strong>Suspense Boundaries</strong> (transitions + Suspense = loading states without spinners).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="56-tearing-concurrent-ui.html" class="nav-btn nav-btn-prev">← Tearing in Concurrent UI</a>
+                <a href="58-render-waterfalls.html" class="nav-btn nav-btn-next">Render Waterfalls →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

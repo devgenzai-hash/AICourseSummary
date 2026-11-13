@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load Balancer - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html" class="active"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">API &amp; Communication &rarr; Load Balancer</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">API</span>
+                <span class="tag">Concept</span>
+            </div>
+            <h1>Load Balancer</h1>
+            <p class="hero-subtitle">Distributing incoming network traffic across multiple servers &mdash; ensuring no single server bears too much load, improving availability, reliability, and response times.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Imagine a <strong>supermarket with multiple checkout lanes</strong>. Without any guidance, customers cluster at one lane while others sit empty. The &ldquo;next available&rdquo; sign (or a staff member pointing) directs customers to the shortest queue, balancing the load across all cashiers. If a cashier goes on break (server down), customers are simply directed to the remaining open lanes. A load balancer does exactly this for your servers &mdash; directing each request to the best available instance.</p>
+        </div>
+
+        <h2>Load Balancing Algorithms</h2>
+        <h3>Round Robin</h3>
+        <ul>
+            <li>Requests are distributed sequentially: Server 1, Server 2, Server 3, Server 1, Server 2&hellip;</li>
+            <li>Simple and fair when all servers have equal capacity</li>
+            <li>Ignores current server load &mdash; a server processing a heavy request still gets the next one</li>
+            <li>Best for stateless services with uniform request complexity</li>
+        </ul>
+
+        <h3>Weighted Round Robin</h3>
+        <ul>
+            <li>Each server gets a weight proportional to its capacity &mdash; a 4-core server gets weight 4, a 2-core gets weight 2</li>
+            <li>The 4-core server receives twice as many requests as the 2-core</li>
+            <li>Useful when servers have different hardware specs in the same pool</li>
+            <li>Weights are configured statically &mdash; doesn&rsquo;t adapt to real-time load</li>
+        </ul>
+
+        <h3>Least Connections</h3>
+        <ul>
+            <li>Routes to the server with the fewest active connections right now</li>
+            <li>Adapts to varying request durations &mdash; slow requests naturally reduce a server&rsquo;s share</li>
+            <li>Ideal for long-lived connections (WebSockets, database queries, file uploads)</li>
+            <li>Requires the load balancer to track connection counts per server</li>
+        </ul>
+
+        <h3>IP Hash</h3>
+        <ul>
+            <li>Hashes the client&rsquo;s IP address to determine which server receives the request</li>
+            <li>Same client always goes to the same server &mdash; &ldquo;sticky sessions&rdquo; without cookies</li>
+            <li>Useful when servers have local caches that benefit from repeated access</li>
+            <li>Problem: if a server goes down, all its clients get re-mapped</li>
+        </ul>
+
+        <h3>Random</h3>
+        <ul>
+            <li>Pick a random server from the pool &mdash; statistically uniform over time</li>
+            <li>Zero state to track &mdash; simplest possible implementation</li>
+            <li>&ldquo;Power of two choices&rdquo; variant: pick two random servers, send to the less-loaded one. Dramatically reduces worst-case imbalance</li>
+        </ul>
+
+        <h2>Layer 4 vs Layer 7 Load Balancing</h2>
+        <ul>
+            <li><strong>L4 (Transport layer):</strong> Routes based on IP address and TCP port. Cannot inspect HTTP headers, URLs, or cookies. Extremely fast &mdash; just forwards TCP packets. Used for raw throughput.</li>
+            <li><strong>L7 (Application layer):</strong> Inspects HTTP headers, URL paths, cookies, and request body. Can route <code>/api/*</code> to one pool and <code>/static/*</code> to another. Supports content-based routing, SSL termination, and request modification.</li>
+            <li><strong>When to use L4:</strong> Database connections, non-HTTP protocols, maximum performance needed</li>
+            <li><strong>When to use L7:</strong> HTTP services, content-based routing, A/B testing, canary deployments</li>
+        </ul>
+
+        <h2>Health Checks</h2>
+        <ul>
+            <li><strong>Active checks:</strong> Load balancer pings servers periodically (every 5&ndash;10s) on a health endpoint</li>
+            <li><strong>Passive checks:</strong> Monitor real traffic &mdash; if a server returns 5xx errors or times out, mark it unhealthy</li>
+            <li><strong>Graceful removal:</strong> Drain existing connections before removing a server (connection draining)</li>
+            <li><strong>Recovery:</strong> After N consecutive successful health checks, mark the server healthy again</li>
+        </ul>
+
+        <h2>Session Stickiness</h2>
+        <ul>
+            <li>Some applications store session state in server memory &mdash; switching servers loses the session</li>
+            <li><strong>Cookie-based:</strong> Load balancer sets a cookie identifying the target server</li>
+            <li><strong>IP-based:</strong> Hash the client IP to always route to the same server</li>
+            <li><strong>Better alternative:</strong> Make services stateless and store sessions in Redis/database &mdash; eliminates the need for stickiness entirely</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>State Required</th>
+                        <th>Best For</th>
+                        <th>Weakness</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Round Robin</strong></td>
+                        <td>Counter only</td>
+                        <td>Uniform stateless services</td>
+                        <td>Ignores server load</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Weighted Round Robin</strong></td>
+                        <td>Weights + counter</td>
+                        <td>Heterogeneous hardware</td>
+                        <td>Static &mdash; no real-time adaptation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Least Connections</strong></td>
+                        <td>Connection counts</td>
+                        <td>Long-lived connections</td>
+                        <td>New servers get flooded</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IP Hash</strong></td>
+                        <td>None (deterministic)</td>
+                        <td>Session affinity, caching</td>
+                        <td>Uneven distribution, server removal reshuffles</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Random (Power of 2)</strong></td>
+                        <td>Connection counts</td>
+                        <td>Large server pools</td>
+                        <td>Not deterministic</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementations</h2>
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> random
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Optional
+<span class="token-keyword">from</span> collections <span class="token-keyword">import</span> defaultdict
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Server model with health tracking</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-class">Server</span>:
+    host: str
+    port: int
+    weight: int = <span class="token-number">1</span>
+    healthy: bool = <span class="token-keyword">True</span>
+    active_connections: int = <span class="token-number">0</span>
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">address</span>(self) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"{self.host}:{self.port}"</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Round Robin Load Balancer</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">RoundRobinBalancer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, servers: List[Server]):
+        self.servers = servers
+        self.current = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">next_server</span>(self) -> Optional[Server]:
+        healthy = [s <span class="token-keyword">for</span> s <span class="token-keyword">in</span> self.servers <span class="token-keyword">if</span> s.healthy]
+        <span class="token-keyword">if not</span> healthy:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        server = healthy[self.current % len(healthy)]
+        self.current += <span class="token-number">1</span>
+        <span class="token-keyword">return</span> server
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Weighted Round Robin Load Balancer</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">WeightedRoundRobinBalancer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, servers: List[Server]):
+        self.servers = servers
+        self.current = <span class="token-number">0</span>
+        <span class="token-comment"># Build expanded pool: [A, A, A, B, B] for weights 3, 2</span>
+        self._pool = []
+        <span class="token-keyword">for</span> server <span class="token-keyword">in</span> servers:
+            self._pool.extend([server] * server.weight)
+
+    <span class="token-keyword">def</span> <span class="token-function">next_server</span>(self) -> Optional[Server]:
+        healthy_pool = [s <span class="token-keyword">for</span> s <span class="token-keyword">in</span> self._pool <span class="token-keyword">if</span> s.healthy]
+        <span class="token-keyword">if not</span> healthy_pool:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        server = healthy_pool[self.current % len(healthy_pool)]
+        self.current += <span class="token-number">1</span>
+        <span class="token-keyword">return</span> server
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Least Connections Load Balancer</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">LeastConnectionsBalancer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, servers: List[Server]):
+        self.servers = servers
+
+    <span class="token-keyword">def</span> <span class="token-function">next_server</span>(self) -> Optional[Server]:
+        healthy = [s <span class="token-keyword">for</span> s <span class="token-keyword">in</span> self.servers <span class="token-keyword">if</span> s.healthy]
+        <span class="token-keyword">if not</span> healthy:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        <span class="token-comment"># Pick the server with fewest active connections</span>
+        <span class="token-keyword">return</span> min(healthy, key=<span class="token-keyword">lambda</span> s: s.active_connections)
+
+    <span class="token-keyword">def</span> <span class="token-function">connect</span>(self, server: Server):
+        server.active_connections += <span class="token-number">1</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">disconnect</span>(self, server: Server):
+        server.active_connections = max(<span class="token-number">0</span>, server.active_connections - <span class="token-number">1</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># IP Hash Load Balancer</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">IPHashBalancer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, servers: List[Server]):
+        self.servers = servers
+
+    <span class="token-keyword">def</span> <span class="token-function">next_server</span>(self, client_ip: str) -> Optional[Server]:
+        healthy = [s <span class="token-keyword">for</span> s <span class="token-keyword">in</span> self.servers <span class="token-keyword">if</span> s.healthy]
+        <span class="token-keyword">if not</span> healthy:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        <span class="token-comment"># Hash the IP to get a consistent server index</span>
+        hash_val = int(hashlib.md5(client_ip.encode()).hexdigest(), <span class="token-number">16</span>)
+        index = hash_val % len(healthy)
+        <span class="token-keyword">return</span> healthy[index]
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Health Checker</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HealthChecker</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, servers: List[Server], threshold: int = <span class="token-number">3</span>):
+        self.servers = servers
+        self.threshold = threshold
+        self.fail_counts: Dict[str, int] = defaultdict(int)
+        self.recovery_counts: Dict[str, int] = defaultdict(int)
+
+    <span class="token-keyword">def</span> <span class="token-function">record_success</span>(self, server: Server):
+        self.fail_counts[server.address] = <span class="token-number">0</span>
+        <span class="token-keyword">if not</span> server.healthy:
+            self.recovery_counts[server.address] += <span class="token-number">1</span>
+            <span class="token-keyword">if</span> self.recovery_counts[server.address] >= self.threshold:
+                server.healthy = <span class="token-keyword">True</span>
+                self.recovery_counts[server.address] = <span class="token-number">0</span>
+                print(f<span class="token-string">"  ✓ {server.address} marked HEALTHY"</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">record_failure</span>(self, server: Server):
+        self.recovery_counts[server.address] = <span class="token-number">0</span>
+        self.fail_counts[server.address] += <span class="token-number">1</span>
+        <span class="token-keyword">if</span> self.fail_counts[server.address] >= self.threshold:
+            server.healthy = <span class="token-keyword">False</span>
+            print(f<span class="token-string">"  ✗ {server.address} marked UNHEALTHY"</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Load balancer algorithms in action</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+servers = [
+    Server(<span class="token-string">"web-1"</span>, <span class="token-number">8080</span>, weight=<span class="token-number">3</span>),
+    Server(<span class="token-string">"web-2"</span>, <span class="token-number">8080</span>, weight=<span class="token-number">2</span>),
+    Server(<span class="token-string">"web-3"</span>, <span class="token-number">8080</span>, weight=<span class="token-number">1</span>),
+]
+
+print(<span class="token-string">"=== Round Robin ==="</span>)
+rr = RoundRobinBalancer(servers)
+<span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">6</span>):
+    s = rr.next_server()
+    print(f<span class="token-string">"  Request {i+1} → {s.address}"</span>)
+
+print(<span class="token-string">"\n=== Weighted Round Robin ==="</span>)
+wrr = WeightedRoundRobinBalancer(servers)
+<span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">6</span>):
+    s = wrr.next_server()
+    print(f<span class="token-string">"  Request {i+1} → {s.address}"</span>)
+
+print(<span class="token-string">"\n=== Least Connections ==="</span>)
+lc = LeastConnectionsBalancer(servers)
+servers[<span class="token-number">0</span>].active_connections = <span class="token-number">5</span>
+servers[<span class="token-number">1</span>].active_connections = <span class="token-number">2</span>
+servers[<span class="token-number">2</span>].active_connections = <span class="token-number">1</span>
+s = lc.next_server()
+print(f<span class="token-string">"  Picked: {s.address} (conns={s.active_connections})"</span>)
+
+print(<span class="token-string">"\n=== IP Hash (sticky sessions) ==="</span>)
+ip_lb = IPHashBalancer(servers)
+<span class="token-keyword">for</span> ip <span class="token-keyword">in</span> [<span class="token-string">"192.168.1.10"</span>, <span class="token-string">"10.0.0.5"</span>, <span class="token-string">"192.168.1.10"</span>]:
+    s = ip_lb.next_server(ip)
+    print(f<span class="token-string">"  {ip} → {s.address}"</span>)
+
+print(<span class="token-string">"\n=== Health Check ==="</span>)
+checker = HealthChecker(servers, threshold=<span class="token-number">2</span>)
+checker.record_failure(servers[<span class="token-number">0</span>])
+checker.record_failure(servers[<span class="token-number">0</span>])  <span class="token-comment"># 2nd failure → marked unhealthy</span>
+s = rr.next_server()
+print(f<span class="token-string">"  After failure: next → {s.address}"</span>)  <span class="token-comment"># Skips web-1</span></code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>nginx:</strong> The most popular open-source load balancer. Supports round-robin, least connections, IP hash, and generic hash. Handles millions of concurrent connections with minimal memory. Used as both a reverse proxy and load balancer at companies like Netflix, Dropbox, and WordPress.com.</p>
+            <p><strong>HAProxy:</strong> High-performance TCP/HTTP load balancer used by GitHub, Reddit, and Stack Overflow. Supports advanced health checks, connection draining, and stick tables for session persistence. Known for sub-millisecond latency overhead and extreme reliability.</p>
+            <p><strong>AWS ALB/NLB:</strong> Application Load Balancer (L7) routes based on URL path, host header, or HTTP method. Network Load Balancer (L4) handles millions of requests per second with ultra-low latency. Both integrate with Auto Scaling to add/remove targets automatically.</p>
+            <p><strong>DNS Load Balancing:</strong> Route 53 (AWS), Cloudflare, and other DNS providers distribute traffic at the DNS level. Simple but coarse-grained &mdash; TTL caching means changes propagate slowly. Often used for geographic routing (US users &rarr; US servers, EU users &rarr; EU servers).</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Load balancers distribute traffic across servers &mdash; preventing any single server from becoming a bottleneck</li>
+                <li>Round-robin is simplest but ignores actual load. Least-connections adapts to varying request durations</li>
+                <li>L4 balancing is faster (TCP packets only), L7 balancing is smarter (can inspect HTTP content and route by path/header)</li>
+                <li>Health checks detect failed servers and remove them from the pool &mdash; always implement both active and passive checks</li>
+                <li>Session stickiness solves stateful problems but creates uneven load &mdash; prefer stateless services with external session stores</li>
+                <li>The load balancer itself must be redundant &mdash; use active-passive failover or DNS-level distribution across multiple LB instances</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of a load balancer as a traffic controller at a busy intersection. It doesn&rsquo;t process requests itself &mdash; it just decides which lane (server) each car (request) should take to keep traffic flowing smoothly.</p>
+            <div class="model-visual">
+                <pre>
+  LOAD BALANCING ALGORITHMS:
+  ══════════════════════════════════════════════════════
+
+  ROUND ROBIN:
+  Request 1 → Server A
+  Request 2 → Server B
+  Request 3 → Server C
+  Request 4 → Server A  (cycles back)
+  Request 5 → Server B
+  Request 6 → Server C
+
+  LEAST CONNECTIONS:
+  Server A: ████████ (8 conns)
+  Server B: ███ (3 conns)      ← next request goes here
+  Server C: █████ (5 conns)
+
+  IP HASH (sticky):
+  192.168.1.10 → always Server B
+  10.0.0.5     → always Server A
+  172.16.0.1   → always Server C
+
+
+  L4 vs L7 LOAD BALANCING:
+  ══════════════════════════════════════════════════════
+
+  L4 (Transport):          L7 (Application):
+  ┌───────────────┐        ┌───────────────┐
+  │ Sees: IP+Port │        │ Sees: URL,    │
+  │               │        │ headers,      │
+  │ Decision:     │        │ cookies, body │
+  │ TCP forwarding│        │               │
+  │               │        │ Decision:     │
+  │ Speed: ██████ │        │ content-based │
+  │ Smarts: █     │        │ routing       │
+  └───────────────┘        │               │
+                           │ Speed: ████   │
+                           │ Smarts: █████ │
+                           └───────────────┘
+
+
+  HEALTH CHECK LIFECYCLE:
+  ══════════════════════════════════════════════════════
+
+  HEALTHY ──[3 failures]──▶ UNHEALTHY
+     ▲                          │
+     │                          │
+     └──[3 successes]───────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>No health checks:</strong> The load balancer keeps sending traffic to a dead server, causing 50% of requests to fail. Always configure active health checks with appropriate intervals (5&ndash;10s) and failure thresholds (2&ndash;3 consecutive failures before removal).</li>
+                <li><strong>Sticky sessions hiding scaling problems:</strong> Using session affinity to avoid making services stateless. When that one server goes down, all its users lose their sessions. Externalize state to Redis or a database, then use stateless round-robin for true horizontal scaling.</li>
+                <li><strong>Single load balancer without failover:</strong> Your load balancer is the single point of failure. If it dies, everything dies. Deploy LBs in active-passive (VRRP/keepalived) or active-active pairs. Use DNS failover to switch between LB clusters in different availability zones.</li>
+                <li><strong>Ignoring connection draining:</strong> Removing a server from the pool while it&rsquo;s still processing requests causes those requests to fail. Always drain existing connections gracefully &mdash; stop sending new requests, wait for active ones to complete (with a timeout), then remove the server.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Implement &ldquo;Power of Two Choices&rdquo;:</strong> Build a load balancer that picks 2 random servers and routes to the one with fewer connections. Simulate 10,000 requests with varying durations. Compare the max server load against pure random and round-robin. Graph the results.</li>
+                <li><strong>Build a health-aware weighted balancer:</strong> Combine weighted round-robin with health checks. When a server fails health checks, redistribute its weight among remaining servers proportionally. When it recovers, gradually ramp its weight back up (slow start) to avoid a sudden flood of traffic.</li>
+                <li><strong>Simulate session stickiness vs stateless:</strong> Create 100 &ldquo;users&rdquo; with sessions. Run scenario A (sticky sessions, in-memory state) and scenario B (stateless, Redis store). Kill a random server. Measure how many users lose their session in each scenario. Calculate the availability difference.</li>
+                <li><strong>L7 content-based routing:</strong> Build an L7 load balancer that routes based on URL path: <code>/api/*</code> &rarr; API pool (3 servers), <code>/static/*</code> &rarr; CDN pool (2 servers), <code>/ws/*</code> &rarr; WebSocket pool (2 servers). Add the ability to split traffic for A/B testing: 10% of <code>/api/*</code> goes to a canary server.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="59-api-gateway.html" class="prev">&larr; API Gateway</a>
+            <a href="61-reverse-proxy.html" class="next">Reverse Proxy &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

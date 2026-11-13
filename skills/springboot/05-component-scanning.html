@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Scanning & Classpath Scanning - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Spring Core & IoC Internals</li>
+            <li><a href="01-ioc-container.html"><span class="nav-number">1</span> IoC Container & BeanFactory</a></li>
+            <li><a href="02-application-context.html"><span class="nav-number">2</span> ApplicationContext Lifecycle</a></li>
+            <li><a href="03-bean-lifecycle.html"><span class="nav-number">3</span> Bean Lifecycle & Callbacks</a></li>
+            <li><a href="04-dependency-injection.html"><span class="nav-number">4</span> Dependency Injection Internals</a></li>
+            <li><a href="05-component-scanning.html" class="active"><span class="nav-number">5</span> Component Scanning</a></li>
+            <li><a href="06-bean-scopes.html"><span class="nav-number">6</span> Bean Scopes & Proxy Mechanisms</a></li>
+            <li><a href="07-aop-internals.html"><span class="nav-number">7</span> AOP Internals</a></li>
+            <li><a href="08-spel.html"><span class="nav-number">8</span> Spring Expression Language</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Spring Core & IoC Internals → Component Scanning</div>
+        <div class="topic-number">Topic 5 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Component Scanning & Classpath Scanning</h1>
+            <p class="subtitle-description">How Spring discovers your beans without explicit registration — the bytecode-reading, classpath-traversing machinery behind <code><span class="token-annotation">@ComponentScan</span></code>.</p>
+
+            <div class="tags">
+                <span class="tag tag-concept">concept</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-internal">internal</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🔍 The Census Bureau Analogy</div>
+                <p>Imagine the government needs to find every registered business in a city. They don't call each business and ask "do you exist?" — that would require loading every business into memory first. Instead, they <strong>scan the registry office records</strong> (metadata on file) without disturbing any actual business. They check each record's "type" field: Restaurant? Clinic? Shop? Only those matching the desired categories get a follow-up visit. That's exactly how Spring's component scanning works: it reads <strong>.class file metadata using ASM bytecode analysis</strong> — never loading classes into the JVM — and only instantiates the ones that pass its filters.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: ClassPathBeanDefinitionScanner -->
+            <!-- ============================================ -->
+            <h2>1. How ClassPathBeanDefinitionScanner Works Internally</h2>
+
+            <p>The <code><span class="token-class">ClassPathBeanDefinitionScanner</span></code> is the core engine that traverses the classpath, reads bytecode metadata, applies filters, and registers matching classes as <code><span class="token-type">BeanDefinition</span></code> objects in the <code><span class="token-type">BeanDefinitionRegistry</span></code>.</p>
+
+            <h3>The Scanning Pipeline</h3>
+
+            <pre><code><span class="token-comment">// The entry point — called when @ComponentScan is processed</span>
+<span class="token-keyword">public class</span> <span class="token-class">ClassPathBeanDefinitionScanner</span> <span class="token-keyword">extends</span> <span class="token-type">ClassPathScanningCandidateComponentProvider</span> {
+
+    <span class="token-keyword">public int</span> <span class="token-function">scan</span>(<span class="token-type">String</span>... basePackages) {
+        <span class="token-keyword">int</span> beanCountAtScanStart = <span class="token-keyword">this</span>.registry.<span class="token-function">getBeanDefinitionCount</span>();
+
+        <span class="token-function">doScan</span>(basePackages);
+
+        <span class="token-comment">// Register annotation config processors (@Autowired, @Required, etc.)</span>
+        <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.includeAnnotationConfig) {
+            <span class="token-type">AnnotationConfigUtils</span>.<span class="token-function">registerAnnotationConfigProcessors</span>(<span class="token-keyword">this</span>.registry);
+        }
+
+        <span class="token-keyword">return</span> (<span class="token-keyword">this</span>.registry.<span class="token-function">getBeanDefinitionCount</span>() - beanCountAtScanStart);
+    }
+
+    <span class="token-keyword">protected</span> <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinitionHolder</span>&gt; <span class="token-function">doScan</span>(<span class="token-type">String</span>... basePackages) {
+        <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinitionHolder</span>&gt; beanDefinitions = <span class="token-keyword">new</span> <span class="token-type">LinkedHashSet</span>&lt;&gt;();
+
+        <span class="token-keyword">for</span> (<span class="token-type">String</span> basePackage : basePackages) {
+            <span class="token-comment">// STEP 1: Find candidate components (bytecode scanning)</span>
+            <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinition</span>&gt; candidates = <span class="token-function">findCandidateComponents</span>(basePackage);
+
+            <span class="token-keyword">for</span> (<span class="token-type">BeanDefinition</span> candidate : candidates) {
+                <span class="token-comment">// STEP 2: Resolve scope metadata (@Scope annotation)</span>
+                <span class="token-type">ScopeMetadata</span> scopeMetadata = <span class="token-keyword">this</span>.scopeMetadataResolver
+                    .<span class="token-function">resolveScopeMetadata</span>(candidate);
+                candidate.<span class="token-function">setScope</span>(scopeMetadata.<span class="token-function">getScopeName</span>());
+
+                <span class="token-comment">// STEP 3: Generate bean name</span>
+                <span class="token-type">String</span> beanName = <span class="token-keyword">this</span>.beanNameGenerator
+                    .<span class="token-function">generateBeanName</span>(candidate, <span class="token-keyword">this</span>.registry);
+
+                <span class="token-comment">// STEP 4: Apply default values (lazy-init, autowire-mode, etc.)</span>
+                <span class="token-keyword">if</span> (candidate <span class="token-keyword">instanceof</span> <span class="token-type">AbstractBeanDefinition</span>) {
+                    <span class="token-function">postProcessBeanDefinition</span>(
+                        (<span class="token-type">AbstractBeanDefinition</span>) candidate, beanName);
+                }
+
+                <span class="token-comment">// STEP 5: Process common annotations (@Lazy, @Primary, @DependsOn)</span>
+                <span class="token-keyword">if</span> (candidate <span class="token-keyword">instanceof</span> <span class="token-type">AnnotatedBeanDefinition</span>) {
+                    <span class="token-type">AnnotationConfigUtils</span>.<span class="token-function">processCommonDefinitionAnnotations</span>(
+                        (<span class="token-type">AnnotatedBeanDefinition</span>) candidate);
+                }
+
+                <span class="token-comment">// STEP 6: Check for duplicates and register</span>
+                <span class="token-keyword">if</span> (<span class="token-function">checkCandidate</span>(beanName, candidate)) {
+                    <span class="token-type">BeanDefinitionHolder</span> definitionHolder =
+                        <span class="token-keyword">new</span> <span class="token-type">BeanDefinitionHolder</span>(candidate, beanName);
+                    definitionHolder = <span class="token-type">AnnotationConfigUtils</span>
+                        .<span class="token-function">applyScopedProxyMode</span>(scopeMetadata, definitionHolder, <span class="token-keyword">this</span>.registry);
+                    beanDefinitions.<span class="token-function">add</span>(definitionHolder);
+                    <span class="token-function">registerBeanDefinition</span>(definitionHolder, <span class="token-keyword">this</span>.registry);
+                }
+            }
+        }
+        <span class="token-keyword">return</span> beanDefinitions;
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>The scanner operates in 6 distinct steps: bytecode scan → scope resolution → name generation → default values → annotation processing → registration. Each step is individually overridable, making the scanner highly extensible.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ARCHITECTURE DIAGRAM -->
+            <!-- ============================================ -->
+            <div class="architecture-diagram">
+                <h3>📐 Component Scanning Flow</h3>
+                <pre class="diagram-ascii">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         @ComponentScan("com.app")                           │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              ConfigurationClassPostProcessor                                 │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Parses @Configuration classes → finds @ComponentScan directives     │   │
+│  └───────────────────────────────────┬─────────────────────────────────┘   │
+└──────────────────────────────────────┼──────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│             ClassPathBeanDefinitionScanner                                   │
+│                                                                             │
+│  ┌─────────────┐     ┌──────────────────┐     ┌─────────────────────────┐ │
+│  │ Convert pkg  │────▶│ Scan classpath   │────▶│ Apply include/exclude   │ │
+│  │ to path      │     │ resources        │     │ filters                 │ │
+│  │ com.app →    │     │ (PathMatchingRe- │     │                         │ │
+│  │ com/app/**   │     │ sourcePatternRe- │     │ AnnotationTypeFilter    │ │
+│  │ /*.class     │     │ solver)          │     │ AssignableTypeFilter    │ │
+│  └─────────────┘     └──────────────────┘     │ RegexPatternTypeFilter  │ │
+│                                                └────────────┬────────────┘ │
+└─────────────────────────────────────────────────────────────┼──────────────┘
+                                                              │
+                                                              ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ASM MetadataReader (NO class loading!)                    │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  SimpleMetadataReaderFactory → SimpleMetadataReader                  │   │
+│  │  Reads .class file bytes → ClassReader (ASM) → AnnotationMetadata   │   │
+│  │  ✅ Checks annotations without Class.forName()                      │   │
+│  │  ✅ No static initializers run                                      │   │
+│  │  ✅ No dependencies need to be on classpath                         │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              BeanDefinitionRegistry (DefaultListableBeanFactory)             │
+│                                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │
+│  │ OrderService │  │ UserRepo    │  │ PayCtrl     │  │ ... registered  │  │
+│  │ BeanDef     │  │ BeanDef     │  │ BeanDef     │  │ BeanDefinitions │  │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: ASM Bytecode Reading -->
+            <!-- ============================================ -->
+            <h2>2. ASM Bytecode Reading — Scanning Without Loading</h2>
+
+            <p>This is the <strong>most critical insight</strong> about component scanning: Spring <em>never</em> calls <code><span class="token-class">Class</span>.<span class="token-function">forName</span>()</code> during scanning. Instead, it reads raw <code>.class</code> file bytes using the <strong>ASM bytecode library</strong> and extracts annotation metadata directly from the bytecode structure.</p>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Why Not Use Class.forName()?</div>
+                <ul>
+                    <li><strong>Static initializers</strong> — Loading a class runs its <code><span class="token-keyword">static</span> {}</code> blocks, which might connect to databases, start threads, or crash</li>
+                    <li><strong>Dependency chains</strong> — Loading class A might require class B which requires class C... ClassNotFoundException cascades</li>
+                    <li><strong>PermGen/Metaspace pressure</strong> — Loading thousands of classes just to check annotations wastes memory</li>
+                    <li><strong>Performance</strong> — Class loading is expensive (verification, linking, initialization); bytecode reading is a simple file parse</li>
+                </ul>
+            </div>
+
+            <h3>The MetadataReader Pipeline</h3>
+
+            <pre><code><span class="token-comment">// Spring's bytecode reading infrastructure</span>
+<span class="token-keyword">public interface</span> <span class="token-class">MetadataReader</span> {
+    <span class="token-comment">// The resource (jar entry or file) for this .class file</span>
+    <span class="token-type">Resource</span> <span class="token-function">getResource</span>();
+
+    <span class="token-comment">// Class-level metadata (name, superclass, interfaces) — WITHOUT loading</span>
+    <span class="token-type">ClassMetadata</span> <span class="token-function">getClassMetadata</span>();
+
+    <span class="token-comment">// All annotations on the class — read directly from bytecode</span>
+    <span class="token-type">AnnotationMetadata</span> <span class="token-function">getAnnotationMetadata</span>();
+}
+
+<span class="token-keyword">public class</span> <span class="token-class">SimpleMetadataReader</span> <span class="token-keyword">implements</span> <span class="token-type">MetadataReader</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">AnnotationMetadata</span> annotationMetadata;
+
+    <span class="token-function">SimpleMetadataReader</span>(<span class="token-type">Resource</span> resource, <span class="token-type">ClassLoader</span> classLoader) {
+        <span class="token-comment">// Read raw bytes from the .class file</span>
+        <span class="token-type">SimpleAnnotationMetadataReadingVisitor</span> visitor =
+            <span class="token-keyword">new</span> <span class="token-type">SimpleAnnotationMetadataReadingVisitor</span>(classLoader);
+
+        <span class="token-comment">// ASM ClassReader parses the bytecode structure</span>
+        <span class="token-function">getClassReader</span>(resource).<span class="token-function">accept</span>(visitor,
+            <span class="token-type">ClassReader</span>.SKIP_DEBUG | <span class="token-type">ClassReader</span>.SKIP_CODE | <span class="token-type">ClassReader</span>.SKIP_FRAMES);
+            <span class="token-comment">// ↑ SKIP_CODE: Don't read method bodies (huge savings!)</span>
+            <span class="token-comment">// ↑ SKIP_DEBUG: Don't read debug info (line numbers, var names)</span>
+            <span class="token-comment">// ↑ SKIP_FRAMES: Don't read stack map frames</span>
+
+        <span class="token-keyword">this</span>.annotationMetadata = visitor.<span class="token-function">getMetadata</span>();
+    }
+
+    <span class="token-keyword">private</span> <span class="token-type">ClassReader</span> <span class="token-function">getClassReader</span>(<span class="token-type">Resource</span> resource) {
+        <span class="token-keyword">try</span> (<span class="token-type">InputStream</span> is = resource.<span class="token-function">getInputStream</span>()) {
+            <span class="token-keyword">return new</span> <span class="token-type">ClassReader</span>(is); <span class="token-comment">// ASM reads the bytecode</span>
+        }
+    }
+}</code></pre>
+
+            <h3>What ASM Extracts From Bytecode</h3>
+
+            <pre><code><span class="token-comment">// A .class file has this binary structure (simplified):</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// ┌────────────────────────────────────────────────────┐</span>
+<span class="token-comment">// │ Magic Number: 0xCAFEBABE                           │</span>
+<span class="token-comment">// │ Version: 61.0 (Java 17)                            │</span>
+<span class="token-comment">// │ Constant Pool: strings, class refs, method refs    │</span>
+<span class="token-comment">// │ Access Flags: public, final, abstract...           │</span>
+<span class="token-comment">// │ This Class: com/app/service/OrderService            │</span>
+<span class="token-comment">// │ Super Class: java/lang/Object                      │</span>
+<span class="token-comment">// │ Interfaces: []                                     │</span>
+<span class="token-comment">// │ Fields: [...]                                      │</span>
+<span class="token-comment">// │ Methods: [...]                                     │</span>
+<span class="token-comment">// │ Attributes:                                        │</span>
+<span class="token-comment">// │   RuntimeVisibleAnnotations:     ← SPRING READS THIS</span>
+<span class="token-comment">// │     @Service                                       │</span>
+<span class="token-comment">// │     @Transactional                                 │</span>
+<span class="token-comment">// └────────────────────────────────────────────────────┘</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// ASM with SKIP_CODE reads ONLY the header + annotations section</span>
+<span class="token-comment">// Typical .class file: 5-50KB. Annotation section: 100-500 bytes.</span>
+<span class="token-comment">// Spring reads ~1% of the actual file content during scanning!</span>
+
+<span class="token-comment">// What Spring can determine WITHOUT loading the class:</span>
+<span class="token-type">AnnotationMetadata</span> metadata = metadataReader.<span class="token-function">getAnnotationMetadata</span>();
+
+metadata.<span class="token-function">getClassName</span>();            <span class="token-comment">// "com.app.service.OrderService"</span>
+metadata.<span class="token-function">isInterface</span>();             <span class="token-comment">// false</span>
+metadata.<span class="token-function">isAbstract</span>();              <span class="token-comment">// false</span>
+metadata.<span class="token-function">isFinal</span>();                 <span class="token-comment">// false</span>
+metadata.<span class="token-function">hasAnnotation</span>(<span class="token-string">"org.springframework.stereotype.Service"</span>); <span class="token-comment">// true</span>
+metadata.<span class="token-function">hasMetaAnnotation</span>(<span class="token-string">"org.springframework.stereotype.Component"</span>); <span class="token-comment">// true!</span>
+metadata.<span class="token-function">getAnnotationAttributes</span>(<span class="token-string">"org.springframework.stereotype.Service"</span>);
+<span class="token-comment">// {value="orderService"}</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Meta-Annotation Detection</div>
+                <p>When Spring checks if a class has <code><span class="token-annotation">@Component</span></code>, it also checks <strong>meta-annotations</strong>. Since <code><span class="token-annotation">@Service</span></code> is annotated with <code><span class="token-annotation">@Component</span></code>, any class with <code><span class="token-annotation">@Service</span></code> automatically matches the <code><span class="token-annotation">@Component</span></code> filter. ASM reads the annotation bytecode of <em>the annotation class itself</em> to discover this hierarchy.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: Include/Exclude Filters -->
+            <!-- ============================================ -->
+            <h2>3. Include/Exclude Filters</h2>
+
+            <p>The scanner uses a chain of <code><span class="token-type">TypeFilter</span></code> objects to decide which classes become beans. By default, the include filter matches <code><span class="token-annotation">@Component</span></code> (and its meta-annotations). You can add custom filters:</p>
+
+            <pre><code><span class="token-annotation">@Configuration</span>
+<span class="token-annotation">@ComponentScan</span>(
+    basePackages = <span class="token-string">"com.app"</span>,
+    includeFilters = {
+        <span class="token-comment">// Match classes annotated with a custom annotation</span>
+        <span class="token-annotation">@Filter</span>(type = <span class="token-type">FilterType</span>.ANNOTATION, classes = <span class="token-type">MyCustomBean</span>.<span class="token-keyword">class</span>),
+
+        <span class="token-comment">// Match classes assignable to a specific type</span>
+        <span class="token-annotation">@Filter</span>(type = <span class="token-type">FilterType</span>.ASSIGNABLE_TYPE, classes = <span class="token-type">Plugin</span>.<span class="token-keyword">class</span>),
+
+        <span class="token-comment">// Match classes whose name matches a regex</span>
+        <span class="token-annotation">@Filter</span>(type = <span class="token-type">FilterType</span>.REGEX, pattern = <span class="token-string">".*Gateway$"</span>),
+
+        <span class="token-comment">// Full custom logic</span>
+        <span class="token-annotation">@Filter</span>(type = <span class="token-type">FilterType</span>.CUSTOM, classes = <span class="token-type">MyTypeFilter</span>.<span class="token-keyword">class</span>)
+    },
+    excludeFilters = {
+        <span class="token-comment">// Exclude all @Repository classes (maybe using a separate data config)</span>
+        <span class="token-annotation">@Filter</span>(type = <span class="token-type">FilterType</span>.ANNOTATION, classes = <span class="token-type">Repository</span>.<span class="token-keyword">class</span>),
+
+        <span class="token-comment">// Exclude test doubles</span>
+        <span class="token-annotation">@Filter</span>(type = <span class="token-type">FilterType</span>.REGEX, pattern = <span class="token-string">".*Mock.*"</span>)
+    }
+)
+<span class="token-keyword">public class</span> <span class="token-class">AppConfig</span> {}</code></pre>
+
+            <h3>TypeFilter Implementations</h3>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Filter Type</th>
+                        <th>Implementation Class</th>
+                        <th>What It Checks</th>
+                        <th>Loads Class?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>ANNOTATION</code></td>
+                        <td><code><span class="token-class">AnnotationTypeFilter</span></code></td>
+                        <td>Class has the specified annotation (or meta-annotation)</td>
+                        <td>❌ No — reads bytecode</td>
+                    </tr>
+                    <tr>
+                        <td><code>ASSIGNABLE_TYPE</code></td>
+                        <td><code><span class="token-class">AssignableTypeFilter</span></code></td>
+                        <td>Class extends/implements the specified type</td>
+                        <td>⚠️ May load class for complex hierarchies</td>
+                    </tr>
+                    <tr>
+                        <td><code>REGEX</code></td>
+                        <td><code><span class="token-class">RegexPatternTypeFilter</span></code></td>
+                        <td>Fully-qualified class name matches regex</td>
+                        <td>❌ No — uses class name from metadata</td>
+                    </tr>
+                    <tr>
+                        <td><code>ASPECTJ</code></td>
+                        <td><code><span class="token-class">AspectJTypeFilter</span></code></td>
+                        <td>AspectJ type pattern expression</td>
+                        <td>⚠️ May load class</td>
+                    </tr>
+                    <tr>
+                        <td><code>CUSTOM</code></td>
+                        <td>Your <code><span class="token-type">TypeFilter</span></code> impl</td>
+                        <td>Whatever you want</td>
+                        <td>Up to you</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Internal: How Filters Are Applied</h3>
+
+            <pre><code><span class="token-comment">// Inside ClassPathScanningCandidateComponentProvider</span>
+<span class="token-keyword">protected boolean</span> <span class="token-function">isCandidateComponent</span>(<span class="token-type">MetadataReader</span> metadataReader) {
+
+    <span class="token-comment">// EXCLUDE filters checked FIRST — early exit for performance</span>
+    <span class="token-keyword">for</span> (<span class="token-type">TypeFilter</span> tf : <span class="token-keyword">this</span>.excludeFilters) {
+        <span class="token-keyword">if</span> (tf.<span class="token-function">match</span>(metadataReader, <span class="token-keyword">this</span>.metadataReaderFactory)) {
+            <span class="token-keyword">return false</span>; <span class="token-comment">// Excluded! Skip immediately.</span>
+        }
+    }
+
+    <span class="token-comment">// INCLUDE filters — must match at least one</span>
+    <span class="token-keyword">for</span> (<span class="token-type">TypeFilter</span> tf : <span class="token-keyword">this</span>.includeFilters) {
+        <span class="token-keyword">if</span> (tf.<span class="token-function">match</span>(metadataReader, <span class="token-keyword">this</span>.metadataReaderFactory)) {
+            <span class="token-keyword">return</span> <span class="token-function">isConditionMatch</span>(metadataReader); <span class="token-comment">// Also check @Conditional</span>
+        }
+    }
+
+    <span class="token-keyword">return false</span>; <span class="token-comment">// No include filter matched</span>
+}
+
+<span class="token-comment">// AnnotationTypeFilter.match() — the most common filter</span>
+<span class="token-keyword">public class</span> <span class="token-class">AnnotationTypeFilter</span> <span class="token-keyword">extends</span> <span class="token-type">AbstractTypeHierarchyTraversingFilter</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">Class</span>&lt;? <span class="token-keyword">extends</span> <span class="token-type">Annotation</span>&gt; annotationType;
+    <span class="token-keyword">private final</span> <span class="token-keyword">boolean</span> considerMetaAnnotations;
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">protected boolean</span> <span class="token-function">matchSelf</span>(<span class="token-type">MetadataReader</span> metadataReader) {
+        <span class="token-type">AnnotationMetadata</span> metadata = metadataReader.<span class="token-function">getAnnotationMetadata</span>();
+
+        <span class="token-comment">// Direct annotation check (fast path)</span>
+        <span class="token-keyword">if</span> (metadata.<span class="token-function">hasAnnotation</span>(<span class="token-keyword">this</span>.annotationType.<span class="token-function">getName</span>())) {
+            <span class="token-keyword">return true</span>;
+        }
+
+        <span class="token-comment">// Meta-annotation check (e.g., @Service has @Component as meta)</span>
+        <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.considerMetaAnnotations) {
+            <span class="token-keyword">return</span> metadata.<span class="token-function">hasMetaAnnotation</span>(<span class="token-keyword">this</span>.annotationType.<span class="token-function">getName</span>());
+        }
+        <span class="token-keyword">return false</span>;
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Filter Ordering Matters</div>
+                <p>Exclude filters are checked <strong>before</strong> include filters. This means you can have a broad include filter (<code><span class="token-annotation">@Component</span></code>) and surgically exclude specific classes. The exclude always wins.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: basePackages Resolution -->
+            <!-- ============================================ -->
+            <h2>4. basePackages Resolution from @ComponentScan</h2>
+
+            <p>The <code>basePackages</code> attribute determines the root directories that the scanner will traverse. The resolution process converts Java package names to filesystem/jar paths:</p>
+
+            <pre><code><span class="token-comment">// Multiple ways to specify scan targets</span>
+
+<span class="token-comment">// Way 1: Explicit package strings</span>
+<span class="token-annotation">@ComponentScan</span>(basePackages = {<span class="token-string">"com.app.service"</span>, <span class="token-string">"com.app.repository"</span>})
+
+<span class="token-comment">// Way 2: Type-safe package references (preferred!)</span>
+<span class="token-annotation">@ComponentScan</span>(basePackageClasses = {<span class="token-type">ServiceMarker</span>.<span class="token-keyword">class</span>, <span class="token-type">RepoMarker</span>.<span class="token-keyword">class</span>})
+<span class="token-comment">// Uses the PACKAGE of these classes as the base package</span>
+<span class="token-comment">// Refactoring-safe: package renames are caught by compiler</span>
+
+<span class="token-comment">// Way 3: No value specified — uses the package of the annotated class</span>
+<span class="token-annotation">@ComponentScan</span>  <span class="token-comment">// scans package of THIS @Configuration class</span>
+
+<span class="token-comment">// Way 4: Spring Boot's @SpringBootApplication (includes @ComponentScan)</span>
+<span class="token-annotation">@SpringBootApplication</span>  <span class="token-comment">// scans from the main class's package DOWN</span></code></pre>
+
+            <h3>Internal: Package-to-Path Conversion</h3>
+
+            <pre><code><span class="token-comment">// ClassPathScanningCandidateComponentProvider.findCandidateComponents()</span>
+<span class="token-keyword">private</span> <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinition</span>&gt; <span class="token-function">scanCandidateComponents</span>(<span class="token-type">String</span> basePackage) {
+    <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinition</span>&gt; candidates = <span class="token-keyword">new</span> <span class="token-type">LinkedHashSet</span>&lt;&gt;();
+
+    <span class="token-comment">// Convert package name to resource path pattern</span>
+    <span class="token-comment">// "com.app.service" → "classpath*:com/app/service/**/*.class"</span>
+    <span class="token-type">String</span> packageSearchPath = <span class="token-type">ResourcePatternResolver</span>.CLASSPATH_ALL_URL_PREFIX +
+        <span class="token-function">resolveBasePackage</span>(basePackage) + <span class="token-string">'/'</span> + <span class="token-keyword">this</span>.resourcePattern;
+    <span class="token-comment">// resourcePattern defaults to "**/*.class"</span>
+
+    <span class="token-comment">// PathMatchingResourcePatternResolver scans:</span>
+    <span class="token-comment">// - File system directories (exploded classes)</span>
+    <span class="token-comment">// - JAR files (scans jar entries)</span>
+    <span class="token-comment">// - Nested JARs (Spring Boot fat jar)</span>
+    <span class="token-type">Resource</span>[] resources = <span class="token-keyword">this</span>.resourcePatternResolver
+        .<span class="token-function">getResources</span>(packageSearchPath);
+
+    <span class="token-keyword">for</span> (<span class="token-type">Resource</span> resource : resources) {
+        <span class="token-type">MetadataReader</span> metadataReader = <span class="token-keyword">this</span>.metadataReaderFactory
+            .<span class="token-function">getMetadataReader</span>(resource);
+
+        <span class="token-keyword">if</span> (<span class="token-function">isCandidateComponent</span>(metadataReader)) {
+            <span class="token-type">ScannedGenericBeanDefinition</span> sbd =
+                <span class="token-keyword">new</span> <span class="token-type">ScannedGenericBeanDefinition</span>(metadataReader);
+            sbd.<span class="token-function">setSource</span>(resource);
+
+            <span class="token-keyword">if</span> (<span class="token-function">isCandidateComponent</span>(sbd)) {
+                candidates.<span class="token-function">add</span>(sbd);
+            }
+        }
+    }
+    <span class="token-keyword">return</span> candidates;
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Why @SpringBootApplication Package Placement Matters</div>
+                <p>Since <code><span class="token-annotation">@SpringBootApplication</span></code> includes <code><span class="token-annotation">@ComponentScan</span></code> with no explicit <code>basePackages</code>, it scans from its own package down. If you place your main class in <code>com.app</code>, it scans <code>com.app.**</code>. If you accidentally put it in <code>com.app.config</code>, it misses <code>com.app.service</code>! Always place the main class at the root package.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: ConfigurationClassPostProcessor -->
+            <!-- ============================================ -->
+            <h2>5. How @ComponentScan is Processed by ConfigurationClassPostProcessor</h2>
+
+            <p><code><span class="token-class">ConfigurationClassPostProcessor</span></code> is the <code><span class="token-type">BeanDefinitionRegistryPostProcessor</span></code> that kicks off the entire annotation-based configuration machinery. It's registered automatically and has the <strong>highest priority</strong> among all post-processors.</p>
+
+            <pre><code><span class="token-comment">// ConfigurationClassPostProcessor — the orchestrator</span>
+<span class="token-keyword">public class</span> <span class="token-class">ConfigurationClassPostProcessor</span>
+        <span class="token-keyword">implements</span> <span class="token-type">BeanDefinitionRegistryPostProcessor</span>, <span class="token-type">PriorityOrdered</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">postProcessBeanDefinitionRegistry</span>(<span class="token-type">BeanDefinitionRegistry</span> registry) {
+        <span class="token-comment">// 1. Find all @Configuration classes in the registry</span>
+        <span class="token-type">List</span>&lt;<span class="token-type">BeanDefinitionHolder</span>&gt; configCandidates = <span class="token-keyword">new</span> <span class="token-type">ArrayList</span>&lt;&gt;();
+        <span class="token-keyword">for</span> (<span class="token-type">String</span> beanName : registry.<span class="token-function">getBeanDefinitionNames</span>()) {
+            <span class="token-type">BeanDefinition</span> beanDef = registry.<span class="token-function">getBeanDefinition</span>(beanName);
+            <span class="token-keyword">if</span> (<span class="token-type">ConfigurationClassUtils</span>.<span class="token-function">checkConfigurationClassCandidate</span>(beanDef, metadataReaderFactory)) {
+                configCandidates.<span class="token-function">add</span>(<span class="token-keyword">new</span> <span class="token-type">BeanDefinitionHolder</span>(beanDef, beanName));
+            }
+        }
+
+        <span class="token-comment">// 2. Parse each @Configuration class</span>
+        <span class="token-type">ConfigurationClassParser</span> parser = <span class="token-keyword">new</span> <span class="token-type">ConfigurationClassParser</span>(
+            metadataReaderFactory, problemReporter, environment, resourceLoader, componentScanParser, registry);
+
+        parser.<span class="token-function">parse</span>(configCandidates);
+
+        <span class="token-comment">// 3. Load bean definitions from parsed configuration</span>
+        <span class="token-type">ConfigurationClassBeanDefinitionReader</span> reader =
+            <span class="token-keyword">new</span> <span class="token-type">ConfigurationClassBeanDefinitionReader</span>(registry, ...);
+        reader.<span class="token-function">loadBeanDefinitions</span>(parser.<span class="token-function">getConfigurationClasses</span>());
+    }
+}
+
+<span class="token-comment">// Inside ConfigurationClassParser — processing @ComponentScan</span>
+<span class="token-keyword">protected void</span> <span class="token-function">processConfigurationClass</span>(<span class="token-type">ConfigurationClass</span> configClass) {
+    <span class="token-comment">// ...</span>
+    <span class="token-type">SourceClass</span> sourceClass = <span class="token-function">asSourceClass</span>(configClass);
+
+    <span class="token-keyword">do</span> {
+        sourceClass = <span class="token-function">doProcessConfigurationClass</span>(configClass, sourceClass);
+    } <span class="token-keyword">while</span> (sourceClass != <span class="token-keyword">null</span>);
+}
+
+<span class="token-keyword">protected</span> <span class="token-type">SourceClass</span> <span class="token-function">doProcessConfigurationClass</span>(<span class="token-type">ConfigurationClass</span> configClass, <span class="token-type">SourceClass</span> sourceClass) {
+    <span class="token-comment">// Process @ComponentScan annotations</span>
+    <span class="token-type">Set</span>&lt;<span class="token-type">AnnotationAttributes</span>&gt; componentScans =
+        <span class="token-type">AnnotationConfigUtils</span>.<span class="token-function">attributesForRepeatable</span>(
+            sourceClass.<span class="token-function">getMetadata</span>(), <span class="token-type">ComponentScans</span>.<span class="token-keyword">class</span>, <span class="token-type">ComponentScan</span>.<span class="token-keyword">class</span>);
+
+    <span class="token-keyword">for</span> (<span class="token-type">AnnotationAttributes</span> componentScan : componentScans) {
+        <span class="token-comment">// TRIGGER THE ACTUAL SCAN</span>
+        <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinitionHolder</span>&gt; scannedBeanDefinitions =
+            <span class="token-keyword">this</span>.componentScanParser.<span class="token-function">parse</span>(componentScan,
+                sourceClass.<span class="token-function">getMetadata</span>().<span class="token-function">getClassName</span>());
+
+        <span class="token-comment">// RECURSIVE: Check if scanned classes are ALSO @Configuration classes</span>
+        <span class="token-keyword">for</span> (<span class="token-type">BeanDefinitionHolder</span> holder : scannedBeanDefinitions) {
+            <span class="token-keyword">if</span> (<span class="token-type">ConfigurationClassUtils</span>.<span class="token-function">checkConfigurationClassCandidate</span>(
+                    holder.<span class="token-function">getBeanDefinition</span>(), <span class="token-keyword">this</span>.metadataReaderFactory)) {
+                <span class="token-comment">// Found another @Configuration! Parse it too (recursive)</span>
+                <span class="token-function">parse</span>(holder.<span class="token-function">getBeanDefinition</span>().<span class="token-function">getBeanClassName</span>(), holder.<span class="token-function">getBeanName</span>());
+            }
+        }
+    }
+    <span class="token-comment">// ... also process @Import, @Bean, @ImportResource, etc.</span>
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 The Recursive Nature</div>
+                <p>Component scanning is <strong>recursive</strong>. If the scanner discovers a class that is itself a <code><span class="token-annotation">@Configuration</span></code> class with its own <code><span class="token-annotation">@ComponentScan</span></code>, that scan is also executed. This is how modular Spring applications compose — each module can define its own scan boundaries.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Why Scanning is Expensive -->
+            <!-- ============================================ -->
+            <h2>6. Why Scanning is Expensive</h2>
+
+            <p>Component scanning is one of the most expensive operations during Spring application startup. Here's why:</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Cost Factor</th>
+                        <th>Impact</th>
+                        <th>Typical Numbers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Classpath size</strong></td>
+                        <td>Every .class file in every jar matching the base package must be opened and read</td>
+                        <td>Enterprise app: 50,000-200,000 .class files</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JAR traversal</strong></td>
+                        <td>Each JAR is a ZIP file — scanning requires reading the central directory of every JAR</td>
+                        <td>Spring Boot fat jar: 100-300 nested JARs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>I/O operations</strong></td>
+                        <td>Each .class file requires a separate InputStream open/read/close</td>
+                        <td>10,000+ file reads for a medium app</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ASM parsing</strong></td>
+                        <td>Even with SKIP_CODE, the bytecode parser must validate the constant pool</td>
+                        <td>~0.1ms per class file</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Broad packages</strong></td>
+                        <td>Scanning "com" instead of "com.myapp" includes ALL libraries under "com.*"</td>
+                        <td>Can add 5-30 seconds to startup</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><code><span class="token-comment">// Real-world measurement of scanning cost</span>
+<span class="token-comment">// Application with basePackage = "com" (TOO BROAD!)</span>
+
+<span class="token-comment">// DEBUG output from ClassPathBeanDefinitionScanner:</span>
+<span class="token-comment">// Scanned 47,832 candidate class resources</span>
+<span class="token-comment">// Identified 342 candidate components</span>
+<span class="token-comment">// Time: 8.4 seconds</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// After narrowing to "com.myapp":</span>
+<span class="token-comment">// Scanned 1,247 candidate class resources</span>
+<span class="token-comment">// Identified 342 candidate components (same beans found!)</span>
+<span class="token-comment">// Time: 0.3 seconds</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 28x speedup just by narrowing the base package!</span></code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ The Hidden Cost: MetadataReaderFactory Caching</div>
+                <p><code><span class="token-class">CachingMetadataReaderFactory</span></code> caches parsed <code><span class="token-type">MetadataReader</span></code> objects to avoid re-reading the same .class file. However, in Spring Boot with a fat JAR, the first scan still pays the full I/O cost. The cache only helps when the same class is checked by multiple filters or during recursive configuration parsing.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Spring Component Index -->
+            <!-- ============================================ -->
+            <h2>7. Spring Boot's Component Index: META-INF/spring.components</h2>
+
+            <p>To solve the scanning performance problem, Spring 5 introduced the <strong>Component Index</strong> — a compile-time optimization that pre-computes which classes are components, eliminating runtime classpath scanning entirely.</p>
+
+            <h3>How It Works</h3>
+
+            <pre><code><span class="token-comment">// Step 1: Add the indexer to your build</span>
+<span class="token-comment">// Maven pom.xml</span>
+&lt;<span class="token-keyword">dependency</span>&gt;
+    &lt;<span class="token-keyword">groupId</span>&gt;org.springframework&lt;/<span class="token-keyword">groupId</span>&gt;
+    &lt;<span class="token-keyword">artifactId</span>&gt;spring-context-indexer&lt;/<span class="token-keyword">artifactId</span>&gt;
+    &lt;<span class="token-keyword">optional</span>&gt;true&lt;/<span class="token-keyword">optional</span>&gt;
+&lt;/<span class="token-keyword">dependency</span>&gt;
+
+<span class="token-comment">// Step 2: At COMPILE TIME, the annotation processor generates:</span>
+<span class="token-comment">// META-INF/spring.components</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// com.app.service.OrderService=org.springframework.stereotype.Component</span>
+<span class="token-comment">// com.app.service.PaymentService=org.springframework.stereotype.Component</span>
+<span class="token-comment">// com.app.repository.UserRepository=org.springframework.stereotype.Component</span>
+<span class="token-comment">// com.app.controller.OrderController=org.springframework.stereotype.Component</span>
+<span class="token-comment">// com.app.config.SecurityConfig=org.springframework.stereotype.Component</span>
+
+<span class="token-comment">// Step 3: At RUNTIME, Spring reads this flat file instead of scanning</span></code></pre>
+
+            <h3>Internal: How the Index is Used</h3>
+
+            <pre><code><span class="token-comment">// ClassPathScanningCandidateComponentProvider.findCandidateComponents()</span>
+<span class="token-keyword">public</span> <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinition</span>&gt; <span class="token-function">findCandidateComponents</span>(<span class="token-type">String</span> basePackage) {
+
+    <span class="token-comment">// CHECK: Is the component index available?</span>
+    <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.componentsIndex != <span class="token-keyword">null</span> &amp;&amp; <span class="token-function">indexSupportsIncludeFilters</span>()) {
+        <span class="token-comment">// FAST PATH: Read from pre-computed index</span>
+        <span class="token-keyword">return</span> <span class="token-function">addCandidateComponentsFromIndex</span>(<span class="token-keyword">this</span>.componentsIndex, basePackage);
+    } <span class="token-keyword">else</span> {
+        <span class="token-comment">// SLOW PATH: Full classpath scanning</span>
+        <span class="token-keyword">return</span> <span class="token-function">scanCandidateComponents</span>(basePackage);
+    }
+}
+
+<span class="token-comment">// Fast path: Read from index file</span>
+<span class="token-keyword">private</span> <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinition</span>&gt; <span class="token-function">addCandidateComponentsFromIndex</span>(
+        <span class="token-type">CandidateComponentsIndex</span> index, <span class="token-type">String</span> basePackage) {
+
+    <span class="token-type">Set</span>&lt;<span class="token-type">BeanDefinition</span>&gt; candidates = <span class="token-keyword">new</span> <span class="token-type">LinkedHashSet</span>&lt;&gt;();
+
+    <span class="token-keyword">for</span> (<span class="token-type">TypeFilter</span> filter : <span class="token-keyword">this</span>.includeFilters) {
+        <span class="token-type">String</span> stereotype = <span class="token-function">extractStereotype</span>(filter);
+        <span class="token-keyword">if</span> (stereotype != <span class="token-keyword">null</span>) {
+            <span class="token-comment">// O(1) lookup from the index instead of O(n) classpath scan!</span>
+            <span class="token-type">Set</span>&lt;<span class="token-type">String</span>&gt; types = index.<span class="token-function">getCandidateTypes</span>(basePackage, stereotype);
+
+            <span class="token-keyword">for</span> (<span class="token-type">String</span> type : types) {
+                <span class="token-type">MetadataReader</span> metadataReader =
+                    metadataReaderFactory.<span class="token-function">getMetadataReader</span>(type);
+                <span class="token-keyword">if</span> (<span class="token-function">isCandidateComponent</span>(metadataReader)) {
+                    candidates.<span class="token-function">add</span>(<span class="token-keyword">new</span> <span class="token-type">ScannedGenericBeanDefinition</span>(metadataReader));
+                }
+            }
+        }
+    }
+    <span class="token-keyword">return</span> candidates;
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 When the Index Falls Back to Scanning</div>
+                <p>The component index is <strong>all-or-nothing per module</strong>. If ANY JAR on the classpath has components but lacks a <code>META-INF/spring.components</code> file, Spring falls back to full classpath scanning for the entire application. ALL modules must generate the index for it to be effective.</p>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Runtime Scanning</th>
+                        <th>Component Index</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>When work happens</strong></td>
+                        <td>Every application startup</td>
+                        <td>Once at compile time</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Startup cost</strong></td>
+                        <td>O(n) where n = all .class files in packages</td>
+                        <td>O(k) where k = actual components</td>
+                    </tr>
+                    <tr>
+                        <td><strong>I/O operations</strong></td>
+                        <td>Thousands of file reads</td>
+                        <td>One file read</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Supports custom filters</strong></td>
+                        <td>✅ Full flexibility</td>
+                        <td>⚠️ Only standard stereotypes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Build tool support</strong></td>
+                        <td>No build changes needed</td>
+                        <td>Requires annotation processor</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: Performance Optimization -->
+            <!-- ============================================ -->
+            <h2>8. Performance Optimization: Narrowing basePackages</h2>
+
+            <p>The single most impactful optimization for Spring startup time is <strong>narrowing your scan boundaries</strong>. Every unnecessary package in the scan path multiplies the work.</p>
+
+            <pre><code><span class="token-comment">// ❌ BAD: Scanning the root package (includes ALL dependencies under "com")</span>
+<span class="token-annotation">@ComponentScan</span>(<span class="token-string">"com"</span>)
+<span class="token-comment">// Scans: com.google.*, com.fasterxml.*, com.zaxxer.*, com.app.*, ...</span>
+<span class="token-comment">// Result: 50,000+ class files read, 8+ seconds wasted</span>
+
+<span class="token-comment">// ❌ MEDIOCRE: Scanning the company root</span>
+<span class="token-annotation">@ComponentScan</span>(<span class="token-string">"com.mycompany"</span>)
+<span class="token-comment">// Still too broad if you have shared libraries under com.mycompany.*</span>
+
+<span class="token-comment">// ✅ GOOD: Scanning only your application's packages</span>
+<span class="token-annotation">@ComponentScan</span>(basePackages = {
+    <span class="token-string">"com.mycompany.orderservice.service"</span>,
+    <span class="token-string">"com.mycompany.orderservice.repository"</span>,
+    <span class="token-string">"com.mycompany.orderservice.controller"</span>,
+    <span class="token-string">"com.mycompany.orderservice.config"</span>
+})
+
+<span class="token-comment">// ✅ BEST: Type-safe marker interfaces (refactoring-safe)</span>
+<span class="token-annotation">@ComponentScan</span>(basePackageClasses = {
+    <span class="token-type">ServicePackage</span>.<span class="token-keyword">class</span>,     <span class="token-comment">// Empty marker interface in each package</span>
+    <span class="token-type">RepositoryPackage</span>.<span class="token-keyword">class</span>,
+    <span class="token-type">ControllerPackage</span>.<span class="token-keyword">class</span>
+})</code></pre>
+
+            <h3>Advanced: Lazy Initialization as a Complement</h3>
+
+            <pre><code><span class="token-comment">// Spring Boot 2.2+ global lazy initialization</span>
+<span class="token-comment">// application.properties</span>
+spring.main.lazy-initialization=<span class="token-keyword">true</span>
+
+<span class="token-comment">// This doesn't reduce SCAN time (classes are still discovered)</span>
+<span class="token-comment">// But it reduces INSTANTIATION time (beans created on first use)</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Scanning: 1,000 classes checked → 200 BeanDefinitions registered</span>
+<span class="token-comment">// Without lazy-init: All 200 beans instantiated at startup</span>
+<span class="token-comment">// With lazy-init: Only ~20 eagerly needed beans created (web server, etc.)</span>
+
+<span class="token-comment">// ⚠️ Trade-off: First request is slower (beans created on demand)</span>
+<span class="token-comment">// ⚠️ Misconfiguration errors deferred to runtime</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Measuring Scan Time</div>
+                <p>Add <code>-Dspring.context.indexer.enabled=false</code> and enable <code>logging.level.org.springframework.context.annotation=DEBUG</code> to see exactly how many classes are scanned and how long it takes. For production profiling, use Spring Boot's startup actuator endpoint: <code>/actuator/startup</code> (requires <code>spring.main.applicationStartup=buffering</code>).</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 9: Stereotype Annotations -->
+            <!-- ============================================ -->
+            <h2>9. Stereotype Annotations: All the Same to the Scanner!</h2>
+
+            <p>A common misconception: <code><span class="token-annotation">@Service</span></code>, <code><span class="token-annotation">@Repository</span></code>, <code><span class="token-annotation">@Controller</span></code>, and <code><span class="token-annotation">@Component</span></code> are different. <strong>To the component scanner, they are identical.</strong> The scanner only sees <code><span class="token-annotation">@Component</span></code> — the rest are meta-annotated with it.</p>
+
+            <pre><code><span class="token-comment">// Look at the actual Spring source code for these annotations:</span>
+
+<span class="token-comment">// @Service — just @Component with a different name</span>
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.TYPE)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Component</span>  <span class="token-comment">// ← THIS is what the scanner sees</span>
+<span class="token-keyword">public</span> <span class="token-annotation">@interface</span> <span class="token-class">Service</span> {
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">Component</span>.<span class="token-keyword">class</span>)
+    <span class="token-type">String</span> <span class="token-function">value</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}
+
+<span class="token-comment">// @Repository — just @Component + exception translation</span>
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.TYPE)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Component</span>  <span class="token-comment">// ← Same thing</span>
+<span class="token-keyword">public</span> <span class="token-annotation">@interface</span> <span class="token-class">Repository</span> {
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">Component</span>.<span class="token-keyword">class</span>)
+    <span class="token-type">String</span> <span class="token-function">value</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}
+
+<span class="token-comment">// @Controller — just @Component + web layer semantics</span>
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.TYPE)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Component</span>  <span class="token-comment">// ← Same thing</span>
+<span class="token-keyword">public</span> <span class="token-annotation">@interface</span> <span class="token-class">Controller</span> {
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">Component</span>.<span class="token-keyword">class</span>)
+    <span class="token-type">String</span> <span class="token-function">value</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}</code></pre>
+
+            <h3>So Why Use Different Annotations?</h3>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Annotation</th>
+                        <th>Scanning Behavior</th>
+                        <th>Additional Runtime Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code><span class="token-annotation">@Component</span></code></td>
+                        <td>Detected as bean candidate</td>
+                        <td>None</td>
+                    </tr>
+                    <tr>
+                        <td><code><span class="token-annotation">@Service</span></code></td>
+                        <td>Same as @Component</td>
+                        <td>None (purely semantic — marks business logic layer)</td>
+                    </tr>
+                    <tr>
+                        <td><code><span class="token-annotation">@Repository</span></code></td>
+                        <td>Same as @Component</td>
+                        <td><code><span class="token-class">PersistenceExceptionTranslationPostProcessor</span></code> wraps data access exceptions into Spring's <code><span class="token-type">DataAccessException</span></code> hierarchy</td>
+                    </tr>
+                    <tr>
+                        <td><code><span class="token-annotation">@Controller</span></code></td>
+                        <td>Same as @Component</td>
+                        <td><code><span class="token-class">RequestMappingHandlerMapping</span></code> scans for <code><span class="token-annotation">@RequestMapping</span></code> methods only on <code><span class="token-annotation">@Controller</span></code> beans</td>
+                    </tr>
+                    <tr>
+                        <td><code><span class="token-annotation">@RestController</span></code></td>
+                        <td>Same as @Component (via @Controller)</td>
+                        <td>@Controller + @ResponseBody on all methods</td>
+                    </tr>
+                    <tr>
+                        <td><code><span class="token-annotation">@Configuration</span></code></td>
+                        <td>Same as @Component</td>
+                        <td>CGLIB proxy for @Bean method inter-references (full mode) + parsed for @Bean, @Import, @ComponentScan</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 The Real Value of Stereotype Annotations</div>
+                <p>They serve three purposes beyond scanning: (1) <strong>Semantics</strong> — developers instantly understand the class's role, (2) <strong>AOP targeting</strong> — you can write pointcuts like <code>@within(org.springframework.stereotype.Service)</code>, (3) <strong>Specific post-processing</strong> — @Repository gets exception translation, @Controller gets handler mapping registration.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 10: Custom Stereotype Annotations -->
+            <!-- ============================================ -->
+            <h2>10. Industry Pattern: Custom Stereotype Annotations</h2>
+
+            <p>In large organizations, teams create <strong>custom stereotype annotations</strong> that compose Spring's stereotypes with additional metadata. This provides convention-over-configuration within the codebase.</p>
+
+            <h3>Pattern 1: Domain-Specific Service Layer</h3>
+
+            <pre><code><span class="token-comment">// Custom annotation that combines @Service with transaction and logging</span>
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.TYPE)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Service</span>                          <span class="token-comment">// ← Inherits @Component behavior (scannable)</span>
+<span class="token-annotation">@Transactional</span>                    <span class="token-comment">// ← All methods are transactional by default</span>
+<span class="token-annotation">@Validated</span>                        <span class="token-comment">// ← Method parameters are validated</span>
+<span class="token-keyword">public</span> <span class="token-annotation">@interface</span> <span class="token-class">DomainService</span> {
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">Service</span>.<span class="token-keyword">class</span>)
+    <span class="token-type">String</span> <span class="token-function">value</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}
+
+<span class="token-comment">// Usage — clean, intention-revealing code</span>
+<span class="token-annotation">@DomainService</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderFulfillmentService</span> {
+
+    <span class="token-keyword">public void</span> <span class="token-function">fulfill</span>(<span class="token-annotation">@Valid</span> <span class="token-type">FulfillmentRequest</span> request) {
+        <span class="token-comment">// Automatically transactional + validated — no annotations needed here</span>
+    }
+}</code></pre>
+
+            <h3>Pattern 2: Infrastructure Gateway</h3>
+
+            <pre><code><span class="token-comment">// Custom annotation for external service integrations</span>
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.TYPE)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Component</span>
+<span class="token-annotation">@Scope</span>(<span class="token-string">"singleton"</span>)
+<span class="token-keyword">public</span> <span class="token-annotation">@interface</span> <span class="token-class">ExternalGateway</span> {
+
+    <span class="token-comment">// Which external system this gateway talks to</span>
+    <span class="token-type">String</span> <span class="token-function">system</span>();
+
+    <span class="token-comment">// Circuit breaker timeout in milliseconds</span>
+    <span class="token-keyword">int</span> <span class="token-function">timeout</span>() <span class="token-keyword">default</span> 5000;
+
+    <span class="token-comment">// Retry attempts on transient failure</span>
+    <span class="token-keyword">int</span> <span class="token-function">retries</span>() <span class="token-keyword">default</span> 3;
+
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">Component</span>.<span class="token-keyword">class</span>, attribute = <span class="token-string">"value"</span>)
+    <span class="token-type">String</span> <span class="token-function">value</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}
+
+<span class="token-comment">// Usage</span>
+<span class="token-annotation">@ExternalGateway</span>(system = <span class="token-string">"payment-provider"</span>, timeout = 3000, retries = 5)
+<span class="token-keyword">public class</span> <span class="token-class">StripeGateway</span> <span class="token-keyword">implements</span> <span class="token-type">PaymentGateway</span> {
+    <span class="token-comment">// Custom BeanPostProcessor can read these attributes</span>
+    <span class="token-comment">// to configure circuit breakers, metrics, and retries automatically</span>
+}</code></pre>
+
+            <h3>Pattern 3: Scheduled Job Discovery</h3>
+
+            <pre><code><span class="token-comment">// Custom annotation for discoverable background jobs</span>
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.TYPE)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Component</span>
+<span class="token-keyword">public</span> <span class="token-annotation">@interface</span> <span class="token-class">ScheduledJob</span> {
+
+    <span class="token-type">String</span> <span class="token-function">cron</span>();
+    <span class="token-type">String</span> <span class="token-function">description</span>();
+    <span class="token-keyword">boolean</span> <span class="token-function">enabledByDefault</span>() <span class="token-keyword">default</span> <span class="token-keyword">true</span>;
+    <span class="token-type">String</span> <span class="token-function">value</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}
+
+<span class="token-annotation">@ScheduledJob</span>(
+    cron = <span class="token-string">"0 0 2 * * ?"</span>,
+    description = <span class="token-string">"Purge expired sessions from database"</span>
+)
+<span class="token-keyword">public class</span> <span class="token-class">SessionPurgeJob</span> <span class="token-keyword">implements</span> <span class="token-type">Runnable</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">run</span>() {
+        <span class="token-comment">// Purge logic</span>
+    }
+}
+
+<span class="token-comment">// A custom BeanPostProcessor discovers all @ScheduledJob beans</span>
+<span class="token-comment">// and registers them with the scheduler, using attributes for config</span>
+<span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">ScheduledJobRegistrar</span> <span class="token-keyword">implements</span> <span class="token-type">BeanPostProcessor</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">TaskScheduler</span> scheduler;
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">postProcessAfterInitialization</span>(<span class="token-type">Object</span> bean, <span class="token-type">String</span> beanName) {
+        <span class="token-type">ScheduledJob</span> annotation = <span class="token-type">AnnotationUtils</span>.<span class="token-function">findAnnotation</span>(
+            bean.<span class="token-function">getClass</span>(), <span class="token-type">ScheduledJob</span>.<span class="token-keyword">class</span>);
+
+        <span class="token-keyword">if</span> (annotation != <span class="token-keyword">null</span> &amp;&amp; annotation.<span class="token-function">enabledByDefault</span>()) {
+            <span class="token-type">CronTrigger</span> trigger = <span class="token-keyword">new</span> <span class="token-type">CronTrigger</span>(annotation.<span class="token-function">cron</span>());
+            scheduler.<span class="token-function">schedule</span>((<span class="token-type">Runnable</span>) bean, trigger);
+        }
+        <span class="token-keyword">return</span> bean;
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Why Custom Stereotypes Work</div>
+                <p>Because Spring's <code><span class="token-class">AnnotationTypeFilter</span></code> checks <strong>meta-annotations recursively</strong>, any annotation that is itself annotated (directly or transitively) with <code><span class="token-annotation">@Component</span></code> will be discovered by the scanner. You can stack as many layers of meta-annotations as you want — the scanner will still find them.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>ClassPathBeanDefinitionScanner</strong> converts packages to classpath resource paths and traverses all .class files</li>
+                    <li><strong>ASM bytecode reading</strong> (MetadataReader) checks annotations WITHOUT calling <code>Class.forName()</code> — no class loading, no static initializers, no dependency chains</li>
+                    <li><strong>Exclude filters are checked first</strong>, then include filters must match. Default include filter is <code>AnnotationTypeFilter(@Component)</code></li>
+                    <li><strong>ConfigurationClassPostProcessor</strong> orchestrates the entire process — it finds @ComponentScan directives and triggers scanning recursively</li>
+                    <li><strong>Scanning cost is O(n)</strong> where n = total .class files in base packages. Narrowing packages is the #1 optimization</li>
+                    <li><strong>spring-context-indexer</strong> generates META-INF/spring.components at compile time, converting O(n) scan to O(k) lookup</li>
+                    <li><strong>@Service, @Repository, @Controller</strong> are just @Component with semantic meaning — the scanner treats them identically</li>
+                    <li><strong>Custom stereotypes</strong> compose @Component with domain annotations for convention-over-configuration</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>Why does Spring use ASM to read bytecode instead of <code>Class.forName()</code>? Name three specific problems it avoids.</li>
+                    <li>If you add <code>@ComponentScan("org")</code> to your config, what happens to startup time and why?</li>
+                    <li>Explain the difference between <code>findCandidateComponents</code> with and without the component index.</li>
+                    <li>Write a custom <code>TypeFilter</code> that matches classes with more than 5 public methods (hint: you'd need to load the class or use ASM visitors).</li>
+                    <li>Why does the component index fall back to full scanning if even ONE JAR lacks a spring.components file?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"Your Spring Boot application takes 45 seconds to start in production. The team suspects component scanning. How would you diagnose and fix this?"</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Measure</strong> — Enable DEBUG logging for <code>org.springframework.context.annotation</code> to see how many class resources are scanned. Use <code>/actuator/startup</code> with buffering ApplicationStartup.</li>
+                    <li><strong>Diagnose</strong> — Check if basePackages is too broad (e.g., "com" or "org"). Check total .class count in scan paths. Check if fat JAR has hundreds of dependency JARs being traversed.</li>
+                    <li><strong>Optimize (ordered by impact)</strong> — (a) Narrow basePackages to only application packages, (b) Add spring-context-indexer to all modules, (c) Enable <code>spring.main.lazy-initialization=true</code> if first-request latency is acceptable, (d) Consider Spring Native/GraalVM which eliminates runtime scanning entirely via AOT processing.</li>
+                </ol>
+            </div>
+
+            <div class="nav-footer">
+                <a href="04-dependency-injection.html" class="nav-btn nav-btn-prev">← Dependency Injection</a>
+                <a href="06-bean-scopes.html" class="nav-btn nav-btn-next">Bean Scopes →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

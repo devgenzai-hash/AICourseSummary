@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@SpringBootApplication Internals - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html" class="active"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html"><span class="nav-number">14</span> Profiles & Environment</a></li>
+            <li><a href="15-custom-auto-configuration.html"><span class="nav-number">15</span> Custom Auto-Configuration</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Auto-Configuration → @SpringBootApplication Internals</div>
+        <div class="topic-number">Topic 9 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>@SpringBootApplication Internals</h1>
+            <p class="subtitle-description">The single annotation that bootstraps everything — a meta-annotation combining three powerful mechanisms.</p>
+
+            <div class="tags">
+                <span class="tag tag-concept">concept</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-internal">internal</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🚀 The Ignition Key Analogy</div>
+                <p>Think of <code><span class="token-annotation">@SpringBootApplication</span></code> as a car's ignition key. One turn of the key doesn't just start the engine — it simultaneously activates the fuel pump (<code>@EnableAutoConfiguration</code>), energizes the electrical system (<code>@ComponentScan</code>), and signals the ECU that this is the master controller (<code>@SpringBootConfiguration</code>). Three systems, one gesture. Without understanding what happens behind that single turn, you can't diagnose why the car won't start.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: The Three-in-One Composition -->
+            <!-- ============================================ -->
+            <h2>1. The Three-in-One Composition</h2>
+
+            <p><code><span class="token-annotation">@SpringBootApplication</span></code> is a <strong>meta-annotation</strong> — it doesn't do anything itself but combines three annotations that each trigger distinct machinery:</p>
+
+            <pre><code><span class="token-comment">// What @SpringBootApplication actually is (from Spring Boot source)</span>
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.TYPE)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-annotation">@Documented</span>
+<span class="token-annotation">@Inherited</span>
+<span class="token-annotation">@SpringBootConfiguration</span>        <span class="token-comment">// ① Marks as configuration source</span>
+<span class="token-annotation">@EnableAutoConfiguration</span>        <span class="token-comment">// ② Triggers auto-config import selector</span>
+<span class="token-annotation">@ComponentScan</span>(excludeFilters = {  <span class="token-comment">// ③ Scans from this package down</span>
+    <span class="token-annotation">@Filter</span>(type = <span class="token-type">FilterType</span>.CUSTOM, classes = <span class="token-type">TypeExcludeFilter</span>.<span class="token-keyword">class</span>),
+    <span class="token-annotation">@Filter</span>(type = <span class="token-type">FilterType</span>.CUSTOM, classes = <span class="token-type">AutoConfigurationExcludeFilter</span>.<span class="token-keyword">class</span>)
+})
+<span class="token-keyword">public @interface</span> <span class="token-annotation">SpringBootApplication</span> {
+    <span class="token-comment">// Delegates attributes to @EnableAutoConfiguration and @ComponentScan</span>
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">EnableAutoConfiguration</span>.<span class="token-keyword">class</span>)
+    <span class="token-type">Class</span>&lt;?&gt;[] exclude() <span class="token-keyword">default</span> {};
+
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">EnableAutoConfiguration</span>.<span class="token-keyword">class</span>)
+    <span class="token-type">String</span>[] excludeName() <span class="token-keyword">default</span> {};
+
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">ComponentScan</span>.<span class="token-keyword">class</span>, attribute = <span class="token-string">"basePackages"</span>)
+    <span class="token-type">String</span>[] scanBasePackages() <span class="token-keyword">default</span> {};
+
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">ComponentScan</span>.<span class="token-keyword">class</span>, attribute = <span class="token-string">"basePackageClasses"</span>)
+    <span class="token-type">Class</span>&lt;?&gt;[] scanBasePackageClasses() <span class="token-keyword">default</span> {};
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>The <code>excludeFilters</code> on <code>@ComponentScan</code> include <code><span class="token-class">AutoConfigurationExcludeFilter</span></code> — this prevents auto-configuration classes from being picked up by component scanning AND auto-configuration import. Without this, auto-configs in the same package would be loaded twice.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: What Each Sub-Annotation Does -->
+            <!-- ============================================ -->
+            <h2>2. What Each Sub-Annotation Does Internally</h2>
+
+            <h3>① @SpringBootConfiguration</h3>
+
+            <pre><code><span class="token-annotation">@Configuration</span>          <span class="token-comment">// It's literally just @Configuration</span>
+<span class="token-annotation">@Indexed</span>                 <span class="token-comment">// Registers in META-INF/spring.components for faster scanning</span>
+<span class="token-keyword">public @interface</span> <span class="token-annotation">SpringBootConfiguration</span> {
+    <span class="token-annotation">@AliasFor</span>(annotation = <span class="token-type">Configuration</span>.<span class="token-keyword">class</span>)
+    <span class="token-keyword">boolean</span> proxyBeanMethods() <span class="token-keyword">default true</span>;
+}</code></pre>
+
+            <p><code><span class="token-annotation">@SpringBootConfiguration</span></code> marks the class as a <strong>bean definition source</strong>. It's semantically identical to <code><span class="token-annotation">@Configuration</span></code> but adds a constraint: only ONE class in your application should carry this annotation. Spring Boot uses this constraint to locate the "primary" configuration (e.g., for tests with <code><span class="token-annotation">@SpringBootTest</span></code>).</p>
+
+            <h3>② @EnableAutoConfiguration</h3>
+
+            <pre><code><span class="token-annotation">@AutoConfigurationPackage</span>  <span class="token-comment">// Registers the base package for entity scanning</span>
+<span class="token-annotation">@Import</span>(<span class="token-type">AutoConfigurationImportSelector</span>.<span class="token-keyword">class</span>)  <span class="token-comment">// THE magic</span>
+<span class="token-keyword">public @interface</span> <span class="token-annotation">EnableAutoConfiguration</span> {
+    <span class="token-type">String</span> ENABLED_OVERRIDE_PROPERTY = <span class="token-string">"spring.boot.enableautoconfiguration"</span>;
+    <span class="token-type">Class</span>&lt;?&gt;[] exclude() <span class="token-keyword">default</span> {};
+    <span class="token-type">String</span>[] excludeName() <span class="token-keyword">default</span> {};
+}</code></pre>
+
+            <p>This is where the real power lives. The <code><span class="token-annotation">@Import</span></code> of <code><span class="token-class">AutoConfigurationImportSelector</span></code> triggers the entire auto-configuration mechanism — reading factory files, evaluating conditions, and importing configuration classes.</p>
+
+            <h3>③ @ComponentScan</h3>
+
+            <p>When <code>scanBasePackages</code> is not specified, <code><span class="token-annotation">@ComponentScan</span></code> defaults to the package of the annotated class. This is <strong>why your main class should be in the root package</strong> — it ensures all sub-packages are scanned.</p>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ The Root Package Rule</div>
+                <p>If your main class is in <code>com.myapp.config</code>, only <code>com.myapp.config</code> and its sub-packages are scanned. Controllers in <code>com.myapp.web</code> would be invisible. Always place your <code>@SpringBootApplication</code> class at the root: <code>com.myapp</code>.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: SpringApplication.run() -->
+            <!-- ============================================ -->
+            <h2>3. SpringApplication.run() — The Bootstrap Sequence</h2>
+
+            <p>When you call <code><span class="token-class">SpringApplication</span>.<span class="token-function">run</span>(MyApp.<span class="token-keyword">class</span>, args)</code>, a precise sequence of events unfolds:</p>
+
+            <pre><code><span class="token-keyword">public class</span> <span class="token-class">SpringApplication</span> {
+
+    <span class="token-keyword">public static</span> <span class="token-type">ConfigurableApplicationContext</span> <span class="token-function">run</span>(
+            <span class="token-type">Class</span>&lt;?&gt; primarySource, <span class="token-type">String</span>... args) {
+        <span class="token-keyword">return</span> <span class="token-keyword">new</span> <span class="token-class">SpringApplication</span>(primarySource).<span class="token-function">run</span>(args);
+    }
+
+    <span class="token-keyword">public</span> <span class="token-type">ConfigurableApplicationContext</span> <span class="token-function">run</span>(<span class="token-type">String</span>... args) {
+        <span class="token-comment">// 1. Start the startup timer</span>
+        <span class="token-type">Startup</span> startup = <span class="token-type">Startup</span>.<span class="token-function">create</span>();
+
+        <span class="token-comment">// 2. Create bootstrap context</span>
+        <span class="token-type">DefaultBootstrapContext</span> bootstrapContext = <span class="token-function">createBootstrapContext</span>();
+
+        <span class="token-comment">// 3. Get SpringApplicationRunListeners (from spring.factories)</span>
+        <span class="token-type">SpringApplicationRunListeners</span> listeners = <span class="token-function">getRunListeners</span>(args);
+        listeners.<span class="token-function">starting</span>(bootstrapContext, <span class="token-keyword">this</span>.mainApplicationClass);
+
+        <span class="token-comment">// 4. Parse command-line args</span>
+        <span class="token-type">ApplicationArguments</span> applicationArguments =
+            <span class="token-keyword">new</span> <span class="token-type">DefaultApplicationArguments</span>(args);
+
+        <span class="token-comment">// 5. Prepare Environment (application.properties loaded here)</span>
+        <span class="token-type">ConfigurableEnvironment</span> environment =
+            <span class="token-function">prepareEnvironment</span>(listeners, bootstrapContext, applicationArguments);
+
+        <span class="token-comment">// 6. Print the banner 🍃</span>
+        <span class="token-type">Banner</span> printedBanner = <span class="token-function">printBanner</span>(environment);
+
+        <span class="token-comment">// 7. Create the ApplicationContext (type depends on web type detection)</span>
+        context = <span class="token-function">createApplicationContext</span>();
+        context.<span class="token-function">setApplicationStartup</span>(<span class="token-keyword">this</span>.applicationStartup);
+
+        <span class="token-comment">// 8. Prepare context (register beans, apply initializers)</span>
+        <span class="token-function">prepareContext</span>(bootstrapContext, context, environment,
+            listeners, applicationArguments, printedBanner);
+
+        <span class="token-comment">// 9. Refresh context (bean creation, auto-config, scanning)</span>
+        <span class="token-function">refreshContext</span>(context);
+
+        <span class="token-comment">// 10. Post-refresh (ApplicationRunner, CommandLineRunner)</span>
+        <span class="token-function">afterRefresh</span>(context, applicationArguments);
+
+        <span class="token-comment">// 11. Log startup time</span>
+        startup.<span class="token-function">started</span>();
+
+        <span class="token-comment">// 12. Call runners</span>
+        <span class="token-function">callRunners</span>(context, applicationArguments);
+
+        <span class="token-keyword">return</span> context;
+    }
+}</code></pre>
+
+            <h3>Web Type Detection</h3>
+
+            <p>In the constructor, <code><span class="token-class">SpringApplication</span></code> detects the web application type:</p>
+
+            <pre><code><span class="token-comment">// WebApplicationType detection logic</span>
+<span class="token-keyword">static</span> <span class="token-type">WebApplicationType</span> <span class="token-function">deduceFromClasspath</span>() {
+    <span class="token-keyword">if</span> (<span class="token-function">ClassUtils.isPresent</span>(<span class="token-string">"org.springframework.web.reactive.DispatcherHandler"</span>, <span class="token-keyword">null</span>)
+        && !<span class="token-function">ClassUtils.isPresent</span>(<span class="token-string">"org.springframework.web.servlet.DispatcherServlet"</span>, <span class="token-keyword">null</span>)) {
+        <span class="token-keyword">return</span> <span class="token-type">WebApplicationType</span>.REACTIVE;
+    }
+    <span class="token-keyword">for</span> (<span class="token-type">String</span> className : SERVLET_INDICATOR_CLASSES) {
+        <span class="token-keyword">if</span> (!<span class="token-function">ClassUtils.isPresent</span>(className, <span class="token-keyword">null</span>)) {
+            <span class="token-keyword">return</span> <span class="token-type">WebApplicationType</span>.NONE;
+        }
+    }
+    <span class="token-keyword">return</span> <span class="token-type">WebApplicationType</span>.SERVLET;
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>The web type dictates which <code>ApplicationContext</code> implementation is created: <code>AnnotationConfigServletWebServerApplicationContext</code> for SERVLET, <code>AnnotationConfigReactiveWebServerApplicationContext</code> for REACTIVE, or <code>AnnotationConfigApplicationContext</code> for NONE.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: The Debug Flag -->
+            <!-- ============================================ -->
+            <h2>4. The Conditions Report (--debug flag)</h2>
+
+            <p>Running your application with <code>--debug</code> or setting <code><span class="token-string">debug=true</span></code> in <code>application.properties</code> activates the <code><span class="token-class">ConditionEvaluationReportLogger</span></code>, which prints every auto-configuration decision:</p>
+
+            <pre><code><span class="token-comment">// What --debug prints:</span>
+============================
+CONDITIONS EVALUATION REPORT
+============================
+
+Positive matches:
+-----------------
+   DataSourceAutoConfiguration matched:
+      - <span class="token-annotation">@ConditionalOnClass</span> found required classes <span class="token-string">'javax.sql.DataSource'</span>,
+        <span class="token-string">'org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType'</span>
+
+Negative matches:
+-----------------
+   ActiveMQAutoConfiguration:
+      Did not match:
+         - <span class="token-annotation">@ConditionalOnClass</span> did not find required class
+           <span class="token-string">'javax.jms.ConnectionFactory'</span>
+
+Exclusions:
+-----------
+   org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+Unconditional classes:
+----------------------
+   org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: Excluding Auto-Configurations -->
+            <!-- ============================================ -->
+            <h2>5. Excluding Auto-Configurations</h2>
+
+            <p>There are multiple ways to prevent specific auto-configurations from loading:</p>
+
+            <pre><code><span class="token-comment">// Method 1: exclude attribute on @SpringBootApplication</span>
+<span class="token-annotation">@SpringBootApplication</span>(exclude = {
+    <span class="token-type">DataSourceAutoConfiguration</span>.<span class="token-keyword">class</span>,
+    <span class="token-type">SecurityAutoConfiguration</span>.<span class="token-keyword">class</span>
+})
+<span class="token-keyword">public class</span> <span class="token-class">MyApplication</span> { }
+
+<span class="token-comment">// Method 2: excludeName for classes not on classpath</span>
+<span class="token-annotation">@SpringBootApplication</span>(excludeName = {
+    <span class="token-string">"org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"</span>
+})
+<span class="token-keyword">public class</span> <span class="token-class">MyApplication</span> { }
+
+<span class="token-comment">// Method 3: application.properties</span>
+spring.autoconfigure.exclude=\
+  org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,\
+  org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Common Pitfall</div>
+                <p>Excluding <code>DataSourceAutoConfiguration</code> doesn't remove the datasource dependency from your classpath — it only prevents Spring Boot from creating the <code>DataSource</code> bean. If other auto-configs depend on that bean with <code>@ConditionalOnBean(DataSource.class)</code>, they'll also be skipped — which may cascade into unexpected missing beans.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- COMPARISON TABLE -->
+            <!-- ============================================ -->
+            <h2>6. @SpringBootApplication vs Manual Configuration</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>@SpringBootApplication</th>
+                        <th>Manual @Configuration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bean scanning</td>
+                        <td>Automatic from root package</td>
+                        <td>Must specify @ComponentScan explicitly</td>
+                    </tr>
+                    <tr>
+                        <td>Auto-configuration</td>
+                        <td>Loads all matching auto-configs</td>
+                        <td>Only what you @Import manually</td>
+                    </tr>
+                    <tr>
+                        <td>Configuration source</td>
+                        <td>Marked via @SpringBootConfiguration</td>
+                        <td>Marked via @Configuration directly</td>
+                    </tr>
+                    <tr>
+                        <td>Test discovery</td>
+                        <td>@SpringBootTest finds it automatically</td>
+                        <td>Must specify classes= in @SpringBootTest</td>
+                    </tr>
+                    <tr>
+                        <td>Startup behavior</td>
+                        <td>Full Spring Boot lifecycle (banner, runners, etc.)</td>
+                        <td>Raw ApplicationContext refresh only</td>
+                    </tr>
+                    <tr>
+                        <td>Exclusion control</td>
+                        <td>exclude/excludeName attributes</td>
+                        <td>N/A — you control what's imported</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>@SpringBootApplication = @SpringBootConfiguration + @EnableAutoConfiguration + @ComponentScan</strong> — a convenience meta-annotation</li>
+                    <li><strong>@SpringBootConfiguration</strong> is just @Configuration with a uniqueness constraint (one per app)</li>
+                    <li><strong>@EnableAutoConfiguration</strong> imports <code>AutoConfigurationImportSelector</code> which loads all auto-config classes from factory files</li>
+                    <li><strong>@ComponentScan</strong> defaults to the package of the annotated class — root package placement is critical</li>
+                    <li><strong>SpringApplication.run()</strong> creates an instance, detects web type, loads factories, runs the full lifecycle (environment → banner → context → refresh → runners)</li>
+                    <li><strong>--debug</strong> activates the conditions report showing why each auto-config matched or didn't</li>
+                    <li><strong>Exclusions</strong> can be done via annotation attributes or the <code>spring.autoconfigure.exclude</code> property</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>What happens if you place your @SpringBootApplication class in <code>com.myapp.config</code> instead of <code>com.myapp</code>?</li>
+                    <li>Why does @SpringBootApplication include an <code>AutoConfigurationExcludeFilter</code> in its @ComponentScan?</li>
+                    <li>Trace the sequence from <code>SpringApplication.run()</code> to the first bean being created. Name at least 5 intermediate steps.</li>
+                    <li>How does Spring Boot detect whether to create a SERVLET vs REACTIVE vs NONE context?</li>
+                    <li>What's the difference between excluding an auto-config via <code>exclude</code> attribute vs <code>spring.autoconfigure.exclude</code> property?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"A junior developer on your team created a second class annotated with @SpringBootApplication in a test package. Now the tests are failing with duplicate bean errors. Explain what went wrong and how to fix it."</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Root cause</strong> — Two @SpringBootConfiguration classes means @SpringBootTest can't determine which is the primary source. Both trigger @ComponentScan from different packages, causing overlapping scans and duplicate registrations.</li>
+                    <li><strong>Fix</strong> — Use <code>@SpringBootTest(classes = MyApplication.class)</code> to explicitly point to the correct config, or replace the test's @SpringBootApplication with a targeted <code>@TestConfiguration</code>.</li>
+                    <li><strong>Prevention</strong> — Enforce single @SpringBootApplication via ArchUnit rule or code review checklist.</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 5 (Component Scanning)</strong> — @ComponentScan within @SpringBootApplication uses the same ClassPathBeanDefinitionScanner</li>
+                    <li><strong>Topic 10 (Auto-Configuration)</strong> — @EnableAutoConfiguration's import selector is the gateway to all auto-config classes</li>
+                    <li><strong>Topic 12 (spring.factories)</strong> — The factory files that AutoConfigurationImportSelector reads to discover auto-configs</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="08-spel.html" class="nav-btn nav-btn-prev">← Spring Expression Language</a>
+                <a href="10-auto-configuration.html" class="nav-btn nav-btn-next">Auto-Configuration →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

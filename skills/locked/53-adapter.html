@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adapter - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html" class="active"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Design Patterns &rarr; Adapter</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Beginner</span>
+                <span class="tag">Pattern</span>
+                <span class="tag">Design Pattern</span>
+            </div>
+            <h1>Adapter</h1>
+            <p class="hero-subtitle">Making <strong>incompatible interfaces work together</strong> &mdash; a structural pattern that acts as a bridge between two classes that couldn&rsquo;t otherwise collaborate.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>travel power adapter</strong>. Your US laptop charger has a flat two-prong plug, but the European socket expects round pins. You don&rsquo;t rewire your charger or rebuild the socket &mdash; you buy a small adapter that sits between them. The adapter converts one interface (US plug shape) to another (European socket shape) without changing either device. The Adapter pattern does exactly this for code &mdash; wrapping one class&rsquo;s interface so it looks like another interface that clients expect.</p>
+        </div>
+
+        <h2>What Is the Adapter Pattern?</h2>
+        <ul>
+            <li><strong>Intent:</strong> Convert the interface of a class into another interface that clients expect &mdash; making incompatible classes work together</li>
+            <li><strong>Classification:</strong> Structural pattern (GoF) &mdash; controls how classes are <em>composed</em></li>
+            <li><strong>Also known as:</strong> Wrapper &mdash; it wraps an existing class with a new interface</li>
+            <li><strong>Key principle:</strong> Neither the client nor the adaptee needs to change &mdash; only the adapter knows about both</li>
+            <li><strong>Open/Closed Principle:</strong> You can introduce new adapters without modifying existing code</li>
+        </ul>
+
+        <h2>When to Use Adapter</h2>
+        <ul>
+            <li><strong>Legacy integration:</strong> You have working legacy code with an old interface that doesn&rsquo;t match your new system</li>
+            <li><strong>Third-party libraries:</strong> A vendor library has a different method signature than what your code expects</li>
+            <li><strong>Multiple implementations:</strong> PayPal, Stripe, and Square all have different APIs but you want one unified payment interface</li>
+            <li><strong>Testing:</strong> Adapting a real service interface to a mock/stub for unit tests</li>
+            <li><strong>Migration:</strong> Gradually switching from one system to another &mdash; the adapter lets both coexist</li>
+        </ul>
+
+        <h2>Object Adapter vs Class Adapter</h2>
+        <h3>Object Adapter (Composition)</h3>
+        <ul>
+            <li>The adapter holds a reference to the adaptee object (composition)</li>
+            <li>Delegates calls to the adaptee, translating method names and parameters</li>
+            <li>More flexible &mdash; can adapt any subclass of the adaptee</li>
+            <li>The standard approach in Python (and most languages without multiple inheritance)</li>
+        </ul>
+
+        <h3>Class Adapter (Inheritance)</h3>
+        <ul>
+            <li>The adapter inherits from both the target interface and the adaptee (multiple inheritance)</li>
+            <li>Overrides methods to translate between interfaces</li>
+            <li>Less flexible &mdash; tied to a specific adaptee class, can&rsquo;t adapt subclasses</li>
+            <li>Possible in Python (supports multiple inheritance) but rarely used in practice</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Object Adapter</th>
+                        <th>Class Adapter</th>
+                        <th>Facade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mechanism</strong></td>
+                        <td>Composition (has-a)</td>
+                        <td>Inheritance (is-a)</td>
+                        <td>Composition (has-many)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Adaptee access</strong></td>
+                        <td>Through reference</td>
+                        <td>Through self (inherited)</td>
+                        <td>Multiple subsystems</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flexibility</strong></td>
+                        <td>Adapts any subclass</td>
+                        <td>Fixed to one class</td>
+                        <td>Simplifies interface</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Interface count</strong></td>
+                        <td>One-to-one mapping</td>
+                        <td>One-to-one mapping</td>
+                        <td>Many-to-one simplification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Use case</strong></td>
+                        <td>Convert interface A &rarr; B</td>
+                        <td>Convert interface A &rarr; B</td>
+                        <td>Hide complexity behind simple API</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementation &mdash; Payment Gateway Adapter</h2>
+        <pre><code><span class="token-keyword">from</span> abc <span class="token-keyword">import</span> ABC, abstractmethod
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Dict
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Target Interface — what our application expects</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">PaymentProcessor</span>(ABC):
+    <span class="token-string">"""
+    Unified payment interface that our app depends on.
+    All payment gateways must look like this.
+    """</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">charge</span>(self, amount: float, currency: str, token: str) -> Dict:
+        <span class="token-string">"""Charge a payment method. Returns transaction result."""</span>
+        ...
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">refund</span>(self, transaction_id: str, amount: float) -> Dict:
+        <span class="token-string">"""Refund a previous transaction."""</span>
+        ...
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Adaptee 1 — Stripe's actual API (different interface)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">StripeSDK</span>:
+    <span class="token-string">"""Third-party Stripe SDK with its own method names."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">create_charge</span>(self, amount_cents: int, currency: str,
+                      source: str, metadata: Dict = <span class="token-keyword">None</span>) -> Dict:
+        <span class="token-comment"># Stripe uses cents, not dollars</span>
+        print(f<span class="token-string">"  [Stripe] Charging {amount_cents} cents ({currency})"</span>)
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"id"</span>: <span class="token-string">"ch_stripe_abc123"</span>,
+            <span class="token-string">"status"</span>: <span class="token-string">"succeeded"</span>,
+            <span class="token-string">"amount"</span>: amount_cents,
+        }
+
+    <span class="token-keyword">def</span> <span class="token-function">create_refund</span>(self, charge_id: str, amount_cents: int) -> Dict:
+        print(f<span class="token-string">"  [Stripe] Refunding {amount_cents} cents on {charge_id}"</span>)
+        <span class="token-keyword">return</span> {<span class="token-string">"id"</span>: <span class="token-string">"re_stripe_xyz"</span>, <span class="token-string">"status"</span>: <span class="token-string">"succeeded"</span>}
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Adaptee 2 — PayPal's actual API (completely different)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">PayPalClient</span>:
+    <span class="token-string">"""Third-party PayPal SDK with its own conventions."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">send_payment</span>(self, recipient_token: str,
+                     amount: str, currency_code: str) -> Dict:
+        <span class="token-comment"># PayPal uses string amounts like "19.99"</span>
+        print(f<span class="token-string">"  [PayPal] Sending ${amount} {currency_code}"</span>)
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"payment_id"</span>: <span class="token-string">"PAY-paypal-789"</span>,
+            <span class="token-string">"state"</span>: <span class="token-string">"approved"</span>,
+            <span class="token-string">"amount"</span>: amount,
+        }
+
+    <span class="token-keyword">def</span> <span class="token-function">reverse_payment</span>(self, payment_id: str, amount: str) -> Dict:
+        print(f<span class="token-string">"  [PayPal] Reversing ${amount} on {payment_id}"</span>)
+        <span class="token-keyword">return</span> {<span class="token-string">"refund_id"</span>: <span class="token-string">"REF-paypal-456"</span>, <span class="token-string">"state"</span>: <span class="token-string">"completed"</span>}
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Adapter 1 — Makes Stripe look like PaymentProcessor</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">StripeAdapter</span>(PaymentProcessor):
+    <span class="token-string">"""Adapts Stripe SDK to our unified PaymentProcessor interface."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, stripe: StripeSDK):
+        self._stripe = stripe  <span class="token-comment"># composition — holds reference</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">charge</span>(self, amount: float, currency: str, token: str) -> Dict:
+        <span class="token-comment"># Convert dollars to cents (Stripe requirement)</span>
+        amount_cents = int(amount * <span class="token-number">100</span>)
+        result = self._stripe.create_charge(amount_cents, currency, token)
+        <span class="token-comment"># Normalize response to our format</span>
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"transaction_id"</span>: result[<span class="token-string">"id"</span>],
+            <span class="token-string">"success"</span>: result[<span class="token-string">"status"</span>] == <span class="token-string">"succeeded"</span>,
+            <span class="token-string">"amount"</span>: amount,
+        }
+
+    <span class="token-keyword">def</span> <span class="token-function">refund</span>(self, transaction_id: str, amount: float) -> Dict:
+        amount_cents = int(amount * <span class="token-number">100</span>)
+        result = self._stripe.create_refund(transaction_id, amount_cents)
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"refund_id"</span>: result[<span class="token-string">"id"</span>],
+            <span class="token-string">"success"</span>: result[<span class="token-string">"status"</span>] == <span class="token-string">"succeeded"</span>,
+        }
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Adapter 2 — Makes PayPal look like PaymentProcessor</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">PayPalAdapter</span>(PaymentProcessor):
+    <span class="token-string">"""Adapts PayPal SDK to our unified PaymentProcessor interface."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, paypal: PayPalClient):
+        self._paypal = paypal
+
+    <span class="token-keyword">def</span> <span class="token-function">charge</span>(self, amount: float, currency: str, token: str) -> Dict:
+        <span class="token-comment"># Convert float to string (PayPal requirement)</span>
+        amount_str = f<span class="token-string">"{amount:.2f}"</span>
+        result = self._paypal.send_payment(token, amount_str, currency)
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"transaction_id"</span>: result[<span class="token-string">"payment_id"</span>],
+            <span class="token-string">"success"</span>: result[<span class="token-string">"state"</span>] == <span class="token-string">"approved"</span>,
+            <span class="token-string">"amount"</span>: amount,
+        }
+
+    <span class="token-keyword">def</span> <span class="token-function">refund</span>(self, transaction_id: str, amount: float) -> Dict:
+        amount_str = f<span class="token-string">"{amount:.2f}"</span>
+        result = self._paypal.reverse_payment(transaction_id, amount_str)
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"refund_id"</span>: result[<span class="token-string">"refund_id"</span>],
+            <span class="token-string">"success"</span>: result[<span class="token-string">"state"</span>] == <span class="token-string">"completed"</span>,
+        }
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Client code — works with ANY PaymentProcessor</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">def</span> <span class="token-function">checkout</span>(processor: PaymentProcessor, amount: float, token: str):
+    <span class="token-string">"""Client doesn't know or care which gateway is underneath."""</span>
+    result = processor.charge(amount, <span class="token-string">"USD"</span>, token)
+    print(f<span class="token-string">"  Result: {result}"</span>)
+    <span class="token-keyword">return</span> result
+
+
+<span class="token-comment"># Usage — swap gateways without changing client code</span>
+print(<span class="token-string">"=== Stripe via Adapter ==="</span>)
+stripe_processor = StripeAdapter(StripeSDK())
+checkout(stripe_processor, <span class="token-number">29.99</span>, <span class="token-string">"tok_visa_123"</span>)
+
+print(<span class="token-string">"=== PayPal via Adapter ==="</span>)
+paypal_processor = PayPalAdapter(PayPalClient())
+checkout(paypal_processor, <span class="token-number">29.99</span>, <span class="token-string">"buyer@email.com"</span>)</code></pre>
+
+        <h2>XML to JSON Adapter</h2>
+        <pre><code><span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Any, Dict
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Legacy system returns XML-like dicts</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">LegacyXMLService</span>:
+    <span class="token-string">"""Old service that returns data in XML-style nested dicts."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">get_user_xml</span>(self, user_id: int) -> Dict:
+        <span class="token-comment"># Simulates parsed XML structure</span>
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"root"</span>: {
+                <span class="token-string">"@version"</span>: <span class="token-string">"1.0"</span>,
+                <span class="token-string">"user"</span>: {
+                    <span class="token-string">"@id"</span>: str(user_id),
+                    <span class="token-string">"name"</span>: {<span class="token-string">"#text"</span>: <span class="token-string">"Alice Johnson"</span>},
+                    <span class="token-string">"email"</span>: {<span class="token-string">"#text"</span>: <span class="token-string">"alice@example.com"</span>},
+                    <span class="token-string">"role"</span>: {<span class="token-string">"#text"</span>: <span class="token-string">"admin"</span>},
+                }
+            }
+        }
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Modern interface our new code expects</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">UserService</span>(ABC):
+    <span class="token-string">"""Modern interface — returns flat JSON-style dicts."""</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">get_user</span>(self, user_id: int) -> Dict[str, Any]:
+        ...
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Adapter — translates XML structure to JSON</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">XMLToJSONAdapter</span>(UserService):
+    <span class="token-string">"""Adapts the legacy XML service to return flat JSON dicts."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, legacy_service: LegacyXMLService):
+        self._legacy = legacy_service
+
+    <span class="token-keyword">def</span> <span class="token-function">get_user</span>(self, user_id: int) -> Dict[str, Any]:
+        <span class="token-comment"># Get XML-style data from legacy system</span>
+        xml_data = self._legacy.get_user_xml(user_id)
+
+        <span class="token-comment"># Transform nested XML structure → flat JSON</span>
+        user_node = xml_data[<span class="token-string">"root"</span>][<span class="token-string">"user"</span>]
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"id"</span>: int(user_node[<span class="token-string">"@id"</span>]),
+            <span class="token-string">"name"</span>: user_node[<span class="token-string">"name"</span>][<span class="token-string">"#text"</span>],
+            <span class="token-string">"email"</span>: user_node[<span class="token-string">"email"</span>][<span class="token-string">"#text"</span>],
+            <span class="token-string">"role"</span>: user_node[<span class="token-string">"role"</span>][<span class="token-string">"#text"</span>],
+        }
+
+
+<span class="token-comment"># Usage</span>
+adapter = XMLToJSONAdapter(LegacyXMLService())
+user = adapter.get_user(<span class="token-number">42</span>)
+print(json.dumps(user, indent=<span class="token-number">2</span>))
+<span class="token-comment"># {"id": 42, "name": "Alice Johnson", "email": "alice@example.com", "role": "admin"}</span></code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>JDBC Drivers (Java):</strong> Every database vendor (MySQL, PostgreSQL, Oracle) has a completely different wire protocol. JDBC drivers are adapters &mdash; they implement the standard <code>java.sql.Connection</code> interface while internally speaking each database&rsquo;s native protocol. Your code just calls <code>connection.executeQuery()</code> regardless of the underlying database.</p>
+            <p><strong>Python DB-API (PEP 249):</strong> Similar to JDBC &mdash; libraries like <code>psycopg2</code>, <code>mysql-connector</code>, and <code>sqlite3</code> all implement the same DB-API interface (<code>connect()</code>, <code>cursor()</code>, <code>execute()</code>). Each is an adapter that makes a different database engine conform to one standard interface.</p>
+            <p><strong>Cloud Provider SDKs:</strong> Libraries like Apache Libcloud adapt AWS, GCP, and Azure APIs into a unified interface. Instead of learning three different APIs for launching VMs, you learn one interface and swap providers via adapter classes.</p>
+            <p><strong>React Component Wrappers:</strong> When using a third-party React component that doesn&rsquo;t match your prop conventions, you write a wrapper component (adapter) that translates your props into the format the library expects. Same pattern, different language.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Adapter converts one interface into another &mdash; making incompatible classes collaborate without modification</li>
+                <li>Object adapter (composition) is preferred &mdash; more flexible and doesn&rsquo;t require multiple inheritance</li>
+                <li>Neither the client nor the adaptee changes &mdash; only the adapter bridges the gap</li>
+                <li>Adapter differs from Facade: adapter converts one interface to another; facade simplifies a complex subsystem</li>
+                <li>Essential for integrating third-party libraries, legacy systems, and multiple vendors behind one interface</li>
+                <li>Follows Open/Closed Principle &mdash; add new adapters without modifying existing code</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of the Adapter as a <strong>translator at a business meeting</strong>. The French CEO and the Japanese investor don&rsquo;t speak each other&rsquo;s language, but the translator converts messages between them in real-time. Neither person needs to learn a new language &mdash; the translator handles the conversion.</p>
+            <div class="model-visual">
+                <pre>
+  ADAPTER PATTERN STRUCTURE:
+  ══════════════════════════════════════════════════════
+
+  Without Adapter (incompatible):
+
+  ┌──────────┐          ┌──────────────┐
+  │  Client  │ ──✗──▶  │   Adaptee    │
+  │          │  can't   │ (Stripe SDK) │
+  │ expects  │  call    │  different   │
+  │ charge() │ directly │  methods     │
+  └──────────┘          └──────────────┘
+
+
+  With Adapter (compatible):
+
+  ┌──────────┐     ┌───────────┐     ┌──────────────┐
+  │  Client  │────▶│  Adapter  │────▶│   Adaptee    │
+  │          │     │           │     │ (Stripe SDK) │
+  │ charge() │     │ charge()  │     │              │
+  │          │     │   ↓       │     │create_charge │
+  │          │     │ translate │     │  (cents)     │
+  └──────────┘     └───────────┘     └──────────────┘
+
+
+  PAYMENT GATEWAY EXAMPLE:
+  ══════════════════════════════════════════════════════
+
+  Your App Interface:         Vendor Interfaces:
+  ┌─────────────────┐
+  │PaymentProcessor │         ┌─────────────────┐
+  │                 │         │   Stripe SDK    │
+  │ charge(dollars) │         │ create_charge   │
+  │ refund(id, amt) │         │   (cents!)      │
+  └────────┬────────┘         └─────────────────┘
+           │
+           ├── StripeAdapter ─── translates $ → cents
+           │
+           ├── PayPalAdapter ─── translates float → string
+           │                     ┌─────────────────┐
+           │                     │  PayPal Client  │
+           └─────────────────────│ send_payment    │
+                                 │   (string!)     │
+                                 └─────────────────┘
+
+
+  ADAPTER vs FACADE vs DECORATOR:
+  ══════════════════════════════════════════════════════
+
+  Adapter:   Interface A  →  Interface B  (convert)
+  Facade:    Complex APIs →  Simple API   (simplify)
+  Decorator: Interface A  →  Interface A  (enhance)
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Adapter doing too much work:</strong> An adapter should only translate interfaces &mdash; not add business logic, validation, or caching. If your adapter is 200+ lines with complex logic, you&rsquo;ve built a service, not an adapter. Keep it thin &mdash; translate and delegate.</li>
+                <li><strong>Not normalizing error handling:</strong> Stripe throws <code>StripeError</code>, PayPal throws <code>PayPalException</code>. If your adapter doesn&rsquo;t catch and re-raise as a unified exception type, clients still need to know which vendor is underneath, defeating the purpose.</li>
+                <li><strong>Leaking adaptee details:</strong> If your adapter returns Stripe&rsquo;s raw response format or exposes Stripe-specific fields, the client becomes coupled to Stripe. Always normalize the return value to your own domain types.</li>
+                <li><strong>Confusing Adapter with Facade:</strong> Adapter makes one interface look like a <em>different</em> expected interface. Facade provides a <em>simpler</em> interface to a complex subsystem. If you&rsquo;re simplifying rather than converting, you want a Facade, not an Adapter.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Notification Adapter:</strong> You have three notification services: <code>TwilioSMS</code> (uses <code>send_sms(phone, body)</code>), <code>SendGridEmail</code> (uses <code>send(to, subject, html)</code>), and <code>SlackWebhook</code> (uses <code>post_message(channel, text)</code>). Create a unified <code>Notifier</code> interface with <code>notify(recipient, message)</code> and write an adapter for each service.</li>
+                <li><strong>Legacy Database Adapter:</strong> A legacy system stores user data as CSV strings: <code>"name,email,role"</code>. Your new system expects <code>User</code> dataclass objects. Write an adapter that wraps the legacy <code>CSVDatabase</code> class and returns proper <code>User</code> objects, handling the parsing and type conversion.</li>
+                <li><strong>Temperature Sensor Adapter:</strong> You have two temperature sensor libraries &mdash; one returns Fahrenheit floats, the other returns Celsius strings with units (e.g., <code>"23.5°C"</code>). Create a unified <code>TemperatureSensor</code> interface that always returns Kelvin as a float. Write adapters for both.</li>
+                <li><strong>Test Double Adapter:</strong> Take a real HTTP client class with methods like <code>get(url)</code> and <code>post(url, data)</code>. Write a <code>MockHTTPAdapter</code> that implements the same interface but returns pre-configured responses from a dictionary. Use it in a unit test to verify your code works without making real HTTP calls.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="52-builder.html" class="prev">&larr; Builder</a>
+            <a href="54-decorator.html" class="next">Decorator &rarr;</a>
+        </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

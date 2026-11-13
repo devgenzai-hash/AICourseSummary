@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volatile vs Synchronized - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Volatile vs Synchronized</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Volatile vs Synchronized</h1>
+                <p class="subtitle">Two different tools for thread communication. Volatile ensures visibility; synchronized ensures both visibility AND atomicity.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">Megaphone vs Private Room</div>
+                <p><strong>Volatile (megaphone)</strong>: When you update a value, you shout it through a megaphone. Everyone hears the latest value immediately. But if two people shout at once, it is chaos.</p>
+<p><strong>Synchronized (private room)</strong>: Only one person can enter the room. Inside, they can read and write freely. Others wait. Guarantees both visibility AND exclusive access.</p>
+            </div>
+
+
+            <h2>The Two Problems of Concurrency</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Problem</th><th>Description</th><th>Solution</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Visibility</strong></td><td>Thread B doesn't see Thread A's writes</td><td>volatile / memory barriers</td></tr>
+                    <tr><td><strong>Atomicity</strong></td><td>Compound operations get interleaved</td><td>synchronized / locks</td></tr>
+                </tbody>
+            </table>
+
+            <h2>When Volatile Is Enough</h2>
+<pre><code><span class="token-keyword">import</span> threading
+
+<span class="token-comment"># Volatile-equivalent in Python: threading.Event or explicit barriers</span>
+<span class="token-comment"># Use case: simple flag (one writer, many readers)</span>
+
+stop_event = threading.Event()  <span class="token-comment"># Acts like a volatile boolean</span>
+
+<span class="token-keyword">def</span> <span class="token-function">worker</span>():
+    <span class="token-keyword">while</span> <span class="token-keyword">not</span> stop_event.is_set():  <span class="token-comment"># Always reads latest value</span>
+        do_work()
+
+<span class="token-keyword">def</span> <span class="token-function">controller</span>():
+    time.sleep(<span class="token-number">5</span>)
+    stop_event.set()  <span class="token-comment"># Immediately visible to all threads</span>
+
+<span class="token-comment"># Volatile is sufficient when:</span>
+<span class="token-comment"># 1. Only ONE thread writes, others only read</span>
+<span class="token-comment"># 2. The write doesn't depend on the current value</span>
+<span class="token-comment"># 3. No compound check-then-act operations</span></code></pre>
+
+            <h2>When You Need Synchronized (Locks)</h2>
+<pre><code><span class="token-keyword">import</span> threading
+
+counter = <span class="token-number">0</span>
+lock = threading.Lock()
+
+<span class="token-comment"># Volatile would NOT fix this — it's a read-modify-write!</span>
+<span class="token-keyword">def</span> <span class="token-function">increment</span>():
+    <span class="token-keyword">global</span> counter
+    <span class="token-keyword">with</span> lock:  <span class="token-comment"># Need atomicity AND visibility</span>
+        counter += <span class="token-number">1</span>  <span class="token-comment"># READ + ADD + WRITE must be indivisible</span>
+
+<span class="token-comment"># Synchronized needed when:</span>
+<span class="token-comment"># 1. Multiple threads write to the same variable</span>
+<span class="token-comment"># 2. Read-modify-write operations (counter++, check-then-act)</span>
+<span class="token-comment"># 3. Multiple variables must be consistent together</span></code></pre>
+
+            <h2>Comparison Table</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Feature</th><th>Volatile</th><th>Synchronized/Lock</th></tr></thead>
+                <tbody>
+                    <tr><td>Visibility</td><td>Yes</td><td>Yes</td></tr>
+                    <tr><td>Atomicity</td><td>Only for single read/write</td><td>Yes (entire block)</td></tr>
+                    <tr><td>Blocking</td><td>Never blocks</td><td>Can block waiting threads</td></tr>
+                    <tr><td>Performance</td><td>Fast (no lock overhead)</td><td>Slower (acquire/release)</td></tr>
+                    <tr><td>Use case</td><td>Flags, status variables</td><td>Counters, state machines, compound ops</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Python Equivalents</h2>
+<pre><code><span class="token-keyword">import</span> threading
+
+<span class="token-comment"># "Volatile" equivalents in Python:</span>
+<span class="token-comment"># - threading.Event (boolean flag)</span>
+<span class="token-comment"># - queue.Queue (thread-safe communication)</span>
+<span class="token-comment"># - Value from multiprocessing (with explicit lock)</span>
+
+<span class="token-comment"># "Synchronized" equivalents:</span>
+<span class="token-comment"># - threading.Lock / RLock</span>
+<span class="token-comment"># - threading.Condition</span>
+<span class="token-comment"># - threading.Semaphore</span>
+
+<span class="token-comment"># Best practice: Use Event for simple signals, Lock for data protection</span>
+<span class="token-keyword">class</span> <span class="token-class">SafePublisher</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._data = <span class="token-keyword">None</span>
+        self._ready = threading.Event()
+
+    <span class="token-keyword">def</span> <span class="token-function">publish</span>(self, value):
+        self._data = value
+        self._ready.set()  <span class="token-comment"># Memory barrier + signal</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">consume</span>(self):
+        self._ready.wait()  <span class="token-comment"># Blocks until set, with memory barrier</span>
+        <span class="token-keyword">return</span> self._data  <span class="token-comment"># Guaranteed to see the published value</span></code></pre>
+
+            <div class="industry-box">
+                <h4>Language Implementations</h4>
+                <ul>
+                    <li><strong>Java volatile</strong> — Guarantees visibility, prevents reordering, does NOT provide atomicity for compound ops</li>
+                    <li><strong>Java synchronized</strong> — Visibility + atomicity + mutual exclusion</li>
+                    <li><strong>C++ volatile</strong> — Only prevents compiler optimization (NOT thread-safe! Use std::atomic instead)</li>
+                    <li><strong>Go</strong> — No volatile keyword; use channels or sync/atomic package</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>Volatile solves visibility (all threads see latest value) but NOT atomicity</li>
+<li>Synchronized (locks) solve both visibility AND atomicity</li>
+<li>Use volatile/Event for simple flags with one writer, many readers</li>
+<li>Use locks for counter++, check-then-act, and multi-variable updates</li>
+<li>C++ volatile is NOT thread-safe — it only prevents compiler optimizations</li>
+<li>Python: threading.Event = volatile-like; threading.Lock = synchronized</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">VOLATILE:    Thread A writes → ALL threads see new value immediately
+             But: if two threads write simultaneously, last one wins (no ordering)
+
+SYNCHRONIZED: Thread A enters → does work → exits
+              Thread B enters → sees ALL of A's changes → does work → exits
+              Ordering AND visibility guaranteed!
+
+DECISION:
+    Simple flag (stop/start)?  → Event (volatile)
+    counter += 1?              → Lock (synchronized)
+    check-then-act?            → Lock (synchronized)</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Using volatile for counter++</strong> — Volatile does NOT make read-modify-write atomic!</li>
+<li><strong>C++ volatile for threading</strong> — C++ volatile is for hardware registers, NOT threads. Use std::atomic.</li>
+<li><strong>Over-synchronizing</strong> — Using locks when a simple Event/flag would suffice kills performance.</li>
+<li><strong>Under-synchronizing</strong> — Using only a flag when compound atomicity is needed causes races.</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Implement a stop flag using threading.Event — show it works correctly with 10 worker threads.</li>
+<li>Try to use Event instead of Lock for a counter — show it fails.</li>
+<li>Build a "double-checked locking" pattern: check flag, then lock, then check again.</li>
+<li>Measure performance: Event.is_set() vs lock.acquire()/release() in a tight loop.</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="11-happens-before.html" class="prev">Happens-Before</a>
+                <a href="13-false-sharing.html" class="next">False Sharing</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

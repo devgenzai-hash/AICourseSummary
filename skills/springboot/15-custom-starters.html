@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Spring Boot Starters - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html"><span class="nav-number">14</span> Profiles & Environment</a></li>
+            <li><a href="15-custom-starters.html" class="active"><span class="nav-number">15</span> Custom Starters</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Auto-Configuration → Custom Spring Boot Starters</div>
+        <div class="topic-number">Topic 15 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Custom Spring Boot Starters</h1>
+            <p class="subtitle-description">How to build reusable auto-configured libraries that integrate seamlessly — the same mechanism that powers spring-boot-starter-web and spring-boot-starter-data-jpa.</p>
+
+            <div class="tags">
+                <span class="tag tag-advanced">advanced</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-production">production</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🔌 The USB Device Analogy</div>
+                <p>A custom starter is like a USB device. When you plug a USB keyboard into your computer, the OS detects it (<code>@ConditionalOnClass</code>), loads the appropriate driver (<code>@AutoConfiguration</code>), applies default settings (<code>@ConfigurationProperties</code>), but lets you override them in System Preferences (<code>@ConditionalOnMissingBean</code>). The keyboard manufacturer ships the device + driver together (starter + autoconfigure modules). You don't configure anything manually — plug it in and it works. That's exactly what a well-built starter does: add the dependency, and everything auto-configures.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: Anatomy of a Starter -->
+            <!-- ============================================ -->
+            <h2>1. Anatomy of a Starter: Two Modules</h2>
+
+            <p>A proper Spring Boot starter consists of two separate modules:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>Purpose</th>
+                        <th>Contains</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>{company}-spring-boot-starter</code></td>
+                        <td>Dependency aggregator (what users add to their pom.xml)</td>
+                        <td>Only <code>pom.xml</code> with dependencies — NO code</td>
+                    </tr>
+                    <tr>
+                        <td><code>{company}-spring-boot-autoconfigure</code></td>
+                        <td>The actual auto-configuration logic</td>
+                        <td>@AutoConfiguration classes, @ConfigurationProperties, META-INF registration</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><code><span class="token-comment">// Project structure:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// acme-spring-boot-starter/          ← Starter module</span>
+<span class="token-comment">//   └── pom.xml                       ← Just dependencies</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// acme-spring-boot-autoconfigure/     ← Autoconfigure module</span>
+<span class="token-comment">//   ├── src/main/java/</span>
+<span class="token-comment">//   │   └── com/acme/autoconfigure/</span>
+<span class="token-comment">//   │       ├── AcmeAutoConfiguration.java</span>
+<span class="token-comment">//   │       └── AcmeProperties.java</span>
+<span class="token-comment">//   └── src/main/resources/</span>
+<span class="token-comment">//       └── META-INF/</span>
+<span class="token-comment">//           └── spring/</span>
+<span class="token-comment">//               └── org.springframework.boot.autoconfigure.AutoConfiguration.imports</span>
+
+<span class="token-comment">// ═══ Starter pom.xml — just pulls in dependencies ═══</span>
+&lt;project&gt;
+    &lt;artifactId&gt;acme-spring-boot-starter&lt;/artifactId&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.acme&lt;/groupId&gt;
+            &lt;artifactId&gt;acme-spring-boot-autoconfigure&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.acme&lt;/groupId&gt;
+            &lt;artifactId&gt;acme-client-library&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Naming Convention</div>
+                <p>Official Spring starters: <code>spring-boot-starter-{name}</code>. Third-party starters: <code>{name}-spring-boot-starter</code>. This isn't enforced but is a strong community convention documented by Spring Boot. Examples: <code>mybatis-spring-boot-starter</code>, <code>camel-spring-boot-starter</code>.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: Auto-Configuration Class -->
+            <!-- ============================================ -->
+            <h2>2. Creating the Auto-Configuration Class</h2>
+
+            <pre><code><span class="token-comment">// ═══ Boot 3.x: Use @AutoConfiguration ═══</span>
+<span class="token-annotation">@AutoConfiguration</span>
+<span class="token-annotation">@ConditionalOnClass</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>)  <span class="token-comment">// Only activate if library is on classpath</span>
+<span class="token-annotation">@EnableConfigurationProperties</span>(<span class="token-class">AcmeProperties</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public class</span> <span class="token-class">AcmeAutoConfiguration</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>  <span class="token-comment">// Users can override by defining their own</span>
+    <span class="token-keyword">public</span> <span class="token-type">AcmeClient</span> <span class="token-function">acmeClient</span>(<span class="token-type">AcmeProperties</span> properties) {
+        <span class="token-keyword">return new</span> <span class="token-type">AcmeClient</span>(
+            properties.<span class="token-function">getEndpoint</span>(),
+            properties.<span class="token-function">getApiKey</span>(),
+            properties.<span class="token-function">getTimeout</span>()
+        );
+    }
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>
+    <span class="token-annotation">@ConditionalOnProperty</span>(
+        prefix = <span class="token-string">"acme"</span>,
+        name = <span class="token-string">"health.enabled"</span>,
+        havingValue = <span class="token-string">"true"</span>,
+        matchIfMissing = <span class="token-keyword">true</span>  <span class="token-comment">// enabled by default</span>
+    )
+    <span class="token-keyword">public</span> <span class="token-type">AcmeHealthIndicator</span> <span class="token-function">acmeHealthIndicator</span>(<span class="token-type">AcmeClient</span> client) {
+        <span class="token-keyword">return new</span> <span class="token-type">AcmeHealthIndicator</span>(client);
+    }
+}
+
+<span class="token-comment">// ═══ Boot 2.x equivalent: @Configuration + spring.factories ═══</span>
+<span class="token-annotation">@Configuration</span>(<span class="token-string">"acmeAutoConfiguration"</span>)
+<span class="token-annotation">@ConditionalOnClass</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@EnableConfigurationProperties</span>(<span class="token-class">AcmeProperties</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public class</span> <span class="token-class">AcmeAutoConfiguration</span> {
+    <span class="token-comment">// Same beans...</span>
+}
+<span class="token-comment">// Registered in META-INF/spring.factories:</span>
+<span class="token-comment">// org.springframework.boot.autoconfigure.EnableAutoConfiguration=\</span>
+<span class="token-comment">//   com.acme.autoconfigure.AcmeAutoConfiguration</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: @ConfigurationProperties -->
+            <!-- ============================================ -->
+            <h2>3. @ConfigurationProperties for Starter Configuration</h2>
+
+            <pre><code><span class="token-annotation">@ConfigurationProperties</span>(prefix = <span class="token-string">"acme"</span>)
+<span class="token-keyword">public class</span> <span class="token-class">AcmeProperties</span> {
+
+    <span class="token-comment">/**
+     * The endpoint URL for the Acme service.
+     */</span>
+    <span class="token-keyword">private</span> <span class="token-type">String</span> endpoint = <span class="token-string">"https://api.acme.com/v2"</span>;
+
+    <span class="token-comment">/**
+     * API key for authentication. Required.
+     */</span>
+    <span class="token-keyword">private</span> <span class="token-type">String</span> apiKey;
+
+    <span class="token-comment">/**
+     * Connection timeout.
+     */</span>
+    <span class="token-keyword">private</span> <span class="token-type">Duration</span> timeout = <span class="token-type">Duration</span>.<span class="token-function">ofSeconds</span>(<span class="token-number">5</span>);
+
+    <span class="token-comment">/**
+     * Health check configuration.
+     */</span>
+    <span class="token-keyword">private final</span> <span class="token-type">Health</span> health = <span class="token-keyword">new</span> <span class="token-type">Health</span>();
+
+    <span class="token-comment">// Getters and setters...</span>
+    <span class="token-keyword">public</span> <span class="token-type">String</span> <span class="token-function">getEndpoint</span>() { <span class="token-keyword">return</span> endpoint; }
+    <span class="token-keyword">public void</span> <span class="token-function">setEndpoint</span>(<span class="token-type">String</span> endpoint) { <span class="token-keyword">this</span>.endpoint = endpoint; }
+    <span class="token-keyword">public</span> <span class="token-type">String</span> <span class="token-function">getApiKey</span>() { <span class="token-keyword">return</span> apiKey; }
+    <span class="token-keyword">public void</span> <span class="token-function">setApiKey</span>(<span class="token-type">String</span> apiKey) { <span class="token-keyword">this</span>.apiKey = apiKey; }
+    <span class="token-keyword">public</span> <span class="token-type">Duration</span> <span class="token-function">getTimeout</span>() { <span class="token-keyword">return</span> timeout; }
+    <span class="token-keyword">public void</span> <span class="token-function">setTimeout</span>(<span class="token-type">Duration</span> timeout) { <span class="token-keyword">this</span>.timeout = timeout; }
+    <span class="token-keyword">public</span> <span class="token-type">Health</span> <span class="token-function">getHealth</span>() { <span class="token-keyword">return</span> health; }
+
+    <span class="token-keyword">public static class</span> <span class="token-class">Health</span> {
+        <span class="token-keyword">private boolean</span> enabled = <span class="token-keyword">true</span>;
+        <span class="token-keyword">public boolean</span> <span class="token-function">isEnabled</span>() { <span class="token-keyword">return</span> enabled; }
+        <span class="token-keyword">public void</span> <span class="token-function">setEnabled</span>(<span class="token-keyword">boolean</span> enabled) { <span class="token-keyword">this</span>.enabled = enabled; }
+    }
+}
+
+<span class="token-comment">// Users configure via application.yml:</span>
+<span class="token-comment">// acme:</span>
+<span class="token-comment">//   endpoint: https://custom.acme.com/v3</span>
+<span class="token-comment">//   api-key: ${ACME_API_KEY}</span>
+<span class="token-comment">//   timeout: 10s</span>
+<span class="token-comment">//   health:</span>
+<span class="token-comment">//     enabled: false</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: @ConditionalOnMissingBean -->
+            <!-- ============================================ -->
+            <h2>4. Providing Sensible Defaults with @ConditionalOnMissingBean</h2>
+
+            <pre><code><span class="token-annotation">@AutoConfiguration</span>
+<span class="token-annotation">@ConditionalOnClass</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@EnableConfigurationProperties</span>(<span class="token-class">AcmeProperties</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public class</span> <span class="token-class">AcmeAutoConfiguration</span> {
+
+    <span class="token-comment">// ═══ Pattern: provide default, allow override ═══</span>
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>)
+    <span class="token-keyword">public</span> <span class="token-type">AcmeClient</span> <span class="token-function">acmeClient</span>(<span class="token-type">AcmeProperties</span> props) {
+        <span class="token-comment">// This bean is ONLY created if the user hasn't defined their own</span>
+        <span class="token-keyword">return</span> <span class="token-type">AcmeClient</span>.<span class="token-function">builder</span>()
+            .<span class="token-function">endpoint</span>(props.<span class="token-function">getEndpoint</span>())
+            .<span class="token-function">apiKey</span>(props.<span class="token-function">getApiKey</span>())
+            .<span class="token-function">timeout</span>(props.<span class="token-function">getTimeout</span>())
+            .<span class="token-function">build</span>();
+    }
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>(<span class="token-type">AcmeSerializer</span>.<span class="token-keyword">class</span>)
+    <span class="token-keyword">public</span> <span class="token-type">AcmeSerializer</span> <span class="token-function">acmeSerializer</span>() {
+        <span class="token-comment">// Default: Jackson-based serialization</span>
+        <span class="token-keyword">return new</span> <span class="token-type">JacksonAcmeSerializer</span>();
+    }
+}
+
+<span class="token-comment">// ═══ User's application — overriding the default ═══</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-keyword">public class</span> <span class="token-class">MyAcmeConfig</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-keyword">public</span> <span class="token-type">AcmeClient</span> <span class="token-function">acmeClient</span>() {
+        <span class="token-comment">// This WINS over the auto-configured bean</span>
+        <span class="token-comment">// because user beans are processed BEFORE auto-configuration</span>
+        <span class="token-keyword">return</span> <span class="token-type">AcmeClient</span>.<span class="token-function">builder</span>()
+            .<span class="token-function">endpoint</span>(<span class="token-string">"https://custom-proxy.internal/acme"</span>)
+            .<span class="token-function">retries</span>(<span class="token-number">5</span>)
+            .<span class="token-function">circuitBreaker</span>(<span class="token-keyword">true</span>)
+            .<span class="token-function">build</span>();
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p><code>@ConditionalOnMissingBean</code> is the cornerstone of starter design. It implements the "opinionated defaults" philosophy: your starter works out of the box with zero config, but users can override ANY bean by simply defining their own. Auto-configuration classes are processed AFTER user-defined @Configuration classes, ensuring user beans always take precedence.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: Testing with ApplicationContextRunner -->
+            <!-- ============================================ -->
+            <h2>5. Testing Your Auto-Configuration</h2>
+
+            <pre><code><span class="token-keyword">class</span> <span class="token-class">AcmeAutoConfigurationTest</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">ApplicationContextRunner</span> contextRunner =
+        <span class="token-keyword">new</span> <span class="token-type">ApplicationContextRunner</span>()
+            .<span class="token-function">withConfiguration</span>(
+                <span class="token-type">AutoConfigurations</span>.<span class="token-function">of</span>(<span class="token-class">AcmeAutoConfiguration</span>.<span class="token-keyword">class</span>));
+
+    <span class="token-annotation">@Test</span>
+    <span class="token-keyword">void</span> <span class="token-function">shouldCreateClientWhenClassPresent</span>() {
+        contextRunner
+            .<span class="token-function">withPropertyValues</span>(<span class="token-string">"acme.api-key=test-key"</span>)
+            .<span class="token-function">run</span>(context -> {
+                <span class="token-function">assertThat</span>(context).<span class="token-function">hasSingleBean</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>);
+                <span class="token-function">assertThat</span>(context).<span class="token-function">hasSingleBean</span>(<span class="token-type">AcmeHealthIndicator</span>.<span class="token-keyword">class</span>);
+            });
+    }
+
+    <span class="token-annotation">@Test</span>
+    <span class="token-keyword">void</span> <span class="token-function">shouldNotCreateClientWhenClassMissing</span>() {
+        contextRunner
+            .<span class="token-function">withClassLoader</span>(<span class="token-keyword">new</span> <span class="token-type">FilteredClassLoader</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>))
+            .<span class="token-function">run</span>(context -> {
+                <span class="token-function">assertThat</span>(context).<span class="token-function">doesNotHaveBean</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>);
+            });
+    }
+
+    <span class="token-annotation">@Test</span>
+    <span class="token-keyword">void</span> <span class="token-function">shouldBackOffWhenUserDefinesOwnBean</span>() {
+        contextRunner
+            .<span class="token-function">withUserConfiguration</span>(<span class="token-class">CustomClientConfig</span>.<span class="token-keyword">class</span>)
+            .<span class="token-function">run</span>(context -> {
+                <span class="token-function">assertThat</span>(context).<span class="token-function">hasSingleBean</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>);
+                <span class="token-comment">// Verify it's the USER's bean, not ours</span>
+                <span class="token-function">assertThat</span>(context.<span class="token-function">getBean</span>(<span class="token-type">AcmeClient</span>.<span class="token-keyword">class</span>).<span class="token-function">getEndpoint</span>())
+                    .<span class="token-function">isEqualTo</span>(<span class="token-string">"https://custom.endpoint"</span>);
+            });
+    }
+
+    <span class="token-annotation">@Test</span>
+    <span class="token-keyword">void</span> <span class="token-function">shouldDisableHealthWhenPropertySet</span>() {
+        contextRunner
+            .<span class="token-function">withPropertyValues</span>(
+                <span class="token-string">"acme.api-key=test"</span>,
+                <span class="token-string">"acme.health.enabled=false"</span>)
+            .<span class="token-function">run</span>(context -> {
+                <span class="token-function">assertThat</span>(context).<span class="token-function">doesNotHaveBean</span>(<span class="token-type">AcmeHealthIndicator</span>.<span class="token-keyword">class</span>);
+            });
+    }
+
+    <span class="token-annotation">@Configuration</span>
+    <span class="token-keyword">static class</span> <span class="token-class">CustomClientConfig</span> {
+        <span class="token-annotation">@Bean</span>
+        <span class="token-type">AcmeClient</span> <span class="token-function">acmeClient</span>() {
+            <span class="token-keyword">return new</span> <span class="token-type">AcmeClient</span>(<span class="token-string">"https://custom.endpoint"</span>, <span class="token-string">"key"</span>, <span class="token-keyword">null</span>);
+        }
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Publishing Registration -->
+            <!-- ============================================ -->
+            <h2>6. Publishing: Registration Files</h2>
+
+            <pre><code><span class="token-comment">// ═══ Boot 3.x Registration ═══</span>
+<span class="token-comment">// File: src/main/resources/META-INF/spring/</span>
+<span class="token-comment">//       org.springframework.boot.autoconfigure.AutoConfiguration.imports</span>
+
+com.acme.autoconfigure.AcmeAutoConfiguration
+com.acme.autoconfigure.AcmeMetricsAutoConfiguration
+com.acme.autoconfigure.AcmeSecurityAutoConfiguration
+
+<span class="token-comment">// ═══ Boot 2.x Registration (for backward compatibility) ═══</span>
+<span class="token-comment">// File: src/main/resources/META-INF/spring.factories</span>
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.acme.autoconfigure.AcmeAutoConfiguration,\
+  com.acme.autoconfigure.AcmeMetricsAutoConfiguration,\
+  com.acme.autoconfigure.AcmeSecurityAutoConfiguration
+
+<span class="token-comment">// ═══ Additional metadata for IDE auto-complete ═══</span>
+<span class="token-comment">// File: src/main/resources/META-INF/</span>
+<span class="token-comment">//       additional-spring-configuration-metadata.json</span>
+{
+  "properties": [
+    {
+      "name": "acme.endpoint",
+      "type": "java.lang.String",
+      "description": "The Acme API endpoint URL",
+      "defaultValue": "https://api.acme.com/v2"
+    },
+    {
+      "name": "acme.health.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable Acme health indicator",
+      "defaultValue": true
+    }
+  ]
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Dependency Management -->
+            <!-- ============================================ -->
+            <h2>7. Proper Dependency Management</h2>
+
+            <pre><code><span class="token-comment">&lt;!-- autoconfigure module pom.xml --&gt;</span>
+&lt;project&gt;
+    &lt;artifactId&gt;acme-spring-boot-autoconfigure&lt;/artifactId&gt;
+
+    &lt;dependencies&gt;
+        <span class="token-comment">&lt;!-- Spring Boot — provided, not transitive --&gt;</span>
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-autoconfigure&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        <span class="token-comment">&lt;!-- The library you're wrapping — OPTIONAL dependency --&gt;</span>
+        <span class="token-comment">&lt;!-- Users must explicitly add it (or the starter does) --&gt;</span>
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.acme&lt;/groupId&gt;
+            &lt;artifactId&gt;acme-client-library&lt;/artifactId&gt;
+            &lt;optional&gt;true&lt;/optional&gt;
+        &lt;/dependency&gt;
+
+        <span class="token-comment">&lt;!-- Annotation processor for config metadata --&gt;</span>
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-configuration-processor&lt;/artifactId&gt;
+            &lt;optional&gt;true&lt;/optional&gt;
+        &lt;/dependency&gt;
+
+        <span class="token-comment">&lt;!-- Test dependencies --&gt;</span>
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Don't Leak Dependencies</div>
+                <p>Mark dependencies as <code>&lt;optional&gt;true&lt;/optional&gt;</code> in the autoconfigure module. This prevents them from becoming transitive dependencies of consumers. The starter module is where you declare non-optional dependencies — it's the "battery pack" that brings everything needed. The autoconfigure module should compile against APIs without forcing them onto consumers.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: Industry Pattern -->
+            <!-- ============================================ -->
+            <h2>8. Industry Pattern: Company-Wide Starters</h2>
+
+            <pre><code><span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Real-world: Netflix, Uber, and large companies create</span>
+<span class="token-comment">// internal starters to enforce standards across 100s of services</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+
+<span class="token-comment">// company-platform-spring-boot-starter brings in:</span>
+<span class="token-comment">//   ├── company-logging-spring-boot-starter</span>
+<span class="token-comment">//   │     → Structured JSON logging, correlation IDs, log shipping</span>
+<span class="token-comment">//   ├── company-metrics-spring-boot-starter</span>
+<span class="token-comment">//   │     → Prometheus metrics, standard dashboards, SLO tracking</span>
+<span class="token-comment">//   ├── company-security-spring-boot-starter</span>
+<span class="token-comment">//   │     → OAuth2 resource server, RBAC, audit logging</span>
+<span class="token-comment">//   ├── company-tracing-spring-boot-starter</span>
+<span class="token-comment">//   │     → Distributed tracing, span propagation, sampling</span>
+<span class="token-comment">//   └── company-resilience-spring-boot-starter</span>
+<span class="token-comment">//         → Circuit breakers, retries, rate limiting, bulkheads</span>
+
+<span class="token-annotation">@AutoConfiguration</span>
+<span class="token-annotation">@ConditionalOnClass</span>(<span class="token-type">MeterRegistry</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@AutoConfigureAfter</span>(<span class="token-class">MetricsAutoConfiguration</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public class</span> <span class="token-class">CompanyMetricsAutoConfiguration</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>
+    <span class="token-keyword">public</span> <span class="token-type">MeterRegistryCustomizer</span>&lt;<span class="token-type">MeterRegistry</span>&gt; <span class="token-function">companyMetricsCustomizer</span>(
+            <span class="token-type">Environment</span> env) {
+        <span class="token-keyword">return</span> registry -> registry.<span class="token-function">config</span>()
+            .<span class="token-function">commonTags</span>(
+                <span class="token-string">"service"</span>, env.<span class="token-function">getProperty</span>(<span class="token-string">"spring.application.name"</span>),
+                <span class="token-string">"team"</span>, env.<span class="token-function">getProperty</span>(<span class="token-string">"company.team"</span>, <span class="token-string">"unknown"</span>),
+                <span class="token-string">"env"</span>, env.<span class="token-function">getProperty</span>(<span class="token-string">"company.environment"</span>, <span class="token-string">"local"</span>)
+            );
+    }
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>
+    <span class="token-keyword">public</span> <span class="token-type">CompanySloTracker</span> <span class="token-function">sloTracker</span>(<span class="token-type">MeterRegistry</span> registry) {
+        <span class="token-comment">// Automatically tracks p99 latency, error rate, availability</span>
+        <span class="token-keyword">return new</span> <span class="token-type">CompanySloTracker</span>(registry);
+    }
+}
+
+<span class="token-comment">// Service teams just add ONE dependency:</span>
+<span class="token-comment">// &lt;dependency&gt;</span>
+<span class="token-comment">//   &lt;groupId&gt;com.company.platform&lt;/groupId&gt;</span>
+<span class="token-comment">//   &lt;artifactId&gt;company-platform-spring-boot-starter&lt;/artifactId&gt;</span>
+<span class="token-comment">//   &lt;version&gt;${platform.version}&lt;/version&gt;</span>
+<span class="token-comment">// &lt;/dependency&gt;</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Result: logging, metrics, security, tracing, resilience — all configured</span>
+<span class="token-comment">// All 200+ services behave consistently. Platform team upgrades ONE version.</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>Two modules:</strong> starter (dependency aggregator, no code) + autoconfigure (the actual logic) — separation enables optional dependencies</li>
+                    <li><strong>Naming:</strong> third-party starters use <code>{name}-spring-boot-starter</code>, not <code>spring-boot-starter-{name}</code></li>
+                    <li><strong>@AutoConfiguration (Boot 3.x)</strong> or @Configuration + spring.factories (Boot 2.x) for the auto-config class</li>
+                    <li><strong>@ConditionalOnClass</strong> gates activation on library presence — starter only activates if the user actually has the library</li>
+                    <li><strong>@ConditionalOnMissingBean</strong> implements "provide defaults, allow override" — the cornerstone of starter design</li>
+                    <li><strong>ApplicationContextRunner</strong> is the testing tool — fast, no real Spring context, tests all conditional paths</li>
+                    <li><strong>Registration:</strong> Boot 3.x uses <code>.imports</code> file (one class per line), Boot 2.x uses <code>spring.factories</code></li>
+                    <li><strong>Industry pattern:</strong> company-wide platform starters enforce standards (logging, metrics, security) across hundreds of microservices</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>Why does a starter need TWO modules? What breaks if you combine them into one?</li>
+                    <li>Your auto-configured bean should be created AFTER Spring's DataSourceAutoConfiguration. How do you enforce ordering?</li>
+                    <li>A user reports that your starter's bean conflicts with their custom bean. What's the most likely cause and fix?</li>
+                    <li>Explain why dependencies in the autoconfigure module should be <code>&lt;optional&gt;true&lt;/optional&gt;</code> but the starter module should declare them non-optional.</li>
+                    <li>Design a starter that auto-configures a caching layer: Redis if available, Caffeine as fallback, simple HashMap if neither is present.</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"Your company has 200 microservices. You want to add standardized distributed tracing, structured logging, and health checks to all of them with minimal code changes per service. Design the solution."</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Create a platform starter:</strong> <code>company-platform-spring-boot-starter</code> that aggregates tracing, logging, and health starters.</li>
+                    <li><strong>Use @ConditionalOnClass:</strong> Each sub-starter only activates if its required libraries are on the classpath.</li>
+                    <li><strong>@ConditionalOnMissingBean everywhere:</strong> Teams that need custom behavior can override any bean — no conflicts.</li>
+                    <li><strong>Version management:</strong> Use a BOM (Bill of Materials) so all services share compatible versions. One platform team PR updates all 200 services.</li>
+                    <li><strong>@ConditionalOnProperty for opt-out:</strong> <code>company.tracing.enabled=false</code> lets teams disable specific features without removing the dependency.</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 12 (spring.factories)</strong> — The registration mechanism that makes starters discoverable without classpath scanning</li>
+                    <li><strong>Topic 11 (Conditionals)</strong> — @ConditionalOnClass, @ConditionalOnMissingBean are the gates that control starter activation</li>
+                    <li><strong>Topic 10 (Auto-Configuration)</strong> — The ordering and processing pipeline that evaluates your starter's conditions</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="14-profiles.html" class="nav-btn nav-btn-prev">← Profile Management</a>
+                <a href="16-dispatcher-servlet.html" class="nav-btn nav-btn-next">Dispatcher Servlet →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

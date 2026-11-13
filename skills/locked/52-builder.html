@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builder - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html" class="active"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Design Patterns &rarr; Builder</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Beginner</span>
+                <span class="tag">Pattern</span>
+                <span class="tag">Design Pattern</span>
+            </div>
+            <h1>Builder</h1>
+            <p class="hero-subtitle">Constructing complex objects <strong>step by step</strong> &mdash; separating the construction process from the representation so the same building logic can create different configurations.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of <strong>building a custom burger at a restaurant</strong>. You don&rsquo;t get a random burger &mdash; you choose step by step: first the bun (brioche or sesame), then the patty (beef, chicken, or veggie), then toppings (lettuce, tomato, pickles), then the sauce (ketchup, mayo, special sauce). Each step is optional, and you build up your perfect burger one choice at a time. The cashier (Director) might suggest a &ldquo;classic combo&rdquo; that picks standard options for you, but you can always customize. The Builder pattern works the same way &mdash; constructing complex objects one attribute at a time.</p>
+        </div>
+
+        <h2>What Is the Builder Pattern?</h2>
+        <ul>
+            <li><strong>Intent:</strong> Separate the construction of a complex object from its representation, allowing the same construction process to create different representations</li>
+            <li><strong>Classification:</strong> Creational pattern (GoF) &mdash; controls <em>how</em> complex objects are assembled</li>
+            <li><strong>Key idea:</strong> Instead of a constructor with 10+ parameters, provide a step-by-step interface to set each piece</li>
+            <li><strong>Fluent interface:</strong> Each setter method returns <code>self</code>, enabling method chaining: <code>builder.set_x().set_y().build()</code></li>
+            <li><strong>Immutability:</strong> The final object is often immutable &mdash; all configuration happens in the builder, then a frozen object is produced</li>
+        </ul>
+
+        <h2>When to Use Builder</h2>
+        <ul>
+            <li><strong>Many optional parameters:</strong> When a constructor would need 5+ parameters and most are optional</li>
+            <li><strong>Telescoping constructor problem:</strong> When you&rsquo;d otherwise need multiple constructor overloads with different parameter combinations</li>
+            <li><strong>Immutable objects:</strong> When the final object shouldn&rsquo;t be modified after creation but needs complex setup</li>
+            <li><strong>Step-by-step construction:</strong> When the object must be built in stages (e.g., parsing a document, assembling a query)</li>
+            <li><strong>Multiple representations:</strong> When the same building process should create different output formats (HTML vs Markdown vs PDF)</li>
+        </ul>
+
+        <h2>Builder Components</h2>
+        <h3>The Builder Interface</h3>
+        <ul>
+            <li>Declares step methods for setting each part of the product</li>
+            <li>Each method returns <code>self</code> for chaining (fluent interface)</li>
+            <li>Has a <code>build()</code> or <code>get_result()</code> method that produces the final object</li>
+            <li>May include a <code>reset()</code> method to prepare for building another object</li>
+        </ul>
+
+        <h3>The Director (Optional)</h3>
+        <ul>
+            <li>Encapsulates a specific construction sequence &mdash; defines the <em>order</em> of build steps</li>
+            <li>Knows which steps to call and in what order for common configurations</li>
+            <li>The client doesn&rsquo;t need to know the build details &mdash; just asks the Director for a preset</li>
+            <li>Optional &mdash; the client can call builder steps directly if they want full control</li>
+        </ul>
+
+        <h3>Builder vs Telescoping Constructors</h3>
+        <ul>
+            <li><strong>Telescoping:</strong> <code>Query(table, cols, where, order, limit, offset, join, group, having)</code> &mdash; unreadable, error-prone</li>
+            <li><strong>Builder:</strong> <code>QueryBuilder().table("users").where("age > 18").limit(10).build()</code> &mdash; self-documenting</li>
+            <li>Builder makes invalid states harder to represent and the code reads like English</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Approach</th>
+                        <th>Readability</th>
+                        <th>Validation</th>
+                        <th>Immutability</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Large Constructor</strong></td>
+                        <td>Poor &mdash; positional args</td>
+                        <td>All at once</td>
+                        <td>Easy</td>
+                        <td>1&ndash;3 required params</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kwargs / Dict</strong></td>
+                        <td>Moderate</td>
+                        <td>Manual checks</td>
+                        <td>Hard</td>
+                        <td>Dynamic configs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Setters (mutable)</strong></td>
+                        <td>Good</td>
+                        <td>Per-field</td>
+                        <td>Impossible</td>
+                        <td>Mutable objects</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Builder Pattern</strong></td>
+                        <td>Excellent &mdash; fluent</td>
+                        <td>At build time</td>
+                        <td>Natural</td>
+                        <td>Complex, immutable objects</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dataclass + defaults</strong></td>
+                        <td>Good</td>
+                        <td>__post_init__</td>
+                        <td>frozen=True</td>
+                        <td>Simple data containers</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementation &mdash; SQL Query Builder</h2>
+        <pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Optional
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># The Product — an immutable SQL query</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">SQLQuery</span>:
+    <span class="token-string">"""Immutable SQL query object — constructed only by the builder."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, sql: str, params: tuple):
+        self._sql = sql
+        self._params = params
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">sql</span>(self) -> str:
+        <span class="token-keyword">return</span> self._sql
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">params</span>(self) -> tuple:
+        <span class="token-keyword">return</span> self._params
+
+    <span class="token-keyword">def</span> <span class="token-function">__repr__</span>(self):
+        <span class="token-keyword">return</span> f<span class="token-string">"SQLQuery({self._sql!r}, params={self._params})"</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># The Builder — fluent interface for constructing queries</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">QueryBuilder</span>:
+    <span class="token-string">"""
+    Builds SQL SELECT queries step-by-step.
+    Each method returns self for method chaining.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._table: Optional[str] = <span class="token-keyword">None</span>
+        self._columns: List[str] = [<span class="token-string">"*"</span>]
+        self._conditions: List[str] = []
+        self._params: List = []
+        self._order_by: Optional[str] = <span class="token-keyword">None</span>
+        self._limit: Optional[int] = <span class="token-keyword">None</span>
+        self._offset: Optional[int] = <span class="token-keyword">None</span>
+        self._joins: List[str] = []
+
+    <span class="token-keyword">def</span> <span class="token-function">table</span>(self, name: str) -> <span class="token-string">"QueryBuilder"</span>:
+        <span class="token-string">"""Set the FROM table."""</span>
+        self._table = name
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">select</span>(self, *columns: str) -> <span class="token-string">"QueryBuilder"</span>:
+        <span class="token-string">"""Set columns to select."""</span>
+        self._columns = list(columns)
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">where</span>(self, condition: str, *params) -> <span class="token-string">"QueryBuilder"</span>:
+        <span class="token-string">"""Add a WHERE condition with parameters."""</span>
+        self._conditions.append(condition)
+        self._params.extend(params)
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">join</span>(self, table: str, on: str) -> <span class="token-string">"QueryBuilder"</span>:
+        <span class="token-string">"""Add a JOIN clause."""</span>
+        self._joins.append(f<span class="token-string">"JOIN {table} ON {on}"</span>)
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">order_by</span>(self, column: str, direction: str = <span class="token-string">"ASC"</span>) -> <span class="token-string">"QueryBuilder"</span>:
+        <span class="token-string">"""Set ORDER BY clause."""</span>
+        self._order_by = f<span class="token-string">"{column} {direction}"</span>
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">limit</span>(self, count: int) -> <span class="token-string">"QueryBuilder"</span>:
+        <span class="token-string">"""Set LIMIT."""</span>
+        self._limit = count
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">offset</span>(self, count: int) -> <span class="token-string">"QueryBuilder"</span>:
+        <span class="token-string">"""Set OFFSET for pagination."""</span>
+        self._offset = count
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">build</span>(self) -> SQLQuery:
+        <span class="token-string">"""Validate and construct the final immutable query."""</span>
+        <span class="token-keyword">if not</span> self._table:
+            <span class="token-keyword">raise</span> ValueError(<span class="token-string">"Table is required — call .table() first"</span>)
+
+        parts = [f<span class="token-string">"SELECT {', '.join(self._columns)}"</span>]
+        parts.append(f<span class="token-string">"FROM {self._table}"</span>)
+
+        <span class="token-keyword">for</span> join <span class="token-keyword">in</span> self._joins:
+            parts.append(join)
+
+        <span class="token-keyword">if</span> self._conditions:
+            parts.append(f<span class="token-string">"WHERE {' AND '.join(self._conditions)}"</span>)
+
+        <span class="token-keyword">if</span> self._order_by:
+            parts.append(f<span class="token-string">"ORDER BY {self._order_by}"</span>)
+
+        <span class="token-keyword">if</span> self._limit <span class="token-keyword">is not None</span>:
+            parts.append(f<span class="token-string">"LIMIT {self._limit}"</span>)
+
+        <span class="token-keyword">if</span> self._offset <span class="token-keyword">is not None</span>:
+            parts.append(f<span class="token-string">"OFFSET {self._offset}"</span>)
+
+        sql = <span class="token-string">" "</span>.join(parts)
+        <span class="token-keyword">return</span> SQLQuery(sql, tuple(self._params))
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Usage — fluent, readable query construction</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+query = (
+    QueryBuilder()
+    .table(<span class="token-string">"users"</span>)
+    .select(<span class="token-string">"id"</span>, <span class="token-string">"name"</span>, <span class="token-string">"email"</span>)
+    .where(<span class="token-string">"age > ?"</span>, <span class="token-number">18</span>)
+    .where(<span class="token-string">"active = ?"</span>, <span class="token-keyword">True</span>)
+    .join(<span class="token-string">"orders"</span>, <span class="token-string">"orders.user_id = users.id"</span>)
+    .order_by(<span class="token-string">"name"</span>)
+    .limit(<span class="token-number">20</span>)
+    .offset(<span class="token-number">40</span>)
+    .build()
+)
+
+print(query.sql)
+<span class="token-comment"># SELECT id, name, email FROM users JOIN orders ON orders.user_id = users.id</span>
+<span class="token-comment"># WHERE age > ? AND active = ? ORDER BY name ASC LIMIT 20 OFFSET 40</span>
+print(query.params)  <span class="token-comment"># (18, True)</span></code></pre>
+
+        <h2>HTTP Request Builder with Director</h2>
+        <pre><code><span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Dict, Optional
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Product — immutable HTTP request</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+@dataclass(frozen=<span class="token-keyword">True</span>)
+<span class="token-keyword">class</span> <span class="token-class">HttpRequest</span>:
+    method: str
+    url: str
+    headers: Dict[str, str] = field(default_factory=dict)
+    body: Optional[str] = <span class="token-keyword">None</span>
+    timeout: int = <span class="token-number">30</span>
+    retries: int = <span class="token-number">0</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Builder — step-by-step request assembly</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HttpRequestBuilder</span>:
+    <span class="token-string">"""Fluent builder for HTTP requests."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._method = <span class="token-string">"GET"</span>
+        self._url = <span class="token-string">""</span>
+        self._headers: Dict[str, str] = {}
+        self._body: Optional[str] = <span class="token-keyword">None</span>
+        self._timeout = <span class="token-number">30</span>
+        self._retries = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">method</span>(self, method: str) -> <span class="token-string">"HttpRequestBuilder"</span>:
+        self._method = method.upper()
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">url</span>(self, url: str) -> <span class="token-string">"HttpRequestBuilder"</span>:
+        self._url = url
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">header</span>(self, key: str, value: str) -> <span class="token-string">"HttpRequestBuilder"</span>:
+        self._headers[key] = value
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">json_body</span>(self, body: str) -> <span class="token-string">"HttpRequestBuilder"</span>:
+        self._body = body
+        self._headers[<span class="token-string">"Content-Type"</span>] = <span class="token-string">"application/json"</span>
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">timeout</span>(self, seconds: int) -> <span class="token-string">"HttpRequestBuilder"</span>:
+        self._timeout = seconds
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">retries</span>(self, count: int) -> <span class="token-string">"HttpRequestBuilder"</span>:
+        self._retries = count
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">build</span>(self) -> HttpRequest:
+        <span class="token-keyword">if not</span> self._url:
+            <span class="token-keyword">raise</span> ValueError(<span class="token-string">"URL is required"</span>)
+        <span class="token-keyword">return</span> HttpRequest(
+            method=self._method,
+            url=self._url,
+            headers=dict(self._headers),
+            body=self._body,
+            timeout=self._timeout,
+            retries=self._retries,
+        )
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Director — knows how to build common request types</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">RequestDirector</span>:
+    <span class="token-string">"""Encapsulates common request construction sequences."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, base_url: str, api_key: str):
+        self._base_url = base_url
+        self._api_key = api_key
+
+    <span class="token-keyword">def</span> <span class="token-function">build_auth_get</span>(self, path: str) -> HttpRequest:
+        <span class="token-string">"""Pre-configured authenticated GET request."""</span>
+        <span class="token-keyword">return</span> (
+            HttpRequestBuilder()
+            .method(<span class="token-string">"GET"</span>)
+            .url(f<span class="token-string">"{self._base_url}{path}"</span>)
+            .header(<span class="token-string">"Authorization"</span>, f<span class="token-string">"Bearer {self._api_key}"</span>)
+            .header(<span class="token-string">"Accept"</span>, <span class="token-string">"application/json"</span>)
+            .timeout(<span class="token-number">10</span>)
+            .retries(<span class="token-number">3</span>)
+            .build()
+        )
+
+    <span class="token-keyword">def</span> <span class="token-function">build_auth_post</span>(self, path: str, body: str) -> HttpRequest:
+        <span class="token-string">"""Pre-configured authenticated POST request."""</span>
+        <span class="token-keyword">return</span> (
+            HttpRequestBuilder()
+            .method(<span class="token-string">"POST"</span>)
+            .url(f<span class="token-string">"{self._base_url}{path}"</span>)
+            .header(<span class="token-string">"Authorization"</span>, f<span class="token-string">"Bearer {self._api_key}"</span>)
+            .json_body(body)
+            .timeout(<span class="token-number">30</span>)
+            .retries(<span class="token-number">1</span>)
+            .build()
+        )
+
+
+<span class="token-comment"># Usage with Director</span>
+director = RequestDirector(<span class="token-string">"https://api.example.com"</span>, <span class="token-string">"sk-abc123"</span>)
+get_req = director.build_auth_get(<span class="token-string">"/users"</span>)
+post_req = director.build_auth_post(<span class="token-string">"/users"</span>, <span class="token-string">'{"name": "Alice"}'</span>)
+
+print(f<span class="token-string">"GET:  {get_req.method} {get_req.url}"</span>)
+print(f<span class="token-string">"POST: {post_req.method} {post_req.url}, body={post_req.body}"</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>SQLAlchemy Query Building:</strong> SQLAlchemy&rsquo;s ORM uses a fluent builder interface &mdash; <code>session.query(User).filter(User.age > 18).order_by(User.name).limit(10)</code>. Each method returns a new query object (immutable chaining), allowing you to build complex SQL without string concatenation or injection risks.</p>
+            <p><strong>Django ORM QuerySets:</strong> Django&rsquo;s QuerySets are lazy builders &mdash; <code>User.objects.filter(active=True).exclude(age__lt=18).order_by("name")</code>. They don&rsquo;t hit the database until evaluated, letting you compose queries across multiple functions before execution.</p>
+            <p><strong>Protocol Buffers:</strong> Google&rsquo;s protobuf uses builders in Java/C++ &mdash; <code>Person.newBuilder().setName("Alice").setAge(30).build()</code>. The builder validates that required fields are set and produces an immutable protobuf message. In Python, protobuf uses direct assignment but the principle is the same.</p>
+            <p><strong>StringBuilder / StringBuffer:</strong> Java&rsquo;s <code>StringBuilder</code> is a classic builder &mdash; appending strings one at a time is more efficient than concatenation and produces the final string with <code>.toString()</code>. Python&rsquo;s equivalent is joining a list: <code>"".join(parts)</code>.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Builder separates object construction from representation &mdash; build complex objects step by step</li>
+                <li>Method chaining (fluent interface) makes code self-documenting: each step reads like English</li>
+                <li>The Director encapsulates common build sequences &mdash; clients don&rsquo;t need to know every step</li>
+                <li>Builder naturally produces immutable objects &mdash; all mutation happens during building, then freezes</li>
+                <li>Solves the telescoping constructor problem &mdash; no more constructors with 10+ positional arguments</li>
+                <li>Validation happens at <code>build()</code> time &mdash; you can check all invariants before creating the object</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of Builder as an <strong>order form</strong>. You fill in fields one at a time, in any order. When you&rsquo;re done, you submit the form (call <code>.build()</code>) and get back a finished product. The form validates everything before processing &mdash; if required fields are missing, it rejects the submission.</p>
+            <div class="model-visual">
+                <pre>
+  BUILDER PATTERN FLOW:
+  ══════════════════════════════════════════════════════
+
+  Client code (step-by-step construction):
+
+  builder = QueryBuilder()       ← Create blank builder
+      │
+      ├── .table("users")        ← Set required field
+      ├── .select("id", "name")  ← Set optional field
+      ├── .where("age > ?", 18)  ← Add condition
+      ├── .order_by("name")      ← Set ordering
+      ├── .limit(20)             ← Set limit
+      │
+      └── .build()               ← Validate &amp; produce
+              │
+              ▼
+      ┌──────────────────┐
+      │   SQLQuery       │  ← Immutable product
+      │   (frozen)       │
+      └──────────────────┘
+
+
+  WITH DIRECTOR:
+  ══════════════════════════════════════════════════════
+
+  ┌──────────┐         ┌──────────┐        ┌─────────┐
+  │  Client  │ ──────▶ │ Director │ ─────▶ │ Builder │
+  │          │  "make  │          │  calls  │         │
+  │          │  me a   │  knows   │  steps  │  builds │
+  │          │  GET"   │  recipe  │  A→B→C  │  object │
+  └──────────┘         └──────────┘        └─────────┘
+                                                │
+                                                ▼
+                                        ┌──────────────┐
+                                        │   Product    │
+                                        └──────────────┘
+
+
+  BUILDER vs CONSTRUCTOR:
+  ══════════════════════════════════════════════════════
+
+  Constructor (telescoping):
+  ┌────────────────────────────────────────────────┐
+  │ Query("users", ["*"], "age>18", None, 20,      │
+  │       None, None, "name ASC", None)            │
+  │       ↑ What is each positional arg??          │
+  └────────────────────────────────────────────────┘
+
+  Builder (self-documenting):
+  ┌────────────────────────────────────────────────┐
+  │ QueryBuilder()                                 │
+  │   .table("users")      ← clearly the table    │
+  │   .where("age > 18")   ← clearly a filter     │
+  │   .limit(20)           ← clearly the limit    │
+  │   .order_by("name")    ← clearly the order    │
+  │   .build()                                     │
+  └────────────────────────────────────────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Forgetting to return self:</strong> If a builder method doesn&rsquo;t return <code>self</code>, the chain breaks and returns <code>None</code>. Every setter method must end with <code>return self</code> to enable fluent chaining. One missing return silently breaks the entire chain.</li>
+                <li><strong>No validation in build():</strong> Calling <code>build()</code> without checking required fields produces an invalid object. Always validate invariants &mdash; if <code>table</code> is required, raise a clear error in <code>build()</code> rather than producing a broken query that fails at runtime.</li>
+                <li><strong>Mutable builder reuse without reset:</strong> If you reuse a builder instance without resetting its state, the second object inherits leftover configuration from the first build. Either create a new builder for each product or call <code>reset()</code> after <code>build()</code>.</li>
+                <li><strong>Over-engineering simple objects:</strong> Using a Builder for a class with 2&ndash;3 parameters is unnecessary ceremony. A simple constructor or dataclass with defaults is clearer. Builder shines when you have 5+ optional parameters or complex construction logic.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a Pizza:</strong> Create a <code>PizzaBuilder</code> with methods for <code>size()</code>, <code>crust()</code>, <code>sauce()</code>, <code>add_topping()</code>, and <code>build()</code>. The <code>build()</code> method should validate that size and crust are set (required) while sauce and toppings are optional. Create a <code>PizzaDirector</code> with presets like <code>margherita()</code> and <code>pepperoni()</code>.</li>
+                <li><strong>Email Builder:</strong> Implement an <code>EmailBuilder</code> that constructs email messages with <code>to()</code>, <code>cc()</code>, <code>bcc()</code>, <code>subject()</code>, <code>body()</code>, <code>attach()</code>, and <code>build()</code>. Validate that &ldquo;to&rdquo; and &ldquo;subject&rdquo; are required. Support method chaining and produce a frozen dataclass as output.</li>
+                <li><strong>Immutable Config:</strong> Build a <code>ConfigBuilder</code> that reads from environment variables, .env files, and command-line args (in that priority order). Each <code>.from_env()</code>, <code>.from_file(path)</code>, <code>.from_args()</code> call layers on more config. The final <code>build()</code> merges all sources and returns a frozen config object.</li>
+                <li><strong>HTML Tag Builder:</strong> Create a builder that constructs HTML elements: <code>Tag("div").id("main").class_("container").attr("data-x", "1").child(Tag("p").text("Hello")).build()</code>. The <code>build()</code> method should return a properly nested HTML string. Support arbitrary nesting depth.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="51-factory-method.html" class="prev">&larr; Factory Method</a>
+            <a href="53-adapter.html" class="next">Adapter &rarr;</a>
+        </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

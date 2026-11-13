@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTP/3 and QUIC - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preconnect</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> HTTP/3 and QUIC
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>HTTP/3 and QUIC</h1>
+                <p class="subtitle">The internet's latest transport protocol — built on UDP instead of TCP, eliminating head-of-line blocking, enabling 0-RTT connections, and fundamentally changing how browsers load resources.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-concept">Networking</span>
+                    <span class="tag tag-browser">Protocol</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🚗 Daily-Life Analogy: Highway vs Railway</div>
+                <p><strong>TCP (HTTP/1, HTTP/2)</strong> is like a railway — packets must arrive in order on a single track. If one train derails (packet loss), everything behind it stops. <strong>QUIC (HTTP/3)</strong> is like a multi-lane highway — each stream is an independent lane. If one car breaks down in lane 3, lanes 1, 2, and 4 keep moving. Plus, QUIC has "0-RTT fast passes" — returning drivers (connections) can skip the toll booth (handshake) entirely.</p>
+            </div>
+
+            <h2>The Problem: TCP's Limitations</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Problem</th><th>TCP (HTTP/2)</th><th>QUIC (HTTP/3)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Head-of-line blocking</strong></td><td>One lost packet blocks ALL streams (TCP is ordered)</td><td>Each stream independent — loss only blocks that stream</td></tr>
+                    <tr><td><strong>Connection setup</strong></td><td>TCP handshake (1 RTT) + TLS handshake (1-2 RTT) = 2-3 RTT</td><td>Combined handshake = 1 RTT (or 0-RTT for repeat visits!)</td></tr>
+                    <tr><td><strong>Connection migration</strong></td><td>IP change (WiFi→cellular) = broken connection, full reconnect</td><td>Connection ID based — survives IP changes seamlessly</td></tr>
+                    <tr><td><strong>Middlebox ossification</strong></td><td>Firewalls/NATs interfere with TCP extensions</td><td>Encrypted transport (even headers!) — middleboxes can't interfere</td></tr>
+                </tbody>
+            </table>
+
+            <h2>How QUIC Works</h2>
+<pre><code><span class="token-comment">/*
+  QUIC connection establishment (first time):
+  
+  Client                              Server
+    |                                   |
+    |-------- Initial (crypto) -------->|  1 RTT total
+    |<------- Handshake (crypto) -------|  (TCP+TLS was 2-3 RTT)
+    |-------- Data -------->            |  Can send data immediately after handshake
+    
+  QUIC 0-RTT (returning visitor with cached session):
+  
+  Client                              Server
+    |                                   |
+    |-------- 0-RTT Data + crypto ----->|  0 RTT!
+    |<------- Response -----------------| 
+    
+  // 0-RTT means the VERY FIRST packet carries application data
+  // Saves 100-300ms on typical mobile connections
+  // ⚠️ 0-RTT data is replayable (not safe for non-idempotent requests)
+*/</span>
+</code></pre>
+
+            <h3>Stream Multiplexing Without HOL Blocking</h3>
+<pre><code><span class="token-comment">/*
+  HTTP/2 over TCP (head-of-line blocking):
+  
+  Stream 1: [packet 1] [packet 2] [LOST!] [packet 4]
+  Stream 2: [packet A] [packet B] ... BLOCKED waiting for stream 1's packet 3!
+  Stream 3: [packet X] ... also BLOCKED!
+  
+  TCP ensures ordering across ALL data on the connection.
+  One lost packet from ANY stream blocks ALL streams.
+  
+  HTTP/3 over QUIC (independent streams):
+  
+  Stream 1: [packet 1] [packet 2] [LOST!] → only stream 1 pauses for retransmit
+  Stream 2: [packet A] [packet B] [packet C] → keeps flowing! ✅
+  Stream 3: [packet X] [packet Y] → keeps flowing! ✅
+  
+  QUIC provides ordering WITHIN a stream but NOT across streams.
+  Lost packet only affects its own stream.
+*/</span>
+</code></pre>
+
+            <h2>What Frontend Developers Should Know</h2>
+<pre><code><span class="token-comment">// How to check if your site uses HTTP/3:</span>
+<span class="token-comment">// DevTools → Network → Protocol column → shows "h3" for HTTP/3</span>
+<span class="token-comment">// Response header: alt-svc: h3=":443"; ma=86400</span>
+
+<span class="token-comment">// Server advertises HTTP/3 support via Alt-Svc header:</span>
+<span class="token-comment">// alt-svc: h3=":443"; ma=86400</span>
+<span class="token-comment">// Browser then upgrades subsequent connections to QUIC/HTTP3</span>
+
+<span class="token-comment">// As a frontend dev, HTTP/3 is mostly transparent — same fetch() API</span>
+<span class="token-comment">// But it changes performance characteristics:</span>
+<span class="token-comment">// - More parallel requests are now truly parallel (no HOL blocking)</span>
+<span class="token-comment">// - Domain sharding is now HARMFUL (was a hack for HTTP/1 limits)</span>
+<span class="token-comment">// - Connection coalescing: one QUIC connection for multiple origins</span>
+<span class="token-comment">// - Faster on lossy networks (mobile, WiFi): no TCP retransmit stalls</span>
+</code></pre>
+
+            <h2>Performance Impact</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Scenario</th><th>HTTP/2 (TCP)</th><th>HTTP/3 (QUIC)</th><th>Improvement</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>First connection (cold)</td><td>2-3 RTT before data</td><td>1 RTT before data</td><td>100-200ms saved</td></tr>
+                    <tr><td>Returning visitor (warm)</td><td>1 RTT (TLS session resume)</td><td>0 RTT (immediate data)</td><td>50-150ms saved</td></tr>
+                    <tr><td>2% packet loss</td><td>~35% throughput reduction</td><td>~5% throughput reduction</td><td>7x better on lossy networks</td></tr>
+                    <tr><td>WiFi→4G switch</td><td>Connection dies, full reconnect</td><td>Seamless migration</td><td>Eliminates reconnection delay</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Google (all services)</strong> — Gmail, YouTube, Search all use QUIC. Google originated QUIC and it handles ~30% of global internet traffic.</li>
+                <li><strong>Cloudflare</strong> — HTTP/3 enabled by default on all proxied domains. Over 25% of Cloudflare requests now use HTTP/3.</li>
+                <li><strong>Facebook/Meta</strong> — Uses QUIC for mobile app traffic where connection instability is common (cellular networks).</li>
+                <li><strong>Akamai, Fastly</strong> — Major CDNs support HTTP/3, automatically serving it to capable browsers.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Domain sharding with HTTP/3</strong> — An old HTTP/1 trick to get more parallel connections. With HTTP/3's multiplexing, it HURTS (prevents connection reuse, wastes 0-RTT benefits).</li>
+                <li><strong>Assuming HTTP/3 is always faster</strong> — On perfect low-latency networks, the difference is minimal. HTTP/3 shines on lossy, high-latency connections (mobile).</li>
+                <li><strong>Not checking server/CDN support</strong> — HTTP/3 requires server support. Not all hosting providers support it. Check your <code>alt-svc</code> headers.</li>
+                <li><strong>UDP blocking by firewalls</strong> — Some corporate firewalls block UDP (which QUIC uses). Browsers fall back to HTTP/2 automatically, but it's worth knowing.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand HTTP/3 and QUIC When...</h3>
+                <p>You can explain why HTTP/2 over TCP suffers from head-of-line blocking despite stream multiplexing (TCP doesn't know about HTTP streams — it just sees one ordered byte stream), and how QUIC solves this by implementing streams at the transport layer.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Open a site served over HTTP/3 (e.g., google.com) in Chrome DevTools. In the Network tab, enable the Protocol column. Identify which requests use h3. Then simulate 5% packet loss (via Network throttling) and compare page load times between a HTTP/2 site and a HTTP/3 site.</p>
+                <h3>🔗 Connect It</h3>
+                <p>HTTP/3 connects to: <strong>Priority Hints</strong> (QUIC has its own prioritization), <strong>Preload/Prefetch/Preconnect</strong> (preconnect now establishes QUIC connections), and <strong>ETag vs Cache-Control</strong> (caching works identically over HTTP/3, but conditional requests are faster due to 0-RTT).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="44-etag-vs-cache-control.html" class="nav-btn nav-btn-prev">← ETag vs Cache-Control</a>
+                <a href="46-priority-hints.html" class="nav-btn nav-btn-next">Priority Hints →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

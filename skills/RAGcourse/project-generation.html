@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone: Generation & Safety - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/16 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Capstone: Generation &amp; Safety
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>P5: Generation & Safety</h1>
+                <p class="subtitle">Constrained generation with GPT-4o, citation extraction, NLI-based hallucination detection (DeBERTa-v3), confidence decisions, and a 5-level fallback engine.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-code">Full Code</span>
+                    <span class="tag tag-safety">Zero Hallucination</span>
+                </div>
+            </div>
+
+            <!-- ===== SYSTEM PROMPT ===== -->
+            <h2>1. Constrained Generation System Prompt</h2>
+            <p>The system prompt is the first line of defense against hallucination. Every constraint must be explicit.</p>
+
+<pre><code><span class="token-comment"># src/generation/prompts.py</span>
+
+SYSTEM_PROMPT = <span class="token-string">"""You are an enterprise knowledge assistant. You answer questions
+ONLY using the provided context documents. You MUST follow these rules:
+
+RULES:
+1. ONLY use information from the numbered context documents below.
+2. CITE every claim with [1], [2], etc. matching the context number.
+3. If the context does NOT contain enough information to answer, say:
+   "I don't have sufficient information to answer this question."
+4. NEVER invent facts, statistics, dates, or names not in the context.
+5. If sources CONFLICT, state both positions with citations.
+6. For numerical data, quote the EXACT numbers from the source.
+7. Distinguish between facts and opinions when sources express opinions.
+
+RESPONSE FORMAT:
+- Start with a direct answer (1-2 sentences)
+- Follow with detailed explanation citing sources
+- End with confidence indicator: [HIGH/MEDIUM/LOW confidence]
+
+CONTEXT DOCUMENTS:
+{context}
+
+USER QUESTION: {question}"""</span>
+
+CONTEXT_TEMPLATE = <span class="token-string">"""[{index}] Source: {source_type} | {title}
+Confidence: {confidence:.0%}
+Content: {content}
+---"""</span></code></pre>
+
+            <!-- ===== GENERATION ENGINE ===== -->
+            <h2>2. Generation Engine (GPT-4o with Structured Output)</h2>
+
+<pre><code><span class="token-comment"># src/generation/engine.py</span>
+
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">from</span> pydantic <span class="token-keyword">import</span> BaseModel, Field
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Optional
+<span class="token-keyword">from</span> enum <span class="token-keyword">import</span> Enum
+<span class="token-keyword">from</span> src.config <span class="token-keyword">import</span> settings
+<span class="token-keyword">from</span> .prompts <span class="token-keyword">import</span> SYSTEM_PROMPT, CONTEXT_TEMPLATE
+
+<span class="token-keyword">class</span> <span class="token-class">ConfidenceLevel</span>(Enum):
+    HIGH = <span class="token-string">"high"</span>
+    MEDIUM = <span class="token-string">"medium"</span>
+    LOW = <span class="token-string">"low"</span>
+    INSUFFICIENT = <span class="token-string">"insufficient"</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Citation</span>(BaseModel):
+    <span class="token-string">"""A citation linking a claim to a source document."""</span>
+    source_index: <span class="token-builtin">int</span>          <span class="token-comment"># Which context document [1], [2], etc.</span>
+    claim: <span class="token-builtin">str</span>                 <span class="token-comment"># The specific claim being cited</span>
+    quote: Optional[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>  <span class="token-comment"># Exact quote from source (for verification)</span>
+
+<span class="token-keyword">class</span> <span class="token-class">GeneratedResponse</span>(BaseModel):
+    <span class="token-string">"""Structured output from the generation engine."""</span>
+    answer: <span class="token-builtin">str</span>
+    citations: List[Citation]
+    confidence: ConfidenceLevel
+    reasoning: <span class="token-builtin">str</span> = <span class="token-string">""</span>       <span class="token-comment"># Why this confidence level</span>
+    sources_used: List[<span class="token-builtin">int</span>] = Field(default_factory=<span class="token-builtin">list</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">GenerationEngine</span>:
+    <span class="token-string">"""
+    Generate answers using GPT-4o with structured output.
+    Forces the model to produce citations and confidence levels.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.client = OpenAI(api_key=settings.openai_api_key)
+        self.model = settings.generation_model  <span class="token-comment"># "gpt-4o"</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">generate</span>(self, query: <span class="token-builtin">str</span>, scored_chunks: List[dict]) -> GeneratedResponse:
+        <span class="token-string">"""
+        Generate a response with citations.
+        
+        Args:
+            query: User's question
+            scored_chunks: Output from retrieval (chunks + confidence scores)
+        """</span>
+        <span class="token-comment"># Format context documents with numbers</span>
+        context = self._format_context(scored_chunks)
+        
+        <span class="token-comment"># Build the prompt</span>
+        system = SYSTEM_PROMPT.format(context=context, question=query)
+        
+        <span class="token-comment"># Call GPT-4o with structured output</span>
+        response = self.client.beta.chat.completions.parse(
+            model=self.model,
+            messages=[
+                {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system},
+                {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: query}
+            ],
+            response_format=GeneratedResponse,
+            temperature=<span class="token-number">0.1</span>,  <span class="token-comment"># Low temp for factual accuracy</span>
+            max_tokens=<span class="token-number">2000</span>
+        )
+        
+        <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.parsed
+    
+    <span class="token-keyword">def</span> <span class="token-function">_format_context</span>(self, scored_chunks: List[dict]) -> <span class="token-builtin">str</span>:
+        <span class="token-string">"""Format scored chunks into numbered context documents."""</span>
+        parts = []
+        <span class="token-keyword">for</span> i, item <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(scored_chunks, <span class="token-number">1</span>):
+            chunk = item[<span class="token-string">"chunk"</span>]
+            confidence = item[<span class="token-string">"confidence"</span>]
+            
+            formatted = CONTEXT_TEMPLATE.format(
+                index=i,
+                source_type=chunk.source_type,
+                title=chunk.metadata.get(<span class="token-string">"title"</span>, <span class="token-string">"Unknown"</span>),
+                confidence=confidence.overall,
+                content=chunk.content[:<span class="token-number">2000</span>]  <span class="token-comment"># Truncate very long chunks</span>
+            )
+            parts.append(formatted)
+        
+        <span class="token-keyword">return</span> <span class="token-string">"\n"</span>.join(parts)</code></pre>
+
+            <!-- ===== HALLUCINATION DETECTOR ===== -->
+            <h2>3. Hallucination Detector (NLI with DeBERTa-v3)</h2>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Why NLI for Hallucination Detection?</div>
+                <p>Natural Language Inference (NLI) determines if a claim is ENTAILED by, CONTRADICTS, or is NEUTRAL to a premise. We use each citation claim as hypothesis and the source text as premise. If NLI says "contradiction" or "neutral" → hallucination detected.</p>
+            </div>
+
+<pre><code><span class="token-comment"># src/generation/hallucination_detector.py</span>
+
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> pipeline
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Tuple
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">HallucinationResult</span>:
+    claim: <span class="token-builtin">str</span>
+    source_text: <span class="token-builtin">str</span>
+    verdict: <span class="token-builtin">str</span>          <span class="token-comment"># "entailment", "contradiction", "neutral"</span>
+    confidence: <span class="token-builtin">float</span>
+    is_hallucination: <span class="token-builtin">bool</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HallucinationDetector</span>:
+    <span class="token-string">"""
+    Detect hallucinations by verifying each citation against its source.
+    
+    Uses DeBERTa-v3-large-mnli:
+    - SOTA on NLI benchmarks
+    - Runs locally (no API cost)
+    - ~50ms per claim (GPU) / ~200ms (CPU)
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.nli = pipeline(
+            <span class="token-string">"zero-shot-classification"</span>,
+            model=<span class="token-string">"microsoft/deberta-v3-large-mnli"</span>,
+            device=<span class="token-number">0</span>  <span class="token-comment"># GPU</span>
+        )
+        self.entailment_threshold = <span class="token-number">0.7</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">verify_response</span>(
+        self,
+        response,
+        scored_chunks: List[dict]
+    ) -> Tuple[<span class="token-builtin">bool</span>, List[HallucinationResult]]:
+        <span class="token-string">"""
+        Verify all citations in a response.
+        
+        Returns:
+            (is_safe, results) — is_safe=True if no hallucinations detected
+        """</span>
+        results = []
+        
+        <span class="token-keyword">for</span> citation <span class="token-keyword">in</span> response.citations:
+            <span class="token-comment"># Get the source text this citation references</span>
+            <span class="token-keyword">if</span> citation.source_index > <span class="token-builtin">len</span>(scored_chunks):
+                <span class="token-comment"># Citation references non-existent source!</span>
+                results.append(HallucinationResult(
+                    claim=citation.claim,
+                    source_text=<span class="token-string">""</span>,
+                    verdict=<span class="token-string">"contradiction"</span>,
+                    confidence=<span class="token-number">1.0</span>,
+                    is_hallucination=<span class="token-keyword">True</span>
+                ))
+                <span class="token-keyword">continue</span>
+            
+            source = scored_chunks[citation.source_index - <span class="token-number">1</span>]
+            source_text = source[<span class="token-string">"chunk"</span>].content
+            
+            <span class="token-comment"># Run NLI: premise=source, hypothesis=claim</span>
+            result = self._check_entailment(source_text, citation.claim)
+            results.append(result)
+        
+        <span class="token-comment"># Response is safe if no hallucinations found</span>
+        is_safe = <span class="token-keyword">not</span> <span class="token-builtin">any</span>(r.is_hallucination <span class="token-keyword">for</span> r <span class="token-keyword">in</span> results)
+        <span class="token-keyword">return</span> is_safe, results
+    
+    <span class="token-keyword">def</span> <span class="token-function">_check_entailment</span>(self, premise: <span class="token-builtin">str</span>, hypothesis: <span class="token-builtin">str</span>) -> HallucinationResult:
+        <span class="token-string">"""
+        Check if the premise (source text) entails the hypothesis (claim).
+        """</span>
+        <span class="token-comment"># Truncate premise to model max length</span>
+        premise_truncated = premise[:<span class="token-number">1500</span>]
+        
+        result = self.nli(
+            premise_truncated,
+            candidate_labels=[<span class="token-string">"entailment"</span>, <span class="token-string">"contradiction"</span>, <span class="token-string">"neutral"</span>],
+            hypothesis=hypothesis,
+            multi_label=<span class="token-keyword">False</span>
+        )
+        
+        <span class="token-comment"># Get scores for each label</span>
+        label_scores = <span class="token-builtin">dict</span>(<span class="token-builtin">zip</span>(result[<span class="token-string">"labels"</span>], result[<span class="token-string">"scores"</span>]))
+        
+        entailment_score = label_scores.get(<span class="token-string">"entailment"</span>, <span class="token-number">0</span>)
+        contradiction_score = label_scores.get(<span class="token-string">"contradiction"</span>, <span class="token-number">0</span>)
+        
+        <span class="token-comment"># Determine verdict</span>
+        <span class="token-keyword">if</span> entailment_score >= self.entailment_threshold:
+            verdict = <span class="token-string">"entailment"</span>
+            is_hallucination = <span class="token-keyword">False</span>
+        <span class="token-keyword">elif</span> contradiction_score > <span class="token-number">0.5</span>:
+            verdict = <span class="token-string">"contradiction"</span>
+            is_hallucination = <span class="token-keyword">True</span>
+        <span class="token-keyword">else</span>:
+            verdict = <span class="token-string">"neutral"</span>
+            <span class="token-comment"># Neutral = claim might not be supported by source</span>
+            is_hallucination = entailment_score < <span class="token-number">0.4</span>
+        
+        <span class="token-keyword">return</span> HallucinationResult(
+            claim=hypothesis,
+            source_text=premise_truncated[:<span class="token-number">200</span>] + <span class="token-string">"..."</span>,
+            verdict=verdict,
+            confidence=max(entailment_score, contradiction_score),
+            is_hallucination=is_hallucination
+        )</code></pre>
+
+            <!-- ===== FALLBACK ENGINE ===== -->
+            <h2>4. Fallback Decision Engine</h2>
+
+<pre><code><span class="token-comment"># src/generation/fallback.py</span>
+
+<span class="token-keyword">from</span> enum <span class="token-keyword">import</span> Enum
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+
+<span class="token-keyword">class</span> <span class="token-class">ResponseDecision</span>(Enum):
+    <span class="token-string">"""Five-level response decision."""</span>
+    ANSWER = <span class="token-string">"answer"</span>         <span class="token-comment"># Full confident answer</span>
+    CAVEAT = <span class="token-string">"caveat"</span>         <span class="token-comment"># Answer with uncertainty warning</span>
+    PARTIAL = <span class="token-string">"partial"</span>       <span class="token-comment"># Partial answer + what's missing</span>
+    REFUSE = <span class="token-string">"refuse"</span>         <span class="token-comment"># Cannot answer, explain why</span>
+    ESCALATE = <span class="token-string">"escalate"</span>     <span class="token-comment"># Hand off to human expert</span>
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">FallbackResult</span>:
+    decision: ResponseDecision
+    response: <span class="token-builtin">str</span>
+    reasoning: <span class="token-builtin">str</span>
+    hallucinations_found: <span class="token-builtin">int</span> = <span class="token-number">0</span>
+    confidence_score: <span class="token-builtin">float</span> = <span class="token-number">0.0</span>
+
+<span class="token-keyword">class</span> <span class="token-class">FallbackEngine</span>:
+    <span class="token-string">"""
+    Decides what to do based on:
+    - Retrieval confidence (avg score from retrieval stage)
+    - Hallucination check results
+    - Generation confidence level
+    
+    Decision tree:
+    ┌─ High confidence + No hallucinations → ANSWER
+    ├─ Medium confidence + No hallucinations → CAVEAT
+    ├─ Low confidence + Partial info → PARTIAL
+    ├─ Hallucination detected → REFUSE (regenerate or refuse)
+    └─ No relevant info / contradictions → ESCALATE
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">decide</span>(
+        self,
+        retrieval_result,
+        generation_response,
+        hallucination_results: List
+    ) -> FallbackResult:
+        
+        hallucinations = [r <span class="token-keyword">for</span> r <span class="token-keyword">in</span> hallucination_results <span class="token-keyword">if</span> r.is_hallucination]
+        avg_confidence = retrieval_result.avg_confidence
+        
+        <span class="token-comment"># Case 1: Hallucinations detected → REFUSE</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(hallucinations) > <span class="token-number">0</span>:
+            <span class="token-keyword">return</span> FallbackResult(
+                decision=ResponseDecision.REFUSE,
+                response=self._build_refuse_response(hallucinations),
+                reasoning=<span class="token-string">f"Detected {len(hallucinations)} unsupported claims"</span>,
+                hallucinations_found=<span class="token-builtin">len</span>(hallucinations),
+                confidence_score=avg_confidence
+            )
+        
+        <span class="token-comment"># Case 2: No evidence found → ESCALATE</span>
+        <span class="token-keyword">if not</span> retrieval_result.has_sufficient_evidence:
+            <span class="token-keyword">return</span> FallbackResult(
+                decision=ResponseDecision.ESCALATE,
+                response=<span class="token-string">"I don't have sufficient information in our knowledge base to answer this question. Let me connect you with a subject matter expert."</span>,
+                reasoning=<span class="token-string">"Insufficient evidence in retrieval results"</span>,
+                confidence_score=avg_confidence
+            )
+        
+        <span class="token-comment"># Case 3: High confidence → ANSWER</span>
+        <span class="token-keyword">if</span> avg_confidence >= <span class="token-number">0.75</span> <span class="token-keyword">and</span> generation_response.confidence.value == <span class="token-string">"high"</span>:
+            <span class="token-keyword">return</span> FallbackResult(
+                decision=ResponseDecision.ANSWER,
+                response=generation_response.answer,
+                reasoning=<span class="token-string">"High confidence from both retrieval and generation"</span>,
+                confidence_score=avg_confidence
+            )
+        
+        <span class="token-comment"># Case 4: Medium confidence → CAVEAT</span>
+        <span class="token-keyword">if</span> avg_confidence >= <span class="token-number">0.5</span>:
+            caveat = <span class="token-string">f"{generation_response.answer}\n\n⚠️ Note: This answer is based on sources with moderate confidence. Please verify critical details."</span>
+            <span class="token-keyword">return</span> FallbackResult(
+                decision=ResponseDecision.CAVEAT,
+                response=caveat,
+                reasoning=<span class="token-string">"Moderate confidence — adding uncertainty caveat"</span>,
+                confidence_score=avg_confidence
+            )
+        
+        <span class="token-comment"># Case 5: Low confidence → PARTIAL</span>
+        <span class="token-keyword">return</span> FallbackResult(
+            decision=ResponseDecision.PARTIAL,
+            response=self._build_partial_response(generation_response),
+            reasoning=<span class="token-string">"Low confidence — providing partial answer with gaps"</span>,
+            confidence_score=avg_confidence
+        )
+    
+    <span class="token-keyword">def</span> <span class="token-function">_build_refuse_response</span>(self, hallucinations: List) -> <span class="token-builtin">str</span>:
+        <span class="token-string">"""Build a refusal response explaining what went wrong."""</span>
+        <span class="token-keyword">return</span> (
+            <span class="token-string">"I cannot provide a reliable answer to this question. "</span>
+            <span class="token-string">"Some of the information I found could not be verified against "</span>
+            <span class="token-string">"the source documents. Please consult the original sources directly."</span>
+        )
+    
+    <span class="token-keyword">def</span> <span class="token-function">_build_partial_response</span>(self, response) -> <span class="token-builtin">str</span>:
+        <span class="token-string">"""Build a partial response indicating gaps."""</span>
+        <span class="token-keyword">return</span> (
+            <span class="token-string">f"Based on limited information available:\n\n"</span>
+            <span class="token-string">f"{response.answer}\n\n"</span>
+            <span class="token-string">f"⚠️ This answer may be incomplete. The sources available had low "</span>
+            <span class="token-string">f"confidence scores and may not fully address your question."</span>
+        )</code></pre>
+
+            <!-- ===== RESPONSE FORMATTER ===== -->
+            <h2>5. Response Formatter (Citations & Metadata)</h2>
+
+<pre><code><span class="token-comment"># src/generation/formatter.py</span>
+
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> .fallback <span class="token-keyword">import</span> FallbackResult, ResponseDecision
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">FormattedResponse</span>:
+    <span class="token-string">"""Final response ready for the API layer."""</span>
+    answer: <span class="token-builtin">str</span>
+    citations: List[Dict]
+    confidence: <span class="token-builtin">float</span>
+    decision: <span class="token-builtin">str</span>
+    sources: List[Dict]
+    trace_id: <span class="token-builtin">str</span> = <span class="token-string">""</span>
+
+<span class="token-keyword">class</span> <span class="token-class">ResponseFormatter</span>:
+    <span class="token-string">"""
+    Format the final response with:
+    - Clean answer text
+    - Numbered citations with source links
+    - Confidence indicator
+    - Source metadata for transparency
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">format</span>(
+        self,
+        fallback_result: FallbackResult,
+        generation_response,
+        scored_chunks: List[dict],
+        trace_id: <span class="token-builtin">str</span> = <span class="token-string">""</span>
+    ) -> FormattedResponse:
+        
+        <span class="token-comment"># Build citation list</span>
+        citations = []
+        <span class="token-keyword">if</span> generation_response <span class="token-keyword">and</span> hasattr(generation_response, <span class="token-string">'citations'</span>):
+            <span class="token-keyword">for</span> cit <span class="token-keyword">in</span> generation_response.citations:
+                <span class="token-keyword">if</span> cit.source_index <= <span class="token-builtin">len</span>(scored_chunks):
+                    source = scored_chunks[cit.source_index - <span class="token-number">1</span>]
+                    citations.append({
+                        <span class="token-string">"index"</span>: cit.source_index,
+                        <span class="token-string">"claim"</span>: cit.claim,
+                        <span class="token-string">"source_title"</span>: source[<span class="token-string">"chunk"</span>].metadata.get(<span class="token-string">"title"</span>, <span class="token-string">""</span>),
+                        <span class="token-string">"source_type"</span>: source[<span class="token-string">"chunk"</span>].source_type,
+                        <span class="token-string">"confidence"</span>: source[<span class="token-string">"confidence"</span>].overall
+                    })
+        
+        <span class="token-comment"># Build source list</span>
+        sources = []
+        <span class="token-keyword">for</span> i, item <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(scored_chunks, <span class="token-number">1</span>):
+            sources.append({
+                <span class="token-string">"index"</span>: i,
+                <span class="token-string">"title"</span>: item[<span class="token-string">"chunk"</span>].metadata.get(<span class="token-string">"title"</span>, <span class="token-string">"Unknown"</span>),
+                <span class="token-string">"type"</span>: item[<span class="token-string">"chunk"</span>].source_type,
+                <span class="token-string">"confidence"</span>: item[<span class="token-string">"confidence"</span>].overall,
+                <span class="token-string">"path"</span>: item[<span class="token-string">"chunk"</span>].metadata.get(<span class="token-string">"source"</span>, <span class="token-string">""</span>)
+            })
+        
+        <span class="token-keyword">return</span> FormattedResponse(
+            answer=fallback_result.response,
+            citations=citations,
+            confidence=fallback_result.confidence_score,
+            decision=fallback_result.decision.value,
+            sources=sources,
+            trace_id=trace_id
+        )</code></pre>
+
+            <!-- ===== FULL PIPELINE ===== -->
+            <h2>6. Complete RAG Generation Pipeline</h2>
+
+<pre><code><span class="token-comment"># src/generation/rag_pipeline.py</span>
+
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional, List
+<span class="token-keyword">import</span> uuid
+<span class="token-keyword">from</span> src.retrieval.retriever <span class="token-keyword">import</span> HybridRetriever
+<span class="token-keyword">from</span> .engine <span class="token-keyword">import</span> GenerationEngine
+<span class="token-keyword">from</span> .hallucination_detector <span class="token-keyword">import</span> HallucinationDetector
+<span class="token-keyword">from</span> .fallback <span class="token-keyword">import</span> FallbackEngine, ResponseDecision
+<span class="token-keyword">from</span> .formatter <span class="token-keyword">import</span> ResponseFormatter, FormattedResponse
+
+<span class="token-keyword">class</span> <span class="token-class">RAGPipeline</span>:
+    <span class="token-string">"""
+    End-to-end RAG pipeline: Query → Retrieve → Generate → Verify → Respond.
+    
+    This is the core orchestrator that chains all stages together.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.retriever = HybridRetriever()
+        self.generator = GenerationEngine()
+        self.hallucination_detector = HallucinationDetector()
+        self.fallback = FallbackEngine()
+        self.formatter = ResponseFormatter()
+    
+    <span class="token-keyword">def</span> <span class="token-function">query</span>(
+        self,
+        question: <span class="token-builtin">str</span>,
+        conversation: Optional[List] = <span class="token-keyword">None</span>,
+        source_filter: Optional[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>,
+        max_retries: <span class="token-builtin">int</span> = <span class="token-number">1</span>
+    ) -> FormattedResponse:
+        <span class="token-string">"""
+        Execute the full RAG pipeline.
+        
+        Flow:
+        1. Retrieve relevant chunks (hybrid search + rerank)
+        2. Generate answer with citations (GPT-4o structured output)
+        3. Verify citations against sources (NLI hallucination check)
+        4. Decide response level (ANSWER/CAVEAT/PARTIAL/REFUSE/ESCALATE)
+        5. Format final response with sources
+        
+        Args:
+            question: User's question
+            conversation: Previous conversation turns
+            source_filter: Optional filter (e.g., "pdf", "code")
+            max_retries: Retries on hallucination detection
+        """</span>
+        trace_id = <span class="token-builtin">str</span>(uuid.uuid4())
+        
+        <span class="token-comment"># ===== STAGE 1: RETRIEVE =====</span>
+        retrieval_result = self.retriever.retrieve(
+            query=question,
+            conversation=conversation,
+            source_filter=source_filter
+        )
+        
+        <span class="token-comment"># Early exit: no evidence</span>
+        <span class="token-keyword">if not</span> retrieval_result.has_sufficient_evidence:
+            <span class="token-keyword">from</span> .fallback <span class="token-keyword">import</span> FallbackResult
+            result = FallbackResult(
+                decision=ResponseDecision.ESCALATE,
+                response=<span class="token-string">"I don't have sufficient information in our knowledge base to answer this. Let me connect you with an expert."</span>,
+                reasoning=<span class="token-string">"No sufficient evidence"</span>,
+                confidence_score=retrieval_result.avg_confidence
+            )
+            <span class="token-keyword">return</span> self.formatter.format(result, <span class="token-keyword">None</span>, [], trace_id)
+        
+        <span class="token-comment"># ===== STAGE 2: GENERATE =====</span>
+        generation_response = self.generator.generate(
+            query=question,
+            scored_chunks=retrieval_result.chunks
+        )
+        
+        <span class="token-comment"># ===== STAGE 3: VERIFY (Hallucination Detection) =====</span>
+        is_safe, hallucination_results = self.hallucination_detector.verify_response(
+            response=generation_response,
+            scored_chunks=retrieval_result.chunks
+        )
+        
+        <span class="token-comment"># Retry once if hallucination detected</span>
+        <span class="token-keyword">if not</span> is_safe <span class="token-keyword">and</span> max_retries > <span class="token-number">0</span>:
+            <span class="token-comment"># Regenerate with stricter prompt</span>
+            generation_response = self.generator.generate(
+                query=question + <span class="token-string">" (Be extra careful to only cite verified facts)"</span>,
+                scored_chunks=retrieval_result.chunks
+            )
+            is_safe, hallucination_results = self.hallucination_detector.verify_response(
+                response=generation_response,
+                scored_chunks=retrieval_result.chunks
+            )
+        
+        <span class="token-comment"># ===== STAGE 4: DECIDE =====</span>
+        fallback_result = self.fallback.decide(
+            retrieval_result=retrieval_result,
+            generation_response=generation_response,
+            hallucination_results=hallucination_results
+        )
+        
+        <span class="token-comment"># ===== STAGE 5: FORMAT =====</span>
+        <span class="token-keyword">return</span> self.formatter.format(
+            fallback_result=fallback_result,
+            generation_response=generation_response,
+            scored_chunks=retrieval_result.chunks,
+            trace_id=trace_id
+        )</code></pre>
+
+            <!-- ===== PIPELINE DIAGRAM ===== -->
+            <div class="callout callout-info">
+                <div class="callout-title">🔄 Complete Pipeline Flow</div>
+<pre style="background: transparent; border: none; padding: 0; margin: 0;">
+User Query
+    │
+    ▼
+┌─────────────────┐
+│ Query Rewriting │ ← Conversation history
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Hybrid Search   │ ← Qdrant (vector) + ES (BM25)
+│ + RRF Fusion    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Cohere Rerank   │ ← Cross-encoder re-scoring
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Confidence      │ ← Freshness, Authority, Consistency
+│ Scoring         │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ GPT-4o Generate │ ← Structured output with citations
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ DeBERTa NLI     │ ← Verify each citation
+│ Hallucination   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Fallback        │ ← ANSWER / CAVEAT / PARTIAL / REFUSE / ESCALATE
+│ Decision        │
+└────────┬────────┘
+         │
+         ▼
+    Final Response
+    (with citations + confidence)
+</pre>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="project-retrieval.html" class="prev">Retrieval Engine</a>
+                <a href="project-deployment.html" class="next">Deployment & Ops</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

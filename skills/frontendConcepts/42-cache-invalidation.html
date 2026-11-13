@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Invalidation Strategies - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Cache Invalidation Strategies
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Cache Invalidation Strategies</h1>
+                <p class="subtitle">"There are only two hard things in Computer Science: cache invalidation and naming things." — Phil Karlton. How to ensure users get fresh content while maximizing cache hit rates.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Performance</span>
+                    <span class="tag tag-browser">Caching</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📰 Daily-Life Analogy: Newspaper Delivery</div>
+                <p>Caching is keeping yesterday's newspaper on your desk (fast access). <strong>Invalidation</strong> is knowing when to throw it away and get today's edition. Too aggressive = you're reading stale news. Too conservative = you walk to the newsstand every time (slow). The art is knowing exactly when your paper becomes stale.</p>
+            </div>
+
+            <h2>The Strategies</h2>
+
+            <h3>1. Content-Hash Filenames (Immutable Caching)</h3>
+<pre><code><span class="token-comment">/* The Gold Standard for Static Assets */</span>
+<span class="token-comment">/* File: app.a1b2c3d4.js (hash is in the filename) */</span>
+<span class="token-comment">/*</span>
+<span class="token-comment"> * Strategy:</span>
+<span class="token-comment"> * - File content changes → hash changes → new filename → new URL</span>
+<span class="token-comment"> * - Old file is never "invalidated" — it's just abandoned</span>
+<span class="token-comment"> * - Cache forever: Cache-Control: public, max-age=31536000, immutable</span>
+<span class="token-comment"> * - HTML file (entry point) is NEVER cached long (it references the hashed URLs)</span>
+<span class="token-comment"> */</span>
+
+<span class="token-comment">// Webpack/Vite output:</span>
+<span class="token-comment">// index.html → Cache-Control: no-cache (always revalidate)</span>
+<span class="token-comment">//   &lt;script src="/assets/app.a1b2c3d4.js"&gt; → Cache-Control: immutable, 1 year</span>
+<span class="token-comment">//   &lt;link href="/assets/style.e5f6g7h8.css"&gt; → Cache-Control: immutable, 1 year</span>
+
+<span class="token-comment">// On deploy: new hash = new URL = browser fetches fresh version</span>
+<span class="token-comment">// No invalidation needed — old URLs just stop being referenced</span>
+</code></pre>
+
+            <h3>2. Version Query Strings (Simpler But Weaker)</h3>
+<pre><code><span class="token-comment">&lt;!-- Less reliable than content hashing --&gt;</span>
+&lt;script src="/app.js?v=2.1.0"&gt;&lt;/script&gt;
+
+<span class="token-comment">&lt;!-- Problems:</span>
+<span class="token-comment">  - Some CDNs/proxies strip query strings from cache keys</span>
+<span class="token-comment">  - Must manually bump version on every change</span>
+<span class="token-comment">  - All assets bust simultaneously (even unchanged ones)</span>
+<span class="token-comment">--&gt;</span>
+</code></pre>
+
+            <h3>3. Time-Based Expiration (TTL)</h3>
+<pre><code><span class="token-comment">// Server sends: Cache-Control: max-age=3600 (1 hour)</span>
+<span class="token-comment">// Browser caches for 1 hour, then revalidates</span>
+<span class="token-comment">// Good for: API responses that change hourly, news feeds</span>
+<span class="token-comment">// Bad for: Critical real-time data, frequently deployed apps</span>
+
+<span class="token-comment">// The problem: during the 1-hour window, user gets stale data</span>
+<span class="token-comment">// Even after you deploy a fix, users are stuck for up to 1 hour</span>
+</code></pre>
+
+            <h3>4. Event-Driven Invalidation (Purge)</h3>
+<pre><code><span class="token-comment">// CDN purge on deploy (Cloudflare, Fastly, CloudFront)</span>
+<span class="token-comment">// When you deploy → API call to CDN → purge specific URLs → users get fresh content</span>
+
+<span class="token-comment">// Example: Fastly purge by surrogate key</span>
+<span class="token-comment">// curl -X POST https://api.fastly.com/service/{id}/purge/article-123</span>
+<span class="token-comment">// All cached responses tagged with "article-123" are instantly invalidated</span>
+
+<span class="token-comment">// Good for: CMS content, database-driven pages</span>
+<span class="token-comment">// Requires: CDN API integration in your deploy pipeline</span>
+</code></pre>
+
+            <h2>Strategy Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Strategy</th><th>Freshness</th><th>Cache Hit Rate</th><th>Complexity</th><th>Best For</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Content-hash filenames</td><td>Instant (on deploy)</td><td>Near 100%</td><td>Build tool config</td><td>JS, CSS, images</td></tr>
+                    <tr><td>stale-while-revalidate</td><td>Eventual (background)</td><td>~100% (always serves cache)</td><td>Low</td><td>API data, feeds</td></tr>
+                    <tr><td>ETag/Last-Modified</td><td>Instant (conditional request)</td><td>High (304 responses)</td><td>Low</td><td>HTML, API responses</td></tr>
+                    <tr><td>TTL (max-age)</td><td>Up to TTL delay</td><td>High during TTL</td><td>Minimal</td><td>Static content, CDN</td></tr>
+                    <tr><td>CDN purge</td><td>Instant (on purge)</td><td>High</td><td>High (API integration)</td><td>Dynamic content at scale</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Every modern bundler (Webpack, Vite, esbuild)</strong> — Content hashing is the default output strategy for production builds.</li>
+                <li><strong>Vercel / Netlify</strong> — Automatically applies immutable caching to hashed assets and no-cache to HTML pages.</li>
+                <li><strong>Cloudflare</strong> — Surrogate keys and instant purge APIs allow surgical cache invalidation without clearing everything.</li>
+                <li><strong>Next.js ISR (Incremental Static Regeneration)</strong> — Time-based revalidation at the page level with on-demand revalidation API.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Caching index.html with long max-age</strong> — If the HTML file is cached, users never discover the new hashed JS/CSS URLs. HTML must always revalidate.</li>
+                <li><strong>Using content hashing without splitting vendors</strong> — If app code and React are in one file, changing one line busts the entire 500KB cache. Split vendor chunks.</li>
+                <li><strong>Forgetting Service Worker's cache</strong> — Even after CDN purge, the SW's Cache Storage may still serve old content. SW must also update.</li>
+                <li><strong>Not accounting for CDN propagation delay</strong> — After purge, edge nodes may take 1-5 seconds to propagate. Users hitting un-purged edges get stale content briefly.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Cache Invalidation When...</h3>
+                <p>You can design a caching strategy where: hashed static assets are cached forever, HTML always revalidates, API data uses stale-while-revalidate, and you can force-update any user within seconds of a deploy — without cache-busting everything.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Set up a Vite project and deploy to a CDN. Verify: (1) JS/CSS files have content hashes and immutable headers, (2) index.html has no-cache, (3) changing one component only busts that chunk's hash, not all chunks. Bonus: add a Service Worker that respects the invalidation.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Cache Invalidation connects to: <strong>ETag vs Cache-Control</strong> (the HTTP mechanisms), <strong>Stale-While-Revalidate</strong> (a specific invalidation strategy), <strong>Service Worker Lifecycle</strong> (SW caches need their own invalidation), and <strong>Content Hashing/Chunking</strong> (the build tool side).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="41-service-worker-lifecycle.html" class="nav-btn nav-btn-prev">← Service Worker Lifecycle</a>
+                <a href="43-stale-while-revalidate.html" class="nav-btn nav-btn-next">Stale-While-Revalidate →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

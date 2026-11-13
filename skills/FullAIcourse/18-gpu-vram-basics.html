@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPU & VRAM — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 4</a> <span>›</span> GPU & VRAM</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>GPU & VRAM Basics</h1>
+                <p>Which GPU should you buy? How much VRAM do you actually need? Can you run a 70B model on your machine? This chapter gives you the formulas and real-world numbers to answer these questions.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>VRAM = your kitchen counter space.</strong> A bigger counter (more VRAM) lets you prepare more dishes at once. If your recipe needs 16 GB of counter space but you only have 8 GB, you can't cook that dish — no matter how good your stove (compute) is.</p>
+                <p><strong>GPU compute = your stove's BTUs.</strong> More compute power = faster cooking. But if the ingredients don't fit on the counter (VRAM), the stove doesn't matter.</p>
+                <p><strong>Multi-GPU = multiple kitchens.</strong> Split the meal prep across kitchens. Each kitchen needs to communicate (interconnect bandwidth), which adds overhead.</p>
+            </div>
+
+            <h2 id="gpu-landscape">The GPU Landscape (2024-2025)</h2>
+
+            <h3>Consumer GPUs:</h3>
+            <table>
+                <thead><tr><th>GPU</th><th>VRAM</th><th>Price (USD)</th><th>Good For</th></tr></thead>
+                <tbody>
+                    <tr><td>RTX 4060</td><td>8 GB</td><td>$300</td><td>7B quantized models only</td></tr>
+                    <tr><td>RTX 4070 Ti Super</td><td>16 GB</td><td>$800</td><td>7-8B FP16, 13B quantized</td></tr>
+                    <tr><td>RTX 4080 Super</td><td>16 GB</td><td>$1,000</td><td>Same as 4070Ti but faster compute</td></tr>
+                    <tr><td>RTX 4090</td><td>24 GB</td><td>$1,600</td><td>13B FP16, 70B Q4, fine-tuning 7B</td></tr>
+                    <tr><td>RTX 5090</td><td>32 GB</td><td>$2,000</td><td>Best consumer: 13B FP16 + room, 70B Q4</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Data Center GPUs:</h3>
+            <table>
+                <thead><tr><th>GPU</th><th>VRAM</th><th>Price (USD)</th><th>Good For</th></tr></thead>
+                <tbody>
+                    <tr><td>A100 40GB</td><td>40 GB</td><td>$10K (used)</td><td>Training 7-13B, serving 70B Q4</td></tr>
+                    <tr><td>A100 80GB</td><td>80 GB</td><td>$15K (used)</td><td>Training 13B, serving 70B FP16</td></tr>
+                    <tr><td>H100 80GB</td><td>80 GB</td><td>$30K</td><td>Training 70B, fastest inference</td></tr>
+                    <tr><td>H200 141GB</td><td>141 GB</td><td>$40K+</td><td>Training 100B+, massive serving</td></tr>
+                    <tr><td>B200 192GB</td><td>192 GB</td><td>$50K+</td><td>Next-gen training/inference</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Apple Silicon (for local inference):</h3>
+            <table>
+                <thead><tr><th>Chip</th><th>Unified Memory</th><th>Price (MacBook)</th><th>Good For</th></tr></thead>
+                <tbody>
+                    <tr><td>M3 Pro</td><td>18-36 GB</td><td>$2,000-2,500</td><td>7B-13B local inference</td></tr>
+                    <tr><td>M3 Max</td><td>48-128 GB</td><td>$3,500-5,000</td><td>70B quantized models!</td></tr>
+                    <tr><td>M4 Pro</td><td>24-48 GB</td><td>$2,000-2,800</td><td>7-13B models easily</td></tr>
+                    <tr><td>M4 Max</td><td>64-128 GB</td><td>$3,500-5,000</td><td>70B+ quantized, great for MLX</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="vram-calc">VRAM Calculation Formulas</h2>
+
+            <pre><code><span class="token-comment"># VRAM Calculator: How much memory do you need?</span>
+<span class="token-keyword">import</span> math
+
+<span class="token-keyword">class</span> <span class="token-function">VRAMCalculator</span>:
+    <span class="token-string">"""Calculate VRAM requirements for inference and training."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">inference_vram</span>(
+        self,
+        params_billions: <span class="token-builtin">float</span>,
+        precision: str = <span class="token-string">"fp16"</span>,
+        context_length: int = <span class="token-number">4096</span>,
+        batch_size: int = <span class="token-number">1</span>,
+        num_layers: int = <span class="token-keyword">None</span>,
+        num_kv_heads: int = <span class="token-keyword">None</span>,
+        head_dim: int = <span class="token-number">128</span>,
+    ) -> <span class="token-builtin">dict</span>:
+        <span class="token-string">"""Calculate VRAM needed for inference."""</span>
+        
+        <span class="token-comment"># Bytes per parameter</span>
+        precision_map = {
+            <span class="token-string">"fp32"</span>: <span class="token-number">4</span>, <span class="token-string">"fp16"</span>: <span class="token-number">2</span>, <span class="token-string">"bf16"</span>: <span class="token-number">2</span>,
+            <span class="token-string">"int8"</span>: <span class="token-number">1</span>, <span class="token-string">"int4"</span>: <span class="token-number">0.5</span>, <span class="token-string">"q4_k_m"</span>: <span class="token-number">0.5625</span>
+        }
+        bytes_per_param = precision_map[precision]
+        
+        <span class="token-comment"># Model weights</span>
+        model_size_gb = (params_billions * <span class="token-number">1e9</span> * bytes_per_param) / (<span class="token-number">1024</span>**<span class="token-number">3</span>)
+        
+        <span class="token-comment"># KV Cache (if layer info provided)</span>
+        kv_cache_gb = <span class="token-number">0</span>
+        <span class="token-keyword">if</span> num_layers <span class="token-keyword">and</span> num_kv_heads:
+            <span class="token-comment"># 2 (K+V) × layers × seq_len × kv_heads × head_dim × 2 bytes × batch_size</span>
+            kv_cache_bytes = <span class="token-number">2</span> * num_layers * context_length * num_kv_heads * head_dim * <span class="token-number">2</span> * batch_size
+            kv_cache_gb = kv_cache_bytes / (<span class="token-number">1024</span>**<span class="token-number">3</span>)
+        
+        <span class="token-comment"># Overhead (activation memory, CUDA context, etc.)</span>
+        overhead_gb = <span class="token-number">1.5</span>  <span class="token-comment"># ~1-2 GB typical overhead</span>
+        
+        total = model_size_gb + kv_cache_gb + overhead_gb
+        
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"model_weights"</span>: <span class="token-builtin">round</span>(model_size_gb, <span class="token-number">1</span>),
+            <span class="token-string">"kv_cache"</span>: <span class="token-builtin">round</span>(kv_cache_gb, <span class="token-number">1</span>),
+            <span class="token-string">"overhead"</span>: overhead_gb,
+            <span class="token-string">"total_gb"</span>: <span class="token-builtin">round</span>(total, <span class="token-number">1</span>),
+        }
+    
+    <span class="token-keyword">def</span> <span class="token-function">training_vram</span>(
+        self,
+        params_billions: <span class="token-builtin">float</span>,
+        method: str = <span class="token-string">"qlora"</span>,
+        batch_size: int = <span class="token-number">4</span>,
+        seq_length: int = <span class="token-number">2048</span>,
+    ) -> <span class="token-builtin">dict</span>:
+        <span class="token-string">"""Calculate VRAM needed for training."""</span>
+        
+        <span class="token-comment"># Training multipliers</span>
+        multipliers = {
+            <span class="token-string">"full_fp32"</span>: <span class="token-number">18</span>,    <span class="token-comment"># weights(4) + gradients(4) + optimizer(8) + activations(2)</span>
+            <span class="token-string">"full_fp16"</span>: <span class="token-number">10</span>,    <span class="token-comment"># Mixed precision training</span>
+            <span class="token-string">"lora_fp16"</span>: <span class="token-number">3</span>,     <span class="token-comment"># Base model(2) + LoRA overhead(1)</span>
+            <span class="token-string">"qlora"</span>: <span class="token-number">1.5</span>,       <span class="token-comment"># 4-bit base + LoRA overhead</span>
+        }
+        
+        bytes_per_param = multipliers[method]
+        base_gb = (params_billions * <span class="token-number">1e9</span> * bytes_per_param) / (<span class="token-number">1024</span>**<span class="token-number">3</span>)
+        
+        <span class="token-comment"># Activation memory (scales with batch size and seq length)</span>
+        activation_gb = (batch_size * seq_length * params_billions * <span class="token-number">0.001</span>)
+        
+        total = base_gb + activation_gb + <span class="token-number">2.0</span>  <span class="token-comment"># +2 GB overhead</span>
+        
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"method"</span>: method,
+            <span class="token-string">"base_memory"</span>: <span class="token-builtin">round</span>(base_gb, <span class="token-number">1</span>),
+            <span class="token-string">"activations"</span>: <span class="token-builtin">round</span>(activation_gb, <span class="token-number">1</span>),
+            <span class="token-string">"total_gb"</span>: <span class="token-builtin">round</span>(total, <span class="token-number">1</span>),
+        }
+
+<span class="token-comment"># Example calculations</span>
+calc = VRAMCalculator()
+
+<span class="token-builtin">print</span>(<span class="token-string">"=== INFERENCE VRAM ==="</span>)
+<span class="token-builtin">print</span>(<span class="token-string">"Llama 3.1 8B (FP16):"</span>, calc.inference_vram(<span class="token-number">8</span>, <span class="token-string">"fp16"</span>, num_layers=<span class="token-number">32</span>, num_kv_heads=<span class="token-number">8</span>))
+<span class="token-builtin">print</span>(<span class="token-string">"Llama 3.1 8B (Q4):"</span>, calc.inference_vram(<span class="token-number">8</span>, <span class="token-string">"int4"</span>, num_layers=<span class="token-number">32</span>, num_kv_heads=<span class="token-number">8</span>))
+<span class="token-builtin">print</span>(<span class="token-string">"Llama 3.1 70B (Q4):"</span>, calc.inference_vram(<span class="token-number">70</span>, <span class="token-string">"int4"</span>, num_layers=<span class="token-number">80</span>, num_kv_heads=<span class="token-number">8</span>))
+<span class="token-builtin">print</span>()
+<span class="token-builtin">print</span>(<span class="token-string">"=== TRAINING VRAM ==="</span>)
+<span class="token-builtin">print</span>(<span class="token-string">"8B QLoRA:"</span>, calc.training_vram(<span class="token-number">8</span>, <span class="token-string">"qlora"</span>))
+<span class="token-builtin">print</span>(<span class="token-string">"8B Full FP16:"</span>, calc.training_vram(<span class="token-number">8</span>, <span class="token-string">"full_fp16"</span>))
+<span class="token-builtin">print</span>(<span class="token-string">"70B QLoRA:"</span>, calc.training_vram(<span class="token-number">70</span>, <span class="token-string">"qlora"</span>))</code></pre>
+
+            <h2 id="what-fits">What Fits Where?</h2>
+
+            <table>
+                <thead><tr><th>Model</th><th>Precision</th><th>VRAM Needed</th><th>Fits On</th></tr></thead>
+                <tbody>
+                    <tr><td>Llama 3.1 8B</td><td>FP16</td><td>~16 GB</td><td>RTX 4070 Ti, 4090</td></tr>
+                    <tr><td>Llama 3.1 8B</td><td>Q4_K_M</td><td>~6 GB</td><td>RTX 4060 (8GB), any modern GPU</td></tr>
+                    <tr><td>Llama 3.1 70B</td><td>FP16</td><td>~140 GB</td><td>2× A100 80GB, or H200</td></tr>
+                    <tr><td>Llama 3.1 70B</td><td>Q4_K_M</td><td>~40 GB</td><td>A100 40GB, 2× RTX 4090</td></tr>
+                    <tr><td>Qwen 2.5 72B</td><td>Q4_K_M</td><td>~42 GB</td><td>M3 Max 64GB, A100 80GB</td></tr>
+                    <tr><td>Mixtral 8x7B</td><td>Q4_K_M</td><td>~26 GB</td><td>RTX 4090 (24GB) — tight!</td></tr>
+                    <tr><td>Phi-3 Mini 3.8B</td><td>FP16</td><td>~8 GB</td><td>RTX 4060, any 8GB+ GPU</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="multi-gpu">Multi-GPU Strategies</h2>
+
+            <pre><code><span class="token-comment"># Multi-GPU loading with transformers</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM
+
+<span class="token-comment"># Automatic: splits model across all available GPUs</span>
+model = AutoModelForCausalLM.from_pretrained(
+    <span class="token-string">"meta-llama/Llama-3.1-70B-Instruct"</span>,
+    device_map=<span class="token-string">"auto"</span>,  <span class="token-comment"># Automatically distribute layers</span>
+    torch_dtype=<span class="token-string">"auto"</span>,
+)
+
+<span class="token-comment"># Manual: specify which layers go where</span>
+device_map = {
+    <span class="token-string">"model.embed_tokens"</span>: <span class="token-number">0</span>,           <span class="token-comment"># GPU 0</span>
+    <span class="token-string">"model.layers.0"</span>: <span class="token-number">0</span>,               <span class="token-comment"># GPU 0</span>
+    <span class="token-string">"model.layers.1"</span>: <span class="token-number">0</span>,               <span class="token-comment"># GPU 0</span>
+    <span class="token-comment"># ... layers 2-39 on GPU 0</span>
+    <span class="token-string">"model.layers.40"</span>: <span class="token-number">1</span>,              <span class="token-comment"># GPU 1</span>
+    <span class="token-comment"># ... layers 40-79 on GPU 1</span>
+    <span class="token-string">"model.norm"</span>: <span class="token-number">1</span>,                   <span class="token-comment"># GPU 1</span>
+    <span class="token-string">"lm_head"</span>: <span class="token-number">1</span>,                      <span class="token-comment"># GPU 1</span>
+}
+
+<span class="token-comment"># CPU offloading (when VRAM is insufficient)</span>
+model = AutoModelForCausalLM.from_pretrained(
+    <span class="token-string">"meta-llama/Llama-3.1-70B-Instruct"</span>,
+    device_map=<span class="token-string">"auto"</span>,
+    offload_folder=<span class="token-string">"./offload"</span>,  <span class="token-comment"># Overflow to CPU/disk</span>
+    torch_dtype=<span class="token-string">"auto"</span>,
+)
+<span class="token-comment"># Warning: CPU offloading is MUCH slower (10-100x) but works!</span></code></pre>
+
+            <h3>Multi-GPU Training (DeepSpeed/FSDP):</h3>
+            <pre><code><span class="token-comment"># For training across multiple GPUs, use accelerate + DeepSpeed</span>
+<span class="token-comment"># accelerate config  (run this first to set up)</span>
+
+<span class="token-comment"># accelerate_config.yaml</span>
+compute_environment: LOCAL_MACHINE
+distributed_type: DEEPSPEED
+deepspeed_config:
+  deepspeed_multinode_launcher: standard
+  zero_stage: 3  <span class="token-comment"># ZeRO Stage 3: shard weights + gradients + optimizer across GPUs</span>
+  offload_optimizer_device: cpu  <span class="token-comment"># Offload optimizer to CPU (saves VRAM)</span>
+  offload_param_device: none
+machine_rank: 0
+num_machines: 1
+num_processes: 4  <span class="token-comment"># Number of GPUs</span>
+
+<span class="token-comment"># Launch training:</span>
+<span class="token-comment"># accelerate launch --config_file accelerate_config.yaml train.py</span></code></pre>
+
+            <h2 id="cloud-gpus">Cloud GPU Options</h2>
+
+            <table>
+                <thead><tr><th>Provider</th><th>GPU</th><th>Price/Hour</th><th>Best For</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>RunPod</strong></td><td>A100 80GB</td><td>$1.89/hr</td><td>Training, cheapest A100s</td></tr>
+                    <tr><td><strong>Lambda</strong></td><td>H100 80GB</td><td>$2.49/hr</td><td>Fast training, reserved capacity</td></tr>
+                    <tr><td><strong>Together.ai</strong></td><td>H100 cluster</td><td>$2.50/hr</td><td>Training + inference API</td></tr>
+                    <tr><td><strong>AWS (p5)</strong></td><td>H100 80GB</td><td>$5-8/hr</td><td>Enterprise, SLA guarantees</td></tr>
+                    <tr><td><strong>Google Colab Pro</strong></td><td>A100 40GB</td><td>$10/month</td><td>Experimentation, learning</td></tr>
+                    <tr><td><strong>Vast.ai</strong></td><td>Various</td><td>$0.30-2/hr</td><td>Cheapest spot instances</td></tr>
+                    <tr><td><strong>Modal</strong></td><td>A100/H100</td><td>Pay per second</td><td>Serverless GPU, burst workloads</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-success">
+                <div class="callout-title">💡 Cost-Saving Tips</div>
+                <ul>
+                    <li>Use <strong>spot/preemptible instances</strong> for training (60-80% cheaper, but can be interrupted)</li>
+                    <li>Start with <strong>Google Colab Pro</strong> ($10/mo) for learning and prototyping</li>
+                    <li>Use <strong>RunPod/Vast.ai</strong> for serious training (cheapest dedicated GPUs)</li>
+                    <li>For inference, consider <strong>serverless</strong> (Modal, Together) — pay only when processing</li>
+                </ul>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>H100 is the current king</strong> — 3x faster than A100 for training, 2x for inference. H200 for memory-heavy workloads.</li>
+                    <li><strong>24 GB is the sweet spot for hobbyists</strong> — RTX 4090 or M4 Max lets you run/fine-tune most 7-13B models.</li>
+                    <li><strong>QLoRA makes training accessible</strong> — Fine-tune 7B models on a single 16GB GPU, 70B on 48GB.</li>
+                    <li><strong>Apple Silicon for local inference</strong> — M3/M4 Max with 64-128GB unified memory runs 70B quantized models smoothly with MLX.</li>
+                    <li><strong>Tensor Parallelism for inference</strong> — Split one model across GPUs for lower latency (used in production).</li>
+                    <li><strong>Pipeline Parallelism for training</strong> — Split layers across GPUs, process micro-batches in pipeline.</li>
+                    <li><strong>Always calculate VRAM before buying/renting</strong> — Use the formula: params × bytes_per_param + KV cache + overhead.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>VRAM formula</strong>: params (B) × bytes_per_param + KV_cache + overhead</li>
+                    <li><strong>FP16</strong>: params × 2 bytes. <strong>INT4</strong>: params × 0.5 bytes</li>
+                    <li><strong>Training needs 3-18x more VRAM</strong> than inference (gradients, optimizer states)</li>
+                    <li><strong>QLoRA</strong> makes training affordable: 8B on 16GB GPU, 70B on 48GB</li>
+                    <li><strong>Multi-GPU</strong>: use device_map="auto" or DeepSpeed for distribution</li>
+                    <li><strong>Cloud GPUs</strong>: RunPod/Lambda for training, Modal for serverless inference</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    VRAM Budget = Model Weights + KV Cache + Activations + Overhead<br><br>
+                    Inference: 8B FP16 → 16 GB + 2 GB cache + 1.5 GB = ~20 GB<br>
+                    Inference: 8B Q4  → 4 GB + 2 GB cache + 1.5 GB = ~8 GB ← fits 4060!<br>
+                    Training: 8B QLoRA → 6 GB base + 4 GB activations + 2 GB = ~12 GB<br>
+                    Training: 8B Full → 80 GB weights+grads+optimizer = needs A100!
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Buying based on TFLOPS alone</strong> — VRAM matters more than compute for LLMs. A 4090 (24GB) beats a 4080 (16GB) for AI.</li>
+                    <li><strong>Forgetting KV cache in calculations</strong> — The model fits, but crashes when you start generating long sequences.</li>
+                    <li><strong>Not considering batch size</strong> — Batch size multiplies KV cache memory. Batch of 8 = 8x the cache.</li>
+                    <li><strong>Buying consumer GPUs for training</strong> — Cloud is often cheaper: $2/hr × 10 hours = $20 vs $1,600 GPU that sits idle.</li>
+                    <li><strong>Ignoring interconnect for multi-GPU</strong> — 2× RTX 4090 over PCIe is much slower than NVLink-connected A100s.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Plan Your Hardware</h4>
+                <ol>
+                    <li>Use the VRAMCalculator class to compute requirements for 3 different models you want to run</li>
+                    <li>Check your GPU: run <code>nvidia-smi</code> (or check Activity Monitor on Mac) — how much VRAM do you have?</li>
+                    <li>Calculate: what's the largest model you can run on your hardware at FP16? At INT4?</li>
+                    <li>Compare cloud costs: How much would it cost to fine-tune a 7B model for 1 hour on RunPod vs AWS?</li>
+                    <li>Try loading a model with <code>device_map="auto"</code> and check which layers went where</li>
+                    <li><strong>Bonus:</strong> Calculate VRAM needs for serving 10 concurrent users with Llama 3.1 8B at 4096 context</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="17-inference-optimization.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Inference Optimization</span>
+                </a>
+                <a href="19-llamacpp-ollama.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">llama.cpp & Ollama</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

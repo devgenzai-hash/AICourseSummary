@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consistent Hashing - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Consistent Hashing</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Consistent Hashing</h1>
+                <p class="subtitle">A clever way to distribute data across servers so that adding or removing a server only moves a tiny fraction of data — not everything.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-distributed">Distributed</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">&#127968; Daily-Life Analogy: Assigned Parking Spots in a Circle</div>
+                <p>Imagine a circular parking lot with 360 spots (numbered 0-359). There are 4 parking attendants, each responsible for a section of the circle.</p>
+                <p>When a car arrives, you look at the license plate, do a simple calculation (like summing the digits), and get a number 0-359. The car goes to whichever attendant is next clockwise from that number.</p>
+                <p><strong>Now an attendant quits:</strong> Only the cars that were assigned to THAT attendant need to be redistributed to the next attendant clockwise. Everyone else's cars stay put!</p>
+                <p><strong>Traditional approach (modulo):</strong> If you used "license number % 4 attendants," removing one attendant would require almost ALL cars to move. That's terrible.</p>
+                <p><strong>Consistent hashing</strong> = the circular parking lot approach. Add/remove servers with minimal data movement.</p>
+            </div>
+
+            <h2>The Problem: Why Simple Hashing Breaks</h2>
+            <p>The naive approach to distributing data across N servers:</p>
+<pre><code><span class="token-comment"># Naive approach: modulo hashing</span>
+<span class="token-keyword">def</span> <span class="token-function">get_server_naive</span>(key, num_servers):
+    <span class="token-keyword">return</span> hash(key) % num_servers
+
+<span class="token-comment"># With 4 servers:</span>
+servers = [<span class="token-string">"Server-A"</span>, <span class="token-string">"Server-B"</span>, <span class="token-string">"Server-C"</span>, <span class="token-string">"Server-D"</span>]
+
+<span class="token-comment"># key "user:123" → hash = 7 → 7 % 4 = 3 → Server-D</span>
+<span class="token-comment"># key "user:456" → hash = 12 → 12 % 4 = 0 → Server-A</span>
+
+<span class="token-comment"># NOW: Server-C dies. We have 3 servers.</span>
+<span class="token-comment"># key "user:123" → hash = 7 → 7 % 3 = 1 → Server-B  ← MOVED!</span>
+<span class="token-comment"># key "user:456" → hash = 12 → 12 % 3 = 0 → Server-A ← stayed (lucky)</span>
+
+<span class="token-comment"># PROBLEM: ~75% of ALL keys move to different servers!</span>
+<span class="token-comment"># With a cache, this means 75% cache misses = thundering herd = crash</span></code></pre>
+
+            <div class="callout callout-warning">
+                <strong>The Disaster:</strong> With modulo hashing, adding or removing a single server causes ~(N-1)/N of all keys to be remapped. For 100 servers, removing 1 server moves 99% of data. In a cache system, this means instant cache stampede.
+            </div>
+
+            <h2>How Consistent Hashing Works</h2>
+            <h3>Step 1: The Hash Ring</h3>
+            <p>Instead of mapping to server slots (0 to N-1), we map everything onto a <strong>circle</strong> (ring) with positions 0 to 2^32 - 1 (or any large number).</p>
+
+            <h3>Step 2: Place Servers on the Ring</h3>
+            <p>Hash each server's name/IP to get its position on the ring.</p>
+
+            <h3>Step 3: Place Keys on the Ring</h3>
+            <p>Hash each data key to get its position on the ring.</p>
+
+            <h3>Step 4: Walk Clockwise</h3>
+            <p>Each key belongs to the first server you encounter going <strong>clockwise</strong> from the key's position.</p>
+
+<pre><code><span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> bisect
+
+<span class="token-keyword">class</span> <span class="token-class">ConsistentHashRing</span>:
+    <span class="token-string">"""A consistent hash ring for distributing keys across nodes."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, nodes=<span class="token-keyword">None</span>, replicas=<span class="token-number">150</span>):
+        <span class="token-string">"""
+        Args:
+            nodes: List of server names/IPs
+            replicas: Virtual nodes per physical node (for balance)
+        """</span>
+        self.replicas = replicas
+        self.ring = []          <span class="token-comment"># Sorted list of hash positions</span>
+        self.node_map = {}      <span class="token-comment"># hash_position → node name</span>
+
+        <span class="token-keyword">if</span> nodes:
+            <span class="token-keyword">for</span> node <span class="token-keyword">in</span> nodes:
+                self.add_node(node)
+
+    <span class="token-keyword">def</span> <span class="token-function">_hash</span>(self, key):
+        <span class="token-string">"""Generate a consistent hash for a key (0 to 2^32 - 1)"""</span>
+        md5 = hashlib.md5(key.encode()).hexdigest()
+        <span class="token-keyword">return</span> int(md5, <span class="token-number">16</span>) % (<span class="token-number">2</span> ** <span class="token-number">32</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">add_node</span>(self, node):
+        <span class="token-string">"""Add a node to the ring (with virtual nodes for balance)"""</span>
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(self.replicas):
+            <span class="token-comment"># Create virtual node: "ServerA-0", "ServerA-1", etc.</span>
+            virtual_key = <span class="token-string">f"{node}-{i}"</span>
+            hash_val = self._hash(virtual_key)
+            bisect.insort(self.ring, hash_val)
+            self.node_map[hash_val] = node
+
+    <span class="token-keyword">def</span> <span class="token-function">remove_node</span>(self, node):
+        <span class="token-string">"""Remove a node — only its keys move to the next node clockwise"""</span>
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(self.replicas):
+            virtual_key = <span class="token-string">f"{node}-{i}"</span>
+            hash_val = self._hash(virtual_key)
+            self.ring.remove(hash_val)
+            <span class="token-keyword">del</span> self.node_map[hash_val]
+
+    <span class="token-keyword">def</span> <span class="token-function">get_node</span>(self, key):
+        <span class="token-string">"""Find which node a key belongs to (walk clockwise)"""</span>
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> self.ring:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+
+        hash_val = self._hash(key)
+
+        <span class="token-comment"># Find first ring position >= key's hash (clockwise)</span>
+        idx = bisect.bisect_right(self.ring, hash_val)
+
+        <span class="token-comment"># Wrap around if we passed the end of the ring</span>
+        <span class="token-keyword">if</span> idx == len(self.ring):
+            idx = <span class="token-number">0</span>
+
+        <span class="token-keyword">return</span> self.node_map[self.ring[idx]]
+
+
+<span class="token-comment"># Demo: Create ring with 3 servers</span>
+ring = ConsistentHashRing([<span class="token-string">"Server-A"</span>, <span class="token-string">"Server-B"</span>, <span class="token-string">"Server-C"</span>])
+
+<span class="token-comment"># Assign keys to servers</span>
+keys = [<span class="token-string">"user:1"</span>, <span class="token-string">"user:2"</span>, <span class="token-string">"user:3"</span>, <span class="token-string">"order:100"</span>, <span class="token-string">"session:xyz"</span>]
+<span class="token-keyword">print</span>(<span class="token-string">"=== Before removing server ==="</span>)
+<span class="token-keyword">for</span> key <span class="token-keyword">in</span> keys:
+    <span class="token-keyword">print</span>(<span class="token-string">f"  {key} → {ring.get_node(key)}"</span>)
+
+<span class="token-comment"># Remove Server-B — only ~1/3 of keys move!</span>
+ring.remove_node(<span class="token-string">"Server-B"</span>)
+<span class="token-keyword">print</span>(<span class="token-string">"\n=== After removing Server-B ==="</span>)
+<span class="token-keyword">for</span> key <span class="token-keyword">in</span> keys:
+    <span class="token-keyword">print</span>(<span class="token-string">f"  {key} → {ring.get_node(key)}"</span>)</code></pre>
+
+            <h2>Virtual Nodes: Solving the Balance Problem</h2>
+            <p>With just 3 physical servers on a ring, the distribution is often uneven — one server might get 60% of the keys while another gets only 10%. <strong>Virtual nodes</strong> fix this:</p>
+
+            <table class="comparison-table">
+                <thead><tr><th>Approach</th><th>Nodes on Ring</th><th>Distribution</th><th>When a Server Dies</th></tr></thead>
+                <tbody>
+                    <tr><td>No virtual nodes</td><td>3 points</td><td>Very uneven (could be 60/30/10)</td><td>All its keys go to ONE neighbor</td></tr>
+                    <tr><td>150 virtual nodes each</td><td>450 points</td><td>Nearly uniform (~33/33/33)</td><td>Its keys spread across ALL remaining servers</td></tr>
+                </tbody>
+            </table>
+
+<pre><code><span class="token-comment"># Demonstrating virtual node distribution</span>
+<span class="token-keyword">def</span> <span class="token-function">test_distribution</span>(replicas):
+    ring = ConsistentHashRing(
+        [<span class="token-string">"Server-A"</span>, <span class="token-string">"Server-B"</span>, <span class="token-string">"Server-C"</span>],
+        replicas=replicas
+    )
+    counts = {<span class="token-string">"Server-A"</span>: <span class="token-number">0</span>, <span class="token-string">"Server-B"</span>: <span class="token-number">0</span>, <span class="token-string">"Server-C"</span>: <span class="token-number">0</span>}
+
+    <span class="token-comment"># Assign 10,000 keys</span>
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">10000</span>):
+        node = ring.get_node(<span class="token-string">f"key:{i}"</span>)
+        counts[node] += <span class="token-number">1</span>
+
+    <span class="token-keyword">print</span>(<span class="token-string">f"Replicas={replicas}: {counts}"</span>)
+
+test_distribution(<span class="token-number">1</span>)    <span class="token-comment"># Very uneven: {A: 5832, B: 1209, C: 2959}</span>
+test_distribution(<span class="token-number">50</span>)   <span class="token-comment"># Better:      {A: 3512, B: 3201, C: 3287}</span>
+test_distribution(<span class="token-number">150</span>)  <span class="token-comment"># Near-perfect: {A: 3345, B: 3318, C: 3337}</span></code></pre>
+
+            <h2>Consistent Hashing vs Modulo Hashing</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Feature</th><th>Modulo Hashing</th><th>Consistent Hashing</th></tr></thead>
+                <tbody>
+                    <tr><td>Add/remove server</td><td>~N-1/N keys move (disaster)</td><td>Only ~1/N keys move (minimal)</td></tr>
+                    <tr><td>Implementation</td><td>Simple: hash % N</td><td>More complex: ring + binary search</td></tr>
+                    <tr><td>Load balance</td><td>Good if hash is uniform</td><td>Needs virtual nodes for balance</td></tr>
+                    <tr><td>Lookup speed</td><td>O(1)</td><td>O(log N) with binary search</td></tr>
+                    <tr><td>Used by</td><td>Simple caches, hash tables</td><td>DynamoDB, Cassandra, CDNs, load balancers</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Where Consistent Hashing Is Used</h2>
+            <div class="industry-box">
+                <h4>Real-World Usage</h4>
+                <ul>
+                    <li><strong>Amazon DynamoDB</strong> — Partitions data across storage nodes using consistent hashing</li>
+                    <li><strong>Apache Cassandra</strong> — Ring-based architecture; each node owns a range of the hash ring</li>
+                    <li><strong>Akamai CDN</strong> — Routes requests to the nearest cache server using consistent hashing</li>
+                    <li><strong>Discord</strong> — Routes messages to the correct server/shard for each channel</li>
+                    <li><strong>Memcached clients</strong> — libmemcached uses ketama (consistent hashing) for cache distribution</li>
+                    <li><strong>Load Balancers (Nginx, HAProxy)</strong> — Sticky sessions using consistent hashing</li>
+                </ul>
+            </div>
+
+            <h2>Advanced: Weighted Nodes</h2>
+            <p>Not all servers are equal. A beefy server with 64GB RAM should get more data than a small one with 8GB. Solution: give bigger servers more virtual nodes.</p>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">WeightedConsistentHash</span>:
+    <span class="token-string">"""Servers with different capacities get proportional load"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.ring = []
+        self.node_map = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">add_node</span>(self, node, weight=<span class="token-number">1</span>):
+        <span class="token-string">"""
+        weight=1: normal server (100 virtual nodes)
+        weight=2: beefy server (200 virtual nodes = gets 2x the data)
+        """</span>
+        replicas = <span class="token-number">100</span> * weight
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(replicas):
+            hash_val = self._hash(<span class="token-string">f"{node}-{i}"</span>)
+            bisect.insort(self.ring, hash_val)
+            self.node_map[hash_val] = node
+
+    <span class="token-keyword">def</span> <span class="token-function">_hash</span>(self, key):
+        <span class="token-keyword">return</span> int(hashlib.md5(key.encode()).hexdigest(), <span class="token-number">16</span>) % (<span class="token-number">2</span>**<span class="token-number">32</span>)
+
+<span class="token-comment"># Big server gets 2x the traffic</span>
+ring = WeightedConsistentHash()
+ring.add_node(<span class="token-string">"small-server-1"</span>, weight=<span class="token-number">1</span>)   <span class="token-comment"># 100 virtual nodes</span>
+ring.add_node(<span class="token-string">"small-server-2"</span>, weight=<span class="token-number">1</span>)   <span class="token-comment"># 100 virtual nodes</span>
+ring.add_node(<span class="token-string">"beefy-server"</span>, weight=<span class="token-number">3</span>)    <span class="token-comment"># 300 virtual nodes → 3x data</span></code></pre>
+
+            <div class="collapsible">
+                <div class="collapsible-header">Advanced: Jump Consistent Hashing (Google's Optimization)</div>
+                <div class="collapsible-content">
+                    <p>Google published a simpler algorithm called <strong>Jump Consistent Hash</strong> that achieves perfect balance without virtual nodes. It's faster (O(log N) with no memory overhead) but only works when nodes are numbered 0 to N-1.</p>
+<pre><code><span class="token-keyword">def</span> <span class="token-function">jump_consistent_hash</span>(key, num_buckets):
+    <span class="token-string">"""Google's jump consistent hash — O(log N), no memory"""</span>
+    b, j = -<span class="token-number">1</span>, <span class="token-number">0</span>
+    <span class="token-keyword">while</span> j < num_buckets:
+        b = j
+        key = ((key * <span class="token-number">2862933555777941757</span>) + <span class="token-number">1</span>) & <span class="token-number">0xFFFFFFFFFFFFFFFF</span>
+        j = int((b + <span class="token-number">1</span>) * (<span class="token-number">1</span> << <span class="token-number">31</span>) / ((key >> <span class="token-number">33</span>) + <span class="token-number">1</span>))
+    <span class="token-keyword">return</span> b
+
+<span class="token-comment"># Perfectly balanced, minimal remapping on resize</span>
+<span class="token-comment"># Limitation: buckets must be numbered 0..N-1 (can't name them)</span></code></pre>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+                    <li>Modulo hashing (key % N) causes massive data movement when N changes</li>
+                    <li>Consistent hashing uses a ring — adding/removing a server only moves ~1/N of keys</li>
+                    <li>Virtual nodes (replicas) solve the imbalance problem</li>
+                    <li>Weighted nodes let bigger servers take proportionally more data</li>
+                    <li>Used by DynamoDB, Cassandra, CDNs, load balancers, and caching layers</li>
+                    <li>Lookup is O(log N) via binary search on the ring</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">
+    The Hash Ring (0 to 2^32):
+
+            0
+          /   \
+        /       \         ● = server position
+      S-A         S-B     ○ = key position
+     /               \
+    |    ○key1        |   key1 walks clockwise → hits S-B
+    |         ○key2   |   key2 walks clockwise → hits S-C
+     \               /
+      S-C         /
+        \       /
+          \   /
+          2^32
+
+    Remove S-B:
+    - key1 now walks clockwise → hits S-C (moved!)
+    - key2 still hits S-C (unchanged!)
+    - Only keys between S-A and S-B move. Everything else stays!
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+                    <li><strong>Forgetting virtual nodes</strong> — Without them, 3 servers on a ring will have wildly uneven distribution.</li>
+                    <li><strong>Using a weak hash function</strong> — MD5/SHA are fine for distribution (not security). Don't use Python's built-in hash() — it's not consistent across runs!</li>
+                    <li><strong>Too few virtual nodes</strong> — 10 isn't enough. Use 100-200 per physical node for good balance.</li>
+                    <li><strong>Not handling replication</strong> — In practice, each key is stored on the next K nodes clockwise (for redundancy), not just one.</li>
+                    <li><strong>Using consistent hashing when simple modulo works</strong> — If your server count never changes, modulo is simpler and faster.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+                    <li>Implement the ConsistentHashRing class above. Test with 5 servers and 10,000 keys. Print the distribution.</li>
+                    <li>Remove one server. Count how many keys changed their assignment. Verify it's approximately 1/5 (20%).</li>
+                    <li>Experiment with virtual node counts (1, 10, 50, 150, 500). Plot the standard deviation of key counts across servers.</li>
+                    <li>Add weighted nodes (one server gets 3x weight). Verify it receives approximately 3x the keys.</li>
+                    <li>Challenge: Implement replication — each key should be stored on the next 3 distinct physical nodes clockwise.</li>
+                </ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="22-acid-properties.html" class="prev">ACID Properties</a>
+                <a href="24-leader-election.html" class="next">Leader Election</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

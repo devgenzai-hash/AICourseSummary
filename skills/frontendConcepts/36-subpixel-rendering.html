@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subpixel Rendering - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Subpixel Rendering
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Subpixel Rendering</h1>
+                <p class="subtitle">How browsers use individual R/G/B subpixels to triple the apparent resolution of text — why GPU-composited text looks blurrier, and how HiDPI displays changed the game.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-concept">Typography</span>
+                    <span class="tag tag-browser">Rendering</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🔬 Daily-Life Analogy: Microscopic Color Tricks</div>
+                <p>Imagine each pixel on your screen is actually three tiny vertical stripes: Red, Green, Blue. Normal rendering treats the whole pixel as one unit. <strong>Subpixel rendering</strong> is like a calligrapher who paints letter edges on individual color stripes — getting 3x the horizontal resolution for free. The trick: your eye blends the colors so you see sharper black text, not rainbow fringes.</p>
+            </div>
+
+            <h2>The Problem: Text at Low Resolution</h2>
+            <ul>
+                <li><strong>Font outlines are mathematical curves</strong> — They don't align perfectly with pixel grids</li>
+                <li><strong>Regular anti-aliasing (grayscale)</strong> — Uses shades of gray to smooth edges but reduces perceived sharpness</li>
+                <li><strong>At small sizes (12-16px)</strong> — Every fraction of a pixel matters for readability. Subpixel rendering effectively triples horizontal resolution.</li>
+            </ul>
+
+            <h2>How Subpixel Anti-Aliasing Works</h2>
+<pre><code><span class="token-comment">/*
+  Regular pixel:  [████] — one color per pixel (grayscale AA uses gray shades)
+  
+  Subpixel:       [R][G][B] — each pixel has 3 addressable color strips
+  
+  For a vertical edge of black text on white:
+  
+  Grayscale AA:   [███] [▓▓▓] [░░░] [   ]    ← 4 shades of gray
+  Subpixel AA:    [RGB] [rgb] [  B] [   ]    ← 12 addressable positions!
+  
+  The brain perceives the subpixel version as sharper because
+  it has 3x horizontal positional precision.
+*/</span>
+</code></pre>
+
+            <h2>Why GPU Compositing Loses Subpixel Rendering</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Rendering Mode</th><th>Text Quality</th><th>Why</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Normal (CPU-rasterized)</td><td>Full subpixel AA</td><td>Browser knows the background color, can calculate optimal subpixel values</td></tr>
+                    <tr><td>GPU-composited layer</td><td>Grayscale AA only</td><td>Layer is a texture with premultiplied alpha — background is unknown at composition time</td></tr>
+                    <tr><td>Animated (transform)</td><td>Grayscale AA during animation</td><td>Subpixel positions would need per-frame recalculation (too expensive)</td></tr>
+                    <tr><td>HiDPI (2x+)</td><td>Grayscale AA (fine)</td><td>At 2x+, pixels are so small that subpixel AA provides negligible benefit</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 The HiDPI Revolution Made This Less Important</div>
+                <p>On Retina/HiDPI displays (2x or higher device pixel ratio), subpixel rendering provides minimal benefit because individual pixels are already below the eye's resolving power. This is why macOS disabled subpixel AA on Retina displays (macOS Mojave+) and why Chrome followed suit. On 1x displays (still common on desktop monitors), subpixel rendering remains visually significant.</p>
+            </div>
+
+            <h2>Code: Controlling Text Rendering</h2>
+<pre><code><span class="token-comment">/* Control anti-aliasing mode */</span>
+.smooth-text {
+    -webkit-font-smoothing: antialiased;    <span class="token-comment">/* macOS/iOS: grayscale AA */</span>
+    -moz-osx-font-smoothing: grayscale;     <span class="token-comment">/* Firefox on macOS */</span>
+    <span class="token-comment">/* 
+     * Why you'd WANT grayscale (not subpixel):
+     * 1. Light text on dark background — subpixel creates color fringing
+     * 2. Animated text — prevents AA mode switching during animation
+     * 3. Consistency across GPU-composited and non-composited elements
+     */</span>
+}
+
+<span class="token-comment">/* Default (subpixel AA when available) */</span>
+.default-text {
+    -webkit-font-smoothing: auto; <span class="token-comment">/* Let the browser decide */</span>
+}
+
+<span class="token-comment">/* Force subpixel (useful for ensuring sharpness on 1x displays) */</span>
+.sharp-text {
+    -webkit-font-smoothing: subpixel-antialiased;
+    <span class="token-comment">/* Only works on non-composited layers at 1x pixel ratio */</span>
+}
+
+<span class="token-comment">/* The animation text shimmer problem: */</span>
+.animated-card {
+    will-change: transform;
+    <span class="token-comment">/* Text inside this card loses subpixel AA because it's GPU-composited */</span>
+    <span class="token-comment">/* Fix: explicitly use grayscale AA so there's no visual "pop" */</span>
+    -webkit-font-smoothing: antialiased;
+}
+</code></pre>
+
+            <h2>The "Text Shimmer" Problem</h2>
+<pre><code><span class="token-comment">/* When an element gets promoted to a GPU layer (e.g., animation starts),</span>
+<span class="token-comment">   text rendering switches from subpixel → grayscale. This causes a visible</span>
+<span class="token-comment">   "shimmer" or "weight change" in the text at the start/end of animations. */</span>
+
+<span class="token-comment">/* ❌ VISIBLE SHIMMER: text rendering mode changes on hover */</span>
+.card {
+    transition: transform 0.3s;
+}
+.card:hover {
+    transform: scale(1.02); <span class="token-comment">/* Promotes to GPU layer → text AA changes → shimmer */</span>
+}
+
+<span class="token-comment">/* ✅ NO SHIMMER: pre-promote or force consistent AA */</span>
+.card {
+    transition: transform 0.3s;
+    will-change: transform;           <span class="token-comment">/* Always on GPU layer */</span>
+    -webkit-font-smoothing: antialiased; <span class="token-comment">/* Always grayscale = no transition */</span>
+}
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>macOS (since Mojave)</strong> — Disabled subpixel AA entirely on Retina displays. Non-Retina external monitors still use it.</li>
+                <li><strong>Windows ClearType</strong> — Microsoft's subpixel rendering technology used system-wide for sharper text on LCD monitors.</li>
+                <li><strong>Figma/Design tools</strong> — Must account for subpixel rendering differences when designers work on Retina but users view on 1x displays.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Using <code>-webkit-font-smoothing: antialiased</code> globally</strong> — On 1x displays, this makes text thinner and less readable. Only use for dark backgrounds or animated elements.</li>
+                <li><strong>Not noticing the text shimmer during animations</strong> — Subtle but perceptible. Compare with/without <code>will-change</code> to see the AA switch.</li>
+                <li><strong>Assuming subpixel rendering works with transforms</strong> — Any element with a non-identity transform loses subpixel AA, even <code>transform: rotate(0deg)</code>.</li>
+                <li><strong>Testing only on HiDPI</strong> — Subpixel rendering issues are invisible on Retina. Always test on 1x monitors for text rendering quality.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Subpixel Rendering When...</h3>
+                <p>You can explain why text inside a <code>will-change: transform</code> element looks slightly different from text in a normal element on a 1x display, and why this difference vanishes on a 2x Retina display.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>On a 1x display, create two identical paragraphs side by side. Apply <code>transform: translateZ(0)</code> to one. Screenshot and zoom in on the text edges — observe the difference between subpixel and grayscale anti-aliasing. Then add <code>-webkit-font-smoothing: antialiased</code> to both and verify they match.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Subpixel rendering connects to: <strong>GPU Acceleration in CSS</strong> (GPU layers lose subpixel AA), <strong>Browser Compositing Layers</strong> (layer promotion triggers the switch), and <strong>Critical Rendering Path</strong> (text rendering is part of the paint phase).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="35-css-containment.html" class="nav-btn nav-btn-prev">← CSS Containment</a>
+                <a href="37-intersection-observer.html" class="nav-btn nav-btn-next">IntersectionObserver Internals →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

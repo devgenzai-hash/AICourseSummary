@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge Rendering - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Edge Rendering
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Edge Rendering</h1>
+                <p class="subtitle">Executing server-side rendering logic at CDN edge locations (300+ PoPs worldwide) instead of a single origin server — combining the speed of CDN-served static files with the dynamism of server rendering.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Advanced</span> <span class="tag tag-concept">Infrastructure</span> <span class="tag tag-browser">Performance</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏪 Analogy: Local Branch vs Headquarters</div>
+                <p>Traditional SSR is like every customer calling <strong>corporate headquarters</strong> (origin server in us-east-1) for every order. Edge rendering is like opening <strong>local franchise locations</strong> in every city. Each location can handle requests immediately using local inventory (edge cache + compute), only calling HQ for things they can't resolve locally.</p>
+            </div>
+
+            <h2>The Problem: Origin Server Latency</h2>
+            <p>A user in Tokyo requesting an SSR page from a server in Virginia:</p>
+            <ul>
+                <li>Network round trip: ~150-200ms (speed of light through fiber)</li>
+                <li>TLS handshake: another 1-2 roundtrips (~150-400ms)</li>
+                <li>Server processing: 50-500ms</li>
+                <li><strong>Total TTFB: 350-1100ms</strong> — before any content appears</li>
+            </ul>
+            <p>Edge rendering moves the compute to a location <10ms from the user. Tokyo user hits Tokyo edge. São Paulo user hits São Paulo edge.</p>
+
+            <h2>How Edge Rendering Works</h2>
+<pre><code><span class="token-comment">// Edge functions run in lightweight V8 isolates (not full Node.js)</span>
+<span class="token-comment">// They start in &lt;5ms (cold start) vs 500ms+ for traditional servers</span>
+
+<span class="token-comment">// Next.js Edge Runtime example:</span>
+<span class="token-comment">// app/api/hello/route.ts</span>
+<span class="token-keyword">export</span> <span class="token-keyword">const</span> runtime = <span class="token-string">'edge'</span>; <span class="token-comment">// ← Deploys to all edge locations</span>
+
+<span class="token-keyword">export async function</span> <span class="token-function">GET</span>(request) {
+    <span class="token-comment">// This executes at the edge PoP closest to the user</span>
+    <span class="token-comment">// Available APIs: fetch, crypto, streams, Web APIs</span>
+    <span class="token-comment">// NOT available: fs, child_process, native modules</span>
+    
+    <span class="token-keyword">const</span> geo = request.geo; <span class="token-comment">// Edge provides geolocation automatically</span>
+    <span class="token-keyword">const</span> data = <span class="token-keyword">await</span> fetch(<span class="token-string">'https://api.example.com/data'</span>, {
+        headers: { <span class="token-string">'X-Region'</span>: geo.region }
+    });
+    
+    <span class="token-keyword">return</span> Response.json(<span class="token-keyword">await</span> data.json());
+}
+</code></pre>
+
+            <h3>Edge SSR: Full Page Rendering at the Edge</h3>
+<pre><code><span class="token-comment">// Next.js page with edge rendering:</span>
+<span class="token-comment">// app/products/[id]/page.tsx</span>
+<span class="token-keyword">export</span> <span class="token-keyword">const</span> runtime = <span class="token-string">'edge'</span>;
+
+<span class="token-keyword">export default async function</span> <span class="token-function">ProductPage</span>({ params }) {
+    <span class="token-comment">// This React Server Component renders AT THE EDGE</span>
+    <span class="token-comment">// Data fetch goes to nearest database replica or API</span>
+    <span class="token-keyword">const</span> product = <span class="token-keyword">await</span> fetch(
+        <span class="token-string">`https://api.myshop.com/products/${params.id}`</span>,
+        { next: { revalidate: 60 } } <span class="token-comment">// Cache for 60s at edge</span>
+    );
+    
+    <span class="token-keyword">return</span> (
+        &lt;ProductLayout&gt;
+            &lt;ProductImage src={product.image} /&gt;
+            &lt;ProductDetails product={product} /&gt;
+            &lt;PriceDisplay 
+                price={product.price} 
+                currency={detectCurrency(request)} <span class="token-comment">{/* Geo-based */}</span>
+            /&gt;
+        &lt;/ProductLayout&gt;
+    );
+}
+
+<span class="token-comment">// Performance comparison:</span>
+<span class="token-comment">// Origin SSR (Virginia):  TTFB 200-800ms for global users</span>
+<span class="token-comment">// Edge SSR:               TTFB 20-50ms for all users everywhere</span>
+<span class="token-comment">// Static CDN:             TTFB 10-30ms but no dynamic content</span>
+</code></pre>
+
+            <h2>Edge Runtime Constraints</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Feature</th><th>Node.js Runtime</th><th>Edge Runtime</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Cold start</td><td>500ms-2s</td><td>&lt;5ms</td></tr>
+                    <tr><td>Max execution time</td><td>Minutes+</td><td>5-30 seconds (platform dependent)</td></tr>
+                    <tr><td>Memory</td><td>GBs available</td><td>128MB typical limit</td></tr>
+                    <tr><td>File system access</td><td>✅ Full fs module</td><td>❌ No filesystem</td></tr>
+                    <tr><td>Native modules (sharp, bcrypt)</td><td>✅</td><td>❌ V8 isolate only</td></tr>
+                    <tr><td>Database connections</td><td>✅ TCP pools</td><td>⚠️ HTTP-based only (Planetscale, Neon, Turso)</td></tr>
+                    <tr><td>Web Crypto API</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>Streaming responses</td><td>✅</td><td>✅ (primary pattern)</td></tr>
+                    <tr><td>Global deployment</td><td>❌ Single region</td><td>✅ All PoPs (300+)</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ The Database Problem</div>
+                <p>Edge compute is fast, but if your database is in one region, every edge location must make a long request to that region. Solutions: (1) Globally distributed databases (CockroachDB, PlanetScale, Turso), (2) Read replicas at edge (DynamoDB Global Tables), (3) Cache aggressively at edge (stale-while-revalidate), (4) Separate read path (edge) from write path (origin).</p>
+            </div>
+
+            <h2>Patterns: What Works at the Edge</h2>
+<pre><code><span class="token-comment">// Pattern 1: Personalization at edge (no origin roundtrip)</span>
+<span class="token-keyword">export default function</span> <span class="token-function">middleware</span>(request) {
+    <span class="token-keyword">const</span> country = request.geo.country;
+    <span class="token-keyword">const</span> response = NextResponse.next();
+    
+    <span class="token-comment">// Rewrite to country-specific version (pre-rendered at build time)</span>
+    <span class="token-keyword">if</span> (country === <span class="token-string">'DE'</span>) {
+        <span class="token-keyword">return</span> NextResponse.rewrite(<span class="token-keyword">new</span> URL(<span class="token-string">'/de'</span> + request.pathname, request.url));
+    }
+    
+    <span class="token-comment">// A/B testing at edge — no client-side flicker</span>
+    <span class="token-keyword">const</span> bucket = request.cookies.get(<span class="token-string">'experiment'</span>)?.value 
+        || (Math.random() &lt; 0.5 ? <span class="token-string">'A'</span> : <span class="token-string">'B'</span>);
+    response.cookies.set(<span class="token-string">'experiment'</span>, bucket);
+    
+    <span class="token-keyword">return</span> response;
+}
+
+<span class="token-comment">// Pattern 2: Edge caching with stale-while-revalidate</span>
+<span class="token-keyword">export async function</span> <span class="token-function">GET</span>(request) {
+    <span class="token-keyword">const</span> data = <span class="token-keyword">await</span> fetch(<span class="token-string">'https://api.example.com/feed'</span>, {
+        next: { 
+            revalidate: 10,  <span class="token-comment">// Stale after 10s, revalidate in background</span>
+            tags: [<span class="token-string">'feed'</span>]   <span class="token-comment">// On-demand revalidation via tag</span>
+        }
+    });
+    <span class="token-keyword">return</span> Response.json(<span class="token-keyword">await</span> data.json());
+}
+
+<span class="token-comment">// Pattern 3: Streaming at edge (start sending immediately)</span>
+<span class="token-keyword">export async function</span> <span class="token-function">GET</span>() {
+    <span class="token-keyword">const</span> encoder = <span class="token-keyword">new</span> TextEncoder();
+    <span class="token-keyword">const</span> stream = <span class="token-keyword">new</span> ReadableStream({
+        <span class="token-keyword">async</span> start(controller) {
+            <span class="token-comment">// Send shell immediately</span>
+            controller.enqueue(encoder.encode(<span class="token-string">'&lt;html&gt;&lt;body&gt;'</span>));
+            
+            <span class="token-comment">// Stream content as it becomes available</span>
+            <span class="token-keyword">const</span> data = <span class="token-keyword">await</span> fetchSlowAPI();
+            controller.enqueue(encoder.encode(<span class="token-string">`&lt;div&gt;${data}&lt;/div&gt;`</span>));
+            
+            controller.enqueue(encoder.encode(<span class="token-string">'&lt;/body&gt;&lt;/html&gt;'</span>));
+            controller.close();
+        }
+    });
+    
+    <span class="token-keyword">return</span> <span class="token-keyword">new</span> Response(stream, {
+        headers: { <span class="token-string">'Content-Type'</span>: <span class="token-string">'text/html'</span> }
+    });
+}
+</code></pre>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Vercel Edge Functions</strong> — Powers Next.js middleware and edge-rendered pages. Uses Cloudflare's network under the hood. &lt;5ms cold start.</li>
+                <li><strong>Cloudflare Workers</strong> — Pioneer of edge compute. 300+ locations. Used by Discord (API routing), Shopify (Oxygen), and thousands of production apps.</li>
+                <li><strong>Deno Deploy</strong> — Edge runtime using Deno's V8 isolates. Fresh framework renders at the edge by default.</li>
+                <li><strong>AWS CloudFront Functions / Lambda@Edge</strong> — CloudFront Functions for lightweight transforms (1ms limit), Lambda@Edge for heavier compute (5s limit).</li>
+                <li><strong>Netlify Edge Functions</strong> — Deno-based edge functions integrated with their deploy pipeline.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Moving all logic to edge without considering data locality</strong> — If your DB is in us-east-1, edge compute in Tokyo still takes 200ms for DB queries. Edge shines when data is cached or globally distributed.</li>
+                <li><strong>Using Node.js-specific APIs at edge</strong> — <code>Buffer</code>, <code>process.env</code> patterns, <code>require()</code> — use Web standard APIs instead (Uint8Array, env bindings, import).</li>
+                <li><strong>Not handling cold starts for WebSocket-like patterns</strong> — Edge functions are stateless. You can't hold connections between requests. Use Durable Objects or external state.</li>
+                <li><strong>Ignoring the 128MB memory limit</strong> — Processing large files, rendering complex PDFs, or running ML models won't work. These need origin functions.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Edge Rendering When...</h3>
+                <p>You can architect a system that uses edge rendering for the HTML shell + cached data, streams dynamic personalized content from edge, and falls back to origin only for mutations — explaining the latency profile at each step.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a Next.js page that renders at the edge, displays the user's city (from geo headers), fetches product data with 60s edge cache, and shows a "last updated" timestamp. Deploy it and measure TTFB from 3 different continents.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Connects to: <strong>Server Components</strong> (can execute at edge), <strong>Streaming SSR</strong> (edge + streaming = fastest possible TTFB), <strong>Stale-While-Revalidate</strong> (primary caching strategy at edge), <strong>Micro-Frontends</strong> (edge can compose fragments from different origins).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="61-server-components.html" class="nav-btn nav-btn-prev">← Server Components</a>
+                <a href="63-micro-frontend-orchestration.html" class="nav-btn nav-btn-next">Micro-Frontend Orchestration →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

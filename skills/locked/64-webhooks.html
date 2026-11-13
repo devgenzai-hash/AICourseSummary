@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhooks - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>System Design</h2>
+            <p class="sidebar-subtitle">Beginner &rarr; Advanced &bull; 68 Topics</p>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-module">
+                <h3>Concurrency Foundations</h3>
+                <ul>
+                    <li><a href="01-threads-vs-processes.html">01 &mdash; Threads vs Processes</a></li>
+                    <li><a href="02-context-switching.html">02 &mdash; Context Switching</a></li>
+                    <li><a href="03-race-conditions.html">03 &mdash; Race Conditions</a></li>
+                    <li><a href="04-critical-sections.html">04 &mdash; Critical Sections</a></li>
+                    <li><a href="05-mutex-locks.html">05 &mdash; Mutex Locks</a></li>
+                    <li><a href="06-deadlocks.html">06 &mdash; Deadlocks</a></li>
+                    <li><a href="07-livelocks-starvation.html">07 &mdash; Livelocks &amp; Starvation</a></li>
+                    <li><a href="08-thread-safety.html">08 &mdash; Thread Safety</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Low-Level Concurrency</h3>
+                <ul>
+                    <li><a href="09-atomic-operations-cas.html">09 &mdash; Atomic Operations &amp; CAS</a></li>
+                    <li><a href="10-memory-visibility.html">10 &mdash; Memory Visibility</a></li>
+                    <li><a href="11-happens-before.html">11 &mdash; Happens-Before</a></li>
+                    <li><a href="12-volatile-vs-synchronized.html">12 &mdash; Volatile vs Synchronized</a></li>
+                    <li><a href="13-false-sharing.html">13 &mdash; False Sharing</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Concurrency Patterns</h3>
+                <ul>
+                    <li><a href="14-thread-pools.html">14 &mdash; Thread Pools</a></li>
+                    <li><a href="15-futures-promises-async.html">15 &mdash; Futures, Promises &amp; Async</a></li>
+                    <li><a href="16-producer-consumer.html">16 &mdash; Producer-Consumer</a></li>
+                    <li><a href="17-blocking-vs-nonblocking.html">17 &mdash; Blocking vs Non-Blocking</a></li>
+                    <li><a href="18-event-loop.html">18 &mdash; Event Loop</a></li>
+                    <li><a href="19-actor-model.html">19 &mdash; Actor Model</a></li>
+                    <li><a href="20-coroutines-fibers.html">20 &mdash; Coroutines &amp; Fibers</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Distributed Systems Core</h3>
+                <ul>
+                    <li><a href="21-fallacies-distributed.html">21 &mdash; Fallacies of Distributed Computing</a></li>
+                    <li><a href="22-cap-theorem.html">22 &mdash; CAP Theorem</a></li>
+                    <li><a href="23-consistency-models.html">23 &mdash; Consistency Models</a></li>
+                    <li><a href="24-replication.html">24 &mdash; Replication</a></li>
+                    <li><a href="25-partitioning-sharding.html">25 &mdash; Partitioning &amp; Sharding</a></li>
+                    <li><a href="26-consensus-algorithms.html">26 &mdash; Consensus Algorithms</a></li>
+                    <li><a href="27-vector-clocks.html">27 &mdash; Vector Clocks</a></li>
+                    <li><a href="28-gossip-protocols.html">28 &mdash; Gossip Protocols</a></li>
+                    <li><a href="29-distributed-transactions.html">29 &mdash; Distributed Transactions</a></li>
+                    <li><a href="30-saga-pattern.html">30 &mdash; Saga Pattern</a></li>
+                    <li><a href="31-cqrs.html">31 &mdash; CQRS</a></li>
+                    <li><a href="32-event-sourcing.html">32 &mdash; Event Sourcing</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Resilience Patterns</h3>
+                <ul>
+                    <li><a href="33-circuit-breaker.html">33 &mdash; Circuit Breaker</a></li>
+                    <li><a href="34-retry-backoff.html">34 &mdash; Retry &amp; Backoff</a></li>
+                    <li><a href="35-bulkhead-pattern.html">35 &mdash; Bulkhead Pattern</a></li>
+                    <li><a href="36-timeout-patterns.html">36 &mdash; Timeout Patterns</a></li>
+                    <li><a href="37-health-checks.html">37 &mdash; Health Checks</a></li>
+                    <li><a href="38-graceful-degradation.html">38 &mdash; Graceful Degradation</a></li>
+                    <li><a href="39-backpressure.html">39 &mdash; Backpressure</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Database Engineering</h3>
+                <ul>
+                    <li><a href="40-acid-properties.html">40 &mdash; ACID Properties</a></li>
+                    <li><a href="41-indexing-strategies.html">41 &mdash; Indexing Strategies</a></li>
+                    <li><a href="42-query-optimization.html">42 &mdash; Query Optimization</a></li>
+                    <li><a href="43-connection-pooling.html">43 &mdash; Connection Pooling</a></li>
+                    <li><a href="44-nosql-patterns.html">44 &mdash; NoSQL Patterns</a></li>
+                    <li><a href="45-data-migration.html">45 &mdash; Data Migration</a></li>
+                    <li><a href="46-caching-strategies.html">46 &mdash; Caching Strategies</a></li>
+                    <li><a href="47-write-ahead-log.html">47 &mdash; Write-Ahead Log</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Architecture Patterns</h3>
+                <ul>
+                    <li><a href="48-monolith-vs-microservices.html">48 &mdash; Monolith vs Microservices</a></li>
+                    <li><a href="49-service-mesh.html">49 &mdash; Service Mesh</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Design Patterns</h3>
+                <ul>
+                    <li><a href="50-load-balancing.html">50 &mdash; Load Balancing</a></li>
+                    <li><a href="51-api-gateway.html">51 &mdash; API Gateway</a></li>
+                    <li><a href="52-rate-limiting.html">52 &mdash; Rate Limiting</a></li>
+                    <li><a href="53-message-queues.html">53 &mdash; Message Queues</a></li>
+                    <li><a href="54-pub-sub.html">54 &mdash; Pub/Sub</a></li>
+                    <li><a href="55-cdn.html">55 &mdash; CDN</a></li>
+                    <li><a href="56-dns-resolution.html">56 &mdash; DNS Resolution</a></li>
+                    <li><a href="57-proxy-patterns.html">57 &mdash; Proxy Patterns</a></li>
+                    <li><a href="58-consistent-hashing.html">58 &mdash; Consistent Hashing</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>API &amp; Communication</h3>
+                <ul>
+                    <li><a href="59-rest-api-design.html">59 &mdash; REST API Design</a></li>
+                    <li><a href="60-graphql.html">60 &mdash; GraphQL</a></li>
+                    <li><a href="61-websockets.html">61 &mdash; WebSockets</a></li>
+                    <li><a href="62-sse.html">62 &mdash; Server-Sent Events</a></li>
+                    <li><a href="63-grpc.html">63 &mdash; gRPC</a></li>
+                    <li><a href="64-webhooks.html" class="active">64 &mdash; Webhooks</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Security</h3>
+                <ul>
+                    <li><a href="65-jwt.html">65 &mdash; JWT</a></li>
+                    <li><a href="66-oauth2.html">66 &mdash; OAuth 2.0</a></li>
+                    <li><a href="67-tls-mtls.html">67 &mdash; TLS &amp; mTLS</a></li>
+                    <li><a href="68-api-security.html">68 &mdash; API Security</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="sidebar-progress">
+            <div class="progress-bar"><div class="progress-fill" style="width: 94%"></div></div>
+            <span class="progress-text">64 / 68 completed</span>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">&#9776;</button>
+        <h1 class="topbar-title">Webhooks</h1>
+        <div class="topbar-tags">
+            <span class="tag tag-beginner">Beginner</span>
+            <span class="tag tag-api">API</span>
+            <span class="tag tag-pattern">Pattern</span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <h1>Webhooks</h1>
+            <p class="hero-subtitle">Event-driven HTTP callbacks &mdash; push notifications for the web</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#128276; Real-World Analogy</h3>
+            <p>A <strong>doorbell</strong> &mdash; instead of checking every 5 minutes whether someone is at the door (polling), the visitor presses the bell and you are <em>notified instantly</em>. Webhooks work the same way: the source system rings your endpoint whenever an event occurs, eliminating wasteful repeated checks.</p>
+        </div>
+
+        <h2>What Are Webhooks?</h2>
+        <p>A webhook is a user-defined HTTP callback &mdash; a URL that a service calls (via POST) whenever a specific event happens. The consumer registers the URL once, then receives real-time push notifications without repeatedly asking "has anything changed?"</p>
+
+        <h2>Webhooks vs Polling</h2>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Polling</th>
+                        <th>Webhooks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Direction</td>
+                        <td>Consumer pulls from provider</td>
+                        <td>Provider pushes to consumer</td>
+                    </tr>
+                    <tr>
+                        <td>Latency</td>
+                        <td>Up to polling interval (seconds&ndash;minutes)</td>
+                        <td>Near real-time (sub-second)</td>
+                    </tr>
+                    <tr>
+                        <td>Bandwidth</td>
+                        <td>Wasted on empty responses</td>
+                        <td>Only used when events occur</td>
+                    </tr>
+                    <tr>
+                        <td>Complexity</td>
+                        <td>Simple &mdash; consumer controls timing</td>
+                        <td>Consumer must expose a public endpoint</td>
+                    </tr>
+                    <tr>
+                        <td>Reliability</td>
+                        <td>Consumer retries naturally</td>
+                        <td>Provider needs retry &amp; dead-letter logic</td>
+                    </tr>
+                    <tr>
+                        <td>Scalability</td>
+                        <td>Load grows linearly with subscribers</td>
+                        <td>Provider sends only when events fire</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Webhook Security &mdash; HMAC Signatures</h2>
+        <h3>Why Verify?</h3>
+        <p>Any attacker who discovers your endpoint can forge payloads. HMAC (Hash-based Message Authentication Code) signatures let the receiver prove the payload truly originated from the expected sender &mdash; without exposing the secret in transit.</p>
+
+        <h3>How It Works</h3>
+        <ol>
+            <li>Provider and consumer share a secret key at registration time</li>
+            <li>Provider computes <code>HMAC-SHA256(secret, raw_body)</code> and sends it in a header</li>
+            <li>Consumer recomputes the HMAC over the received body and compares</li>
+            <li>If they match &rarr; authentic; if not &rarr; reject with 403</li>
+        </ol>
+
+        <h2>Retry Policies &amp; Reliability</h2>
+        <h3>Exponential Backoff</h3>
+        <p>When a delivery fails (timeout or 5xx), the provider should retry with increasing delays &mdash; e.g., 1s, 5s, 30s, 2m, 15m, 1h. After exhausting retries, move the event to a dead-letter queue for manual inspection.</p>
+
+        <h3>Idempotency in Handlers</h3>
+        <p>Because retries can deliver the same event multiple times, webhook handlers must be <strong>idempotent</strong>. Use a unique event ID (provided in the payload) to deduplicate &mdash; store processed IDs and skip duplicates.</p>
+
+        <h2>Code &mdash; Webhook Sender with HMAC</h2>
+        <div class="code-block">
+            <pre><code><span class="token-keyword">import</span> hmac
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> requests
+
+<span class="token-keyword">class</span> <span class="token-class">WebhookSender</span>:
+    <span class="token-string">"""Sends webhook events with HMAC-SHA256 signing and retry logic."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, secret: <span class="token-class">str</span>, max_retries: <span class="token-class">int</span> = <span class="token-number">5</span>):
+        self.secret = secret.encode(<span class="token-string">"utf-8"</span>)
+        self.max_retries = max_retries
+        self.backoff_factors = [<span class="token-number">1</span>, <span class="token-number">5</span>, <span class="token-number">30</span>, <span class="token-number">120</span>, <span class="token-number">900</span>]
+
+    <span class="token-keyword">def</span> <span class="token-function">_sign</span>(self, payload_bytes: <span class="token-class">bytes</span>) -> <span class="token-class">str</span>:
+        <span class="token-comment"># Compute HMAC-SHA256 signature over raw body</span>
+        signature = hmac.new(self.secret, payload_bytes, hashlib.sha256)
+        <span class="token-keyword">return</span> <span class="token-string">"sha256="</span> + signature.hexdigest()
+
+    <span class="token-keyword">def</span> <span class="token-function">send</span>(self, url: <span class="token-class">str</span>, event_type: <span class="token-class">str</span>, data: <span class="token-class">dict</span>) -> <span class="token-class">bool</span>:
+        <span class="token-comment"># Build the payload with metadata</span>
+        payload = {
+            <span class="token-string">"event_id"</span>: <span class="token-function">generate_uuid</span>(),
+            <span class="token-string">"event_type"</span>: event_type,
+            <span class="token-string">"timestamp"</span>: <span class="token-function">int</span>(time.time()),
+            <span class="token-string">"data"</span>: data,
+        }
+        body = json.dumps(payload, separators=(<span class="token-string">","</span>, <span class="token-string">":"</span>))
+        body_bytes = body.encode(<span class="token-string">"utf-8"</span>)
+        signature = self._sign(body_bytes)
+
+        headers = {
+            <span class="token-string">"Content-Type"</span>: <span class="token-string">"application/json"</span>,
+            <span class="token-string">"X-Webhook-Signature"</span>: signature,
+            <span class="token-string">"X-Webhook-Event"</span>: event_type,
+        }
+
+        <span class="token-keyword">for</span> attempt <span class="token-keyword">in</span> <span class="token-function">range</span>(self.max_retries):
+            <span class="token-keyword">try</span>:
+                resp = requests.post(url, data=body_bytes, headers=headers, timeout=<span class="token-number">10</span>)
+                <span class="token-keyword">if</span> resp.status_code <span class="token-keyword">in</span> (<span class="token-number">200</span>, <span class="token-number">201</span>, <span class="token-number">204</span>):
+                    <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+            <span class="token-keyword">except</span> requests.RequestException:
+                <span class="token-keyword">pass</span>
+            <span class="token-comment"># Exponential backoff before next retry</span>
+            time.sleep(self.backoff_factors[attempt])
+
+        <span class="token-keyword">return</span> <span class="token-keyword">False</span>  <span class="token-comment"># All retries exhausted</span></code></pre>
+        </div>
+
+        <h2>Code &mdash; Webhook Receiver with Verification</h2>
+        <div class="code-block">
+            <pre><code><span class="token-keyword">import</span> hmac
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">from</span> flask <span class="token-keyword">import</span> Flask, request, jsonify
+
+app = Flask(__name__)
+WEBHOOK_SECRET = <span class="token-string">"your-shared-secret"</span>
+processed_events: <span class="token-class">set</span> = <span class="token-function">set</span>()
+
+<span class="token-keyword">def</span> <span class="token-function">verify_signature</span>(payload: <span class="token-class">bytes</span>, signature: <span class="token-class">str</span>) -> <span class="token-class">bool</span>:
+    <span class="token-comment"># Recompute and compare in constant time</span>
+    expected = <span class="token-string">"sha256="</span> + hmac.new(
+        WEBHOOK_SECRET.encode(<span class="token-string">"utf-8"</span>),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+    <span class="token-keyword">return</span> hmac.compare_digest(expected, signature)
+
+<span class="token-keyword">@app.route</span>(<span class="token-string">"/webhooks/receive"</span>, methods=[<span class="token-string">"POST"</span>])
+<span class="token-keyword">def</span> <span class="token-function">handle_webhook</span>():
+    <span class="token-comment"># Step 1 &mdash; Verify authenticity</span>
+    signature = request.headers.get(<span class="token-string">"X-Webhook-Signature"</span>, <span class="token-string">""</span>)
+    <span class="token-keyword">if not</span> verify_signature(request.data, signature):
+        <span class="token-keyword">return</span> jsonify({<span class="token-string">"error"</span>: <span class="token-string">"Invalid signature"</span>}), <span class="token-number">403</span>
+
+    <span class="token-comment"># Step 2 &mdash; Parse event payload</span>
+    event = request.get_json()
+    event_id = event.get(<span class="token-string">"event_id"</span>)
+
+    <span class="token-comment"># Step 3 &mdash; Idempotency check</span>
+    <span class="token-keyword">if</span> event_id <span class="token-keyword">in</span> processed_events:
+        <span class="token-keyword">return</span> jsonify({<span class="token-string">"status"</span>: <span class="token-string">"already_processed"</span>}), <span class="token-number">200</span>
+
+    <span class="token-comment"># Step 4 &mdash; Process the event</span>
+    <span class="token-function">process_event</span>(event)
+    processed_events.add(event_id)
+
+    <span class="token-keyword">return</span> jsonify({<span class="token-string">"status"</span>: <span class="token-string">"accepted"</span>}), <span class="token-number">200</span></code></pre>
+        </div>
+
+        <h2>Reliability Patterns</h2>
+        <h3>Dead-Letter Queue</h3>
+        <p>After all retries fail, persist the event in a dead-letter queue. An operator can inspect failures, fix the consumer endpoint, and replay events manually or automatically.</p>
+
+        <h3>Delivery Guarantees</h3>
+        <ul>
+            <li><strong>At-least-once</strong> &mdash; most webhook systems deliver this; duplicates are possible</li>
+            <li><strong>At-most-once</strong> &mdash; fire-and-forget with no retries (rare, unreliable)</li>
+            <li><strong>Exactly-once</strong> &mdash; impossible in distributed systems; approximate via idempotency keys</li>
+        </ul>
+
+        <h3>Timestamp &amp; Replay Protection</h3>
+        <p>Include a timestamp in the signed payload. Receivers reject events older than 5 minutes to prevent replay attacks where an attacker resends a captured valid request.</p>
+
+        <div class="industry-box">
+            <h3>&#127981; Industry Examples</h3>
+            <ul>
+                <li><strong>Stripe</strong> &mdash; sends payment events (charge.succeeded, invoice.paid) with HMAC-SHA256 signatures; provides a webhook dashboard and auto-disables unhealthy endpoints</li>
+                <li><strong>GitHub</strong> &mdash; fires webhooks for push, PR, issue events; signs payloads with <code>X-Hub-Signature-256</code> header</li>
+                <li><strong>Slack Events API</strong> &mdash; posts events to your server; requires URL verification challenge and request signing</li>
+                <li><strong>Twilio</strong> &mdash; sends SMS/call status callbacks; validates with request signing using auth token</li>
+                <li><strong>Shopify</strong> &mdash; notifies merchants of order, product, and cart events with HMAC-SHA256 verification</li>
+            </ul>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#128203; Summary</h3>
+            <ul>
+                <li>Webhooks are HTTP POST callbacks triggered by events &mdash; push, not pull</li>
+                <li>Always verify authenticity using HMAC signatures with constant-time comparison</li>
+                <li>Implement idempotency &mdash; deduplicate using event IDs to handle retries safely</li>
+                <li>Use exponential backoff with dead-letter queues for reliable delivery</li>
+                <li>Reject stale payloads via timestamp validation to prevent replay attacks</li>
+                <li>Design handlers to respond fast (< 5s) and offload processing to background workers</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#129504; Mental Model</h3>
+            <div class="model-visual">
+                <pre>
+┌──────────────┐         POST /webhooks/receive         ┌──────────────┐
+│              │ ──────────────────────────────────────▶ │              │
+│   Provider   │   Headers: X-Webhook-Signature         │   Consumer   │
+│  (e.g. Stripe)│   Body: { event_id, type, data }      │  (Your App)  │
+│              │ ◀────────────────────────────────────── │              │
+└──────────────┘         200 OK / 403 Forbidden         └──────────────┘
+       │                                                        │
+       │  On failure:                                           │
+       │  ┌───────────────────────┐                             │
+       └──│ Retry with backoff    │                    Verify HMAC
+           │ 1s → 5s → 30s → 2m  │                    Deduplicate
+           │ Dead-letter on exhaust│                    Process async
+           └───────────────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#9888;&#65039; Common Mistakes</h3>
+            <ul>
+                <li><strong>No signature verification</strong> &mdash; accepting any POST to your endpoint lets attackers inject fake events; always verify HMAC before processing</li>
+                <li><strong>Synchronous heavy processing</strong> &mdash; doing database writes or API calls inside the handler causes timeouts; acknowledge fast and process in a background queue</li>
+                <li><strong>Ignoring idempotency</strong> &mdash; retries deliver duplicate events; without deduplication you double-charge customers or send duplicate emails</li>
+                <li><strong>No replay protection</strong> &mdash; without timestamp validation, an attacker can replay captured valid payloads indefinitely; reject events older than your tolerance window</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#128187; Exercises</h3>
+            <ol>
+                <li><strong>Build a webhook sender</strong> &mdash; create a Python service that signs payloads with HMAC-SHA256 and delivers them to a configurable endpoint with 5 retry attempts using exponential backoff</li>
+                <li><strong>Implement a receiver</strong> &mdash; write a Flask/FastAPI endpoint that verifies signatures, deduplicates via event IDs stored in Redis, and returns 200 within 2 seconds</li>
+                <li><strong>Simulate failure scenarios</strong> &mdash; build a mock consumer that randomly returns 500; observe the sender retry behavior and verify events eventually land in a dead-letter store</li>
+                <li><strong>Add replay protection</strong> &mdash; extend your receiver to reject payloads with timestamps older than 5 minutes; write a test that replays a captured valid payload after the window expires and confirm rejection</li>
+            </ol>
+        </div>
+
+        <nav class="page-nav">
+            <a href="63-grpc.html" class="prev">&larr; Previous: gRPC</a>
+            <a href="65-jwt.html" class="next">Next: JWT &rarr;</a>
+        </nav>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

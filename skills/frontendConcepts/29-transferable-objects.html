@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transferable Objects - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Transferable Objects
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Transferable Objects</h1>
+                <p class="subtitle">Zero-copy data transfer between threads — how to move ownership of ArrayBuffers, MessagePorts, and OffscreenCanvas across execution contexts without the serialization cost of structured cloning.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Performance</span>
+                    <span class="tag tag-browser">Browser API</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📦 Daily-Life Analogy: Moving vs Photocopying</div>
+                <p>Normal <code>postMessage</code> is like photocopying a document before handing it to a colleague — slow, uses double the paper. <strong>Transferable</strong> is like physically handing over the original document — instant, no duplication. But now YOU no longer have it. Ownership transfers completely.</p>
+            </div>
+
+            <h2>The Problem: Structured Clone Is Expensive</h2>
+            <p>When you <code>postMessage(data)</code> to a worker, the browser uses the <strong>structured clone algorithm</strong> to deep-copy the data. For a 100MB ArrayBuffer:</p>
+            <ul>
+                <li><strong>Time:</strong> ~50-100ms to copy 100MB (blocks the sending thread during copy)</li>
+                <li><strong>Memory:</strong> 200MB total (original + copy)</li>
+                <li><strong>GC pressure:</strong> The copy must eventually be garbage collected</li>
+            </ul>
+            <p>Transferable objects solve this: the buffer's ownership <strong>moves</strong> to the other thread. The operation is O(1) regardless of buffer size — it just reassigns the memory pointer.</p>
+
+            <h2>What Can Be Transferred</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Object Type</th><th>After Transfer</th><th>Use Case</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>ArrayBuffer</code></td><td>Becomes 0 bytes (neutered/detached)</td><td>Image data, audio buffers, binary protocols</td></tr>
+                    <tr><td><code>MessagePort</code></td><td>Port is no longer usable in sender</td><td>Multi-worker communication channels</td></tr>
+                    <tr><td><code>OffscreenCanvas</code></td><td>Canvas removed from sender context</td><td>Worker-based rendering</td></tr>
+                    <tr><td><code>ImageBitmap</code></td><td>Bitmap neutered in sender</td><td>Decoded images ready to draw</td></tr>
+                    <tr><td><code>ReadableStream</code></td><td>Stream locked in sender</td><td>Streaming data to workers</td></tr>
+                    <tr><td><code>WritableStream</code></td><td>Stream locked in sender</td><td>Workers writing to main-thread sinks</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Code: Transferring vs Cloning</h2>
+<pre><code><span class="token-comment">// ❌ SLOW: Structured clone — copies 100MB</span>
+<span class="token-keyword">const</span> buffer = <span class="token-keyword">new</span> ArrayBuffer(100 * 1024 * 1024); <span class="token-comment">// 100MB</span>
+worker.postMessage({ data: buffer }); <span class="token-comment">// ~80ms to copy!</span>
+console.log(buffer.byteLength); <span class="token-comment">// 104857600 — still have it</span>
+
+<span class="token-comment">// ✅ FAST: Transfer — moves ownership in O(1)</span>
+<span class="token-keyword">const</span> buffer2 = <span class="token-keyword">new</span> ArrayBuffer(100 * 1024 * 1024);
+worker.postMessage({ data: buffer2 }, [buffer2]); <span class="token-comment">// Second arg = transfer list</span>
+console.log(buffer2.byteLength); <span class="token-comment">// 0 — buffer is NEUTERED! You lost it.</span>
+
+<span class="token-comment">// Modern syntax (structuredClone also supports it):</span>
+worker.postMessage({ data: buffer3 }, { transfer: [buffer3] });
+</code></pre>
+
+            <h3>Practical Pattern: Worker Image Processing Pipeline</h3>
+<pre><code><span class="token-comment">// main.js — Transfer image data to worker, get processed result back</span>
+<span class="token-keyword">const</span> worker = <span class="token-keyword">new</span> Worker(<span class="token-string">'image-worker.js'</span>);
+
+<span class="token-keyword">async</span> <span class="token-keyword">function</span> <span class="token-function">processImage</span>(file) {
+    <span class="token-keyword">const</span> arrayBuffer = <span class="token-keyword">await</span> file.arrayBuffer();
+    
+    <span class="token-comment">// Transfer TO worker (we give up access to arrayBuffer)</span>
+    worker.postMessage(
+        { type: <span class="token-string">'process'</span>, buffer: arrayBuffer },
+        [arrayBuffer]  <span class="token-comment">// Transfer list — zero copy!</span>
+    );
+    <span class="token-comment">// arrayBuffer.byteLength === 0 now</span>
+}
+
+worker.onmessage = (e) => {
+    <span class="token-comment">// Worker transferred the result BACK — zero copy return</span>
+    <span class="token-keyword">const</span> processedBuffer = e.data.buffer;
+    <span class="token-keyword">const</span> blob = <span class="token-keyword">new</span> Blob([processedBuffer], { type: <span class="token-string">'image/png'</span> });
+    document.getElementById(<span class="token-string">'output'</span>).src = URL.createObjectURL(blob);
+};
+</code></pre>
+
+<pre><code><span class="token-comment">// image-worker.js — Receives buffer, processes, transfers back</span>
+self.onmessage = (e) => {
+    <span class="token-keyword">const</span> { buffer } = e.data;
+    
+    <span class="token-comment">// Create a view to manipulate the pixel data</span>
+    <span class="token-keyword">const</span> pixels = <span class="token-keyword">new</span> Uint8Array(buffer);
+    
+    <span class="token-comment">// Apply grayscale filter (modify in place)</span>
+    <span class="token-keyword">for</span> (<span class="token-keyword">let</span> i = 0; i &lt; pixels.length; i += 4) {
+        <span class="token-keyword">const</span> avg = (pixels[i] + pixels[i+1] + pixels[i+2]) / 3;
+        pixels[i] = pixels[i+1] = pixels[i+2] = avg;
+    }
+    
+    <span class="token-comment">// Transfer back — worker loses access, main thread gets it for free</span>
+    self.postMessage({ buffer: buffer }, [buffer]);
+};
+</code></pre>
+
+            <h2>Performance Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Data Size</th><th>Structured Clone</th><th>Transfer</th><th>Speedup</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1 MB</td><td>~1ms</td><td>~0.01ms</td><td>100x</td></tr>
+                    <tr><td>10 MB</td><td>~8ms</td><td>~0.01ms</td><td>800x</td></tr>
+                    <tr><td>100 MB</td><td>~80ms</td><td>~0.01ms</td><td>8000x</td></tr>
+                    <tr><td>1 GB</td><td>~800ms</td><td>~0.01ms</td><td>80000x</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Transfer is Always O(1)</div>
+                <p>Regardless of buffer size, transfer takes constant time because it only moves a pointer. The actual bytes never move in memory — only the ownership metadata changes. This is why it's called "zero-copy."</p>
+            </div>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Photoshop Web</strong> — Transfers pixel data (often hundreds of MB) between rendering workers and the main thread without copying.</li>
+                <li><strong>Zoom Web Client</strong> — Audio/video frame buffers are transferred between decode workers and rendering for real-time performance.</li>
+                <li><strong>Google Maps</strong> — Tile image data decoded in workers is transferred back as ImageBitmaps for zero-copy rendering to canvas.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Accessing transferred buffer after transfer</strong> — The buffer becomes detached (0 bytes). Any TypedArray view into it becomes unusable. This is a silent failure, not an error.</li>
+                <li><strong>Transferring when you still need the data</strong> — If you need to keep a copy, clone first: <code>buffer.slice()</code>, then transfer the clone.</li>
+                <li><strong>Confusing transfer list with message</strong> — The transfer list is a separate argument. Objects in the list must also appear in the message itself.</li>
+                <li><strong>Trying to transfer non-transferable objects</strong> — Regular objects, strings, Maps, etc. cannot be transferred. Only specific types listed above.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Transferable Objects When...</h3>
+                <p>You can explain why <code>buffer.byteLength === 0</code> after transfer, what "neutered" means at the memory level, and when you'd choose transfer over SharedArrayBuffer (hint: transfer = single owner; SAB = multiple owners).</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a file upload processor that: reads a File as ArrayBuffer on main thread, transfers it to a worker for hashing (SHA-256), then transfers the result back. Measure the time difference between clone and transfer for a 50MB file.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Transferable Objects connect to: <strong>SharedArrayBuffer</strong> (shared memory — different paradigm), <strong>OffscreenCanvas</strong> (a transferable itself), and <strong>Web Workers</strong> (the thread boundary these cross).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="28-sharedarraybuffer.html" class="nav-btn nav-btn-prev">← SharedArrayBuffer</a>
+                <a href="30-offscreencanvas.html" class="nav-btn nav-btn-next">OffscreenCanvas →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

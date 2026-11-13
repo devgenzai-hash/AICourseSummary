@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Orchestration — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 11</a> <span>›</span> AI Orchestration</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>AI Orchestration</h1>
+                <p>Complex AI systems don't use one model call. They chain multiple models, route between providers, handle fallbacks, and manage state across steps. This is orchestration — the conductor of your AI orchestra.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>AI orchestration = a film director.</strong> The director doesn't act, film, or edit — they coordinate actors (models), camera crews (tools), and editors (post-processing) to create the final movie. Each specialist does their part, the director ensures it all comes together.</p>
+            </div>
+
+            <h2 id="patterns">Orchestration Patterns</h2>
+
+            <table>
+                <thead><tr><th>Pattern</th><th>How It Works</th><th>When To Use</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Sequential chain</strong></td><td>Step 1 → Step 2 → Step 3</td><td>Multi-step processing (analyze → plan → write)</td></tr>
+                    <tr><td><strong>Parallel fan-out</strong></td><td>Send to N models, combine results</td><td>Comparing models, gathering perspectives</td></tr>
+                    <tr><td><strong>Router</strong></td><td>Classify input, route to specialist</td><td>Different models for different tasks</td></tr>
+                    <tr><td><strong>Fallback cascade</strong></td><td>Try Model A, if fails try Model B</td><td>Reliability, cost optimization</td></tr>
+                    <tr><td><strong>Map-reduce</strong></td><td>Split data → process each → combine</td><td>Large document processing</td></tr>
+                    <tr><td><strong>Evaluator loop</strong></td><td>Generate → evaluate → regenerate if bad</td><td>Quality-critical outputs</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="orchestrator">Production Orchestrator</h2>
+
+            <pre><code><span class="token-comment"># AI Orchestration framework — chain, route, and manage multiple AI calls</span>
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> asyncio
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Callable, Any
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-function">StepResult</span>:
+    step_name: str
+    output: Any
+    model_used: str
+    tokens: int = <span class="token-number">0</span>
+    latency_ms: float = <span class="token-number">0</span>
+
+<span class="token-keyword">class</span> <span class="token-function">AIOrchestrator</span>:
+    <span class="token-string">"""Chain multiple AI operations with routing, fallbacks, and state."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.providers = {
+            <span class="token-string">"local"</span>: OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>),
+            <span class="token-comment"># "openai": OpenAI(api_key="sk-..."),</span>
+            <span class="token-comment"># "anthropic": OpenAI(base_url="https://api.anthropic.com/v1", api_key="..."),</span>
+        }
+        self.steps = []
+        self.results = []
+        self.state = {}  <span class="token-comment"># Shared state between steps</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">add_step</span>(self, name: str, func: Callable, **kwargs):
+        <span class="token-string">"""Add a step to the orchestration pipeline."""</span>
+        self.steps.append({<span class="token-string">"name"</span>: name, <span class="token-string">"func"</span>: func, <span class="token-string">"kwargs"</span>: kwargs})
+        <span class="token-keyword">return</span> self  <span class="token-comment"># Enable chaining</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">run</span>(self, initial_input: str) -> list[StepResult]:
+        <span class="token-string">"""Execute all steps sequentially, passing state between them."""</span>
+        self.state[<span class="token-string">"input"</span>] = initial_input
+        self.results = []
+        
+        <span class="token-keyword">for</span> step <span class="token-keyword">in</span> self.steps:
+            <span class="token-builtin">print</span>(<span class="token-string">f"🔄 Running: {step['name']}"</span>)
+            result = step[<span class="token-string">"func"</span>](self.state, **step[<span class="token-string">"kwargs"</span>])
+            self.state[step[<span class="token-string">"name"</span>]] = result.output
+            self.results.append(result)
+            <span class="token-builtin">print</span>(<span class="token-string">f"  ✅ Done ({result.tokens} tokens, {result.latency_ms:.0f}ms)"</span>)
+        
+        <span class="token-keyword">return</span> self.results
+
+<span class="token-comment"># ====== Orchestration steps ======</span>
+
+<span class="token-keyword">import</span> time
+
+<span class="token-keyword">def</span> <span class="token-function">classify_intent</span>(state: dict, **kwargs) -> StepResult:
+    <span class="token-string">"""Step 1: Classify the user's intent."""</span>
+    client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+    start = time.time()
+    
+    response = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"""Classify this request into one category:
+- code_generation
+- explanation
+- debugging
+- data_analysis
+- creative_writing
+
+Request: {state['input']}
+Category:"""</span>}],
+        temperature=<span class="token-number">0</span>, max_tokens=<span class="token-number">20</span>,
+    )
+    
+    <span class="token-keyword">return</span> StepResult(
+        step_name=<span class="token-string">"classify_intent"</span>,
+        output=response.choices[<span class="token-number">0</span>].message.content.strip(),
+        model_used=<span class="token-string">"llama3.1:8b"</span>,
+        tokens=response.usage.total_tokens,
+        latency_ms=(time.time() - start) * <span class="token-number">1000</span>,
+    )
+
+<span class="token-keyword">def</span> <span class="token-function">route_to_specialist</span>(state: dict, **kwargs) -> StepResult:
+    <span class="token-string">"""Step 2: Route to specialized model/prompt based on intent."""</span>
+    client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+    intent = state.get(<span class="token-string">"classify_intent"</span>, <span class="token-string">"explanation"</span>)
+    start = time.time()
+    
+    <span class="token-comment"># Different system prompts per intent</span>
+    prompts = {
+        <span class="token-string">"code_generation"</span>: <span class="token-string">"You are an expert programmer. Write clean, production-ready code."</span>,
+        <span class="token-string">"explanation"</span>: <span class="token-string">"You explain complex topics simply. Use analogies."</span>,
+        <span class="token-string">"debugging"</span>: <span class="token-string">"You are a debugging expert. Find and fix the bug step by step."</span>,
+        <span class="token-string">"data_analysis"</span>: <span class="token-string">"You analyze data and provide clear insights with numbers."</span>,
+        <span class="token-string">"creative_writing"</span>: <span class="token-string">"You are a creative writer. Be vivid and engaging."</span>,
+    }
+    
+    system = prompts.get(intent, prompts[<span class="token-string">"explanation"</span>])
+    
+    response = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=[
+            {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system},
+            {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: state[<span class="token-string">"input"</span>]},
+        ],
+        temperature=<span class="token-number">0.7</span>,
+    )
+    
+    <span class="token-keyword">return</span> StepResult(
+        step_name=<span class="token-string">"route_to_specialist"</span>,
+        output=response.choices[<span class="token-number">0</span>].message.content,
+        model_used=<span class="token-string">"llama3.1:8b"</span>,
+        tokens=response.usage.total_tokens,
+        latency_ms=(time.time() - start) * <span class="token-number">1000</span>,
+    )
+
+<span class="token-keyword">def</span> <span class="token-function">quality_check</span>(state: dict, **kwargs) -> StepResult:
+    <span class="token-string">"""Step 3: Check output quality, regenerate if needed."""</span>
+    client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+    start = time.time()
+    
+    response = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"""Rate this response quality 1-10:
+Request: {state['input']}
+Response: {state['route_to_specialist']}
+
+Score (number only):"""</span>}],
+        temperature=<span class="token-number">0</span>, max_tokens=<span class="token-number">5</span>,
+    )
+    
+    <span class="token-keyword">return</span> StepResult(
+        step_name=<span class="token-string">"quality_check"</span>,
+        output=response.choices[<span class="token-number">0</span>].message.content.strip(),
+        model_used=<span class="token-string">"llama3.1:8b"</span>,
+        tokens=response.usage.total_tokens,
+        latency_ms=(time.time() - start) * <span class="token-number">1000</span>,
+    )
+
+<span class="token-comment"># ====== Build and run the pipeline ======</span>
+orchestrator = AIOrchestrator()
+orchestrator.add_step(<span class="token-string">"classify_intent"</span>, classify_intent)
+orchestrator.add_step(<span class="token-string">"route_to_specialist"</span>, route_to_specialist)
+orchestrator.add_step(<span class="token-string">"quality_check"</span>, quality_check)
+
+results = orchestrator.run(<span class="token-string">"Write a Python function to merge two sorted lists"</span>)
+
+<span class="token-comment"># Print final results</span>
+<span class="token-builtin">print</span>(<span class="token-string">f"\nIntent: {results[0].output}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Response: {results[1].output[:200]}..."</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Quality: {results[2].output}/10"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Total tokens: {sum(r.tokens for r in results)}"</span>)</code></pre>
+
+            <h2 id="fallback">Fallback & Multi-Provider</h2>
+
+            <pre><code><span class="token-comment"># Robust multi-provider system with fallbacks</span>
+
+<span class="token-keyword">class</span> <span class="token-function">ModelRouter</span>:
+    <span class="token-string">"""Route requests to models with fallback chains."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.providers = [
+            {<span class="token-string">"name"</span>: <span class="token-string">"local"</span>, <span class="token-string">"client"</span>: OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>), <span class="token-string">"model"</span>: <span class="token-string">"llama3.1:8b"</span>},
+            <span class="token-comment"># {"name": "openai", "client": OpenAI(), "model": "gpt-4o-mini"},</span>
+            <span class="token-comment"># {"name": "anthropic", "client": ..., "model": "claude-3-haiku"},</span>
+        ]
+    
+    <span class="token-keyword">def</span> <span class="token-function">call_with_fallback</span>(self, messages: list, **kwargs) -> dict:
+        <span class="token-string">"""Try each provider until one succeeds."""</span>
+        <span class="token-keyword">for</span> provider <span class="token-keyword">in</span> self.providers:
+            <span class="token-keyword">try</span>:
+                response = provider[<span class="token-string">"client"</span>].chat.completions.create(
+                    model=provider[<span class="token-string">"model"</span>],
+                    messages=messages,
+                    timeout=<span class="token-number">30</span>,
+                    **kwargs,
+                )
+                <span class="token-keyword">return</span> {
+                    <span class="token-string">"content"</span>: response.choices[<span class="token-number">0</span>].message.content,
+                    <span class="token-string">"provider"</span>: provider[<span class="token-string">"name"</span>],
+                    <span class="token-string">"model"</span>: provider[<span class="token-string">"model"</span>],
+                }
+            <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+                <span class="token-builtin">print</span>(<span class="token-string">f"⚠️ {provider['name']} failed: {e}, trying next..."</span>)
+                <span class="token-keyword">continue</span>
+        
+        <span class="token-keyword">raise</span> Exception(<span class="token-string">"All providers failed"</span>)
+
+router = ModelRouter()
+result = router.call_with_fallback([{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Hello!"</span>}])
+<span class="token-builtin">print</span>(<span class="token-string">f"Response from {result['provider']}: {result['content']}"</span>)</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>LangChain/LangGraph</strong> — Most popular orchestration framework. Chains, agents, state graphs.</li>
+                    <li><strong>Always have fallbacks</strong> — If OpenAI is down, switch to Anthropic. If that fails, use local model.</li>
+                    <li><strong>Use cheap models for routing</strong> — Classify with 8B model, generate with 70B. Save 80% on tokens.</li>
+                    <li><strong>Observability is critical</strong> — LangSmith, Langfuse, or custom logging. See every step and its result.</li>
+                    <li><strong>Structured state management</strong> — Pass state between steps explicitly. Makes debugging possible.</li>
+                    <li><strong>Timeout every LLM call</strong> — Models can hang. Always set timeouts (15-60 seconds).</li>
+                    <li><strong>Retry with exponential backoff</strong> — Rate limits are common. Retry 3 times with increasing delays.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Orchestration</strong> = coordinating multiple AI calls into a coherent pipeline</li>
+                    <li>Patterns: sequential chain, parallel fan-out, router, fallback cascade, map-reduce</li>
+                    <li>Use <strong>cheap models for routing</strong>, expensive models for generation</li>
+                    <li><strong>Fallback chains</strong>: Local → OpenAI → Anthropic ensures uptime</li>
+                    <li><strong>Quality check loops</strong>: generate → evaluate → regenerate if score is low</li>
+                    <li>Always: timeout, retry, log every step, track total tokens/cost</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build an Orchestration Pipeline</h4>
+                <ol>
+                    <li>Build the AIOrchestrator with classify → route → generate → quality check</li>
+                    <li>Implement fallback routing between 2+ providers</li>
+                    <li>Add a "map-reduce" step that processes a long document in chunks</li>
+                    <li>Implement cost tracking (total tokens and estimated cost per pipeline run)</li>
+                    <li>Add retry logic with exponential backoff</li>
+                    <li><strong>Bonus:</strong> Build a visual dashboard showing pipeline execution traces</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="33-ai-automation-saas.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">AI Automation & SaaS</span>
+                </a>
+                <a href="35-capstone-project.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Capstone Project</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

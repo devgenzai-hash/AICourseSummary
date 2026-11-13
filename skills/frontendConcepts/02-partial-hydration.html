@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partial Hydration - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing Complexity</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop (Macro vs Microta…</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interoperabil…</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver Internals</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver Loop Limits</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver Cost</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle Traps</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation Strategies</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preco…</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture & State Machines</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+            <li><a href="64-finite-state-modeling.html"><span class="nav-number">64</span> Finite State Modeling</a></li>
+            <li><a href="65-event-sourcing-frontend.html"><span class="nav-number">65</span> Event Sourcing in Frontend</a></li>
+            <li><a href="66-optimistic-ui-rollback.html"><span class="nav-number">66</span> Optimistic UI Rollback Strat…</a></li>
+            <li class="module-label">Offline & Collaboration</li>
+            <li><a href="67-offline-conflict-resolution.html"><span class="nav-number">67</span> Offline Conflict Resolution</a></li>
+            <li><a href="68-crdt-basics.html"><span class="nav-number">68</span> CRDT Basics for Collaboration</a></li>
+            <li><a href="69-webrtc.html"><span class="nav-number">69</span> WebRTC</a></li>
+            <li class="module-label">Streams & Async Patterns</li>
+            <li><a href="70-backpressure-streams.html"><span class="nav-number">70</span> Backpressure in Streams API</a></li>
+            <li><a href="71-abort-controller.html"><span class="nav-number">71</span> AbortController</a></li>
+            <li><a href="72-streaming-fetch.html"><span class="nav-number">72</span> Streaming Fetch Response Han…</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (I…</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async …</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/88 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Partial Hydration
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Partial Hydration</h1>
+                <p class="subtitle">The optimization that says: don't hydrate what doesn't need to be interactive. Only send JavaScript for components that actually have event handlers.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span> <span class="tag tag-concept">Concept</span> <span class="tag tag-performance">Performance</span>
+                </div>
+            </div>
+
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏗️ Analogy: Wiring a House</div>
+                <p>Full hydration is like running electrical wires to <em>every single wall</em> in a house — even walls that will never have an outlet. Partial hydration is like an electrician who only wires the walls where you actually want outlets and switches. The other walls remain perfectly fine as-is — they just don't need electricity.</p>
+            </div>
+
+            <h2>The Problem: Full Hydration is Wasteful</h2>
+            <p>Consider a typical blog post page: 90% is static text, images, and layout. Only 10% is interactive (comment form, like button, share menu). With full hydration, you download and execute JavaScript for the <em>entire</em> page — including all that static content that will never change.</p>
+            <p>Partial hydration recognizes that <strong>most server-rendered content doesn't need client-side JavaScript</strong>. It only sends JS for the "interactive islands" on the page.</p>
+
+            <h2>How Partial Hydration Works</h2>
+            <ol>
+                <li><strong>Server renders full HTML</strong> — The complete page is generated server-side</li>
+                <li><strong>Compiler/framework identifies interactive components</strong> — Either via directives or static analysis</li>
+                <li><strong>Only interactive component JS is sent</strong> — Static components get zero client JavaScript</li>
+                <li><strong>Hydration runs ONLY on interactive components</strong> — The rest of the DOM is left alone</li>
+            </ol>
+
+            <h2>Code: Astro's Partial Hydration</h2>
+<pre><code><span class="token-comment">&lt;!-- Astro uses "client directives" to mark what gets hydrated --&gt;</span>
+<span class="token-comment">&lt;!-- This component sends ZERO JavaScript to the browser --&gt;</span>
+<span class="token-tag">&lt;StaticHeader</span> <span class="token-attr">title</span>=<span class="token-string">"My Blog Post"</span> <span class="token-tag">/&gt;</span>
+
+<span class="token-comment">&lt;!-- This component gets hydrated immediately on page load --&gt;</span>
+<span class="token-tag">&lt;SearchBar</span> <span class="token-attr">client:load</span> <span class="token-tag">/&gt;</span>
+
+<span class="token-comment">&lt;!-- This one hydrates only when it scrolls into the viewport --&gt;</span>
+<span class="token-tag">&lt;CommentSection</span> <span class="token-attr">client:visible</span> <span class="token-tag">/&gt;</span>
+
+<span class="token-comment">&lt;!-- This hydrates only when the browser is idle (requestIdleCallback) --&gt;</span>
+<span class="token-tag">&lt;RecommendedPosts</span> <span class="token-attr">client:idle</span> <span class="token-tag">/&gt;</span>
+
+<span class="token-comment">&lt;!-- This NEVER hydrates unless explicitly triggered by JS --&gt;</span>
+<span class="token-tag">&lt;HeavyChart</span> <span class="token-attr">client:only="react"</span> <span class="token-tag">/&gt;</span>
+
+<span class="token-comment">&lt;!-- 
+  Result: Instead of shipping 200KB of JS for the full page,
+  you might ship only 15KB for just the interactive components.
+  The blog post text, navigation, footer — all zero-JS static HTML.
+--&gt;</span>
+</code></pre>
+
+            <h2>Implementation Pattern: Manual Partial Hydration</h2>
+<pre><code><span class="token-comment">// A simplified partial hydration loader</span>
+<span class="token-comment">// Only hydrates elements marked with data-hydrate attribute</span>
+
+<span class="token-keyword">async function</span> <span class="token-function">partialHydrate</span>() {
+    <span class="token-comment">// Find all elements that need hydration</span>
+    <span class="token-keyword">const</span> islands = document.querySelectorAll(<span class="token-string">'[data-hydrate]'</span>);
+    
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> island <span class="token-keyword">of</span> islands) {
+        <span class="token-keyword">const</span> componentName = island.dataset.hydrate;
+        <span class="token-keyword">const</span> strategy = island.dataset.strategy || <span class="token-string">'load'</span>;
+        
+        <span class="token-keyword">switch</span> (strategy) {
+            <span class="token-keyword">case</span> <span class="token-string">'load'</span>:
+                <span class="token-comment">// Hydrate immediately</span>
+                <span class="token-keyword">await</span> hydrateComponent(island, componentName);
+                <span class="token-keyword">break</span>;
+                
+            <span class="token-keyword">case</span> <span class="token-string">'visible'</span>:
+                <span class="token-comment">// Hydrate when element enters viewport</span>
+                <span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> IntersectionObserver(
+                    <span class="token-keyword">async</span> ([entry]) => {
+                        <span class="token-keyword">if</span> (entry.isIntersecting) {
+                            observer.disconnect();
+                            <span class="token-keyword">await</span> hydrateComponent(island, componentName);
+                        }
+                    }
+                );
+                observer.observe(island);
+                <span class="token-keyword">break</span>;
+                
+            <span class="token-keyword">case</span> <span class="token-string">'idle'</span>:
+                <span class="token-comment">// Hydrate when browser is idle</span>
+                requestIdleCallback(<span class="token-keyword">async</span> () => {
+                    <span class="token-keyword">await</span> hydrateComponent(island, componentName);
+                });
+                <span class="token-keyword">break</span>;
+        }
+    }
+}
+
+<span class="token-keyword">async function</span> <span class="token-function">hydrateComponent</span>(element, name) {
+    <span class="token-comment">// Dynamic import — only loads JS for this specific component</span>
+    <span class="token-keyword">const</span> { default: Component } = <span class="token-keyword">await</span> import(<span class="token-string">`./components/\${name}.js`</span>);
+    
+    <span class="token-comment">// Get serialized props from the HTML</span>
+    <span class="token-keyword">const</span> props = JSON.parse(element.dataset.props || <span class="token-string">'{}'</span>);
+    
+    <span class="token-comment">// Hydrate only this island — rest of page untouched</span>
+    hydrateRoot(element, &lt;Component {...props} /&gt;);
+}
+
+partialHydrate();
+</code></pre>
+
+            <h2>Real-World Usage</h2>
+            <ul>
+                <li><strong>Astro</strong> — The pioneer of partial hydration in modern frameworks. Uses "client directives" (client:load, client:visible, client:idle, client:media) to control when/if components hydrate.</li>
+                <li><strong>Eleventy + Islands</strong> — Static site generator with opt-in island hydration via <code>is-land</code> web component.</li>
+                <li><strong>Marko (eBay)</strong> — Automatically detects which components are interactive and only sends JS for those.</li>
+            </ul>
+
+            <h2>Trade-offs</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Aspect</th><th>Full Hydration</th><th>Partial Hydration</th></tr></thead>
+                <tbody>
+                    <tr><td>JS Bundle Size</td><td>All components shipped</td><td>Only interactive components</td></tr>
+                    <tr><td>Time to Interactive</td><td>Slower (hydrate everything)</td><td>Faster (less work)</td></tr>
+                    <tr><td>Complexity</td><td>Simple (everything hydrates)</td><td>Requires explicit marking</td></tr>
+                    <tr><td>State Sharing</td><td>Easy (single React tree)</td><td>Hard (isolated islands)</td></tr>
+                    <tr><td>Framework Support</td><td>All frameworks</td><td>Astro, Marko, Fresh</td></tr>
+                </tbody>
+            </table>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Partial Hydration When...</h3>
+                <p>You can look at a page design and identify which components are "islands" that need JS vs pure static content, and explain why sharing state between islands is architecturally challenging.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Take a typical e-commerce product page and list every component. Mark each as "static" or "interactive island." Calculate what percentage of JS you'd save with partial hydration.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Connects to: <strong>Islands Architecture</strong> (the pattern that partial hydration enables), <strong>Code Splitting</strong> (each island is its own chunk), <strong>Selective Hydration</strong> (React's approach to prioritizing hydration).</p>
+            </div>
+
+
+            <div class="nav-footer">
+                <a href="01-hydration.html" class="nav-btn">← Hydration</a>
+                <a href="03-islands-architecture.html" class="nav-btn nav-btn-next">Islands Architecture →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

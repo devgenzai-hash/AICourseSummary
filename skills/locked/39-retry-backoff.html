@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retry with Backoff - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Resilience Patterns &rarr; Retry with Backoff</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Resilience</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Retry with Backoff</h1>
+            <p class="hero-subtitle">Automatically retrying failed operations with progressively increasing delays &mdash; recovering from transient failures without overwhelming already-stressed systems.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Imagine <strong>calling a busy restaurant</strong> for a reservation. If you get a busy signal, you don&rsquo;t slam redial immediately &mdash; that just keeps the line jammed. Instead, you wait 1 minute, try again. Still busy? Wait 2 minutes. Then 4. Then 8. You also add a little randomness &mdash; maybe you wait 7.3 minutes instead of exactly 8 &mdash; so you don&rsquo;t collide with the 50 other people doing the same thing (that&rsquo;s jitter).</p>
+        </div>
+
+        <h2>Why Naive Retry Is Dangerous</h2>
+        <p>Immediate retry without backoff creates a <strong>thundering herd</strong> &mdash; when a server recovers from a brief failure, all clients retry simultaneously and crash it again:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Retry Strategy</th>
+                        <th>Behavior After Failure</th>
+                        <th>Server Impact</th>
+                        <th>Recovery</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>No retry</strong></td>
+                        <td>Give up immediately</td>
+                        <td>None (but poor UX)</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Immediate retry</strong></td>
+                        <td>Retry 0ms after failure</td>
+                        <td>Amplifies load 3-5x</td>
+                        <td>Prevents recovery</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fixed interval</strong></td>
+                        <td>Retry every N seconds</td>
+                        <td>Synchronized bursts</td>
+                        <td>Slow &mdash; bursts align</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exponential backoff</strong></td>
+                        <td>1s, 2s, 4s, 8s, 16s&hellip;</td>
+                        <td>Decreasing over time</td>
+                        <td>Good &mdash; spreads load</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backoff + jitter</strong></td>
+                        <td>Random within [0, 2^n]</td>
+                        <td>Minimal &mdash; desynchronized</td>
+                        <td>Best &mdash; no bursts</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Exponential Backoff Formula</h2>
+        <p>The base formula for exponential backoff:</p>
+        <p><code>delay = min(base_delay * 2^attempt, max_delay)</code></p>
+        <p>With <strong>full jitter</strong> (recommended by AWS):</p>
+        <p><code>delay = random(0, min(base_delay * 2^attempt, max_delay))</code></p>
+
+        <h3>Jitter Strategies</h3>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Jitter Type</th>
+                        <th>Formula</th>
+                        <th>Behavior</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>No jitter</strong></td>
+                        <td><code>base * 2^n</code></td>
+                        <td>All clients retry at same time</td>
+                        <td>Never use in production</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Full jitter</strong></td>
+                        <td><code>random(0, base * 2^n)</code></td>
+                        <td>Uniform spread across window</td>
+                        <td>Default choice; best spread</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Equal jitter</strong></td>
+                        <td><code>base*2^n/2 + random(0, base*2^n/2)</code></td>
+                        <td>At least half the backoff guaranteed</td>
+                        <td>When min delay matters</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Decorrelated jitter</strong></td>
+                        <td><code>random(base, prev_delay * 3)</code></td>
+                        <td>Each delay independent of attempt count</td>
+                        <td>AWS SDK default</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Retry with Backoff Decorator</h2>
+        <p>A production-ready retry decorator with exponential backoff, jitter, and configurable retryable exceptions:</p>
+
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> random
+<span class="token-keyword">import</span> functools
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Tuple, Type
+
+<span class="token-keyword">def</span> <span class="token-function">retry_with_backoff</span>(
+    max_retries: int = <span class="token-number">5</span>,
+    base_delay: float = <span class="token-number">1.0</span>,
+    max_delay: float = <span class="token-number">60.0</span>,
+    jitter: str = <span class="token-string">"full"</span>,
+    retryable_exceptions: Tuple[Type[Exception], ...] = (Exception,)
+):
+    <span class="token-string">"""Decorator that retries with exponential backoff.
+
+    Args:
+        max_retries: Maximum number of retry attempts.
+        base_delay: Initial delay in seconds.
+        max_delay: Cap on delay (prevents absurd waits).
+        jitter: "full", "equal", or "decorrelated".
+        retryable_exceptions: Only retry on these errors.
+    """</span>
+    <span class="token-keyword">def</span> <span class="token-function">decorator</span>(func):
+        @functools.wraps(func)
+        <span class="token-keyword">def</span> <span class="token-function">wrapper</span>(*args, **kwargs):
+            last_exception = <span class="token-keyword">None</span>
+            prev_delay = base_delay
+
+            <span class="token-keyword">for</span> attempt <span class="token-keyword">in</span> range(max_retries + <span class="token-number">1</span>):
+                <span class="token-keyword">try</span>:
+                    <span class="token-keyword">return</span> func(*args, **kwargs)
+                <span class="token-keyword">except</span> retryable_exceptions <span class="token-keyword">as</span> e:
+                    last_exception = e
+                    <span class="token-keyword">if</span> attempt == max_retries:
+                        <span class="token-keyword">break</span>
+
+                    <span class="token-comment"># Calculate backoff delay</span>
+                    exp_delay = min(
+                        base_delay * (<span class="token-number">2</span> ** attempt),
+                        max_delay
+                    )
+
+                    <span class="token-keyword">if</span> jitter == <span class="token-string">"full"</span>:
+                        delay = random.uniform(<span class="token-number">0</span>, exp_delay)
+                    <span class="token-keyword">elif</span> jitter == <span class="token-string">"equal"</span>:
+                        delay = exp_delay / <span class="token-number">2</span> + random.uniform(
+                            <span class="token-number">0</span>, exp_delay / <span class="token-number">2</span>
+                        )
+                    <span class="token-keyword">elif</span> jitter == <span class="token-string">"decorrelated"</span>:
+                        delay = random.uniform(
+                            base_delay, prev_delay * <span class="token-number">3</span>
+                        )
+                        delay = min(delay, max_delay)
+                        prev_delay = delay
+                    <span class="token-keyword">else</span>:
+                        delay = exp_delay
+
+                    print(<span class="token-string">f"Attempt </span>{attempt + <span class="token-number">1</span>}<span class="token-string"> failed: </span>{e}<span class="token-string">"</span>)
+                    print(<span class="token-string">f"Retrying in </span>{delay:<span class="token-number">.2</span>f}<span class="token-string">s..."</span>)
+                    time.sleep(delay)
+
+            <span class="token-keyword">raise</span> last_exception
+        <span class="token-keyword">return</span> wrapper
+    <span class="token-keyword">return</span> decorator
+
+
+<span class="token-comment"># Usage: retry HTTP calls on transient errors</span>
+@retry_with_backoff(
+    max_retries=<span class="token-number">4</span>,
+    base_delay=<span class="token-number">0.5</span>,
+    max_delay=<span class="token-number">30.0</span>,
+    jitter=<span class="token-string">"full"</span>,
+    retryable_exceptions=(ConnectionError, TimeoutError)
+)
+<span class="token-keyword">def</span> <span class="token-function">call_payment_api</span>(order_id: str):
+    <span class="token-string">"""Idempotent payment call with retry."""</span>
+    <span class="token-comment"># response = requests.post(url, json=payload)</span>
+    <span class="token-comment"># if response.status_code == 503:</span>
+    <span class="token-comment">#     raise ConnectionError("Service unavailable")</span>
+    <span class="token-keyword">pass</span></code></pre>
+
+        <h2>Retryable vs Non-Retryable Errors</h2>
+        <p>Not all errors should be retried. Retrying a 400 Bad Request wastes resources and will never succeed:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Error Type</th>
+                        <th>Retryable?</th>
+                        <th>Examples</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Transient network</strong></td>
+                        <td>&#x2713; Yes</td>
+                        <td>Connection timeout, DNS failure</td>
+                        <td>Likely to resolve on next attempt</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Server overload</strong></td>
+                        <td>&#x2713; Yes</td>
+                        <td>HTTP 429, 503</td>
+                        <td>Server will recover with time</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conflict/lock</strong></td>
+                        <td>&#x2713; Yes</td>
+                        <td>HTTP 409, deadlock detected</td>
+                        <td>Concurrent operation will finish</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Client error</strong></td>
+                        <td>&#x2717; No</td>
+                        <td>HTTP 400, 401, 403, 404</td>
+                        <td>Request itself is wrong</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validation failure</strong></td>
+                        <td>&#x2717; No</td>
+                        <td>HTTP 422, schema mismatch</td>
+                        <td>Data won&rsquo;t magically fix itself</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Business logic</strong></td>
+                        <td>&#x2717; No</td>
+                        <td>Insufficient funds, quota exceeded</td>
+                        <td>Requires user action to resolve</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Retry Budget</h2>
+        <p>A retry budget limits the total percentage of requests that can be retries. This prevents cascading failures where retries dominate traffic:</p>
+
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> threading
+<span class="token-keyword">from</span> collections <span class="token-keyword">import</span> deque
+
+<span class="token-keyword">class</span> <span class="token-class">RetryBudget</span>:
+    <span class="token-string">"""Limits retry attempts to a percentage of total requests.
+
+    Prevents retry storms: if more than budget_percent of
+    recent requests are retries, new retries are denied.
+    Google SRE recommends a 10% retry budget.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, budget_percent: float = <span class="token-number">10.0</span>,
+                 window_seconds: float = <span class="token-number">60.0</span>):
+        self._budget = budget_percent / <span class="token-number">100.0</span>
+        self._window = window_seconds
+        self._requests: deque = deque()  <span class="token-comment"># (timestamp, is_retry)</span>
+        self._lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">_cleanup</span>(self, now: float):
+        cutoff = now - self._window
+        <span class="token-keyword">while</span> self._requests <span class="token-keyword">and</span> self._requests[<span class="token-number">0</span>][<span class="token-number">0</span>] &lt; cutoff:
+            self._requests.popleft()
+
+    <span class="token-keyword">def</span> <span class="token-function">record_request</span>(self, is_retry: bool = <span class="token-keyword">False</span>):
+        <span class="token-string">"""Record a request (first attempt or retry)."""</span>
+        <span class="token-keyword">with</span> self._lock:
+            now = time.monotonic()
+            self._cleanup(now)
+            self._requests.append((now, is_retry))
+
+    <span class="token-keyword">def</span> <span class="token-function">can_retry</span>(self) -> bool:
+        <span class="token-string">"""Check if retry budget allows another retry.
+
+        Returns False if retries exceed budget_percent
+        of total requests in the current window.
+        """</span>
+        <span class="token-keyword">with</span> self._lock:
+            now = time.monotonic()
+            self._cleanup(now)
+
+            <span class="token-keyword">if</span> <span class="token-keyword">not</span> self._requests:
+                <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+
+            total = len(self._requests)
+            retries = sum(
+                <span class="token-number">1</span> <span class="token-keyword">for</span> _, is_retry <span class="token-keyword">in</span> self._requests
+                <span class="token-keyword">if</span> is_retry
+            )
+            <span class="token-keyword">return</span> (retries / total) &lt; self._budget
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">retry_ratio</span>(self) -> float:
+        <span class="token-string">"""Current retry ratio (0.0 to 1.0)."""</span>
+        <span class="token-keyword">with</span> self._lock:
+            self._cleanup(time.monotonic())
+            <span class="token-keyword">if</span> <span class="token-keyword">not</span> self._requests:
+                <span class="token-keyword">return</span> <span class="token-number">0.0</span>
+            retries = sum(
+                <span class="token-number">1</span> <span class="token-keyword">for</span> _, is_retry <span class="token-keyword">in</span> self._requests
+                <span class="token-keyword">if</span> is_retry
+            )
+            <span class="token-keyword">return</span> retries / len(self._requests)
+
+
+<span class="token-comment"># Usage with retry logic</span>
+budget = RetryBudget(budget_percent=<span class="token-number">10.0</span>, window_seconds=<span class="token-number">60.0</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">make_request_with_budget</span>(url: str):
+    budget.record_request(is_retry=<span class="token-keyword">False</span>)
+    <span class="token-keyword">try</span>:
+        <span class="token-comment"># response = requests.get(url)</span>
+        <span class="token-keyword">return</span> <span class="token-string">"success"</span>
+    <span class="token-keyword">except</span> ConnectionError:
+        <span class="token-keyword">if</span> budget.can_retry():
+            budget.record_request(is_retry=<span class="token-keyword">True</span>)
+            <span class="token-comment"># ... retry with backoff</span>
+        <span class="token-keyword">else</span>:
+            print(<span class="token-string">"Retry budget exhausted &mdash; failing fast"</span>)
+            <span class="token-keyword">raise</span></code></pre>
+
+        <h2>Combining Backoff with Retry-After Header</h2>
+        <p>When a server returns HTTP 429 or 503 with a <code>Retry-After</code> header, always respect it &mdash; it supersedes your calculated backoff:</p>
+
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> random
+
+<span class="token-keyword">def</span> <span class="token-function">get_retry_delay</span>(
+    attempt: int,
+    base_delay: float,
+    max_delay: float,
+    retry_after_header: str = <span class="token-keyword">None</span>
+) -> float:
+    <span class="token-string">"""Calculate retry delay, respecting Retry-After header.
+
+    The server knows best when it will recover.
+    Always use Retry-After if provided.
+    """</span>
+    <span class="token-keyword">if</span> retry_after_header:
+        <span class="token-keyword">try</span>:
+            <span class="token-comment"># Retry-After can be seconds or HTTP-date</span>
+            server_delay = float(retry_after_header)
+            <span class="token-comment"># Add small jitter to avoid synchronized retries</span>
+            <span class="token-keyword">return</span> server_delay + random.uniform(<span class="token-number">0</span>, <span class="token-number">1.0</span>)
+        <span class="token-keyword">except</span> ValueError:
+            <span class="token-keyword">pass</span>  <span class="token-comment"># Fall through to calculated backoff</span>
+
+    <span class="token-comment"># Exponential backoff with full jitter</span>
+    exp_delay = min(base_delay * (<span class="token-number">2</span> ** attempt), max_delay)
+    <span class="token-keyword">return</span> random.uniform(<span class="token-number">0</span>, exp_delay)
+
+
+<span class="token-comment"># Example delays for 5 attempts (base=1s, max=30s):</span>
+<span class="token-comment"># Attempt 0: random(0, 1)   &rarr; ~0.5s</span>
+<span class="token-comment"># Attempt 1: random(0, 2)   &rarr; ~1.0s</span>
+<span class="token-comment"># Attempt 2: random(0, 4)   &rarr; ~2.0s</span>
+<span class="token-comment"># Attempt 3: random(0, 8)   &rarr; ~4.0s</span>
+<span class="token-comment"># Attempt 4: random(0, 16)  &rarr; ~8.0s</span></code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>AWS SDK Retry Behavior:</strong> Uses exponential backoff with full jitter. Default is 3 retries for most services, 5 for DynamoDB. The SDK respects <code>Retry-After</code> headers and automatically classifies errors as retryable or terminal. Configurable via <code>RetryMode.ADAPTIVE</code> which includes a client-side token bucket.</p>
+            <p><strong>gRPC Retry Policy:</strong> Configured per-method in service config. Specifies <code>maxAttempts</code>, <code>initialBackoff</code>, <code>maxBackoff</code>, <code>backoffMultiplier</code>, and <code>retryableStatusCodes</code>. Supports hedging (sending parallel requests) as an alternative to retry for latency-sensitive calls.</p>
+            <p><strong>HTTP Retry-After Header:</strong> RFC 7231 standard. Can be seconds (<code>Retry-After: 120</code>) or an HTTP-date (<code>Retry-After: Thu, 26 May 2026 12:00:00 GMT</code>). Clients that ignore this risk being permanently banned by rate limiters.</p>
+            <p><strong>Kubernetes Pod Restart Backoff:</strong> When a container crashes, kubelet restarts it with exponential backoff: 10s, 20s, 40s&hellip; up to 5 minutes (<code>CrashLoopBackOff</code>). Resets after 10 minutes of successful running. This prevents a buggy container from consuming all node resources in a tight restart loop.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Never retry immediately &mdash; exponential backoff prevents thundering herds on recovery</li>
+                <li>Always add jitter &mdash; full jitter provides the best load distribution across retrying clients</li>
+                <li>Classify errors: only retry transient failures (429, 503, timeouts), never client errors (400, 401)</li>
+                <li>Cap delays with <code>max_delay</code> to bound worst-case latency</li>
+                <li>Use retry budgets (10% of traffic) to prevent retries from dominating system load</li>
+                <li>Respect <code>Retry-After</code> headers &mdash; the server knows when it will recover better than your formula</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Exponential backoff with jitter is like a polite crowd at a closed store. Without jitter, everyone rushes the door the moment it opens (stampede). With jitter, each person checks at a slightly different random time &mdash; the store handles them smoothly one by one.</p>
+            <div class="model-visual">
+                <pre>
+  EXPONENTIAL BACKOFF + FULL JITTER:
+
+  Attempt:    0        1         2          3           4
+  Max delay:  1s       2s        4s         8s          16s
+              │        │         │          │           │
+  Actual:  ───┼──●─────┼───●─────┼─────●────┼──────●────┼──
+              │ 0.3s   │  1.7s   │    2.9s  │     6.1s  │
+              │        │         │          │           │
+              └────────┴─────────┴──────────┴───────────┘
+              Total elapsed: ~11s for 5 attempts
+
+  WITHOUT JITTER (all clients aligned):
+  ─────────────────────────────────────────────────────────►
+  t=0    t=1    t=3      t=7         t=15
+   │      │      │        │            │
+   ████   ████   ████     ████         ████  &lt;-- bursts!
+   All clients retry at same moment
+
+  WITH FULL JITTER (clients desynchronized):
+  ─────────────────────────────────────────────────────────►
+  t=0        t=1-2     t=3-7       t=7-15
+   │          │ │ │      │  │ │      │ │  │
+   ████       █ █ █      █  █ █      █ █  █  &lt;-- smooth!
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Retrying non-idempotent operations:</strong> Retrying a <code>POST /charge</code> without an idempotency key can charge the customer multiple times. Always pair retry with idempotency &mdash; use a unique request ID so the server deduplicates repeated attempts.</li>
+                <li><strong>No maximum retry limit:</strong> Without <code>max_retries</code>, a permanently broken endpoint causes clients to retry forever, consuming resources indefinitely. Always set a cap (3-5 retries) and fail fast after exhausting attempts.</li>
+                <li><strong>Exponential backoff without jitter:</strong> Pure exponential (1s, 2s, 4s, 8s) without randomness causes all clients to retry at the same moment after each interval. The server sees periodic spikes instead of smooth load. Always add jitter.</li>
+                <li><strong>Ignoring Retry-After headers:</strong> When a server says &ldquo;retry after 60 seconds,&rdquo; retrying after your calculated 4-second backoff is aggressive and may result in IP bans. Always check and respect the header before using your own calculation.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Implement all jitter strategies:</strong> Build a retry function that supports no-jitter, full-jitter, equal-jitter, and decorrelated-jitter. Run 100 simulated clients retrying simultaneously and plot the retry distribution over time for each strategy.</li>
+                <li><strong>Build a retry budget:</strong> Implement the RetryBudget class with a 10% budget over a 60-second window. Simulate a 50% failure rate and verify that retries are denied once the budget is exceeded, preventing retry amplification.</li>
+                <li><strong>Retry-aware HTTP client:</strong> Wrap <code>requests</code> or <code>httpx</code> with automatic retry logic that classifies HTTP status codes (retry on 429/503, fail on 400/401), respects <code>Retry-After</code> headers, and logs each attempt with delay.</li>
+                <li><strong>Combine retry with circuit breaker:</strong> Build a client that uses exponential backoff for transient failures but trips a circuit breaker after N consecutive failures. Verify the circuit breaker prevents retries entirely when the downstream is completely down.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="38-throttling.html" class="prev">&larr; Throttling</a>
+            <a href="40-isolation-levels.html" class="next">Isolation Levels &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saga Pattern - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Saga Pattern</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Saga Pattern</h1>
+                <p class="subtitle">Managing distributed transactions without distributed locks. When you can't do one ACID transaction across services, use compensating actions instead.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-distributed">Distributed</span>
+                    <span class="tag tag-pattern">Pattern</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">&#127968; Daily-Life Analogy: Planning a Wedding</div>
+                <p>Booking a wedding involves multiple vendors: venue, caterer, photographer. You can't book them atomically. Instead:</p>
+                <ul>
+                    <li>Book venue &#10004;</li>
+                    <li>Book caterer &#10004;</li>
+                    <li>Book photographer... REJECTED (not available)</li>
+                </ul>
+                <p>Now you <strong>undo</strong> previous bookings: cancel caterer, cancel venue. These "undo" actions are <strong>compensating transactions</strong>. The whole sequence is a <strong>saga</strong>.</p>
+            </div>
+
+            <h2>Why Not Distributed Transactions?</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Approach</th><th>How</th><th>Problem</th></tr></thead>
+                <tbody>
+                    <tr><td>2PC (Two-Phase Commit)</td><td>Lock all resources, commit together</td><td>Blocking, slow, coordinator crash = stuck</td></tr>
+                    <tr><td>Saga Pattern</td><td>Each step commits independently; compensate on failure</td><td>More complex logic, but non-blocking</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Orchestration Saga (Central Coordinator)</h2>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">OrderSagaOrchestrator</span>:
+    <span class="token-string">"""Central coordinator for order processing saga"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.steps = [
+            {<span class="token-string">"action"</span>: self.create_order,
+             <span class="token-string">"compensation"</span>: self.cancel_order},
+            {<span class="token-string">"action"</span>: self.charge_payment,
+             <span class="token-string">"compensation"</span>: self.refund_payment},
+            {<span class="token-string">"action"</span>: self.reserve_inventory,
+             <span class="token-string">"compensation"</span>: self.release_inventory},
+            {<span class="token-string">"action"</span>: self.arrange_shipping,
+             <span class="token-string">"compensation"</span>: self.cancel_shipping},
+        ]
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self, order):
+        <span class="token-string">"""Run saga: if any step fails, compensate previous"""</span>
+        completed = []
+
+        <span class="token-keyword">for</span> step <span class="token-keyword">in</span> self.steps:
+            <span class="token-keyword">try</span>:
+                step[<span class="token-string">"action"</span>](order)
+                completed.append(step)
+                <span class="token-keyword">print</span>(<span class="token-string">f"  OK: {step['action'].__name__}"</span>)
+            <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+                <span class="token-keyword">print</span>(<span class="token-string">f"  FAIL: {step['action'].__name__}: {e}"</span>)
+                self._compensate(completed, order)
+                <span class="token-keyword">return</span> <span class="token-string">"SAGA FAILED"</span>
+
+        <span class="token-keyword">return</span> <span class="token-string">"SAGA COMPLETED"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_compensate</span>(self, completed, order):
+        <span class="token-string">"""Run compensations in REVERSE order"""</span>
+        <span class="token-keyword">for</span> step <span class="token-keyword">in</span> reversed(completed):
+            <span class="token-keyword">try</span>:
+                step[<span class="token-string">"compensation"</span>](order)
+                <span class="token-keyword">print</span>(<span class="token-string">f"  UNDO: {step['compensation'].__name__}"</span>)
+            <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+                <span class="token-keyword">print</span>(<span class="token-string">f"  UNDO FAILED: {e} (needs manual fix!)"</span>)
+
+    <span class="token-comment"># Actions</span>
+    <span class="token-keyword">def</span> <span class="token-function">create_order</span>(self, o): <span class="token-keyword">print</span>(<span class="token-string">"    Creating order..."</span>)
+    <span class="token-keyword">def</span> <span class="token-function">charge_payment</span>(self, o): <span class="token-keyword">print</span>(<span class="token-string">"    Charging payment..."</span>)
+    <span class="token-keyword">def</span> <span class="token-function">reserve_inventory</span>(self, o): <span class="token-keyword">print</span>(<span class="token-string">"    Reserving stock..."</span>)
+    <span class="token-keyword">def</span> <span class="token-function">arrange_shipping</span>(self, o):
+        <span class="token-keyword">raise</span> Exception(<span class="token-string">"Shipping unavailable!"</span>)
+
+    <span class="token-comment"># Compensations</span>
+    <span class="token-keyword">def</span> <span class="token-function">cancel_order</span>(self, o): <span class="token-keyword">print</span>(<span class="token-string">"    Cancelling order..."</span>)
+    <span class="token-keyword">def</span> <span class="token-function">refund_payment</span>(self, o): <span class="token-keyword">print</span>(<span class="token-string">"    Refunding payment..."</span>)
+    <span class="token-keyword">def</span> <span class="token-function">release_inventory</span>(self, o): <span class="token-keyword">print</span>(<span class="token-string">"    Releasing stock..."</span>)
+    <span class="token-keyword">def</span> <span class="token-function">cancel_shipping</span>(self, o): <span class="token-keyword">print</span>(<span class="token-string">"    Cancelling shipping..."</span>)
+
+<span class="token-comment"># Demo</span>
+saga = OrderSagaOrchestrator()
+result = saga.execute({<span class="token-string">"id"</span>: <span class="token-number">1</span>, <span class="token-string">"total"</span>: <span class="token-number">29.99</span>})
+<span class="token-keyword">print</span>(result)
+<span class="token-comment"># OK: create_order</span>
+<span class="token-comment"># OK: charge_payment</span>
+<span class="token-comment"># OK: reserve_inventory</span>
+<span class="token-comment"># FAIL: arrange_shipping: Shipping unavailable!</span>
+<span class="token-comment"># UNDO: release_inventory</span>
+<span class="token-comment"># UNDO: refund_payment</span>
+<span class="token-comment"># UNDO: cancel_order</span>
+<span class="token-comment"># SAGA FAILED</span></code></pre>
+
+            <h2>Choreography Saga (Event-Based)</h2>
+            <p>No central coordinator. Each service listens for events and reacts:</p>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">OrderService</span>:
+    <span class="token-keyword">def</span> <span class="token-function">create_order</span>(self, order):
+        self.save(order, status=<span class="token-string">"PENDING"</span>)
+        emit(<span class="token-string">"OrderCreated"</span>, order)  <span class="token-comment"># PaymentService listens</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">on_payment_failed</span>(self, order_id):
+        self.update(order_id, status=<span class="token-string">"CANCELLED"</span>)  <span class="token-comment"># Compensation</span>
+
+<span class="token-keyword">class</span> <span class="token-class">PaymentService</span>:
+    <span class="token-keyword">def</span> <span class="token-function">on_order_created</span>(self, order):
+        <span class="token-keyword">try</span>:
+            self.charge(order.user_id, order.total)
+            emit(<span class="token-string">"PaymentCompleted"</span>, order)
+        <span class="token-keyword">except</span> PaymentError:
+            emit(<span class="token-string">"PaymentFailed"</span>, order)  <span class="token-comment"># Triggers rollback</span>
+
+<span class="token-keyword">class</span> <span class="token-class">InventoryService</span>:
+    <span class="token-keyword">def</span> <span class="token-function">on_payment_completed</span>(self, order):
+        <span class="token-keyword">try</span>:
+            self.reserve(order.items)
+            emit(<span class="token-string">"InventoryReserved"</span>, order)
+        <span class="token-keyword">except</span> OutOfStockError:
+            emit(<span class="token-string">"InventoryFailed"</span>, order)  <span class="token-comment"># Triggers refund</span></code></pre>
+
+            <h2>Choreography vs Orchestration</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Aspect</th><th>Choreography</th><th>Orchestration</th></tr></thead>
+                <tbody>
+                    <tr><td>Coordination</td><td>Decentralized (events)</td><td>Centralized (orchestrator)</td></tr>
+                    <tr><td>Coupling</td><td>Loose</td><td>Tighter (orchestrator knows all)</td></tr>
+                    <tr><td>Debugging</td><td>Hard (events bounce around)</td><td>Easy (one place to look)</td></tr>
+                    <tr><td>Complexity</td><td>Simple for 2-3 steps</td><td>Handles complex flows well</td></tr>
+                    <tr><td>SPOF</td><td>None</td><td>Orchestrator (but replicable)</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>Real-World Saga Usage</h4>
+                <ul>
+                    <li><strong>Uber</strong> &mdash; Trip lifecycle saga (match &rarr; start &rarr; end &rarr; charge)</li>
+                    <li><strong>Netflix Conductor</strong> &mdash; Orchestration engine for multi-service workflows</li>
+                    <li><strong>Amazon</strong> &mdash; Order processing (payment &rarr; inventory &rarr; shipping)</li>
+                    <li><strong>Temporal/Cadence</strong> &mdash; Workflow engines with built-in saga/retry/compensation</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+                    <li>Saga = sequence of local transactions with compensating actions</li>
+                    <li>Use when you can't do a single ACID transaction across services</li>
+                    <li>Choreography: decentralized via events (simple but hard to debug)</li>
+                    <li>Orchestration: central coordinator (easier to understand)</li>
+                    <li>Compensations must be idempotent (may run multiple times)</li>
+                    <li>Not all actions are compensable (can't "unsend" an email)</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">
+    Happy path:
+    [Create] &rarr; [Pay] &rarr; [Reserve] &rarr; [Ship] &rarr; DONE
+
+    Failure at step 3:
+    [Create] &rarr; [Pay] &rarr; [Reserve FAIL]
+                            |
+         Compensate in reverse:
+                            |
+    [Cancel] &larr; [Refund] &larr;--+
+
+    Each step COMMITS independently.
+    No global lock held during the saga.
+    If something fails, you UNDO, not ROLLBACK.
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+                    <li><strong>Non-idempotent compensations</strong> &mdash; "Refund $10" must check if already refunded.</li>
+                    <li><strong>Compensation itself fails</strong> &mdash; Need retry or dead-letter queue for failed compensations.</li>
+                    <li><strong>Using sagas for single-DB operations</strong> &mdash; Just use a regular transaction!</li>
+                    <li><strong>No saga state persistence</strong> &mdash; Must persist current step to resume after crash.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+                    <li>Implement OrderSagaOrchestrator. Make step 3 fail randomly. Verify compensations run correctly.</li>
+                    <li>Add state persistence: save step to DB. Simulate crash mid-saga and resume.</li>
+                    <li>Implement choreography version with an event bus. Compare debugging difficulty.</li>
+                    <li>Design a saga for travel booking (flight + hotel + car). What if hotel fails after flight is booked?</li>
+                </ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="31-distributed-locking.html" class="prev">Distributed Locking</a>
+                <a href="33-idempotency.html" class="next">Idempotency</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

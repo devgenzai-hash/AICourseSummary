@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bean Lifecycle & Callbacks - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals &bull; 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Spring Core & IoC Internals</li>
+            <li><a href="01-ioc-container.html"><span class="nav-number">1</span> IoC Container & BeanFactory</a></li>
+            <li><a href="02-application-context.html"><span class="nav-number">2</span> ApplicationContext Lifecycle</a></li>
+            <li><a href="03-bean-lifecycle.html"><span class="nav-number">3</span> Bean Lifecycle & Callbacks</a></li>
+            <li><a href="04-dependency-injection.html"><span class="nav-number">4</span> Dependency Injection Internals</a></li>
+            <li><a href="05-component-scanning.html"><span class="nav-number">5</span> Component Scanning</a></li>
+            <li><a href="06-bean-scopes.html"><span class="nav-number">6</span> Bean Scopes & Proxy Mechanisms</a></li>
+            <li><a href="07-aop-internals.html"><span class="nav-number">7</span> AOP Internals</a></li>
+            <li><a href="08-spel.html"><span class="nav-number">8</span> Spring Expression Language</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Spring Boot Mastery</a>
+                <span>/</span> Bean Lifecycle & Callbacks
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Bean Lifecycle & Callbacks</h1>
+                <p class="subtitle">Every step from instantiation to destruction — the 11 phases a bean goes through and every hook you can use to intercept them.</p>
+                <div class="tag-row">
+                    <span class="tag tag-concept">Core Concept</span>
+                    <span class="tag tag-spring">Spring Framework</span>
+                    <span class="tag tag-internal">Internals</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏥 Daily-Life Analogy: Hospital Patient Journey</div>
+                <p>A bean's lifecycle is like a patient going through a hospital: <strong>Registration</strong> (BeanDefinition), <strong>Triage</strong> (BeanPostProcessor.before), <strong>Admission</strong> (instantiation), <strong>Vitals Check</strong> (property population), <strong>Doctor Consultation</strong> (initialization callbacks), <strong>Treatment</strong> (ready for use), and finally <strong>Discharge</strong> (destruction). At each stage, different specialists (PostProcessors) can intervene.</p>
+            </div>
+
+            <h2>The Complete Bean Lifecycle — All 11 Phases</h2>
+
+<pre><code><span class="token-comment">// The EXACT order Spring processes a bean:</span>
+
+<span class="token-comment">// Phase 1: Instantiation</span>
+<span class="token-comment">//   → Constructor called (via reflection or CGLIB)</span>
+
+<span class="token-comment">// Phase 2: Populate Properties</span>
+<span class="token-comment">//   → @Autowired fields injected</span>
+<span class="token-comment">//   → @Value properties resolved</span>
+<span class="token-comment">//   → Setter injection called</span>
+
+<span class="token-comment">// Phase 3: BeanNameAware.setBeanName()</span>
+<span class="token-comment">// Phase 4: BeanFactoryAware.setBeanFactory()</span>
+<span class="token-comment">// Phase 5: ApplicationContextAware.setApplicationContext()</span>
+
+<span class="token-comment">// Phase 6: BeanPostProcessor.postProcessBeforeInitialization()</span>
+<span class="token-comment">//   → @PostConstruct is processed HERE by CommonAnnotationBeanPostProcessor</span>
+
+<span class="token-comment">// Phase 7: InitializingBean.afterPropertiesSet()</span>
+
+<span class="token-comment">// Phase 8: Custom init-method (from @Bean(initMethod="..."))</span>
+
+<span class="token-comment">// Phase 9: BeanPostProcessor.postProcessAfterInitialization()</span>
+<span class="token-comment">//   → AOP proxies are created HERE</span>
+<span class="token-comment">//   → @Async proxies created HERE</span>
+<span class="token-comment">//   → @Transactional proxies created HERE</span>
+
+<span class="token-comment">// ═══════ BEAN IS NOW READY FOR USE ═══════</span>
+
+<span class="token-comment">// Phase 10: @PreDestroy (on shutdown)</span>
+<span class="token-comment">// Phase 11: DisposableBean.destroy() / custom destroy-method</span>
+</code></pre>
+
+            <h2>Each Phase in Detail</h2>
+
+            <h3>Phase 1-2: Instantiation & Property Population</h3>
+<pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+    
+    <span class="token-keyword">private final</span> <span class="token-type">OrderRepository</span> repo; <span class="token-comment">// Injected in Phase 2</span>
+    
+    <span class="token-comment">// Phase 1: Constructor called</span>
+    <span class="token-keyword">public</span> <span class="token-function">OrderService</span>(<span class="token-type">OrderRepository</span> repo) {
+        System.out.println(<span class="token-string">"1. Constructor — bean instantiated"</span>);
+        <span class="token-keyword">this</span>.repo = repo;
+        <span class="token-comment">// NOTE: With constructor injection, Phase 1 and 2 happen together</span>
+        <span class="token-comment">// With field injection, the field is null during constructor!</span>
+    }
+    
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">PaymentGateway</span> gateway; <span class="token-comment">// Injected AFTER constructor (Phase 2)</span>
+}
+</code></pre>
+
+            <h3>Phase 3-5: Aware Interfaces</h3>
+<pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">AwareBean</span> <span class="token-keyword">implements</span> 
+        <span class="token-type">BeanNameAware</span>, <span class="token-type">BeanFactoryAware</span>, <span class="token-type">ApplicationContextAware</span> {
+    
+    <span class="token-keyword">private</span> String beanName;
+    <span class="token-keyword">private</span> BeanFactory factory;
+    <span class="token-keyword">private</span> ApplicationContext context;
+    
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">setBeanName</span>(String name) {
+        <span class="token-comment">// Phase 3: Spring tells you your own bean name</span>
+        <span class="token-keyword">this</span>.beanName = name; <span class="token-comment">// "awareBean"</span>
+    }
+    
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">setBeanFactory</span>(BeanFactory factory) {
+        <span class="token-comment">// Phase 4: Access to the BeanFactory (rarely needed)</span>
+        <span class="token-keyword">this</span>.factory = factory;
+    }
+    
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">setApplicationContext</span>(ApplicationContext ctx) {
+        <span class="token-comment">// Phase 5: Access to full ApplicationContext</span>
+        <span class="token-comment">// Use case: publish events, access resources</span>
+        <span class="token-keyword">this</span>.context = ctx;
+    }
+}
+</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Avoid Aware Interfaces in Business Code</div>
+                <p>Implementing <code>ApplicationContextAware</code> couples your bean to Spring. In production, prefer <code>@Autowired ApplicationContext</code> or better yet, inject only what you need. Aware interfaces are for framework-level code (custom annotations, dynamic proxies).</p>
+            </div>
+
+            <h3>Phase 6-9: The PostProcessor Dance</h3>
+<pre><code><span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">TimingBeanPostProcessor</span> <span class="token-keyword">implements</span> <span class="token-type">BeanPostProcessor</span> {
+    
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> Object <span class="token-function">postProcessBeforeInitialization</span>(
+            Object bean, String beanName) {
+        <span class="token-comment">// Phase 6: Called BEFORE @PostConstruct</span>
+        <span class="token-comment">// The bean exists, properties are set, but not yet initialized</span>
+        <span class="token-keyword">if</span> (bean.getClass().isAnnotationPresent(Timed.class)) {
+            <span class="token-comment">// Record start time for initialization timing</span>
+        }
+        <span class="token-keyword">return</span> bean; <span class="token-comment">// MUST return bean (or a replacement!)</span>
+    }
+    
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> Object <span class="token-function">postProcessAfterInitialization</span>(
+            Object bean, String beanName) {
+        <span class="token-comment">// Phase 9: Called AFTER all initialization</span>
+        <span class="token-comment">// THIS is where proxies are created!</span>
+        <span class="token-comment">// You can return a completely different object here</span>
+        
+        <span class="token-keyword">if</span> (bean.getClass().isAnnotationPresent(Timed.class)) {
+            <span class="token-comment">// Return a JDK/CGLIB proxy that adds timing</span>
+            <span class="token-keyword">return</span> createTimingProxy(bean);
+        }
+        <span class="token-keyword">return</span> bean;
+    }
+}
+</code></pre>
+
+            <h3>The Three Initialization Callbacks (Phases 6, 7, 8)</h3>
+<pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">CacheService</span> <span class="token-keyword">implements</span> <span class="token-type">InitializingBean</span> {
+    
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">RedisTemplate</span> redis;
+    
+    <span class="token-comment">// Called in Phase 6 (via CommonAnnotationBeanPostProcessor)</span>
+    <span class="token-annotation">@PostConstruct</span>
+    <span class="token-keyword">public void</span> <span class="token-function">postConstruct</span>() {
+        System.out.println(<span class="token-string">"1st: @PostConstruct — redis is available here"</span>);
+        <span class="token-comment">// Good for: lightweight initialization using injected deps</span>
+    }
+    
+    <span class="token-comment">// Called in Phase 7</span>
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">afterPropertiesSet</span>() {
+        System.out.println(<span class="token-string">"2nd: InitializingBean — Spring interface callback"</span>);
+        <span class="token-comment">// Couples to Spring — prefer @PostConstruct in app code</span>
+    }
+    
+    <span class="token-comment">// Called in Phase 8 (configured externally)</span>
+    <span class="token-keyword">public void</span> <span class="token-function">customInit</span>() {
+        System.out.println(<span class="token-string">"3rd: custom init-method"</span>);
+        <span class="token-comment">// Used when you can't modify the class (third-party libs)</span>
+    }
+}
+
+<span class="token-comment">// Configuration for custom init-method:</span>
+<span class="token-annotation">@Bean</span>(initMethod = <span class="token-string">"customInit"</span>, destroyMethod = <span class="token-string">"customDestroy"</span>)
+<span class="token-keyword">public</span> CacheService <span class="token-function">cacheService</span>() {
+    <span class="token-keyword">return new</span> CacheService();
+}
+</code></pre>
+
+            <h2>Destruction Phase (Application Shutdown)</h2>
+<pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">ConnectionPoolService</span> <span class="token-keyword">implements</span> <span class="token-type">DisposableBean</span> {
+    
+    <span class="token-keyword">private</span> <span class="token-type">HikariDataSource</span> dataSource;
+    
+    <span class="token-annotation">@PreDestroy</span>
+    <span class="token-keyword">public void</span> <span class="token-function">preDestroy</span>() {
+        <span class="token-comment">// Called first during shutdown</span>
+        log.info(<span class="token-string">"Draining active connections..."</span>);
+        dataSource.getHikariPoolMXBean().softEvictConnections();
+    }
+    
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">destroy</span>() {
+        <span class="token-comment">// Called second</span>
+        log.info(<span class="token-string">"Closing datasource"</span>);
+        dataSource.close();
+    }
+}
+</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Prototype Beans Don't Get Destroyed!</div>
+                <p>Spring does NOT call <code>@PreDestroy</code> or <code>destroy()</code> on prototype-scoped beans. Once the container hands you a prototype instance, it forgets about it. You must manage cleanup yourself. This is a common source of memory leaks.</p>
+            </div>
+
+            <h2>Industry Pattern: SmartInitializingSingleton</h2>
+<pre><code><span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">EndpointRegistry</span> <span class="token-keyword">implements</span> <span class="token-type">SmartInitializingSingleton</span> {
+    
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> List&lt;RestEndpoint&gt; endpoints;
+    
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">afterSingletonsInstantiated</span>() {
+        <span class="token-comment">// Called AFTER ALL singletons are fully created</span>
+        <span class="token-comment">// Unlike @PostConstruct which fires per-bean,</span>
+        <span class="token-comment">// this guarantees every other bean is ready</span>
+        
+        <span class="token-comment">// Industry use: register all endpoints with service mesh</span>
+        endpoints.forEach(ep -> serviceMesh.register(ep));
+    }
+}
+</code></pre>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Bean Lifecycle When...</h3>
+                <p>You can explain why <code>@Transactional</code> doesn't work when called from within the same class (the proxy is created in Phase 9 — AFTER initialization — so internal calls bypass it), and you know the exact order: <code>@PostConstruct</code> → <code>afterPropertiesSet()</code> → <code>init-method</code>.</p>
+                <h3>🧪 Interview Challenge</h3>
+                <p>"If you have a bean with both <code>@PostConstruct</code> and <code>InitializingBean</code>, which runs first?" — <code>@PostConstruct</code> always runs first. It's processed by <code>CommonAnnotationBeanPostProcessor</code> in Phase 6 (before), while <code>afterPropertiesSet()</code> is Phase 7.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Connects to: <strong>AOP Internals</strong> (proxies in Phase 9), <strong>@Transactional</strong> (why self-invocation fails), <strong>Graceful Shutdown</strong> (destruction sequence).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="02-application-context.html" class="nav-btn nav-btn-prev">← ApplicationContext</a>
+                <a href="04-dependency-injection.html" class="nav-btn nav-btn-next">Dependency Injection →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

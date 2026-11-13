@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constrained Generation - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Constrained Generation
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 5: Constrained Generation</h1>
+                <p class="subtitle">The model is ONLY allowed to answer using retrieved context. Nothing invented. Nothing from its training data. Zero hallucination by design.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-code">Code</span>
+                    <span class="tag tag-production">Production</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: Open-Book Exam</div>
+                <p>Imagine two types of exams:</p>
+                <p><strong>Closed-book exam (normal LLM):</strong> The student answers from memory. They might remember wrong, mix up facts, or just make something up if they don't know. This is how ChatGPT normally works — it generates from "memory" (training data).</p>
+                <p><strong>Open-book exam (constrained RAG):</strong> The student is given specific pages from the textbook and can ONLY write answers that come directly from those pages. If the answer isn't on the pages they were given, they must write "I don't have enough information to answer this."</p>
+                <p><strong>Constrained generation = forcing the AI to take an open-book exam.</strong> Every answer must come from the retrieved documents, never from "memory."</p>
+            </div>
+
+            <!-- ===== WHAT IS IT ===== -->
+            <h2>What Is Constrained Generation?</h2>
+            <p><strong>Constrained generation</strong> means designing your prompt and system so that the LLM is strictly limited to:</p>
+            <ul>
+                <li>Only use information from the retrieved context provided</li>
+                <li>Never invent facts, figures, dates, or claims not in the context</li>
+                <li>Explicitly refuse to answer if the context doesn't contain the answer</li>
+                <li>Never supplement with information from its training data</li>
+            </ul>
+
+            <p>This is THE most important defense against hallucination. All previous stages (retrieval, reranking, confidence scoring) exist to get the right context here. This stage ensures the model ONLY uses that context.</p>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">🚨 Why This Matters</div>
+                <p>Without constraints, even with perfect retrieval, LLMs will:</p>
+                <ul>
+                    <li>Add "helpful" details that aren't in the source (hallucination)</li>
+                    <li>Merge information from context with training data (contamination)</li>
+                    <li>Fill gaps with plausible-sounding but incorrect information (confabulation)</li>
+                    <li>Extrapolate beyond what the source actually says (over-inference)</li>
+                </ul>
+            </div>
+
+            <!-- ===== THE PROMPT ===== -->
+            <h2>The Constrained Prompt Template</h2>
+
+            <h3>Basic Template</h3>
+<pre><code><span class="token-comment"># The most important prompt in your entire RAG system</span>
+
+SYSTEM_PROMPT = <span class="token-string">"""You are a precise information retrieval assistant.
+
+STRICT RULES (NEVER BREAK THESE):
+1. Answer ONLY using the provided context below.
+2. If the context does not contain the answer, say: 
+   "I don't have sufficient information in the available documents to answer this question."
+3. NEVER use your training knowledge to supplement answers.
+4. NEVER invent, guess, or assume information not explicitly stated in the context.
+5. If the context partially answers the question, provide what you can and explicitly 
+   state what information is missing.
+6. Always indicate which specific source(s) your answer comes from.
+7. If sources conflict, present both views and note the conflict.
+
+CONTEXT (Retrieved Documents):
+---
+{retrieved_context}
+---
+
+CONFIDENCE LEVELS OF SOURCES:
+{confidence_annotations}
+"""</span>
+
+USER_PROMPT = <span class="token-string">"""Based ONLY on the context above, answer this question:
+
+{user_query}
+
+Remember: If the answer is not in the context, say so. Do not guess."""</span></code></pre>
+
+            <h3>Advanced Template with Structured Output</h3>
+<pre><code>ADVANCED_SYSTEM_PROMPT = <span class="token-string">"""You are a precise information retrieval assistant for enterprise documents.
+
+STRICT RULES:
+1. Answer ONLY from the provided context. Nothing else.
+2. For every claim you make, you MUST cite the source using [Source X] notation.
+3. If context is insufficient: respond with the INSUFFICIENT template.
+4. If sources conflict: present both and flag the conflict.
+5. Rate your own answer confidence: HIGH / MEDIUM / LOW based on context quality.
+
+RESPONSE FORMAT:
+---
+**Answer:** [Your answer with inline citations]
+
+**Sources Used:** [List which source chunks were used]
+
+**Answer Confidence:** [HIGH|MEDIUM|LOW]
+- HIGH: Context directly and clearly answers the question
+- MEDIUM: Context partially answers, some inference required
+- LOW: Context tangentially related, answer may be incomplete
+
+**Information Gaps:** [What the context DOESN'T tell us]
+---
+
+INSUFFICIENT EVIDENCE TEMPLATE (use when context doesn't have the answer):
+---
+**Answer:** I don't have sufficient information in the available documents to answer this question.
+
+**What I found:** [Brief note on what related info exists, if any]
+
+**Suggested next steps:** [What the user might search for instead]
+---
+
+CONTEXT:
+{context_with_citations}
+"""</span></code></pre>
+
+            <!-- ===== GROUNDING TECHNIQUES ===== -->
+            <h2>Grounding Techniques (How to Enforce Constraints)</h2>
+
+            <h3>Technique 1: Context-Only Prompting</h3>
+            <p>The simplest approach — just tell the model firmly in the prompt. Works surprisingly well with strong models.</p>
+
+            <h3>Technique 2: Extractive + Abstractive Hybrid</h3>
+            <p><strong>Simple:</strong> First extract relevant sentences verbatim, then let the model rephrase them into a natural answer.</p>
+
+<pre><code><span class="token-keyword">def</span> <span class="token-function">constrained_generate</span>(query: <span class="token-builtin">str</span>, context_chunks: List[Dict]) -> Dict:
+    <span class="token-string">"""
+    Two-step constrained generation:
+    1. Extract relevant sentences (grounding)
+    2. Synthesize into natural answer (generation)
+    """</span>
+    
+    <span class="token-comment"># Step 1: Extract key sentences that answer the query</span>
+    extraction_prompt = <span class="token-string">f"""Given this query: "{query}"
+
+Extract ONLY the sentences from the context below that directly answer the query.
+Do not add any information. Only copy exact sentences.
+
+Context:
+{format_context(context_chunks)}
+
+Relevant sentences (copy exactly):"""</span>
+    
+    extracted = llm.generate(extraction_prompt)
+    
+    <span class="token-comment"># Step 2: Synthesize extracted sentences into a natural answer</span>
+    synthesis_prompt = <span class="token-string">f"""Using ONLY these extracted facts, write a clear answer to: "{query}"
+
+Extracted facts:
+{extracted}
+
+Rules:
+- Use ONLY the facts above
+- Do not add ANY information not in the extracted facts
+- Cite which fact supports each claim
+- If facts are insufficient, say so
+
+Answer:"""</span>
+    
+    answer = llm.generate(synthesis_prompt)
+    
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"answer"</span>: answer,
+        <span class="token-string">"extracted_evidence"</span>: extracted,
+        <span class="token-string">"sources"</span>: [c[<span class="token-string">"chunk_id"</span>] <span class="token-keyword">for</span> c <span class="token-keyword">in</span> context_chunks]
+    }</code></pre>
+
+            <h3>Technique 3: Structured JSON Output</h3>
+            <p>Force the model to output structured JSON that includes citations. This makes it harder to hallucinate because every claim must have a linked source.</p>
+
+<pre><code>STRUCTURED_PROMPT = <span class="token-string">"""Answer the query using ONLY the provided context.
+Return your response as valid JSON matching this schema:
+
+{
+    "answer": "Your answer text",
+    "claims": [
+        {
+            "statement": "Each factual claim you make",
+            "source_chunk_id": "Which chunk this comes from",
+            "verbatim_quote": "The exact text from the source supporting this",
+            "confidence": "high|medium|low"
+        }
+    ],
+    "unanswered_aspects": ["Parts of the query the context doesn't address"],
+    "overall_confidence": "high|medium|low"
+}
+
+If the context doesn't contain the answer, return:
+{
+    "answer": null,
+    "reason": "insufficient_context",
+    "related_info": "What related info was found, if any"
+}
+
+Context:
+{context}
+
+Query: {query}
+"""</span></code></pre>
+
+            <h3>Technique 4: NLI Verification (Post-Generation Check)</h3>
+            <p><strong>NLI (Natural Language Inference)</strong> — after the model generates an answer, automatically verify that each claim is supported by the context.</p>
+
+<pre><code><span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> pipeline
+
+<span class="token-comment"># NLI model checks if a claim is supported by evidence</span>
+nli_model = pipeline(<span class="token-string">"text-classification"</span>, model=<span class="token-string">"roberta-large-mnli"</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">verify_answer_grounding</span>(
+    answer: <span class="token-builtin">str</span>, 
+    context_chunks: List[Dict]
+) -> Dict:
+    <span class="token-string">"""
+    Post-generation verification: check if each sentence 
+    in the answer is actually supported by the context.
+    
+    NLI = Natural Language Inference
+    Checks: does the context ENTAIL (support) this claim?
+    """</span>
+    context_text = <span class="token-string">" "</span>.join([c[<span class="token-string">"content"</span>] <span class="token-keyword">for</span> c <span class="token-keyword">in</span> context_chunks])
+    
+    <span class="token-comment"># Split answer into individual claims/sentences</span>
+    sentences = answer.split(<span class="token-string">"."</span>)
+    
+    verification_results = []
+    <span class="token-keyword">for</span> sentence <span class="token-keyword">in</span> sentences:
+        sentence = sentence.strip()
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> sentence:
+            <span class="token-keyword">continue</span>
+        
+        <span class="token-comment"># Check if context supports (entails) this sentence</span>
+        result = nli_model(
+            <span class="token-string">f"{context_text}"</span>,  <span class="token-comment"># premise (evidence)</span>
+            sentence,            <span class="token-comment"># hypothesis (claim)</span>
+        )
+        
+        <span class="token-comment"># NLI outputs: entailment, neutral, contradiction</span>
+        label = result[<span class="token-number">0</span>][<span class="token-string">"label"</span>]
+        score = result[<span class="token-number">0</span>][<span class="token-string">"score"</span>]
+        
+        verification_results.append({
+            <span class="token-string">"claim"</span>: sentence,
+            <span class="token-string">"verdict"</span>: label,  <span class="token-comment"># "ENTAILMENT" = supported</span>
+            <span class="token-string">"confidence"</span>: score,
+            <span class="token-string">"is_grounded"</span>: label == <span class="token-string">"ENTAILMENT"</span> <span class="token-keyword">and</span> score > <span class="token-number">0.8</span>
+        })
+    
+    <span class="token-comment"># Overall grounding score</span>
+    grounded_count = sum(<span class="token-number">1</span> <span class="token-keyword">for</span> r <span class="token-keyword">in</span> verification_results <span class="token-keyword">if</span> r[<span class="token-string">"is_grounded"</span>])
+    total_claims = <span class="token-builtin">len</span>(verification_results)
+    
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"grounding_score"</span>: grounded_count / total_claims <span class="token-keyword">if</span> total_claims > <span class="token-number">0</span> <span class="token-keyword">else</span> <span class="token-number">0</span>,
+        <span class="token-string">"claims"</span>: verification_results,
+        <span class="token-string">"ungrounded_claims"</span>: [
+            r[<span class="token-string">"claim"</span>] <span class="token-keyword">for</span> r <span class="token-keyword">in</span> verification_results 
+            <span class="token-keyword">if not</span> r[<span class="token-string">"is_grounded"</span>]
+        ],
+        <span class="token-string">"should_regenerate"</span>: grounded_count / total_claims < <span class="token-number">0.8</span>
+    }</code></pre>
+
+            <!-- ===== FULL PIPELINE ===== -->
+            <h2>Complete Constrained Generation Pipeline</h2>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">ConstrainedGenerator</span>:
+    <span class="token-string">"""
+    Generate answers ONLY from retrieved context.
+    Includes verification and fallback.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, llm, nli_verifier):
+        self.llm = llm
+        self.verifier = nli_verifier
+        self.max_retries = <span class="token-number">2</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">generate</span>(
+        self, 
+        query: <span class="token-builtin">str</span>, 
+        context_chunks: List[Dict],
+        min_grounding_score: <span class="token-builtin">float</span> = <span class="token-number">0.8</span>
+    ) -> Dict:
+        <span class="token-string">"""Generate a constrained, verified answer."""</span>
+        
+        <span class="token-comment"># Format context with source annotations</span>
+        formatted_context = self._format_context(context_chunks)
+        
+        <span class="token-comment"># Generate answer with strict constraints</span>
+        prompt = self._build_prompt(query, formatted_context)
+        answer = self.llm.generate(prompt, temperature=<span class="token-number">0.1</span>)  <span class="token-comment"># Low temp = less creative</span>
+        
+        <span class="token-comment"># Verify grounding (is the answer actually supported?)</span>
+        verification = self.verifier.verify(answer, context_chunks)
+        
+        <span class="token-keyword">if</span> verification[<span class="token-string">"grounding_score"</span>] >= min_grounding_score:
+            <span class="token-keyword">return</span> {
+                <span class="token-string">"answer"</span>: answer,
+                <span class="token-string">"grounding_score"</span>: verification[<span class="token-string">"grounding_score"</span>],
+                <span class="token-string">"sources"</span>: [c[<span class="token-string">"chunk_id"</span>] <span class="token-keyword">for</span> c <span class="token-keyword">in</span> context_chunks],
+                <span class="token-string">"status"</span>: <span class="token-string">"grounded"</span>
+            }
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># Answer has ungrounded claims → regenerate or refuse</span>
+            <span class="token-keyword">return</span> self._handle_ungrounded(
+                query, context_chunks, verification
+            )
+    
+    <span class="token-keyword">def</span> <span class="token-function">_handle_ungrounded</span>(self, query, chunks, verification):
+        <span class="token-string">"""Handle case where generated answer isn't fully grounded."""</span>
+        
+        <span class="token-comment"># Try once more with stricter prompt</span>
+        stricter_prompt = self._build_strict_prompt(
+            query, chunks, verification[<span class="token-string">"ungrounded_claims"</span>]
+        )
+        retry_answer = self.llm.generate(stricter_prompt, temperature=<span class="token-number">0.0</span>)
+        retry_verification = self.verifier.verify(retry_answer, chunks)
+        
+        <span class="token-keyword">if</span> retry_verification[<span class="token-string">"grounding_score"</span>] >= <span class="token-number">0.8</span>:
+            <span class="token-keyword">return</span> {<span class="token-string">"answer"</span>: retry_answer, <span class="token-string">"status"</span>: <span class="token-string">"grounded_retry"</span>}
+        
+        <span class="token-comment"># Still not grounded → trigger fallback (Stage 7)</span>
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"answer"</span>: <span class="token-keyword">None</span>,
+            <span class="token-string">"status"</span>: <span class="token-string">"insufficient_evidence"</span>,
+            <span class="token-string">"reason"</span>: <span class="token-string">"Could not generate a fully grounded answer"</span>,
+            <span class="token-string">"partial_info"</span>: verification.get(<span class="token-string">"grounded_claims"</span>, [])
+        }</code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Documents Scale</div>
+                <ul>
+                    <li><strong>Temperature:</strong> Use 0.0-0.2 for constrained generation. Higher temperature = more creativity = more hallucination risk</li>
+                    <li><strong>Context window management:</strong> With many retrieved chunks, you may hit token limits. Prioritize high-confidence chunks (from Stage 4)</li>
+                    <li><strong>Latency consideration:</strong> NLI verification adds ~100-300ms. Worth it for high-stakes answers. Optional for casual queries.</li>
+                    <li><strong>Model choice:</strong> At this stage, even a smaller model with perfect context beats a large model with bad context</li>
+                </ul>
+            </div>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>GPT-4 + strict system prompt</strong> — Most common approach. Works well with good prompt engineering.</li>
+                    <li><strong>Claude's constitutional approach</strong> — Built-in tendency to refuse when unsure, good for constrained generation</li>
+                    <li><strong>Structured output (JSON mode)</strong> — Forces citation with every claim, reducing uncited hallucination</li>
+                    <li><strong>Post-generation NLI check</strong> — Used by enterprises for high-stakes (legal, medical, financial) applications</li>
+                    <li><strong>Multi-step generation</strong> — Extract → Verify → Synthesize pipeline for maximum grounding</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>Constrained generation = the model can ONLY answer from retrieved context, never from training data</li>
+                    <li>The system prompt is your primary defense — be explicit, firm, and repetitive about constraints</li>
+                    <li>Use low temperature (0.0-0.2) to reduce creative generation</li>
+                    <li>Verify grounding post-generation using NLI models to catch any leaked hallucination</li>
+                    <li>If grounding fails, trigger the fallback (Stage 7) — never serve an ungrounded answer</li>
+                    <li>Structured output (JSON with citations) makes hallucination harder by design</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+Context (from Stages 1-4):
+┌─────────────────────────────┐
+│ "Vacation policy: 20 days"  │  ← Source A (confidence: 0.95)
+│ "Remote workers: +5 days"   │  ← Source B (confidence: 0.82)
+└─────────────────────────────┘
+
+Query: "How many vacation days do remote workers get?"
+
+CONSTRAINED answer: "Remote workers get 25 days (20 base + 5 remote bonus) [Source A, B]"
+  ✅ Every fact traceable to context
+
+UNCONSTRAINED answer: "Remote workers typically get 25-30 days plus national holidays..."
+  ❌ "typically" — not in context
+  ❌ "25-30" — context says exactly 25
+  ❌ "national holidays" — invented, not in context
+                </div>
+                <p><strong>Think of it as:</strong> A courtroom witness who can only testify about what they personally saw (the documents), not what they think might be true.</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>Weak system prompts:</strong> "Try to use the context" is too weak. Use "ONLY use the context. NEVER add information not in the context."</li>
+                    <li><strong>High temperature:</strong> Using temperature > 0.3 with constrained generation defeats the purpose. Creativity = hallucination risk.</li>
+                    <li><strong>No verification step:</strong> Trusting the model to follow instructions perfectly. Always verify grounding for high-stakes answers.</li>
+                    <li><strong>Not handling "I don't know":</strong> If you don't give the model a graceful way to say "insufficient info," it'll make something up instead.</li>
+                    <li><strong>Stuffing too much context:</strong> More context ≠ better. If irrelevant chunks are included, the model might use them incorrectly.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Constrained Generator</h3>
+                <ol>
+                    <li>Create 5 context chunks about a fictional company's HR policies</li>
+                    <li>Write a constrained system prompt using the template above</li>
+                    <li>Test with 5 queries: 3 answerable from context, 2 NOT answerable</li>
+                    <li>Verify the model correctly refuses the unanswerable queries</li>
+                    <li>Implement a simple NLI check: for each sentence in the answer, check if it appears (paraphrased) in the context</li>
+                    <li>Calculate a grounding score (% of answer sentences supported by context)</li>
+                    <li><strong>Bonus:</strong> Try the same queries with high temperature (1.0) vs low (0.0) and compare hallucination rates</li>
+                </ol>
+                <p><strong>Success criteria:</strong> Your system achieves 90%+ grounding score on answerable queries and correctly refuses unanswerable ones.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="04-source-confidence.html" class="prev">Source Confidence</a>
+                <a href="06-citation-responses.html" class="next">Citation Responses</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

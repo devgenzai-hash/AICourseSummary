@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Input Delay (FID) - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li class="active"><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (INP)</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> First Input Delay (FID)
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>First Input Delay (FID)</h1>
+                <p class="subtitle">The time between a user's FIRST interaction (click, tap, keypress) and when the browser can BEGIN processing the event handler — measuring how blocked the main thread was at the critical moment of first engagement.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-performance">Core Web Vital (Legacy)</span>
+                    <span class="tag tag-browser">User Experience</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏪 Analogy: Walking Into a Store</div>
+                <p>You walk into a store and say "Hello!" to the employee. FID measures how long the employee takes to look up and acknowledge you — NOT how long it takes them to fully help you. They might be stocking shelves (running JavaScript), so your greeting waits. FID = the wait before they start responding. The actual help time is separate (processing + rendering).</p>
+            </div>
+
+            <h2>The Problem: Pages That Look Ready But Aren't</h2>
+<pre><code><span class="token-comment">// Classic scenario: Page renders content (good LCP!) but main thread is blocked</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Timeline:</span>
+<span class="token-comment">// 0ms        1000ms      2000ms      3000ms      4000ms</span>
+<span class="token-comment">// |──────────|──────────|──────────|──────────|</span>
+<span class="token-comment">// [HTML parse]                                        </span>
+<span class="token-comment">//      [CSS download + parse]                         </span>
+<span class="token-comment">//            [Hero image loads → LCP at 1200ms]       </span>
+<span class="token-comment">//                  [████ JS bundle executing (1500-3500ms) ████]</span>
+<span class="token-comment">//                        ↑ USER CLICKS at 2000ms</span>
+<span class="token-comment">//                        │                    ↑ Handler starts at 3500ms</span>
+<span class="token-comment">//                        └── FID = 1500ms ────┘</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Page LOOKS interactive (content visible) but IS NOT interactive</span>
+<span class="token-comment">// This is the "uncanny valley of interactivity"</span>
+</code></pre>
+
+            <h2>How FID Is Measured</h2>
+<pre><code><span class="token-comment">// FID uses the Event Timing API via PerformanceObserver</span>
+<span class="token-comment">// It measures: event.processingStart - event.startTime</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// event.startTime     = when the user physically interacted (hardware timestamp)</span>
+<span class="token-comment">// event.processingStart = when the browser began running the event handler</span>
+<span class="token-comment">// The gap between them IS the input delay</span>
+
+<span class="token-keyword">const</span> fidObserver = <span class="token-keyword">new</span> PerformanceObserver((list) =&gt; {
+    <span class="token-keyword">const</span> entry = list.getEntries()[0]; <span class="token-comment">// Only first input matters for FID</span>
+    
+    <span class="token-keyword">const</span> fid = entry.processingStart - entry.startTime;
+    
+    console.log({
+        fid: fid,                          <span class="token-comment">// The actual delay in ms</span>
+        eventType: entry.name,             <span class="token-comment">// 'pointerdown', 'click', 'keydown', etc.</span>
+        startTime: entry.startTime,        <span class="token-comment">// When user interacted</span>
+        processingStart: entry.processingStart, <span class="token-comment">// When handler began</span>
+        processingEnd: entry.processingEnd,     <span class="token-comment">// When handler finished</span>
+        duration: entry.duration           <span class="token-comment">// Total time including rendering</span>
+    });
+    
+    <span class="token-comment">// Google's thresholds:</span>
+    <span class="token-comment">// Good: ≤100ms | Needs Improvement: 100-300ms | Poor: >300ms</span>
+});
+
+fidObserver.observe({ type: <span class="token-string">'first-input'</span>, buffered: <span class="token-keyword">true</span> });
+<span class="token-comment">// buffered:true is ESSENTIAL — first input often fires before analytics loads</span>
+</code></pre>
+
+            <h3>What Counts as "First Input"?</h3>
+<pre><code><span class="token-comment">// COUNTED (discrete events with clear start/end):</span>
+<span class="token-comment">// - click / mousedown / pointerdown</span>
+<span class="token-comment">// - keydown / keypress</span>
+<span class="token-comment">// - touchstart / pointerdown (mobile tap)</span>
+
+<span class="token-comment">// NOT COUNTED (continuous events without clear "first" moment):</span>
+<span class="token-comment">// - scroll (starts from a scroll event, not pointer)</span>
+<span class="token-comment">// - mousemove / pointermove (continuous)</span>
+<span class="token-comment">// - wheel (scroll events)</span>
+
+<span class="token-comment">// WHY scroll is excluded:</span>
+<span class="token-comment">// Scroll is handled by the compositor thread (off main thread)</span>
+<span class="token-comment">// It doesn't wait for JavaScript, so it has different perf characteristics</span>
+</code></pre>
+
+            <h2>FID vs TBT: Field vs Lab</h2>
+<pre><code><span class="token-comment">// FID is a FIELD metric — measured on real user devices</span>
+<span class="token-comment">// You CANNOT measure FID in a lab (Lighthouse, WebPageTest) because</span>
+<span class="token-comment">// there's no real user to provide the "first input"</span>
+
+<span class="token-comment">// TBT (Total Blocking Time) is the LAB PROXY for FID:</span>
+<span class="token-comment">// TBT = sum of blocking portions of all long tasks between FCP and TTI</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Long task: 250ms  → blocking time = 250 - 50 = 200ms</span>
+<span class="token-comment">// Long task: 90ms   → blocking time = 90 - 50 = 40ms</span>
+<span class="token-comment">// Long task: 45ms   → blocking time = 0 (under 50ms threshold)</span>
+<span class="token-comment">// TBT = 200 + 40 = 240ms</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// High TBT in lab → likely high FID in field</span>
+<span class="token-comment">// The correlation isn't perfect because FID depends on WHEN the user clicks</span>
+<span class="token-comment">// (if they click between long tasks, FID can be 0 even with high TBT)</span>
+</code></pre>
+
+            <h2>What Causes High FID (and How to Fix It)</h2>
+<pre><code><span class="token-comment">// CAUSE 1: Large JavaScript bundles executing during page load</span>
+<span class="token-comment">// FIX: Code-split, defer non-critical JS, use dynamic imports</span>
+
+<span class="token-comment">// Before: One massive bundle blocks the main thread</span>
+&lt;script src=<span class="token-string">"app-bundle.js"</span>&gt;&lt;/script&gt; <span class="token-comment">// 500KB, takes 2000ms to parse+execute</span>
+
+<span class="token-comment">// After: Split into critical path + deferred chunks</span>
+&lt;script src=<span class="token-string">"critical.js"</span>&gt;&lt;/script&gt;          <span class="token-comment">// 50KB, 200ms</span>
+&lt;script src=<span class="token-string">"deferred.js"</span> defer&gt;&lt;/script&gt;     <span class="token-comment">// Parses after HTML, lower priority</span>
+&lt;link rel=<span class="token-string">"modulepreload"</span> href=<span class="token-string">"lazy.js"</span>&gt;    <span class="token-comment">// Preload but don't execute yet</span>
+
+<span class="token-comment">// CAUSE 2: Third-party scripts (analytics, ads, chat widgets)</span>
+<span class="token-comment">// FIX: Load them after first interaction or in idle time</span>
+
+<span class="token-comment">// Defer third-party loading until user shows engagement</span>
+<span class="token-keyword">const</span> <span class="token-function">loadThirdParty</span> = () =&gt; {
+    <span class="token-keyword">const</span> script = document.createElement(<span class="token-string">'script'</span>);
+    script.src = <span class="token-string">'https://chat-widget.example.com/sdk.js'</span>;
+    document.body.appendChild(script);
+};
+
+<span class="token-comment">// Only load after user scrolls, clicks, or 5s passes (whichever first)</span>
+<span class="token-keyword">const</span> triggers = [<span class="token-string">'scroll'</span>, <span class="token-string">'click'</span>, <span class="token-string">'touchstart'</span>, <span class="token-string">'keydown'</span>];
+<span class="token-keyword">let</span> loaded = <span class="token-keyword">false</span>;
+<span class="token-keyword">const</span> <span class="token-function">onTrigger</span> = () =&gt; {
+    <span class="token-keyword">if</span> (loaded) <span class="token-keyword">return</span>;
+    loaded = <span class="token-keyword">true</span>;
+    loadThirdParty();
+    triggers.forEach(t =&gt; document.removeEventListener(t, onTrigger));
+};
+triggers.forEach(t =&gt; document.addEventListener(t, onTrigger, { once: <span class="token-keyword">true</span>, passive: <span class="token-keyword">true</span> }));
+setTimeout(onTrigger, 5000); <span class="token-comment">// Fallback: load after 5s regardless</span>
+
+<span class="token-comment">// CAUSE 3: Hydration cost in SSR frameworks (React, Next.js, Nuxt)</span>
+<span class="token-comment">// FIX: Progressive/selective hydration, Islands architecture</span>
+
+<span class="token-comment">// CAUSE 4: Long synchronous operations (JSON parsing, list rendering)</span>
+<span class="token-comment">// FIX: Use Web Workers for heavy computation</span>
+
+<span class="token-comment">// Move JSON parsing off main thread</span>
+<span class="token-keyword">const</span> worker = <span class="token-keyword">new</span> Worker(<span class="token-string">'json-parser.js'</span>);
+worker.postMessage(hugeJsonString); <span class="token-comment">// Parse in worker, not main thread</span>
+worker.onmessage = (e) =&gt; render(e.data); <span class="token-comment">// Structured clone back</span>
+</code></pre>
+
+            <h2>FID Is Being Replaced by INP (March 2024)</h2>
+<pre><code><span class="token-comment">// WHY FID was retired as a Core Web Vital:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 1. Only measures FIRST interaction — ignores all subsequent slow interactions</span>
+<span class="token-comment">//    User could have great FID but terrible responsiveness after that</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 2. Only measures INPUT DELAY — ignores processing time and rendering</span>
+<span class="token-comment">//    A handler could take 500ms but if input delay was 10ms, FID looks "good"</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 3. Most sites have good FID (>90% of sites pass)</span>
+<span class="token-comment">//    The metric stopped differentiating good sites from great ones</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// INP (Interaction to Next Paint) replaces FID because:</span>
+<span class="token-comment">// - Measures ALL interactions throughout page lifetime</span>
+<span class="token-comment">// - Measures full duration: input delay + processing + paint delay</span>
+<span class="token-comment">// - Reports the WORST interaction (p98 of all interactions)</span>
+<span class="token-comment">// - Much harder to "pass" — drives real improvements</span>
+</code></pre>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Chrome UX Report (CrUX)</strong> — FID data collected from Chrome users with their consent. Available in BigQuery, PageSpeed Insights, and Search Console.</li>
+                <li><strong>Google Search Ranking</strong> — FID was part of Core Web Vitals ranking signal from June 2021 to March 2024, when INP replaced it.</li>
+                <li><strong>web-vitals library (Google)</strong> — The <code>onFID()</code> function wraps the PerformanceObserver setup with proper edge-case handling.</li>
+                <li><strong>RUM tools (SpeedCurve, Calibre, mPulse)</strong> — All Real User Monitoring tools report FID alongside other vitals for field performance tracking.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Confusing FID with TTI</strong> — TTI is when the page becomes CONSISTENTLY interactive. FID is the delay at ONE specific moment (the first click).</li>
+                <li><strong>Trying to measure FID in Lighthouse</strong> — Impossible. Use TBT as the lab proxy instead.</li>
+                <li><strong>Thinking good FID = good interactivity</strong> — FID only captures the first interaction. A site can have 5ms FID but 500ms delays on subsequent interactions.</li>
+                <li><strong>Optimizing for FID but not INP</strong> — Since March 2024, INP is the ranking signal. Fix all slow interactions, not just the first one.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand FID When...</h3>
+                <p>You can explain why a page with a 1200ms LCP and 5ms FID is possible (user clicked after JS finished), and why a page with 200ms LCP but 800ms FID is also possible (user clicked during JS execution) — and why INP is a better metric for both cases.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a page that intentionally has good FID (<50ms) but terrible subsequent interaction latency (>500ms). Then explain what code pattern creates this discrepancy and how INP would catch it.</p>
+                <h3>🔗 Connect It</h3>
+                <p>FID connects to: <strong>Long Tasks API</strong> (long tasks during load are the #1 cause of high FID), <strong>Interaction to Next Paint</strong> (INP replaces FID), and <strong>Hydration</strong> (framework hydration is often the long task blocking first input).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="77-long-tasks-api.html" class="nav-btn nav-btn-prev">← Long Tasks API</a>
+                <a href="79-interaction-next-paint.html" class="nav-btn nav-btn-next">Interaction to Next Paint →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

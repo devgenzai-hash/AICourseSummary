@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Method - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html" class="active"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Design Patterns &rarr; Factory Method</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Beginner</span>
+                <span class="tag">Pattern</span>
+                <span class="tag">Design Pattern</span>
+            </div>
+            <h1>Factory Method</h1>
+            <p class="hero-subtitle">Define an interface for creating objects, but let subclasses decide which class to instantiate &mdash; decoupling the <strong>what</strong> from the <strong>how</strong> of object creation.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>A <strong>restaurant menu</strong> &mdash; you order &ldquo;pasta&rdquo; and the kitchen decides how to make it. You don&rsquo;t need to know the recipe, which chef prepares it, or whether it&rsquo;s made from scratch or reheated. You just say what you want, and the kitchen (the factory) handles the creation details. Tomorrow the kitchen might change the recipe entirely, but your ordering experience stays the same. That&rsquo;s the Factory Method &mdash; you request a product by type, and the factory decides exactly which concrete class to build.</p>
+        </div>
+
+        <h2>What Is the Factory Method Pattern?</h2>
+        <ul>
+            <li><strong>Intent:</strong> Define a method that creates objects without specifying the exact class to instantiate</li>
+            <li><strong>Classification:</strong> Creational pattern (GoF) &mdash; controls object creation through polymorphism</li>
+            <li><strong>Key idea:</strong> Replace direct constructor calls (<code>obj = ConcreteClass()</code>) with a factory call (<code>obj = factory.create(type)</code>)</li>
+            <li><strong>Benefit:</strong> Client code depends on abstractions, not concrete implementations</li>
+            <li><strong>Principle:</strong> Follows the Open/Closed Principle &mdash; add new types without modifying existing code</li>
+        </ul>
+
+        <h2>Simple Factory vs Factory Method vs Abstract Factory</h2>
+        <ul>
+            <li><strong>Simple Factory:</strong> A single function/class with a switch/if-else that returns different objects &mdash; not a GoF pattern, but common in practice</li>
+            <li><strong>Factory Method:</strong> An abstract method in a base class that subclasses override to create specific products &mdash; uses inheritance</li>
+            <li><strong>Abstract Factory:</strong> A factory of factories &mdash; creates families of related objects (e.g., Windows buttons + Windows scrollbars vs Mac buttons + Mac scrollbars)</li>
+        </ul>
+
+        <h2>When to Use Factory Method</h2>
+        <ul>
+            <li>You don&rsquo;t know ahead of time which exact class you need to create</li>
+            <li>You want subclasses to specify the objects they create</li>
+            <li>Object creation involves complex logic (validation, config lookup, caching) that shouldn&rsquo;t live in the constructor</li>
+            <li>You need to return different implementations based on runtime conditions (env, config, input)</li>
+            <li>You want to centralize object creation so changes happen in one place</li>
+        </ul>
+
+        <h2>Open/Closed Principle</h2>
+        <ul>
+            <li><strong>Open for extension:</strong> Add a new notification type by creating a new class and registering it</li>
+            <li><strong>Closed for modification:</strong> Existing factory code and client code don&rsquo;t change</li>
+            <li>Without a factory, adding a new type means modifying every <code>if/elif</code> chain that creates objects</li>
+            <li>With a factory, you register the new class and existing code picks it up automatically</li>
+        </ul>
+
+        <h2>Polymorphic Creation</h2>
+        <ul>
+            <li>The factory returns an object typed to the <strong>abstract base class</strong>, not the concrete implementation</li>
+            <li>Client code calls methods on the interface &mdash; it never knows (or cares) which concrete class it got</li>
+            <li>This enables swapping implementations without touching client code (e.g., switch from email to SMS)</li>
+            <li>In Python, use <code>ABC</code> and <code>@abstractmethod</code> to enforce the contract</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Simple Factory</th>
+                        <th>Factory Method</th>
+                        <th>Abstract Factory</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mechanism</strong></td>
+                        <td>Single function with if/else</td>
+                        <td>Abstract method in base class</td>
+                        <td>Interface for creating families</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Uses</strong></td>
+                        <td>Conditionals</td>
+                        <td>Inheritance + polymorphism</td>
+                        <td>Composition of factories</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Adding Types</strong></td>
+                        <td>Modify the factory function</td>
+                        <td>Create a new subclass</td>
+                        <td>Create a new factory class</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Complexity</strong></td>
+                        <td>Low</td>
+                        <td>Medium</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Open/Closed</strong></td>
+                        <td>Violates (must modify)</td>
+                        <td>Follows (extend via subclass)</td>
+                        <td>Follows (extend via new factory)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Best For</strong></td>
+                        <td>Small, stable set of types</td>
+                        <td>Growing type hierarchies</td>
+                        <td>Multiple product families</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Python Idiom</strong></td>
+                        <td>Dict mapping + function</td>
+                        <td>ABC with create method</td>
+                        <td>Multiple ABC factories</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementations</h2>
+        <pre><code><span class="token-keyword">from</span> abc <span class="token-keyword">import</span> ABC, abstractmethod
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Dict, Type
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># EXAMPLE 1: Notification Factory</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Notification</span>(ABC):
+    <span class="token-string">"""Abstract base — all notifications must implement send()."""</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">send</span>(self, recipient: str, message: str) -> str:
+        ...
+
+
+<span class="token-keyword">class</span> <span class="token-class">EmailNotification</span>(Notification):
+    <span class="token-keyword">def</span> <span class="token-function">send</span>(self, recipient: str, message: str) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"📧 Email to {recipient}: {message}"</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">SMSNotification</span>(Notification):
+    <span class="token-keyword">def</span> <span class="token-function">send</span>(self, recipient: str, message: str) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"📱 SMS to {recipient}: {message}"</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">PushNotification</span>(Notification):
+    <span class="token-keyword">def</span> <span class="token-function">send</span>(self, recipient: str, message: str) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"🔔 Push to {recipient}: {message}"</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">SlackNotification</span>(Notification):
+    <span class="token-keyword">def</span> <span class="token-function">send</span>(self, recipient: str, message: str) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"💬 Slack to #{recipient}: {message}"</span>
+
+
+<span class="token-comment"># Simple Factory: dict-based registry (Pythonic approach)</span>
+<span class="token-keyword">class</span> <span class="token-class">NotificationFactory</span>:
+    <span class="token-string">"""Registry-based factory — Open/Closed compliant."""</span>
+    _registry: Dict[str, Type[Notification]] = {}
+
+    @classmethod
+    <span class="token-keyword">def</span> <span class="token-function">register</span>(cls, channel: str, notification_cls: Type[Notification]):
+        cls._registry[channel] = notification_cls
+
+    @classmethod
+    <span class="token-keyword">def</span> <span class="token-function">create</span>(cls, channel: str) -> Notification:
+        <span class="token-keyword">if</span> channel <span class="token-keyword">not in</span> cls._registry:
+            <span class="token-keyword">raise</span> ValueError(f<span class="token-string">"Unknown channel: {channel}"</span>)
+        <span class="token-keyword">return</span> cls._registry[channel]()
+
+    @classmethod
+    <span class="token-keyword">def</span> <span class="token-function">available</span>(cls) -> list:
+        <span class="token-keyword">return</span> list(cls._registry.keys())
+
+
+<span class="token-comment"># Register notification types</span>
+NotificationFactory.register(<span class="token-string">"email"</span>, EmailNotification)
+NotificationFactory.register(<span class="token-string">"sms"</span>, SMSNotification)
+NotificationFactory.register(<span class="token-string">"push"</span>, PushNotification)
+NotificationFactory.register(<span class="token-string">"slack"</span>, SlackNotification)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># EXAMPLE 2: Database Connector Factory (Factory Method)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">DatabaseConnector</span>(ABC):
+    <span class="token-string">"""Abstract base for database connections."""</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">connect</span>(self, host: str, port: int) -> str:
+        ...
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self, query: str) -> str:
+        ...
+
+
+<span class="token-keyword">class</span> <span class="token-class">PostgresConnector</span>(DatabaseConnector):
+    <span class="token-keyword">def</span> <span class="token-function">connect</span>(self, host: str, port: int = <span class="token-number">5432</span>) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"Connected to PostgreSQL @ {host}:{port}"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self, query: str) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"[PG] Executing: {query}"</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">MySQLConnector</span>(DatabaseConnector):
+    <span class="token-keyword">def</span> <span class="token-function">connect</span>(self, host: str, port: int = <span class="token-number">3306</span>) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"Connected to MySQL @ {host}:{port}"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self, query: str) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"[MySQL] Executing: {query}"</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">SQLiteConnector</span>(DatabaseConnector):
+    <span class="token-keyword">def</span> <span class="token-function">connect</span>(self, host: str = <span class="token-string">":memory:"</span>, port: int = <span class="token-number">0</span>) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"Connected to SQLite @ {host}"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self, query: str) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"[SQLite] Executing: {query}"</span>
+
+
+<span class="token-comment"># Factory Method pattern using ABC</span>
+<span class="token-keyword">class</span> <span class="token-class">DatabaseFactory</span>(ABC):
+    <span class="token-string">"""Abstract creator — subclasses override create_connector()."""</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">create_connector</span>(self) -> DatabaseConnector:
+        ...
+
+    <span class="token-keyword">def</span> <span class="token-function">get_connection</span>(self, host: str, port: int) -> str:
+        <span class="token-string">"""Template method — uses the factory method internally."""</span>
+        connector = self.create_connector()
+        <span class="token-keyword">return</span> connector.connect(host, port)
+
+
+<span class="token-keyword">class</span> <span class="token-class">PostgresFactory</span>(DatabaseFactory):
+    <span class="token-keyword">def</span> <span class="token-function">create_connector</span>(self) -> DatabaseConnector:
+        <span class="token-keyword">return</span> PostgresConnector()
+
+
+<span class="token-keyword">class</span> <span class="token-class">MySQLFactory</span>(DatabaseFactory):
+    <span class="token-keyword">def</span> <span class="token-function">create_connector</span>(self) -> DatabaseConnector:
+        <span class="token-keyword">return</span> MySQLConnector()
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># EXAMPLE 3: Auto-registering factory with decorator</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">SerializerFactory</span>:
+    <span class="token-string">"""Factory with decorator-based registration."""</span>
+    _formats: Dict[str, Type] = {}
+
+    @classmethod
+    <span class="token-keyword">def</span> <span class="token-function">register</span>(cls, format_name: str):
+        <span class="token-string">"""Decorator to auto-register serializer classes."""</span>
+        <span class="token-keyword">def</span> <span class="token-function">decorator</span>(serializer_cls):
+            cls._formats[format_name] = serializer_cls
+            <span class="token-keyword">return</span> serializer_cls
+        <span class="token-keyword">return</span> decorator
+
+    @classmethod
+    <span class="token-keyword">def</span> <span class="token-function">create</span>(cls, format_name: str):
+        <span class="token-keyword">if</span> format_name <span class="token-keyword">not in</span> cls._formats:
+            <span class="token-keyword">raise</span> ValueError(f<span class="token-string">"Unknown format: {format_name}"</span>)
+        <span class="token-keyword">return</span> cls._formats[format_name]()
+
+
+@SerializerFactory.register(<span class="token-string">"json"</span>)
+<span class="token-keyword">class</span> <span class="token-class">JSONSerializer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">serialize</span>(self, data) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"{{JSON: {data}}}"</span>
+
+
+@SerializerFactory.register(<span class="token-string">"xml"</span>)
+<span class="token-keyword">class</span> <span class="token-class">XMLSerializer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">serialize</span>(self, data) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"&lt;data&gt;{data}&lt;/data&gt;"</span>
+
+
+@SerializerFactory.register(<span class="token-string">"yaml"</span>)
+<span class="token-keyword">class</span> <span class="token-class">YAMLSerializer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">serialize</span>(self, data) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"data: {data}"</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Using the factories</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+print(<span class="token-string">"=== Factory Method Pattern ==="</span>)
+print()
+
+<span class="token-comment"># Notification factory</span>
+print(<span class="token-string">"--- Notification Factory ---"</span>)
+<span class="token-keyword">for</span> channel <span class="token-keyword">in</span> NotificationFactory.available():
+    notif = NotificationFactory.create(channel)
+    print(f<span class="token-string">"  {notif.send('alice', 'Hello!')}"</span>)
+print()
+
+<span class="token-comment"># Database factory method</span>
+print(<span class="token-string">"--- Database Factory Method ---"</span>)
+pg_factory = PostgresFactory()
+mysql_factory = MySQLFactory()
+
+print(f<span class="token-string">"  {pg_factory.get_connection('db.prod', 5432)}"</span>)
+print(f<span class="token-string">"  {mysql_factory.get_connection('db.legacy', 3306)}"</span>)
+print()
+
+<span class="token-comment"># Serializer factory with decorator registration</span>
+print(<span class="token-string">"--- Serializer Factory ---"</span>)
+<span class="token-keyword">for</span> fmt <span class="token-keyword">in</span> [<span class="token-string">"json"</span>, <span class="token-string">"xml"</span>, <span class="token-string">"yaml"</span>]:
+    serializer = SerializerFactory.create(fmt)
+    print(f<span class="token-string">"  {fmt}: {serializer.serialize({'name': 'Alice'})}"</span>)
+print()
+
+<span class="token-comment"># Adding a new type WITHOUT modifying existing code</span>
+print(<span class="token-string">"--- Open/Closed in Action ---"</span>)
+
+@SerializerFactory.register(<span class="token-string">"csv"</span>)
+<span class="token-keyword">class</span> <span class="token-class">CSVSerializer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">serialize</span>(self, data) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"name,{data.get('name', '')}"</span>
+
+csv_s = SerializerFactory.create(<span class="token-string">"csv"</span>)
+print(f<span class="token-string">"  New format: {csv_s.serialize({'name': 'Bob'})}"</span>)
+print(<span class="token-string">"  (Added without modifying any existing class!)"</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Django Form Fields:</strong> Django uses factory-like patterns throughout &mdash; <code>models.CharField()</code>, <code>models.IntegerField()</code> etc. create appropriate form widgets and validators without you knowing the internals. The <code>formfield()</code> method on model fields is a textbook Factory Method &mdash; each field type overrides it to produce the correct form field.</p>
+            <p><strong>SQLAlchemy create_engine:</strong> <code>create_engine("postgresql://...")</code> is a factory function that examines the URL scheme and returns the appropriate dialect/driver combination. You pass a connection string and get back an engine without knowing whether it&rsquo;s psycopg2, asyncpg, or mysqlclient under the hood.</p>
+            <p><strong>React.createElement:</strong> In React, <code>createElement(type, props, children)</code> is a factory that produces different virtual DOM nodes based on the <code>type</code> argument. Whether it&rsquo;s a string (HTML element) or a component class, the same factory handles creation polymorphically.</p>
+            <p><strong>Java Collections:</strong> <code>Collections.unmodifiableList()</code>, <code>List.of()</code>, <code>Map.of()</code> are factory methods that return optimized implementations without exposing their concrete classes. The implementation can change between Java versions without breaking client code.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Factory Method decouples object creation from usage &mdash; client code depends on abstractions, not concrete classes</li>
+                <li>Use it when you need to create objects polymorphically based on runtime conditions</li>
+                <li>In Python, a registry dict + <code>ABC</code> is the most idiomatic Factory Method implementation</li>
+                <li>The pattern follows Open/Closed &mdash; add new types by registering them, not modifying existing code</li>
+                <li>Simple Factory (if/else) works fine for a small, stable set of types &mdash; don&rsquo;t over-engineer</li>
+                <li>Abstract Factory is for when you need to create <em>families</em> of related objects together</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of a <strong>vending machine</strong>. You press button A5 (the request), and the machine (the factory) figures out which item to drop. You never reach inside to grab it yourself &mdash; the machine handles the &ldquo;creation&rdquo; and just gives you the product through the slot.</p>
+            <div class="model-visual">
+                <pre>
+  WITHOUT FACTORY (tight coupling):
+  ══════════════════════════════════════════════════════
+
+  Client Code:
+  ┌───────────────────────────────┐
+  │ if type == "email":           │
+  │     notif = EmailNotif()      │  ← Client knows ALL
+  │ elif type == "sms":           │     concrete classes
+  │     notif = SMSNotif()        │
+  │ elif type == "push":          │  ← Adding "slack"
+  │     notif = PushNotif()       │     means changing
+  │ # add new type = change HERE  │     THIS code
+  └───────────────────────────────┘
+
+
+  WITH FACTORY (decoupled):
+  ══════════════════════════════════════════════════════
+
+  Client Code:              Factory:
+  ┌──────────────────┐      ┌────────────────────────┐
+  │                  │      │  registry = {          │
+  │ notif = factory  │─────►│    "email": EmailCls,  │
+  │   .create(type)  │      │    "sms":   SMSCls,    │
+  │                  │      │    "push":  PushCls,   │
+  │ notif.send(...)  │      │    "slack": SlackCls   │
+  │                  │      │  }                     │
+  └──────────────────┘      └────────────────────────┘
+        │                           │
+        │ Knows only                │ Adding "slack" =
+        │ the interface             │ just register it
+        ▼                           ▼
+  ┌──────────────┐          No existing code changes!
+  │ Notification │
+  │  .send()     │  ← abstract interface
+  └──────────────┘
+
+
+  FACTORY METHOD (inheritance-based):
+  ══════════════════════════════════════════════════════
+
+  DatabaseFactory (abstract)
+  ├── create_connector() → abstract
+  └── get_connection()   → template method
+        │
+        ├── PostgresFactory
+        │     └── create_connector() → PostgresConnector
+        │
+        └── MySQLFactory
+              └── create_connector() → MySQLConnector
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Over-engineering with factories for 2 types:</strong> If you only have <code>EmailNotification</code> and <code>SMSNotification</code> and no plans to add more, a simple <code>if/else</code> is fine. Factory Method adds indirection &mdash; it&rsquo;s only worth the cost when the type set is expected to grow or change.</li>
+                <li><strong>Forgetting to enforce the interface:</strong> If your factory returns objects that don&rsquo;t share a common interface (ABC), client code can&rsquo;t treat them polymorphically. Always define an abstract base class with the expected methods &mdash; this catches missing method implementations at class definition time, not at runtime.</li>
+                <li><strong>Putting business logic in the factory:</strong> The factory&rsquo;s job is <em>only</em> to create the right object. It should not validate input, send emails, or do work. If your factory has 50 lines of logic, it&rsquo;s doing too much &mdash; move that logic into the product classes or a separate service.</li>
+                <li><strong>Confusing Factory Method with Abstract Factory:</strong> Factory Method creates <em>one product</em> via inheritance (subclass overrides a create method). Abstract Factory creates <em>families of products</em> via composition (a factory object with multiple create methods). Using Abstract Factory when you only need one product type adds unnecessary complexity.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a payment gateway factory:</strong> Create an abstract <code>PaymentProcessor</code> with <code>charge(amount)</code> and <code>refund(transaction_id)</code>. Implement <code>StripeProcessor</code>, <code>PayPalProcessor</code>, and <code>SquareProcessor</code>. Build a registry-based factory that creates the right processor from a config string. Write tests that verify all processors share the same interface.</li>
+                <li><strong>Decorator-based auto-registration:</strong> Implement a <code>@register("type_name")</code> decorator that automatically adds classes to the factory registry at import time. Create a plugin system where new serializer formats (JSON, XML, CSV, Protobuf) are registered simply by decorating the class. Verify that adding a new format requires zero changes to existing code.</li>
+                <li><strong>Factory with dependency injection:</strong> Build a <code>LoggerFactory</code> that creates loggers configured differently based on environment (dev &rarr; console logger, prod &rarr; file logger, test &rarr; null logger). The factory should accept the environment as a constructor parameter. Write tests that verify each environment produces the correct logger type without touching real files.</li>
+                <li><strong>Abstract Factory for UI components:</strong> Create an abstract factory that produces Button, Checkbox, and TextField objects. Implement <code>MaterialUIFactory</code> and <code>BootstrapFactory</code>, each returning themed components. Write client code that renders a form using whichever factory is injected &mdash; proving the client is fully decoupled from the concrete UI library.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="50-singleton.html" class="prev">&larr; Singleton</a>
+            <a href="52-builder.html" class="next">Builder &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

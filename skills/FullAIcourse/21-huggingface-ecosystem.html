@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuggingFace Ecosystem — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 5</a> <span>›</span> HuggingFace Ecosystem</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>HuggingFace Ecosystem</h1>
+                <p>HuggingFace is the GitHub of AI. Models, datasets, spaces, training tools — everything in one platform. This chapter shows you how to use every piece of their ecosystem like a pro.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>HuggingFace Hub = the App Store for AI.</strong> Instead of apps, it has models and datasets. You browse, download, rate, and share. Over 1 million models available!</p>
+                <p><strong>Transformers library = a universal power adapter.</strong> No matter what model architecture (GPT, Llama, Mistral), the transformers library lets you plug them all in with the same code.</p>
+            </div>
+
+            <h2 id="hub">The HuggingFace Hub</h2>
+
+            <pre><code><span class="token-comment"># pip install huggingface_hub transformers datasets</span>
+<span class="token-keyword">from</span> huggingface_hub <span class="token-keyword">import</span> HfApi, hf_hub_download, snapshot_download
+
+<span class="token-comment"># Login (needed for gated models like Llama)</span>
+<span class="token-comment"># huggingface-cli login</span>
+
+api = HfApi()
+
+<span class="token-comment"># Search for models</span>
+models = api.list_models(
+    filter=<span class="token-string">"text-generation"</span>,
+    sort=<span class="token-string">"downloads"</span>,
+    direction=-<span class="token-number">1</span>,
+    limit=<span class="token-number">5</span>,
+)
+<span class="token-keyword">for</span> model <span class="token-keyword">in</span> models:
+    <span class="token-builtin">print</span>(<span class="token-string">f"{model.id}: {model.downloads:,} downloads"</span>)
+
+<span class="token-comment"># Download a single file</span>
+path = hf_hub_download(
+    repo_id=<span class="token-string">"TheBloke/Llama-2-7B-Chat-GGUF"</span>,
+    filename=<span class="token-string">"llama-2-7b-chat.Q4_K_M.gguf"</span>,
+)
+<span class="token-builtin">print</span>(<span class="token-string">f"Downloaded to: {path}"</span>)
+
+<span class="token-comment"># Download entire model</span>
+snapshot_download(
+    repo_id=<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    local_dir=<span class="token-string">"./llama-3.1-8b"</span>,
+)</code></pre>
+
+            <h2 id="transformers">Transformers Library</h2>
+
+            <pre><code><span class="token-comment"># The universal interface for loading any model</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    pipeline,
+    BitsAndBytesConfig,
+)
+<span class="token-keyword">import</span> torch
+
+<span class="token-comment"># Method 1: Pipeline (simplest, great for quick testing)</span>
+pipe = pipeline(
+    <span class="token-string">"text-generation"</span>,
+    model=<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    torch_dtype=torch.bfloat16,
+    device_map=<span class="token-string">"auto"</span>,
+)
+messages = [{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"What is a transformer?"</span>}]
+output = pipe(messages, max_new_tokens=<span class="token-number">200</span>)
+<span class="token-builtin">print</span>(output[<span class="token-number">0</span>][<span class="token-string">"generated_text"</span>][-<span class="token-number">1</span>][<span class="token-string">"content"</span>])
+
+<span class="token-comment"># Method 2: Full control (production code)</span>
+model_name = <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    torch_dtype=torch.bfloat16,
+    device_map=<span class="token-string">"auto"</span>,
+    attn_implementation=<span class="token-string">"sdpa"</span>,  <span class="token-comment"># Fast attention</span>
+)
+
+<span class="token-comment"># Chat with proper template</span>
+messages = [
+    {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a helpful AI assistant."</span>},
+    {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Explain API rate limiting"</span>},
+]
+inputs = tokenizer.apply_chat_template(messages, return_tensors=<span class="token-string">"pt"</span>).to(model.device)
+outputs = model.generate(inputs, max_new_tokens=<span class="token-number">300</span>, temperature=<span class="token-number">0.7</span>, do_sample=<span class="token-keyword">True</span>)
+response = tokenizer.decode(outputs[<span class="token-number">0</span>][inputs.shape[-<span class="token-number">1</span>]:], skip_special_tokens=<span class="token-keyword">True</span>)
+<span class="token-builtin">print</span>(response)
+
+<span class="token-comment"># Method 3: 4-bit quantized loading (fits on smaller GPUs)</span>
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=<span class="token-keyword">True</span>,
+    bnb_4bit_quant_type=<span class="token-string">"nf4"</span>,
+    bnb_4bit_compute_dtype=torch.bfloat16,
+)
+model_4bit = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    quantization_config=bnb_config,
+    device_map=<span class="token-string">"auto"</span>,
+)</code></pre>
+
+            <h2 id="datasets">Datasets Library</h2>
+
+            <pre><code><span class="token-comment"># pip install datasets</span>
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> load_dataset, Dataset, DatasetDict
+
+<span class="token-comment"># Load a dataset from the Hub</span>
+dataset = load_dataset(<span class="token-string">"tatsu-lab/alpaca"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Training examples: {len(dataset['train'])}"</span>)
+<span class="token-builtin">print</span>(dataset[<span class="token-string">"train"</span>][<span class="token-number">0</span>])  <span class="token-comment"># First example</span>
+
+<span class="token-comment"># Load specific split</span>
+train = load_dataset(<span class="token-string">"HuggingFaceH4/ultrachat_200k"</span>, split=<span class="token-string">"train_sft[:5000]"</span>)
+
+<span class="token-comment"># Create your own dataset</span>
+my_data = Dataset.from_dict({
+    <span class="token-string">"instruction"</span>: [<span class="token-string">"Write a poem"</span>, <span class="token-string">"Explain AI"</span>],
+    <span class="token-string">"response"</span>: [<span class="token-string">"Roses are red..."</span>, <span class="token-string">"AI is..."</span>],
+})
+
+<span class="token-comment"># Push your dataset to the Hub</span>
+my_data.push_to_hub(<span class="token-string">"your-username/my-dataset"</span>)
+
+<span class="token-comment"># Stream large datasets (don't download everything)</span>
+streamed = load_dataset(<span class="token-string">"HuggingFaceFW/fineweb"</span>, streaming=<span class="token-keyword">True</span>)
+<span class="token-keyword">for</span> i, example <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(streamed[<span class="token-string">"train"</span>]):
+    <span class="token-builtin">print</span>(example[<span class="token-string">"text"</span>][:<span class="token-number">100</span>])
+    <span class="token-keyword">if</span> i >= <span class="token-number">5</span>:
+        <span class="token-keyword">break</span></code></pre>
+
+            <h2 id="push">Pushing Models & Datasets to Hub</h2>
+
+            <pre><code><span class="token-comment"># Push a model to HuggingFace Hub</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer
+<span class="token-keyword">from</span> huggingface_hub <span class="token-keyword">import</span> HfApi, create_repo
+
+<span class="token-comment"># After training/merging, push to Hub</span>
+model.push_to_hub(<span class="token-string">"your-username/my-fine-tuned-model"</span>)
+tokenizer.push_to_hub(<span class="token-string">"your-username/my-fine-tuned-model"</span>)
+
+<span class="token-comment"># Create a model card (README.md)</span>
+model_card = <span class="token-string">"""
+---
+license: apache-2.0
+base_model: meta-llama/Llama-3.1-8B-Instruct
+tags:
+  - fine-tuned
+  - qlora
+  - python-code
+datasets:
+  - your-username/my-dataset
+---
+
+# My Fine-Tuned Model
+
+Fine-tuned Llama 3.1 8B for Python code generation.
+
+## Training Details
+- Method: QLoRA (4-bit)
+- Epochs: 3
+- Learning rate: 2e-4
+- Dataset: 10K Python examples
+
+## Usage
+```python
+from transformers import pipeline
+pipe = pipeline("text-generation", model="your-username/my-fine-tuned-model")
+```
+"""</span>
+
+<span class="token-comment"># Upload model card</span>
+api = HfApi()
+api.upload_file(
+    path_or_fileobj=model_card.encode(),
+    path_in_repo=<span class="token-string">"README.md"</span>,
+    repo_id=<span class="token-string">"your-username/my-fine-tuned-model"</span>,
+)</code></pre>
+
+            <h2 id="ecosystem">Full Ecosystem Map</h2>
+
+            <table>
+                <thead><tr><th>Library</th><th>Purpose</th><th>Key Classes/Functions</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>transformers</strong></td><td>Load/run/train models</td><td>AutoModel, AutoTokenizer, Trainer, pipeline</td></tr>
+                    <tr><td><strong>datasets</strong></td><td>Load/process datasets</td><td>load_dataset, Dataset.map(), push_to_hub</td></tr>
+                    <tr><td><strong>peft</strong></td><td>LoRA/QLoRA adapters</td><td>PeftModel, LoraConfig, get_peft_model</td></tr>
+                    <tr><td><strong>trl</strong></td><td>Training (SFT/DPO/RLHF)</td><td>SFTTrainer, DPOTrainer, GRPOTrainer</td></tr>
+                    <tr><td><strong>accelerate</strong></td><td>Multi-GPU/distributed</td><td>Accelerator, DeepSpeed integration</td></tr>
+                    <tr><td><strong>bitsandbytes</strong></td><td>Quantization for training</td><td>BitsAndBytesConfig, 4-bit/8-bit loading</td></tr>
+                    <tr><td><strong>huggingface_hub</strong></td><td>Hub interaction</td><td>HfApi, push_to_hub, hf_hub_download</td></tr>
+                    <tr><td><strong>tokenizers</strong></td><td>Fast tokenization</td><td>Tokenizer, BPE, training custom tokenizers</td></tr>
+                    <tr><td><strong>evaluate</strong></td><td>Metrics & benchmarks</td><td>load("bleu"), load("rouge")</td></tr>
+                    <tr><td><strong>gradio</strong></td><td>Quick demos/UIs</td><td>Interface, ChatInterface, Blocks</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="spaces">Gradio & Spaces (Quick Demos)</h2>
+
+            <pre><code><span class="token-comment"># Create a chat UI in 10 lines of code!</span>
+<span class="token-comment"># pip install gradio</span>
+<span class="token-keyword">import</span> gradio <span class="token-keyword">as</span> gr
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"ollama"</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">chat</span>(message, history):
+    messages = [{<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are helpful."</span>}]
+    <span class="token-keyword">for</span> h <span class="token-keyword">in</span> history:
+        messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: h[<span class="token-number">0</span>]})
+        messages.append({<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: h[<span class="token-number">1</span>]})
+    messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: message})
+    
+    response = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>, messages=messages, stream=<span class="token-keyword">True</span>
+    )
+    
+    partial = <span class="token-string">""</span>
+    <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> response:
+        <span class="token-keyword">if</span> chunk.choices[<span class="token-number">0</span>].delta.content:
+            partial += chunk.choices[<span class="token-number">0</span>].delta.content
+            <span class="token-keyword">yield</span> partial
+
+<span class="token-comment"># Launch!</span>
+demo = gr.ChatInterface(chat, title=<span class="token-string">"Local AI Chat"</span>)
+demo.launch()  <span class="token-comment"># Opens in browser at localhost:7860</span>
+
+<span class="token-comment"># Deploy to HuggingFace Spaces (free hosting!):</span>
+<span class="token-comment"># demo.launch() → Push to a Space on huggingface.co</span></code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>HuggingFace is THE platform for open-source AI</strong> — 1M+ models, 200K+ datasets.</li>
+                    <li><strong>Model cards are required</strong> — Always create a proper README with training details, license, usage examples.</li>
+                    <li><strong>SafeTensors is the standard format</strong> — Replaced pickle for model weights (secure, fast).</li>
+                    <li><strong>Gated models</strong> — Meta, Google require you to accept a license on HuggingFace before downloading.</li>
+                    <li><strong>Spaces for demos</strong> — Free hosting for Gradio/Streamlit apps. Great for showing work.</li>
+                    <li><strong>Use streaming datasets for large data</strong> — Don't download 500GB. Stream what you need.</li>
+                    <li><strong>Transformers + TRL + PEFT = complete training stack</strong> — All HuggingFace, all compatible.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>HuggingFace Hub</strong> = model/dataset repository (like GitHub for AI)</li>
+                    <li><strong>Transformers</strong> = load any model with AutoModel/AutoTokenizer</li>
+                    <li><strong>Datasets</strong> = load/process/share datasets efficiently</li>
+                    <li><strong>TRL + PEFT</strong> = training stack (SFT, DPO, LoRA)</li>
+                    <li><strong>Gradio + Spaces</strong> = quick demos with free hosting</li>
+                    <li>Everything integrates: train with TRL → push to Hub → serve with vLLM → demo with Gradio</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Not logging in for gated models</strong> — Run <code>huggingface-cli login</code> first for Llama, Gemma, etc.</li>
+                    <li><strong>Downloading huge models you can't run</strong> — Check model size vs your VRAM before downloading.</li>
+                    <li><strong>Using pipeline() in production</strong> — It's great for testing but slow for serving. Use model.generate() or vLLM.</li>
+                    <li><strong>No model card</strong> — If you push a model without a README, nobody will use it.</li>
+                    <li><strong>Forgetting chat templates</strong> — Use <code>tokenizer.apply_chat_template()</code> for instruct models, not raw text.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Master the Ecosystem</h4>
+                <ol>
+                    <li>Create a HuggingFace account and get an API token</li>
+                    <li>Load a model using pipeline() and generate text</li>
+                    <li>Load a dataset, filter it, and explore 10 examples</li>
+                    <li>Create a small custom dataset and push it to the Hub</li>
+                    <li>Build a Gradio chat interface connected to Ollama</li>
+                    <li>Use <code>apply_chat_template()</code> to properly format messages for an instruct model</li>
+                    <li><strong>Bonus:</strong> Deploy your Gradio app to HuggingFace Spaces (free!)</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="20-vllm-mlx.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">vLLM & MLX</span>
+                </a>
+                <a href="22-rag-fundamentals.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">RAG Fundamentals</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACID Properties - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> ACID Properties</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>ACID Properties</h1>
+                <p class="subtitle">The four guarantees every reliable database transaction must provide. ACID is why your bank doesn't lose money when two people transfer at the same time.</p>
+                <div class="tag-row">
+                    <span class="tag tag-beginner">Beginner</span>
+                    <span class="tag tag-database">Database</span>
+                    <span class="tag tag-concept">Concept</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">&#127968; Daily-Life Analogy: Sending a Package</div>
+                <p>Imagine you're sending a gift box to a friend. For the delivery to be "ACID compliant," all four things must be true:</p>
+                <ul>
+                    <li><strong>Atomicity</strong>: The package either arrives completely or not at all. No "half the items arrived." If the truck crashes, everything comes back to you.</li>
+                    <li><strong>Consistency</strong>: The package follows all rules. If you're not allowed to ship liquids, the system rejects your package BEFORE it enters the system.</li>
+                    <li><strong>Isolation</strong>: Even if 1000 packages are being delivered simultaneously, each one is handled as if it's the only package in the world. Nobody else's package interferes with yours.</li>
+                    <li><strong>Durability</strong>: Once the delivery is confirmed, it STAYS confirmed. Even if the delivery company's computer crashes, the record of delivery persists.</li>
+                </ul>
+            </div>
+
+            <h2>What Are ACID Properties?</h2>
+            <p>ACID is a set of four properties that guarantee database transactions are processed reliably. If a database is "ACID compliant," it means every transaction (a group of operations) is safe, correct, and won't corrupt your data — even during crashes, power failures, or concurrent access.</p>
+
+            <h2>A — Atomicity (All or Nothing)</h2>
+            <h3>Simple Explanation</h3>
+            <p>A transaction is like a single action — even if it involves multiple steps. Either ALL steps complete successfully, or NONE of them happen. There is no "half-done" state.</p>
+
+            <h3>Technical Explanation</h3>
+            <p>Atomicity is implemented using a <strong>Write-Ahead Log (WAL)</strong> or <strong>undo log</strong>. Before any change is made to the actual data, the database writes the intended changes to a log. If the transaction fails midway, the database reads the log and <strong>rolls back</strong> (undoes) all partial changes.</p>
+
+<pre><code><span class="token-comment"># Atomicity Example: Bank Transfer</span>
+<span class="token-comment"># Either BOTH operations succeed, or NEITHER happens</span>
+
+<span class="token-keyword">import</span> sqlite3
+
+<span class="token-keyword">def</span> <span class="token-function">transfer_money</span>(from_account, to_account, amount):
+    conn = sqlite3.connect(<span class="token-string">'bank.db'</span>)
+    <span class="token-keyword">try</span>:
+        cursor = conn.cursor()
+
+        <span class="token-comment"># Step 1: Deduct from sender</span>
+        cursor.execute(
+            <span class="token-string">"UPDATE accounts SET balance = balance - ? WHERE id = ?"</span>,
+            (amount, from_account)
+        )
+
+        <span class="token-comment"># Step 2: Add to receiver</span>
+        cursor.execute(
+            <span class="token-string">"UPDATE accounts SET balance = balance + ? WHERE id = ?"</span>,
+            (amount, to_account)
+        )
+
+        <span class="token-comment"># BOTH succeed → commit (make permanent)</span>
+        conn.commit()
+        <span class="token-keyword">print</span>(<span class="token-string">"Transfer complete!"</span>)
+
+    <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+        <span class="token-comment"># ANY step fails → rollback (undo everything)</span>
+        conn.rollback()
+        <span class="token-keyword">print</span>(<span class="token-string">f"Transfer failed, rolled back: {e}"</span>)
+
+    <span class="token-keyword">finally</span>:
+        conn.close()
+
+<span class="token-comment"># Without atomicity: money could be deducted from sender</span>
+<span class="token-comment"># but never added to receiver = money vanishes!</span></code></pre>
+
+            <div class="callout callout-info">
+                <strong>Key Insight:</strong> Atomicity doesn't mean "fast" or "instant." It means "undoable." The database can take its time, but if anything goes wrong at ANY point, it will cleanly undo all partial work.
+            </div>
+
+            <h2>C — Consistency (Rules Are Never Broken)</h2>
+            <h3>Simple Explanation</h3>
+            <p>The database has rules (constraints). Every transaction must leave the database in a valid state. If a transaction would break a rule, the entire transaction is rejected.</p>
+
+            <h3>Technical Explanation</h3>
+            <p>Consistency ensures that all defined rules — foreign keys, unique constraints, check constraints, triggers — are satisfied before AND after every transaction. The database validates constraints at commit time.</p>
+
+<pre><code><span class="token-comment"># Consistency Example: Rules that can never be violated</span>
+
+<span class="token-comment"># Rule: Account balance can NEVER go negative</span>
+<span class="token-comment"># Rule: Total money in the system must stay constant</span>
+
+<span class="token-keyword">CREATE</span> TABLE accounts (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    balance DECIMAL(<span class="token-number">10</span>,<span class="token-number">2</span>) CHECK (balance >= <span class="token-number">0</span>)  <span class="token-comment">-- Constraint!</span>
+);
+
+<span class="token-comment">-- This transaction FAILS because it violates the constraint:</span>
+<span class="token-keyword">BEGIN</span>;
+UPDATE accounts SET balance = balance - <span class="token-number">1000</span> WHERE id = <span class="token-number">1</span>;  <span class="token-comment">-- balance = -500? REJECTED!</span>
+<span class="token-keyword">ROLLBACK</span>;  <span class="token-comment">-- Automatic — constraint violation</span>
+
+<span class="token-comment">-- Foreign key consistency:</span>
+<span class="token-keyword">CREATE</span> TABLE orders (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),  <span class="token-comment">-- Must reference valid user</span>
+    total DECIMAL(<span class="token-number">10</span>,<span class="token-number">2</span>)
+);
+
+<span class="token-comment">-- This FAILS: can't create order for non-existent user</span>
+INSERT INTO orders (user_id, total) VALUES (<span class="token-number">9999</span>, <span class="token-number">50.00</span>);  <span class="token-comment">-- REJECTED!</span></code></pre>
+
+            <div class="callout callout-warning">
+                <strong>Don't Confuse:</strong> ACID Consistency ≠ CAP Consistency. ACID-C means "database rules are never broken." CAP-C means "all nodes see the same data." Completely different concepts with the same word!
+            </div>
+
+            <h2>I — Isolation (Transactions Don't Interfere)</h2>
+            <h3>Simple Explanation</h3>
+            <p>Even when thousands of transactions run at the same time, each one behaves as if it's the ONLY transaction running. One transaction's half-finished work is invisible to others.</p>
+
+            <h3>Technical Explanation</h3>
+            <p>Isolation is implemented using locks, MVCC (Multi-Version Concurrency Control), or timestamp ordering. Different <strong>isolation levels</strong> provide different guarantees (see Topic 40 for deep dive).</p>
+
+<pre><code><span class="token-comment"># Isolation Problem: Two people buying the last concert ticket</span>
+
+<span class="token-keyword">import</span> threading
+<span class="token-keyword">import</span> sqlite3
+
+<span class="token-comment"># WITHOUT isolation (broken!):</span>
+<span class="token-keyword">def</span> <span class="token-function">buy_ticket_unsafe</span>(user):
+    conn = sqlite3.connect(<span class="token-string">'tickets.db'</span>)
+    cursor = conn.cursor()
+
+    <span class="token-comment"># Both threads read: 1 ticket available</span>
+    cursor.execute(<span class="token-string">"SELECT count FROM tickets WHERE event='concert'"</span>)
+    count = cursor.fetchone()[<span class="token-number">0</span>]
+
+    <span class="token-keyword">if</span> count > <span class="token-number">0</span>:
+        <span class="token-comment"># Both threads think they can buy!</span>
+        cursor.execute(<span class="token-string">"UPDATE tickets SET count = count - 1 WHERE event='concert'"</span>)
+        conn.commit()
+        <span class="token-keyword">print</span>(<span class="token-string">f"{user} bought a ticket!"</span>)  <span class="token-comment"># OVERSOLD!</span>
+
+<span class="token-comment"># WITH isolation (safe!):</span>
+<span class="token-keyword">def</span> <span class="token-function">buy_ticket_safe</span>(user):
+    conn = sqlite3.connect(<span class="token-string">'tickets.db'</span>, isolation_level=<span class="token-string">'EXCLUSIVE'</span>)
+    cursor = conn.cursor()
+
+    <span class="token-keyword">try</span>:
+        <span class="token-comment"># This locks the row — other transactions must wait</span>
+        cursor.execute(<span class="token-string">"SELECT count FROM tickets WHERE event='concert' FOR UPDATE"</span>)
+        count = cursor.fetchone()[<span class="token-number">0</span>]
+
+        <span class="token-keyword">if</span> count > <span class="token-number">0</span>:
+            cursor.execute(<span class="token-string">"UPDATE tickets SET count = count - 1 WHERE event='concert'"</span>)
+            conn.commit()
+            <span class="token-keyword">print</span>(<span class="token-string">f"{user} bought a ticket!"</span>)
+        <span class="token-keyword">else</span>:
+            <span class="token-keyword">print</span>(<span class="token-string">f"{user}: Sorry, sold out!"</span>)
+    <span class="token-keyword">except</span>:
+        conn.rollback()</code></pre>
+
+            <h2>D — Durability (Saved Means Saved Forever)</h2>
+            <h3>Simple Explanation</h3>
+            <p>Once a transaction is committed (confirmed), it stays committed — even if the power goes out, the server crashes, or a meteor hits the data center. The data is permanently saved.</p>
+
+            <h3>Technical Explanation</h3>
+            <p>Durability is implemented by writing committed data to <strong>non-volatile storage</strong> (disk/SSD) before confirming the commit. Techniques include:</p>
+            <ul>
+                <li><strong>Write-Ahead Log (WAL)</strong>: Write the transaction to a log file on disk BEFORE modifying the data files</li>
+                <li><strong>fsync()</strong>: Force the OS to flush data from RAM to disk</li>
+                <li><strong>Replication</strong>: Write to multiple machines so even hardware failure can't lose it</li>
+            </ul>
+
+<pre><code><span class="token-comment"># Durability: What happens under the hood</span>
+
+<span class="token-keyword">class</span> <span class="token-class">DurableDatabase</span>:
+    <span class="token-string">"""Simplified view of how databases ensure durability"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">commit_transaction</span>(self, transaction):
+        <span class="token-comment"># Step 1: Write to WAL (Write-Ahead Log) on disk</span>
+        self.write_to_wal(transaction)
+
+        <span class="token-comment"># Step 2: fsync — force OS to flush to physical disk</span>
+        self.fsync_wal()
+
+        <span class="token-comment"># Step 3: NOW tell the client "committed!"</span>
+        <span class="token-comment"># Even if we crash here, the WAL has the data</span>
+        <span class="token-keyword">return</span> <span class="token-string">"COMMITTED"</span>
+
+        <span class="token-comment"># Step 4 (background): Apply WAL entries to actual data files</span>
+        <span class="token-comment"># This can happen lazily — the WAL IS the source of truth</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">recover_after_crash</span>(self):
+        <span class="token-string">"""Called when database restarts after a crash"""</span>
+        <span class="token-comment"># Read WAL and replay any committed transactions</span>
+        <span class="token-comment"># that weren't yet applied to data files</span>
+        wal_entries = self.read_wal()
+        <span class="token-keyword">for</span> entry <span class="token-keyword">in</span> wal_entries:
+            <span class="token-keyword">if</span> entry.status == <span class="token-string">"committed"</span>:
+                self.apply_to_data_files(entry)
+            <span class="token-keyword">else</span>:
+                self.discard(entry)  <span class="token-comment"># Uncommitted = rollback</span></code></pre>
+
+            <h2>ACID vs BASE: Two Philosophies</h2>
+            <p>Not every system needs full ACID. Distributed systems often use <strong>BASE</strong> instead — a more relaxed approach that trades strict consistency for availability and performance.</p>
+
+            <table class="comparison-table">
+                <thead><tr><th>Property</th><th>ACID</th><th>BASE</th></tr></thead>
+                <tbody>
+                    <tr><td>Full Name</td><td>Atomicity, Consistency, Isolation, Durability</td><td>Basically Available, Soft state, Eventually consistent</td></tr>
+                    <tr><td>Philosophy</td><td>"Everything must be perfect NOW"</td><td>"Things will be correct EVENTUALLY"</td></tr>
+                    <tr><td>Consistency</td><td>Strict — always correct</td><td>Eventual — correct after some delay</td></tr>
+                    <tr><td>Availability</td><td>May sacrifice for correctness</td><td>Always available, even if stale</td></tr>
+                    <tr><td>Use Case</td><td>Banking, inventory, critical data</td><td>Social media, analytics, caching</td></tr>
+                    <tr><td>Examples</td><td>PostgreSQL, MySQL, Oracle</td><td>Cassandra, DynamoDB, MongoDB (default)</td></tr>
+                    <tr><td>Speed</td><td>Slower (more safety checks)</td><td>Faster (fewer guarantees)</td></tr>
+                </tbody>
+            </table>
+
+            <h2>How Databases Implement ACID</h2>
+            <table class="comparison-table">
+                <thead><tr><th>ACID Property</th><th>Implementation Technique</th><th>What It Does</th></tr></thead>
+                <tbody>
+                    <tr><td>Atomicity</td><td>Write-Ahead Log (WAL) / Undo Log</td><td>Records all changes; can undo partial transactions</td></tr>
+                    <tr><td>Consistency</td><td>Constraints, Triggers, Validation</td><td>Checks all rules before committing</td></tr>
+                    <tr><td>Isolation</td><td>Locks, MVCC, Timestamp Ordering</td><td>Prevents concurrent transactions from interfering</td></tr>
+                    <tr><td>Durability</td><td>WAL + fsync + Replication</td><td>Forces data to disk before confirming</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Real-World ACID in Action</h2>
+<pre><code><span class="token-comment"># Complete ACID transaction: E-commerce order</span>
+<span class="token-keyword">import</span> psycopg2
+
+<span class="token-keyword">def</span> <span class="token-function">place_order</span>(user_id, product_id, quantity):
+    conn = psycopg2.connect(<span class="token-string">"dbname=shop"</span>)
+    conn.autocommit = <span class="token-keyword">False</span>  <span class="token-comment"># Enable transaction mode</span>
+
+    <span class="token-keyword">try</span>:
+        cursor = conn.cursor()
+
+        <span class="token-comment"># ISOLATION: Lock the inventory row so no one else can modify it</span>
+        cursor.execute(
+            <span class="token-string">"SELECT stock FROM products WHERE id = %s FOR UPDATE"</span>,
+            (product_id,)
+        )
+        stock = cursor.fetchone()[<span class="token-number">0</span>]
+
+        <span class="token-comment"># CONSISTENCY: Check business rules</span>
+        <span class="token-keyword">if</span> stock < quantity:
+            <span class="token-keyword">raise</span> ValueError(<span class="token-string">"Not enough stock!"</span>)
+
+        <span class="token-comment"># ATOMICITY: All these happen together or not at all</span>
+        cursor.execute(
+            <span class="token-string">"UPDATE products SET stock = stock - %s WHERE id = %s"</span>,
+            (quantity, product_id)
+        )
+        cursor.execute(
+            <span class="token-string">"INSERT INTO orders (user_id, product_id, qty) VALUES (%s, %s, %s)"</span>,
+            (user_id, product_id, quantity)
+        )
+        cursor.execute(
+            <span class="token-string">"UPDATE users SET order_count = order_count + 1 WHERE id = %s"</span>,
+            (user_id,)
+        )
+
+        <span class="token-comment"># DURABILITY: commit writes to WAL on disk before confirming</span>
+        conn.commit()
+        <span class="token-keyword">print</span>(<span class="token-string">"Order placed successfully!"</span>)
+
+    <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+        <span class="token-comment"># ATOMICITY: Any failure → undo everything</span>
+        conn.rollback()
+        <span class="token-keyword">print</span>(<span class="token-string">f"Order failed: {e}"</span>)
+
+    <span class="token-keyword">finally</span>:
+        conn.close()</code></pre>
+
+            <div class="collapsible">
+                <div class="collapsible-header">Advanced: Write-Ahead Log (WAL) Deep Dive</div>
+                <div class="collapsible-content">
+                    <p>The WAL is the secret weapon behind both Atomicity and Durability. Here's how it works step by step:</p>
+                    <ol>
+                        <li><strong>Before modifying data</strong>: Write the intended change to the WAL file on disk.</li>
+                        <li><strong>Call fsync()</strong>: Ensure the WAL entry is physically on disk (not in OS buffer).</li>
+                        <li><strong>Modify the actual data pages</strong>: Now change the real data (in memory first, then disk later).</li>
+                        <li><strong>On commit</strong>: Write a "COMMIT" record to the WAL.</li>
+                        <li><strong>On crash recovery</strong>: Replay WAL from last checkpoint. Committed entries get applied. Uncommitted entries get discarded.</li>
+                    </ol>
+                    <p>This is why PostgreSQL's <code>pg_wal/</code> directory exists and why you should never delete WAL files manually!</p>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+                    <li><strong>Atomicity</strong>: All-or-nothing. Transaction fully completes or fully rolls back.</li>
+                    <li><strong>Consistency</strong>: All rules/constraints are satisfied after every transaction.</li>
+                    <li><strong>Isolation</strong>: Concurrent transactions don't see each other's uncommitted work.</li>
+                    <li><strong>Durability</strong>: Once committed, data survives any failure.</li>
+                    <li>ACID is implemented via WAL, locks/MVCC, constraints, and fsync.</li>
+                    <li>BASE is the alternative for systems that prioritize availability over strict consistency.</li>
+                    <li>ACID-C ≠ CAP-C — they're entirely different concepts.</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">
+    Transaction: "Transfer $100 from Alice to Bob"
+
+    ┌─────────────────────────────────────────────┐
+    │  BEGIN TRANSACTION                          │
+    │                                             │
+    │  1. Alice.balance -= 100   ─┐              │
+    │  2. Bob.balance += 100     ─┤ ATOMIC       │
+    │  3. Check: balance >= 0    ─┤ CONSISTENT   │
+    │  4. No other TX sees this  ─┤ ISOLATED     │
+    │                              │              │
+    │  COMMIT ─────────────────────┘              │
+    │  (written to disk permanently = DURABLE)   │
+    └─────────────────────────────────────────────┘
+
+    If ANYTHING fails between BEGIN and COMMIT → ROLLBACK
+    If COMMIT succeeds → survives power failure, crash, anything
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+                    <li><strong>Not using transactions for multi-step operations</strong> — If you do step 1 and step 2 as separate queries without a transaction, a crash between them = corrupted data.</li>
+                    <li><strong>Confusing ACID-C with CAP-C</strong> — ACID consistency = rules enforcement. CAP consistency = all nodes agree. Completely different.</li>
+                    <li><strong>Assuming all databases are ACID</strong> — MongoDB wasn't fully ACID until v4.0. Redis is not ACID. Know your database!</li>
+                    <li><strong>Long-running transactions</strong> — Holding locks for minutes (while waiting for user input) blocks everyone else. Keep transactions short!</li>
+                    <li><strong>Ignoring isolation levels</strong> — Default isolation may not prevent all anomalies. Understand what your level guarantees (see Topic 40).</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+                    <li>Create a SQLite database with an "accounts" table. Write a transfer function that is fully atomic (uses BEGIN/COMMIT/ROLLBACK).</li>
+                    <li>Intentionally cause a failure mid-transaction (raise an exception between the two UPDATEs). Verify that rollback works correctly.</li>
+                    <li>Add a CHECK constraint (balance >= 0). Try to overdraw an account. Observe how consistency prevents the violation.</li>
+                    <li>Research: How does your favorite database implement durability? (PostgreSQL WAL? MySQL InnoDB redo log? MongoDB journal?)</li>
+                </ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="21-cap-theorem.html" class="prev">CAP Theorem</a>
+                <a href="23-consistent-hashing.html" class="next">Consistent Hashing</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

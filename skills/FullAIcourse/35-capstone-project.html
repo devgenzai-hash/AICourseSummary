@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone Project — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 11</a> <span>›</span> Capstone Project</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Capstone Project</h1>
+                <p>Put everything together. Build a complete, production-ready AI system from scratch that combines RAG, agents, tool calling, memory, and deployment. This is your portfolio piece.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>The capstone = your final exam + job application combined.</strong> It's not about getting 100% on theory — it's about proving you can build a real thing that works, end to end. Employers and clients care about what you've BUILT, not what you've read.</p>
+            </div>
+
+            <h2 id="project">The Project: AI Research Assistant</h2>
+
+            <p>Build a complete <strong>AI Research Assistant</strong> that can:</p>
+            <ul>
+                <li>Chat with users naturally (streaming responses)</li>
+                <li>Search and retrieve information from documents (RAG)</li>
+                <li>Remember user preferences across sessions (memory)</li>
+                <li>Use tools to search the web, run code, and process files</li>
+                <li>Route between different specialized modes</li>
+                <li>Be deployed as a Docker container with an API</li>
+            </ul>
+
+            <h2 id="architecture">System Architecture</h2>
+
+            <div class="mental-model">
+                <h4>🧠 Full System Design</h4>
+                <pre><code>┌─────────────────────────────────────────────────────┐
+│                   Frontend (Gradio)                   │
+│           Chat UI + File Upload + Settings            │
+└──────────────────────┬──────────────────────────────┘
+                       │ HTTP/WebSocket
+┌──────────────────────▼──────────────────────────────┐
+│                  FastAPI Backend                      │
+│  /chat  /upload  /search  /health  /metrics          │
+└──────┬───────────┬───────────┬──────────────────────┘
+       │           │           │
+┌──────▼───┐ ┌────▼────┐ ┌───▼──────────┐
+│ Orchestr │ │ RAG     │ │ Memory       │
+│ -ator    │ │ Pipeline│ │ System       │
+│          │ │         │ │ (ChromaDB)   │
+│ Route →  │ │ Embed → │ │              │
+│ Classify │ │ Search →│ │ Short-term   │
+│ Generate │ │ Augment │ │ Long-term    │
+└──────┬───┘ └────┬────┘ └───┬──────────┘
+       │           │           │
+┌──────▼───────────▼───────────▼──────────────────────┐
+│              Model Layer (Ollama/vLLM)                │
+│       llama3.1:8b  |  nomic-embed  |  llava          │
+└─────────────────────────────────────────────────────┘</code></pre>
+            </div>
+
+            <h2 id="implementation">Implementation Guide</h2>
+
+            <h3>Phase 1: Core Chat Engine</h3>
+            <pre><code><span class="token-comment"># core/chat_engine.py — The heart of your assistant</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Generator
+
+<span class="token-keyword">class</span> <span class="token-function">ChatEngine</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, model: str = <span class="token-string">"llama3.1:8b"</span>):
+        self.client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+        self.model = model
+        self.system_prompt = <span class="token-string">"You are a helpful AI research assistant."</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">chat</span>(self, message: str, history: list = <span class="token-keyword">None</span>, context: str = <span class="token-string">""</span>) -> str:
+        messages = self._build_messages(message, history, context)
+        response = self.client.chat.completions.create(
+            model=self.model, messages=messages, temperature=<span class="token-number">0.7</span>
+        )
+        <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.content
+    
+    <span class="token-keyword">def</span> <span class="token-function">chat_stream</span>(self, message: str, history: list = <span class="token-keyword">None</span>, context: str = <span class="token-string">""</span>) -> Generator:
+        messages = self._build_messages(message, history, context)
+        stream = self.client.chat.completions.create(
+            model=self.model, messages=messages, temperature=<span class="token-number">0.7</span>, stream=<span class="token-keyword">True</span>
+        )
+        <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> stream:
+            <span class="token-keyword">if</span> chunk.choices[<span class="token-number">0</span>].delta.content:
+                <span class="token-keyword">yield</span> chunk.choices[<span class="token-number">0</span>].delta.content
+    
+    <span class="token-keyword">def</span> <span class="token-function">_build_messages</span>(self, message, history, context):
+        system = self.system_prompt
+        <span class="token-keyword">if</span> context:
+            system += <span class="token-string">f"\n\nRelevant context:\n{context}"</span>
+        messages = [{<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system}]
+        <span class="token-keyword">if</span> history:
+            <span class="token-keyword">for</span> user_msg, bot_msg <span class="token-keyword">in</span> history[-<span class="token-number">10</span>:]:
+                messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: user_msg})
+                messages.append({<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: bot_msg})
+        messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: message})
+        <span class="token-keyword">return</span> messages</code></pre>
+
+            <h3>Phase 2: RAG Pipeline</h3>
+            <pre><code><span class="token-comment"># core/rag.py — Document search and retrieval</span>
+<span class="token-keyword">import</span> chromadb
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> SentenceTransformer
+
+<span class="token-keyword">class</span> <span class="token-function">RAGPipeline</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.embedder = SentenceTransformer(<span class="token-string">"all-MiniLM-L6-v2"</span>)
+        self.chroma = chromadb.PersistentClient(path=<span class="token-string">"./data/vectordb"</span>)
+        self.collection = self.chroma.get_or_create_collection(<span class="token-string">"documents"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">add_document</span>(self, text: str, source: str):
+        <span class="token-string">"""Chunk and index a document."""</span>
+        chunks = self._chunk_text(text, chunk_size=<span class="token-number">500</span>, overlap=<span class="token-number">50</span>)
+        <span class="token-keyword">for</span> i, chunk <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(chunks):
+            self.collection.add(
+                ids=[<span class="token-string">f"{source}_{i}"</span>],
+                documents=[chunk],
+                metadatas=[{<span class="token-string">"source"</span>: source, <span class="token-string">"chunk"</span>: i}]
+            )
+    
+    <span class="token-keyword">def</span> <span class="token-function">search</span>(self, query: str, top_k: int = <span class="token-number">3</span>) -> str:
+        <span class="token-string">"""Search for relevant context."""</span>
+        <span class="token-keyword">if</span> self.collection.count() == <span class="token-number">0</span>:
+            <span class="token-keyword">return</span> <span class="token-string">""</span>
+        results = self.collection.query(query_texts=[query], n_results=top_k)
+        <span class="token-keyword">return</span> <span class="token-string">"\n\n"</span>.join(results[<span class="token-string">"documents"</span>][<span class="token-number">0</span>])
+    
+    <span class="token-keyword">def</span> <span class="token-function">_chunk_text</span>(self, text, chunk_size, overlap):
+        words = text.split()
+        chunks = []
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-number">0</span>, <span class="token-builtin">len</span>(words), chunk_size - overlap):
+            chunks.append(<span class="token-string">" "</span>.join(words[i:i + chunk_size]))
+        <span class="token-keyword">return</span> chunks</code></pre>
+
+            <h3>Phase 3: Memory + Tools + API</h3>
+            <pre><code><span class="token-comment"># app.py — FastAPI application tying it all together</span>
+<span class="token-keyword">from</span> fastapi <span class="token-keyword">import</span> FastAPI, UploadFile, File
+<span class="token-keyword">from</span> fastapi.responses <span class="token-keyword">import</span> StreamingResponse
+<span class="token-keyword">from</span> pydantic <span class="token-keyword">import</span> BaseModel
+
+app = FastAPI(title=<span class="token-string">"AI Research Assistant"</span>)
+
+<span class="token-comment"># Initialize components</span>
+chat_engine = ChatEngine()
+rag = RAGPipeline()
+
+<span class="token-keyword">class</span> <span class="token-function">ChatRequest</span>(BaseModel):
+    message: str
+    user_id: str = <span class="token-string">"default"</span>
+
+@app.post(<span class="token-string">"/chat"</span>)
+<span class="token-keyword">async def</span> <span class="token-function">chat_endpoint</span>(request: ChatRequest):
+    <span class="token-comment"># 1. Search for relevant context</span>
+    context = rag.search(request.message)
+    <span class="token-comment"># 2. Generate response with context</span>
+    response = chat_engine.chat(request.message, context=context)
+    <span class="token-keyword">return</span> {<span class="token-string">"response"</span>: response}
+
+@app.post(<span class="token-string">"/upload"</span>)
+<span class="token-keyword">async def</span> <span class="token-function">upload_document</span>(file: UploadFile = File(...)):
+    content = (<span class="token-keyword">await</span> file.read()).decode(<span class="token-string">"utf-8"</span>)
+    rag.add_document(content, source=file.filename)
+    <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"indexed"</span>, <span class="token-string">"filename"</span>: file.filename}
+
+@app.get(<span class="token-string">"/health"</span>)
+<span class="token-keyword">async def</span> <span class="token-function">health</span>():
+    <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"healthy"</span>, <span class="token-string">"documents"</span>: rag.collection.count()}</code></pre>
+
+            <h2 id="checklist">Completion Checklist</h2>
+
+            <table>
+                <thead><tr><th>Component</th><th>Required</th><th>Bonus</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Chat</strong></td><td>Streaming responses, conversation history</td><td>Multi-model routing</td></tr>
+                    <tr><td><strong>RAG</strong></td><td>Document upload, chunking, retrieval</td><td>Reranking, hybrid search</td></tr>
+                    <tr><td><strong>Memory</strong></td><td>Conversation history (session)</td><td>Long-term user facts, episodic</td></tr>
+                    <tr><td><strong>Tools</strong></td><td>At least 2 tools (search, calculate)</td><td>File ops, code execution, web scraping</td></tr>
+                    <tr><td><strong>API</strong></td><td>FastAPI with /chat, /upload, /health</td><td>Auth, rate limiting, metrics</td></tr>
+                    <tr><td><strong>Deployment</strong></td><td>Dockerfile, runs locally</td><td>docker-compose, cloud deploy</td></tr>
+                    <tr><td><strong>Eval</strong></td><td>5+ test cases, pass rate tracked</td><td>Automated eval on every change</td></tr>
+                    <tr><td><strong>Docs</strong></td><td>README with setup instructions</td><td>API docs, architecture diagram</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="project-structure">Recommended Project Structure</h2>
+
+            <pre><code>ai-research-assistant/
+├── app.py              <span class="token-comment"># FastAPI entry point</span>
+├── core/
+│   ├── chat_engine.py  <span class="token-comment"># LLM interaction</span>
+│   ├── rag.py          <span class="token-comment"># RAG pipeline</span>
+│   ├── memory.py       <span class="token-comment"># Memory system</span>
+│   ├── tools.py        <span class="token-comment"># Tool definitions</span>
+│   └── orchestrator.py <span class="token-comment"># Pipeline orchestration</span>
+├── tests/
+│   ├── test_chat.py
+│   ├── test_rag.py
+│   └── eval_suite.py   <span class="token-comment"># Custom evaluations</span>
+├── data/
+│   └── vectordb/       <span class="token-comment"># ChromaDB storage</span>
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── README.md</code></pre>
+
+            <h2 id="next-steps">What's Next: Your AI Career</h2>
+
+            <table>
+                <thead><tr><th>Path</th><th>Focus</th><th>Skills to Deepen</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>AI Engineer</strong></td><td>Build AI products</td><td>RAG, agents, deployment, full-stack</td></tr>
+                    <tr><td><strong>ML Engineer</strong></td><td>Train & fine-tune models</td><td>LoRA, DPO, distributed training, evals</td></tr>
+                    <tr><td><strong>AI Entrepreneur</strong></td><td>Build AI SaaS products</td><td>Product-market fit, billing, UX</td></tr>
+                    <tr><td><strong>Research Engineer</strong></td><td>Push model capabilities</td><td>Architectures, training at scale, papers</td></tr>
+                    <tr><td><strong>AI Consultant</strong></td><td>Help companies adopt AI</td><td>Use cases, ROI, integration patterns</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>🏭 Portfolio Tips</h4>
+                <ul>
+                    <li><strong>GitHub repo with README</strong> — Clean code, clear instructions, architecture diagram.</li>
+                    <li><strong>Live demo</strong> — Deploy on Railway/Render/HuggingFace Spaces. Recruiters click links.</li>
+                    <li><strong>Blog post</strong> — Write about what you built, decisions you made, challenges you solved.</li>
+                    <li><strong>Metrics</strong> — "Reduced hallucination by 40%" or "Handles 100 req/s" speaks louder than "built a chatbot".</li>
+                    <li><strong>Open source contributions</strong> — Contribute to LangChain, vLLM, or HuggingFace. Shows real skill.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Course Complete! 🎉</h4>
+                <ul>
+                    <li>You now understand the <strong>full AI/LLM engineering stack</strong></li>
+                    <li>From <strong>tokens to transformers</strong>, from <strong>fine-tuning to deployment</strong></li>
+                    <li>You can build: chatbots, RAG systems, agents, AI SaaS products</li>
+                    <li>You can evaluate, deploy, and scale AI systems</li>
+                    <li><strong>Next step:</strong> Build the capstone project and put it in your portfolio</li>
+                    <li>The AI field moves fast — keep building, keep learning, ship real things! 🚀</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Final Exercise: Ship Your Capstone</h4>
+                <ol>
+                    <li>Build Phase 1: Chat engine with streaming</li>
+                    <li>Build Phase 2: RAG pipeline with document upload</li>
+                    <li>Build Phase 3: Add memory and at least 2 tools</li>
+                    <li>Build Phase 4: FastAPI endpoints + Docker deployment</li>
+                    <li>Build Phase 5: Custom eval suite (10+ test cases)</li>
+                    <li>Deploy to cloud, write README, push to GitHub</li>
+                    <li><strong>Share your project link!</strong> You're now an AI engineer. 🎓</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="34-ai-orchestration.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">AI Orchestration</span>
+                </a>
+                <a href="index.html">
+                    <span class="nav-label">🏠 Home</span>
+                    <span class="nav-title">Back to Course Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

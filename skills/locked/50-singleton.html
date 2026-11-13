@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singleton - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html" class="active"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Design Patterns &rarr; Singleton</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Beginner</span>
+                <span class="tag">Pattern</span>
+                <span class="tag">Design Pattern</span>
+            </div>
+            <h1>Singleton</h1>
+            <p class="hero-subtitle">Ensuring a class has only <strong>one instance</strong> and providing a global point of access to it &mdash; the most famous (and most controversial) design pattern in software engineering.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>There&rsquo;s only <strong>one president of a country</strong> at a time. When anyone in the government says &ldquo;the president,&rdquo; everyone knows exactly who they&rsquo;re referring to &mdash; there&rsquo;s no ambiguity. You don&rsquo;t create a new president every time you need a decision made; you always go to THE existing one. The Singleton pattern works the same way &mdash; no matter how many parts of your code request the instance, they all get the same one.</p>
+        </div>
+
+        <h2>What Is the Singleton Pattern?</h2>
+        <ul>
+            <li><strong>Intent:</strong> Guarantee that a class has exactly one instance across the entire application</li>
+            <li><strong>Classification:</strong> Creational pattern (GoF) &mdash; controls <em>how</em> objects are created</li>
+            <li><strong>Key constraint:</strong> The constructor is private/controlled &mdash; you cannot call <code>new Singleton()</code> freely</li>
+            <li><strong>Access:</strong> A static method (usually <code>get_instance()</code>) returns the single instance, creating it on first call</li>
+            <li><strong>Lifecycle:</strong> The instance lives for the entire lifetime of the application</li>
+        </ul>
+
+        <h2>Why Use Singleton?</h2>
+        <ul>
+            <li><strong>Shared state:</strong> Application-wide configuration that every module needs to read</li>
+            <li><strong>Expensive resources:</strong> Database connection pools where creating multiple pools wastes memory and connections</li>
+            <li><strong>Coordination:</strong> A logging framework where all log messages must go through a single writer</li>
+            <li><strong>Hardware access:</strong> A printer spooler &mdash; only one process should talk to the printer at a time</li>
+            <li><strong>Caching:</strong> An in-memory cache that must be consistent across all request handlers</li>
+        </ul>
+
+        <h2>Thread-Safe Implementations</h2>
+        <h3>The Problem with Na&iuml;ve Singleton</h3>
+        <ul>
+            <li>If two threads call <code>get_instance()</code> simultaneously and the instance doesn&rsquo;t exist yet, both may create one</li>
+            <li>You end up with two instances &mdash; violating the entire purpose of the pattern</li>
+            <li>This is a classic <strong>race condition</strong> on the instance creation check</li>
+        </ul>
+
+        <h3>Double-Checked Locking</h3>
+        <ul>
+            <li>Check if instance exists (no lock) &rarr; if not, acquire lock &rarr; check again &rarr; create</li>
+            <li>The second check inside the lock prevents the race condition</li>
+            <li>The first check outside the lock avoids the overhead of locking on every access after creation</li>
+            <li>In Java, the instance field must be <code>volatile</code> to prevent instruction reordering</li>
+        </ul>
+
+        <h3>Python&rsquo;s Module-Level Singleton</h3>
+        <ul>
+            <li>Python modules are only imported once &mdash; the module <em>itself</em> is a singleton</li>
+            <li>Simply define your instance at module level: <code>_config = Config()</code></li>
+            <li>Python&rsquo;s GIL makes module import thread-safe by default</li>
+            <li>This is the most Pythonic approach &mdash; no metaclass magic needed</li>
+        </ul>
+
+        <h2>Why Singleton Is Controversial</h2>
+        <ul>
+            <li><strong>Testing nightmare:</strong> Singletons carry state between tests &mdash; test order matters and tests aren&rsquo;t isolated</li>
+            <li><strong>Hidden dependencies:</strong> Any code can access the singleton globally, making dependency graphs invisible</li>
+            <li><strong>Tight coupling:</strong> Code depends on a specific concrete class rather than an interface</li>
+            <li><strong>Violates SRP:</strong> The class manages its own lifecycle <em>and</em> does its actual job</li>
+            <li><strong>Concurrency issues:</strong> Mutable shared state is the root of all concurrency bugs</li>
+        </ul>
+
+        <h2>Alternatives to Singleton</h2>
+        <ul>
+            <li><strong>Dependency Injection:</strong> Create one instance and pass it to whoever needs it &mdash; explicit, testable, no global state</li>
+            <li><strong>Module-level instance:</strong> In Python, just instantiate at module scope and import it</li>
+            <li><strong>Scoped lifetime:</strong> Use a DI container (Spring, FastAPI Depends) to manage &ldquo;one per request&rdquo; or &ldquo;one per app&rdquo;</li>
+            <li><strong>Monostate (Borg):</strong> Multiple instances share the same state dict &mdash; less restrictive than true Singleton</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Approach</th>
+                        <th>Thread-Safe?</th>
+                        <th>Testable?</th>
+                        <th>Pythonic?</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Metaclass Singleton</strong></td>
+                        <td>With lock &mdash; yes</td>
+                        <td>Hard to mock</td>
+                        <td>Over-engineered</td>
+                        <td>Library authors, strict enforcement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Decorator Singleton</strong></td>
+                        <td>With lock &mdash; yes</td>
+                        <td>Hard to mock</td>
+                        <td>Moderate</td>
+                        <td>Simple one-off singletons</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Module-Level Instance</strong></td>
+                        <td>Yes (import lock)</td>
+                        <td>Easy to patch</td>
+                        <td>Most Pythonic</td>
+                        <td>Configuration, logging setup</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Borg / Monostate</strong></td>
+                        <td>With lock &mdash; yes</td>
+                        <td>Moderate</td>
+                        <td>Unusual</td>
+                        <td>Shared state without identity constraint</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dependency Injection</strong></td>
+                        <td>Yes (no shared creation)</td>
+                        <td>Excellent</td>
+                        <td>Best practice</td>
+                        <td>Production applications, large codebases</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementations</h2>
+        <pre><code><span class="token-keyword">import</span> threading
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Any, Dict
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># APPROACH 1: Metaclass Singleton (strict enforcement)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">SingletonMeta</span>(type):
+    <span class="token-string">"""
+    Thread-safe Singleton metaclass.
+    Any class using this metaclass will have only one instance.
+    """</span>
+    _instances: Dict[type, Any] = {}
+    _lock: threading.Lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">__call__</span>(cls, *args, **kwargs):
+        <span class="token-comment"># Double-checked locking pattern</span>
+        <span class="token-keyword">if</span> cls <span class="token-keyword">not in</span> cls._instances:
+            <span class="token-keyword">with</span> cls._lock:
+                <span class="token-comment"># Second check after acquiring lock</span>
+                <span class="token-keyword">if</span> cls <span class="token-keyword">not in</span> cls._instances:
+                    instance = super().__call__(*args, **kwargs)
+                    cls._instances[cls] = instance
+        <span class="token-keyword">return</span> cls._instances[cls]
+
+
+<span class="token-keyword">class</span> <span class="token-class">DatabasePool</span>(metaclass=SingletonMeta):
+    <span class="token-string">"""Connection pool — only one should exist."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, host: str = <span class="token-string">"localhost"</span>, max_conns: int = <span class="token-number">10</span>):
+        self.host = host
+        self.max_conns = max_conns
+        self.connections = []
+        print(f<span class="token-string">"  Pool created: {host}, max={max_conns}"</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">get_connection</span>(self):
+        <span class="token-keyword">return</span> f<span class="token-string">"conn@{self.host}"</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># APPROACH 2: Decorator Singleton (simple and clean)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">def</span> <span class="token-function">singleton</span>(cls):
+    <span class="token-string">"""Decorator that makes a class a singleton."""</span>
+    instances = {}
+    lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">get_instance</span>(*args, **kwargs):
+        <span class="token-keyword">if</span> cls <span class="token-keyword">not in</span> instances:
+            <span class="token-keyword">with</span> lock:
+                <span class="token-keyword">if</span> cls <span class="token-keyword">not in</span> instances:
+                    instances[cls] = cls(*args, **kwargs)
+        <span class="token-keyword">return</span> instances[cls]
+
+    <span class="token-keyword">return</span> get_instance
+
+
+@singleton
+<span class="token-keyword">class</span> <span class="token-class">AppConfig</span>:
+    <span class="token-string">"""Application configuration — loaded once, read everywhere."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.settings = {
+            <span class="token-string">"debug"</span>: <span class="token-keyword">False</span>,
+            <span class="token-string">"db_url"</span>: <span class="token-string">"postgres://localhost/myapp"</span>,
+            <span class="token-string">"cache_ttl"</span>: <span class="token-number">300</span>
+        }
+        print(<span class="token-string">"  Config loaded from environment"</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str, default=<span class="token-keyword">None</span>):
+        <span class="token-keyword">return</span> self.settings.get(key, default)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># APPROACH 3: Module-Level Singleton (most Pythonic)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-comment"># In a real project, this would be in its own file:</span>
+<span class="token-comment"># config.py</span>
+<span class="token-comment"># ---------</span>
+<span class="token-comment"># _config = Config()  # created once at import time</span>
+<span class="token-comment"># def get_config(): return _config</span>
+<span class="token-comment">#</span>
+<span class="token-comment"># Usage: from config import get_config</span>
+<span class="token-comment"># Python guarantees this module executes only ONCE</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># APPROACH 4: Borg / Monostate Pattern</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Borg</span>:
+    <span class="token-string">"""
+    Multiple instances, but all share the same state.
+    Unlike Singleton, id(a) != id(b), but a.__dict__ is b.__dict__
+    """</span>
+    _shared_state: Dict[str, Any] = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.__dict__ = self._shared_state
+
+
+<span class="token-keyword">class</span> <span class="token-class">Logger</span>(Borg):
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, level: str = <span class="token-string">"INFO"</span>):
+        super().__init__()
+        <span class="token-keyword">if not</span> hasattr(self, <span class="token-string">"_initialized"</span>):
+            self.level = level
+            self.messages = []
+            self._initialized = <span class="token-keyword">True</span>
+            print(f<span class="token-string">"  Logger initialized: level={level}"</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">log</span>(self, msg: str):
+        self.messages.append(f<span class="token-string">"[{self.level}] {msg}"</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># APPROACH 5: Thread-Safe with Lock (explicit control)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">CacheManager</span>:
+    _instance = <span class="token-keyword">None</span>
+    _lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">__new__</span>(cls):
+        <span class="token-keyword">if</span> cls._instance <span class="token-keyword">is None</span>:
+            <span class="token-keyword">with</span> cls._lock:
+                <span class="token-keyword">if</span> cls._instance <span class="token-keyword">is None</span>:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._cache = {}
+        <span class="token-keyword">return</span> cls._instance
+
+    <span class="token-keyword">def</span> <span class="token-function">set</span>(self, key: str, value: Any):
+        self._cache[key] = value
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str) -> Any:
+        <span class="token-keyword">return</span> self._cache.get(key)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Verify singleton behavior</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+print(<span class="token-string">"=== Singleton Implementations ==="</span>)
+print()
+
+<span class="token-comment"># Metaclass approach</span>
+print(<span class="token-string">"--- Metaclass Singleton ---"</span>)
+pool1 = DatabasePool(<span class="token-string">"db.prod.internal"</span>, <span class="token-number">20</span>)
+pool2 = DatabasePool(<span class="token-string">"db.staging.internal"</span>, <span class="token-number">5</span>)
+print(f<span class="token-string">"  Same instance? {pool1 is pool2}"</span>)  <span class="token-comment"># True</span>
+print(f<span class="token-string">"  Host: {pool2.host}"</span>)  <span class="token-comment"># "db.prod.internal" (first call wins)</span>
+print()
+
+<span class="token-comment"># Decorator approach</span>
+print(<span class="token-string">"--- Decorator Singleton ---"</span>)
+cfg1 = AppConfig()
+cfg2 = AppConfig()
+print(f<span class="token-string">"  Same instance? {cfg1 is cfg2}"</span>)  <span class="token-comment"># True</span>
+print(f<span class="token-string">"  Debug: {cfg1.get('debug')}"</span>)
+print()
+
+<span class="token-comment"># Borg pattern</span>
+print(<span class="token-string">"--- Borg / Monostate ---"</span>)
+log1 = Logger(<span class="token-string">"DEBUG"</span>)
+log2 = Logger(<span class="token-string">"ERROR"</span>)
+log1.log(<span class="token-string">"test message"</span>)
+print(f<span class="token-string">"  Same object? {log1 is log2}"</span>)  <span class="token-comment"># False (different objects)</span>
+print(f<span class="token-string">"  Same state? {log1.messages is log2.messages}"</span>)  <span class="token-comment"># True</span>
+print(f<span class="token-string">"  log2 sees: {log2.messages}"</span>)
+print()
+
+<span class="token-comment"># Thread-safe __new__</span>
+print(<span class="token-string">"--- Thread-Safe __new__ ---"</span>)
+cache1 = CacheManager()
+cache1.set(<span class="token-string">"user:1"</span>, {<span class="token-string">"name"</span>: <span class="token-string">"Alice"</span>})
+cache2 = CacheManager()
+print(f<span class="token-string">"  Same instance? {cache1 is cache2}"</span>)  <span class="token-comment"># True</span>
+print(f<span class="token-string">"  cache2 sees: {cache2.get('user:1')}"</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Database Connection Pools:</strong> Libraries like SQLAlchemy use a single engine instance per application. The engine manages a connection pool internally &mdash; creating multiple engines would waste database connections and memory. In practice, you create one <code>engine = create_engine(...)</code> at startup and share it via dependency injection.</p>
+            <p><strong>Logging Frameworks:</strong> Python&rsquo;s built-in <code>logging</code> module uses a singleton-like pattern &mdash; <code>logging.getLogger("name")</code> always returns the same logger for a given name. The logger registry is a module-level dictionary, making it a natural singleton without any metaclass tricks.</p>
+            <p><strong>Spring Framework (Java):</strong> By default, all Spring beans are singletons scoped to the application context. The IoC container creates one instance and injects it everywhere. This gives you singleton semantics with full testability &mdash; you can override beans in test configurations.</p>
+            <p><strong>Configuration Managers:</strong> Tools like python-decouple, dynaconf, and Django&rsquo;s <code>settings</code> module all follow singleton semantics &mdash; configuration is loaded once at startup and remains immutable throughout the application lifecycle.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Singleton ensures exactly one instance exists &mdash; useful for connection pools, config, caches, and loggers</li>
+                <li>Na&iuml;ve implementations have race conditions &mdash; use double-checked locking with a threading lock</li>
+                <li>In Python, the module-level instance is the simplest and most idiomatic singleton approach</li>
+                <li>Singleton makes testing difficult because global state leaks between tests &mdash; prefer dependency injection</li>
+                <li>The Borg/Monostate pattern shares state without enforcing identity &mdash; a less restrictive alternative</li>
+                <li>Modern frameworks (Spring, FastAPI) solve the &ldquo;one instance&rdquo; problem through DI containers, not Singleton classes</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of Singleton as a phone number for a pizza shop. Everyone in town dials the <strong>same number</strong> and reaches the <strong>same kitchen</strong>. You don&rsquo;t build a new pizza shop every time someone wants a pizza &mdash; you all share the one that exists.</p>
+            <div class="model-visual">
+                <pre>
+  SINGLETON LIFECYCLE:
+  ══════════════════════════════════════════════════════
+
+  First call: get_instance()
+  ┌─────────────────────────────────┐
+  │  instance == None?  → YES       │
+  │  acquire lock                   │
+  │  instance == None?  → YES       │
+  │  instance = Class()  ← CREATED  │
+  │  release lock                   │
+  │  return instance                │
+  └─────────────────────────────────┘
+
+  All subsequent calls: get_instance()
+  ┌─────────────────────────────────┐
+  │  instance == None?  → NO        │
+  │  return instance  ← INSTANT     │
+  │  (no lock needed!)              │
+  └─────────────────────────────────┘
+
+
+  WHY DOUBLE-CHECKED LOCKING:
+  ══════════════════════════════════════════════════════
+
+  Thread A              Thread B
+  ─────────             ─────────
+  check: None? YES      check: None? YES
+  acquire lock ←────┐
+  check: None? YES  │   (blocked on lock)
+  create instance   │
+  release lock ─────┘
+                        acquire lock
+                        check: None? NO ← saved!
+                        release lock
+                        return existing instance
+
+
+  SINGLETON vs DEPENDENCY INJECTION:
+  ══════════════════════════════════════════════════════
+
+  Singleton:            DI Container:
+  ┌──────────┐          ┌──────────┐
+  │ Global   │          │ Container│
+  │ access   │          │ manages  │
+  │ anywhere │          │ lifetime │
+  └──────────┘          └──────────┘
+       ↑                     │
+  Any code can            Explicit
+  reach in               injection
+  (hidden dep)           (visible dep)
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Forgetting thread safety:</strong> A na&iuml;ve <code>if _instance is None: _instance = Cls()</code> has a race condition. Two threads can both see <code>None</code> and both create instances. Always use a lock (or rely on Python&rsquo;s import mechanism for module-level singletons).</li>
+                <li><strong>Making everything a Singleton:</strong> Not every &ldquo;I only need one&rdquo; scenario requires the Singleton pattern. If you only create one instance anyway, just... create one instance and pass it around. Reserve Singleton for cases where multiple instances would cause actual bugs.</li>
+                <li><strong>Mutable singleton state without synchronization:</strong> A singleton logger or cache is accessed from multiple threads. If you mutate its internal state (appending to lists, updating dicts) without locks, you get corrupted data. The singleton guarantees one instance, not thread-safe operations on that instance.</li>
+                <li><strong>Testing without reset mechanism:</strong> Singletons persist across test cases, causing flaky tests that depend on execution order. Always provide a <code>_reset()</code> or <code>_clear()</code> method for testing, or better yet, use dependency injection so tests can supply their own mock instance.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Prove the race condition:</strong> Implement a na&iuml;ve Singleton (no lock) and spawn 100 threads that all call <code>get_instance()</code> simultaneously. Add a <code>time.sleep(0.001)</code> inside <code>__init__</code> to widen the race window. Count how many times <code>__init__</code> runs &mdash; it should be more than once, proving the bug.</li>
+                <li><strong>Build a thread-safe registry:</strong> Create a <code>ServiceRegistry</code> singleton that maps service names to instances. Implement <code>register(name, instance)</code> and <code>get(name)</code>. Ensure thread safety for both reads and writes. Write a test that registers services from 10 threads concurrently.</li>
+                <li><strong>Compare DI vs Singleton:</strong> Build a small app with a <code>DatabaseService</code>. First implement it as a Singleton, then refactor to use dependency injection. Write unit tests for both versions &mdash; observe how much easier mocking is with DI. Measure the lines of test setup code for each approach.</li>
+                <li><strong>Implement a resettable Singleton:</strong> Create a configuration singleton that supports <code>reload()</code> to re-read from disk and <code>_reset_for_testing()</code> to destroy the instance. Ensure <code>reload()</code> is atomic &mdash; readers should never see a half-loaded config. Use a read-write lock to allow concurrent reads but exclusive writes.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="49-pagination.html" class="prev">&larr; Pagination</a>
+            <a href="51-factory-method.html" class="next">Factory Method &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

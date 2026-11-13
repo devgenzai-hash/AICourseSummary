@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Continued Pre-Training (CPT) — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span>Fine-Tuning Guide</span>
+            <h2>🙏 Gemma × Hindu Scriptures</h2>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+                <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+                <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+                <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+                <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+                <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+                <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+                <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+                <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+                <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+                <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+                <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb">
+            <a href="index.html">Guide</a><span>›</span> Continued Pre-Training (CPT)
+        </div>
+        <div class="topbar-actions">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 4: Stage 1 — Continued Pre-Training (CPT)</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Domain Adaptive Pre-Training: Teaching Gemma to deeply understand Hindu scriptures by training on your raw text corpus.</p>
+
+            <h2 id="concept">🧠 What is Continued Pre-Training?</h2>
+            
+            <h3>The Concept (Non-Technical)</h3>
+            <p>Gemma was pre-trained on general internet text — it knows a bit about everything. Continued Pre-Training (CPT), also called <strong>Domain Adaptive Pre-Training (DAPT)</strong>, is like sending it to a specialized university. You feed it your entire scripture corpus and let it <em>read</em> all of it, learning the vocabulary, writing patterns, facts, and structure of Hindu philosophical texts.</p>
+
+            <h3>The Technical Explanation</h3>
+            <p>CPT continues the original causal language modeling objective on domain-specific data. The model learns to predict the next token given previous tokens, but now exclusively on your scripture corpus. This:</p>
+            <ul>
+                <li>Adapts the model's internal representations to the scripture domain</li>
+                <li>Improves tokenization efficiency for Sanskrit/Hindi terms</li>
+                <li>Injects factual knowledge (verses, stories, philosophical concepts)</li>
+                <li>Teaches the writing style and structure of scriptural texts</li>
+            </ul>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ When to Skip CPT</div>
+                <p>CPT is optional if:</p>
+                <ul>
+                    <li>Your domain data is small (&lt;100MB)</li>
+                    <li>The base model already performs well on your domain</li>
+                    <li>You have limited compute budget (CPT is the most expensive stage)</li>
+                </ul>
+                <p>In those cases, skip directly to SFT (Chapter 5). But for the best results on Hindu scriptures — especially Sanskrit content — CPT significantly improves quality.</p>
+            </div>
+
+            <h2 id="approach">📋 Two Approaches: Full Fine-Tune vs LoRA</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Approach</th>
+                        <th>Memory</th>
+                        <th>Quality</th>
+                        <th>Speed</th>
+                        <th>Cost</th>
+                        <th>Recommended For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Full Fine-Tune</strong></td>
+                        <td>~200 GB (27B model)</td>
+                        <td>Best</td>
+                        <td>Slow</td>
+                        <td>$$$</td>
+                        <td>Production models, large corpus (5GB+)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA</strong></td>
+                        <td>~20 GB (QLoRA)</td>
+                        <td>Very Good</td>
+                        <td>Fast</td>
+                        <td>$</td>
+                        <td>Experimentation, smaller corpus, budget-limited</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="code-lora">💻 Code: CPT with LoRA (Recommended Start)</h2>
+            
+            <pre><code>"""
+Continued Pre-Training with LoRA on Hindu Scripture Corpus
+===========================================================
+This script trains the Gemma model on raw scripture text using
+LoRA for memory efficiency. Can run on a single A100 40GB GPU.
+
+Usage:
+    python cpt_lora.py
+
+Requirements:
+    pip install torch transformers trl peft bitsandbytes datasets accelerate
+"""
+import torch
+from datasets import load_dataset
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+from trl import SFTTrainer, SFTConfig
+
+# ============================================
+# CONFIGURATION
+# ============================================
+MODEL_NAME = "google/gemma-3-27b-it"  # or "google/gemma-3-12b-it" for less VRAM
+DATASET_PATH = "./datasets/cpt_corpus.jsonl"
+OUTPUT_DIR = "./checkpoints/cpt_lora"
+
+# Hyperparameters
+LEARNING_RATE = 2e-5
+NUM_EPOCHS = 2
+BATCH_SIZE = 2
+GRADIENT_ACCUMULATION = 8  # Effective batch = 2 * 8 = 16
+MAX_SEQ_LENGTH = 2048
+WARMUP_STEPS = 100
+
+# ============================================
+# STEP 1: Load Tokenizer
+# ============================================
+print("Loading tokenizer...")
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+# Set padding token (Gemma uses eos_token for padding)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+
+# ============================================
+# STEP 2: Load Model in 4-bit (QLoRA)
+# ============================================
+print("Loading model in 4-bit precision...")
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",          # NormalFloat4 quantization
+    bnb_4bit_compute_dtype=torch.bfloat16,  # Compute in BF16
+    bnb_4bit_use_double_quant=True,      # Nested quantization for extra savings
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_NAME,
+    quantization_config=bnb_config,
+    device_map="auto",
+    torch_dtype=torch.bfloat16,
+    attn_implementation="flash_attention_2",  # Use Flash Attention for speed
+)
+
+# Prepare for k-bit training (fixes some layers for gradient computation)
+model = prepare_model_for_kbit_training(model)
+
+# ============================================
+# STEP 3: Configure LoRA
+# ============================================
+print("Configuring LoRA adapters...")
+
+lora_config = LoraConfig(
+    r=64,                    # Rank — higher = more capacity but more memory
+    lora_alpha=32,           # Scaling factor (usually r/2 or r)
+    lora_dropout=0.05,       # Dropout for regularization
+    bias="none",             # Don't train bias terms
+    task_type="CAUSAL_LM",   # Causal language modeling
+    target_modules=[          # Which layers to add LoRA to
+        "q_proj",    # Query projection (attention)
+        "k_proj",    # Key projection (attention)
+        "v_proj",    # Value projection (attention)
+        "o_proj",    # Output projection (attention)
+        "gate_proj", # Gate in FFN (SwiGLU)
+        "up_proj",   # Up projection in FFN
+        "down_proj", # Down projection in FFN
+    ],
+)
+
+model = get_peft_model(model, lora_config)
+
+# Print trainable parameters
+model.print_trainable_parameters()
+# Output: trainable params: 167,772,160 || all params: 27,227,128,832 || trainable%: 0.62%
+
+# ============================================
+# STEP 4: Load Dataset
+# ============================================
+print("Loading dataset...")
+
+dataset = load_dataset("json", data_files=DATASET_PATH, split="train")
+print(f"Dataset size: {len(dataset)} examples")
+
+# For CPT, we use the "text" field directly (language modeling)
+# The SFTTrainer handles tokenization automatically
+
+# ============================================
+# STEP 5: Configure Training
+# ============================================
+training_args = SFTConfig(
+    output_dir=OUTPUT_DIR,
+    
+    # Training schedule
+    num_train_epochs=NUM_EPOCHS,
+    per_device_train_batch_size=BATCH_SIZE,
+    gradient_accumulation_steps=GRADIENT_ACCUMULATION,
+    
+    # Optimizer
+    learning_rate=LEARNING_RATE,
+    lr_scheduler_type="cosine",         # Cosine decay schedule
+    warmup_steps=WARMUP_STEPS,
+    weight_decay=0.01,
+    optim="paged_adamw_8bit",           # Memory-efficient optimizer
+    
+    # Precision
+    bf16=True,                          # BFloat16 training
+    
+    # Memory optimization
+    gradient_checkpointing=True,        # Trade compute for memory
+    max_seq_length=MAX_SEQ_LENGTH,
+    packing=True,                       # Pack multiple short texts into one sequence
+    
+    # Logging
+    logging_steps=10,
+    logging_dir=f"{OUTPUT_DIR}/logs",
+    
+    # Saving
+    save_strategy="steps",
+    save_steps=500,
+    save_total_limit=3,                 # Keep only last 3 checkpoints
+    
+    # Evaluation
+    eval_strategy="steps",
+    eval_steps=500,
+    
+    # Misc
+    report_to="wandb",                  # Log to Weights & Biases
+    run_name="gemma-scripture-cpt",
+    seed=42,
+    
+    # Dataset
+    dataset_text_field="text",          # Column name in our JSONL
+)
+
+# ============================================
+# STEP 6: Create Trainer and Train
+# ============================================
+print("Starting training...")
+
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    processing_class=tokenizer,
+)
+
+# Train!
+train_result = trainer.train()
+
+# Save final model
+print("Saving final model...")
+trainer.save_model(f"{OUTPUT_DIR}/final")
+tokenizer.save_pretrained(f"{OUTPUT_DIR}/final")
+
+# Print results
+print(f"\n{'='*50}")
+print(f"Training complete!")
+print(f"Final loss: {train_result.training_loss:.4f}")
+print(f"Model saved to: {OUTPUT_DIR}/final")
+print(f"{'='*50}")</code></pre>
+
+            <h2 id="code-full">💻 Code: Full Fine-Tune with DeepSpeed (Maximum Quality)</h2>
+            
+            <div class="collapsible">
+                <div class="collapsible-header">🔍 Full Fine-Tune Code (Requires Multi-GPU)</div>
+                <div class="collapsible-content">
+                    <pre><code>"""
+Full parameter Continued Pre-Training with DeepSpeed ZeRO-3
+============================================================
+Requires: 4-8x A100 80GB GPUs
+Gives: Best possible domain adaptation quality
+
+Usage:
+    accelerate launch --config_file deepspeed_config.yaml cpt_full.py
+"""
+import torch
+from datasets import load_dataset
+from transformers import (
+    AutoTokenizer, 
+    AutoModelForCausalLM,
+    TrainingArguments,
+    Trainer,
+    DataCollatorForLanguageModeling
+)
+
+# Configuration
+MODEL_NAME = "google/gemma-3-27b-pt"  # Use PRE-TRAINED (not instruct) for CPT
+DATASET_PATH = "./datasets/cpt_corpus.jsonl"
+OUTPUT_DIR = "./checkpoints/cpt_full"
+MAX_SEQ_LENGTH = 4096
+
+# Load tokenizer and model (full precision for full fine-tune)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_NAME,
+    torch_dtype=torch.bfloat16,
+    attn_implementation="flash_attention_2",
+)
+
+# Load and tokenize dataset
+dataset = load_dataset("json", data_files=DATASET_PATH, split="train")
+
+def tokenize_function(examples):
+    """Tokenize text for causal language modeling."""
+    return tokenizer(
+        examples["text"],
+        truncation=True,
+        max_length=MAX_SEQ_LENGTH,
+        padding=False,
+    )
+
+tokenized_dataset = dataset.map(
+    tokenize_function,
+    batched=True,
+    remove_columns=dataset.column_names,
+    num_proc=8
+)
+
+# Data collator (handles dynamic padding and label creation)
+data_collator = DataCollatorForLanguageModeling(
+    tokenizer=tokenizer,
+    mlm=False  # Causal LM, not masked LM
+)
+
+# Training arguments for DeepSpeed
+training_args = TrainingArguments(
+    output_dir=OUTPUT_DIR,
+    num_train_epochs=1,
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=32,   # Effective batch = 4 GPUs * 1 * 32 = 128
+    learning_rate=1e-5,               # Lower LR for full fine-tune
+    lr_scheduler_type="cosine",
+    warmup_ratio=0.05,
+    weight_decay=0.01,
+    bf16=True,
+    gradient_checkpointing=True,
+    logging_steps=5,
+    save_strategy="steps",
+    save_steps=200,
+    save_total_limit=2,
+    deepspeed="./configs/ds_zero3.json",  # DeepSpeed config
+    report_to="wandb",
+    run_name="gemma-scripture-cpt-full",
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized_dataset,
+    data_collator=data_collator,
+)
+
+trainer.train()
+trainer.save_model(f"{OUTPUT_DIR}/final")</code></pre>
+
+                    <h4>DeepSpeed ZeRO-3 Configuration</h4>
+                    <pre><code>// configs/ds_zero3.json
+{
+    "bf16": {
+        "enabled": true
+    },
+    "zero_optimization": {
+        "stage": 3,
+        "offload_optimizer": {
+            "device": "cpu",
+            "pin_memory": true
+        },
+        "offload_param": {
+            "device": "none"
+        },
+        "overlap_comm": true,
+        "contiguous_gradients": true,
+        "sub_group_size": 1e9,
+        "reduce_bucket_size": "auto",
+        "stage3_prefetch_bucket_size": "auto",
+        "stage3_param_persistence_threshold": "auto",
+        "stage3_max_live_parameters": 1e9,
+        "stage3_max_reuse_distance": 1e9,
+        "stage3_gather_16bit_weights_on_model_save": true
+    },
+    "gradient_accumulation_steps": 32,
+    "gradient_clipping": 1.0,
+    "train_batch_size": "auto",
+    "train_micro_batch_size_per_gpu": "auto",
+    "wall_clock_breakdown": false
+}</code></pre>
+
+                    <h4>Accelerate Configuration</h4>
+                    <pre><code># configs/accelerate_config.yaml
+compute_environment: LOCAL_MACHINE
+distributed_type: DEEPSPEED
+deepspeed_config:
+  deepspeed_config_file: ./configs/ds_zero3.json
+  zero3_init_flag: true
+machine_rank: 0
+main_training_function: main
+num_machines: 1
+num_processes: 4          # Number of GPUs
+use_cpu: false
+mixed_precision: bf16</code></pre>
+                </div>
+            </div>
+
+            <h2 id="hyperparameters">⚙️ Hyperparameter Guide</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>LoRA Value</th>
+                        <th>Full FT Value</th>
+                        <th>Explanation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Learning Rate</strong></td>
+                        <td>2e-5</td>
+                        <td>1e-5</td>
+                        <td>How fast the model learns. Too high = unstable. Too low = slow.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Epochs</strong></td>
+                        <td>2-3</td>
+                        <td>1-2</td>
+                        <td>Number of times to read the entire dataset. More for small datasets.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Batch Size (effective)</strong></td>
+                        <td>16-32</td>
+                        <td>64-128</td>
+                        <td>Number of examples processed before updating weights.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Max Seq Length</strong></td>
+                        <td>2048</td>
+                        <td>4096</td>
+                        <td>Maximum tokens per training example. Longer = more context but more memory.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Warmup Steps</strong></td>
+                        <td>100</td>
+                        <td>200</td>
+                        <td>Gradual increase of learning rate at start. Prevents early instability.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Weight Decay</strong></td>
+                        <td>0.01</td>
+                        <td>0.01</td>
+                        <td>L2 regularization to prevent overfitting.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA Rank (r)</strong></td>
+                        <td>64</td>
+                        <td>N/A</td>
+                        <td>Capacity of LoRA adapters. Higher = more expressive but more memory.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA Alpha</strong></td>
+                        <td>32</td>
+                        <td>N/A</td>
+                        <td>Scaling factor. Typically r/2 or r. Affects learning magnitude.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="monitoring">📊 Monitoring Training</h2>
+            <pre><code>"""
+Monitor CPT training with Weights & Biases.
+Look for these key metrics:
+"""
+# What to watch during training:
+
+# 1. TRAINING LOSS — Should decrease steadily
+#    - Good: Starts ~3.0, ends ~1.5-2.0
+#    - Bad: Stays flat, spikes, or increases
+
+# 2. LEARNING RATE — Should follow cosine curve
+#    - Warmup → peak → gradual decay
+
+# 3. GRADIENT NORM — Should be stable
+#    - Good: Stays below 1.0 (with grad clipping)
+#    - Bad: Frequent spikes above 5.0
+
+# Setup W&B logging
+import wandb
+wandb.init(
+    project="gemma-scripture-finetuning",
+    name="cpt-lora-v1",
+    config={
+        "model": "google/gemma-3-27b-it",
+        "method": "LoRA",
+        "lora_r": 64,
+        "learning_rate": 2e-5,
+        "epochs": 2,
+        "dataset_size": "5GB",
+        "stage": "CPT"
+    }
+)
+
+# Custom callback to log perplexity
+from transformers import TrainerCallback
+import math
+
+class PerplexityCallback(TrainerCallback):
+    """Log perplexity (exp(loss)) which is more interpretable."""
+    
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        if logs and "loss" in logs:
+            perplexity = math.exp(logs["loss"])
+            wandb.log({"perplexity": perplexity}, step=state.global_step)</code></pre>
+
+            <h2 id="validation">✅ Validating CPT Results</h2>
+            <pre><code>"""
+After CPT, verify the model has learned domain knowledge.
+Quick sanity check before proceeding to SFT.
+"""
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from peft import PeftModel
+import torch
+
+def validate_cpt_model(base_model: str, adapter_path: str):
+    """Test CPT model with domain-specific prompts."""
+    
+    # Load base + LoRA adapter
+    tokenizer = AutoTokenizer.from_pretrained(base_model)
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model,
+        torch_dtype=torch.bfloat16,
+        device_map="auto"
+    )
+    model = PeftModel.from_pretrained(model, adapter_path)
+    
+    # Create text generation pipeline
+    gen = pipeline("text-generation", model=model, tokenizer=tokenizer)
+    
+    # Test prompts — model should complete these with scripture knowledge
+    test_prompts = [
+        "धर्मक्षेत्रे कुरुक्षेत्रे",                    # Should continue Gita 1.1
+        "The Bhagavad Gita teaches that",              # Should discuss teachings
+        "According to the Upanishads, Brahman is",     # Should describe Brahman
+        "कर्मण्येवाधिकारस्ते",                          # Should continue Gita 2.47
+        "The eight limbs of yoga as described by Patanjali are", # Should list ashtanga
+    ]
+    
+    print("=" * 60)
+    print("CPT Validation — Domain Knowledge Check")
+    print("=" * 60)
+    
+    for prompt in test_prompts:
+        output = gen(
+            prompt,
+            max_new_tokens=100,
+            temperature=0.3,
+            do_sample=True,
+            top_p=0.9
+        )
+        completion = output[0]['generated_text'][len(prompt):]
+        print(f"\n📝 Prompt: {prompt}")
+        print(f"✍️  Completion: {completion[:200]}")
+        print("-" * 40)
+
+
+# Run validation
+validate_cpt_model(
+    base_model="google/gemma-3-27b-it",
+    adapter_path="./checkpoints/cpt_lora/final"
+)</code></pre>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ What Good CPT Results Look Like</div>
+                <ul>
+                    <li>Model completes Sanskrit verses correctly</li>
+                    <li>Uses appropriate Hindu philosophical terminology</li>
+                    <li>Generates coherent text about scripture topics</li>
+                    <li>Training loss decreased by 30-50% from start</li>
+                    <li>Perplexity on held-out scripture text is lower than base model</li>
+                </ul>
+            </div>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">❌ Signs of Problems</div>
+                <ul>
+                    <li><strong>Loss not decreasing:</strong> Learning rate too low, or data quality issues</li>
+                    <li><strong>Loss spiking:</strong> Learning rate too high, reduce by 2-5x</li>
+                    <li><strong>Gibberish output:</strong> Model collapsed — reduce LR, increase warmup</li>
+                    <li><strong>Memorization:</strong> Model repeats training data verbatim — add dropout, reduce epochs</li>
+                </ul>
+            </div>
+
+            <h2 id="next-steps">➡️ Next Steps After CPT</h2>
+            <p>Once CPT is complete and validated, your model has deep domain knowledge. But it can't yet follow instructions — it just generates text continuations. The next step (<a href="05-supervised-finetuning.html">Chapter 5: SFT</a>) teaches it to have conversations and answer questions.</p>
+
+            <nav class="page-nav">
+                <a href="03-dataset-formats.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Dataset Format Requirements</span>
+                </a>
+                <a href="05-supervised-finetuning.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Supervised Fine-Tuning (SFT)</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

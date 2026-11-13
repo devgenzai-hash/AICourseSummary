@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script
+  src="../widget/dist/chatbot-widget.js"
+  data-site-key="YOUR_SITE_KEY"
+  data-api-url="http://localhost:8000"
+  data-position="bottom-right"
+  data-color="#6366f1"
+  data-title="Ask AI"
+  data-welcome-message="Hi! Ask me anything about this website's docs."
+></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning Gemma on Hindu Scriptures — Complete Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span>Fine-Tuning Guide</span>
+            <h2>🙏 Gemma × Hindu Scriptures</h2>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active"><span class="nav-number">🏠</span> Home</a></li>
+                <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+                <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+                <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+                <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+                <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+                <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+                <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+                <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+                <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+                <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+                <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+                <li><a href="12-cpt-vs-sft-vs-dpo.html"><span class="nav-number">★</span> CPT vs SFT vs DPO</a></li>
+                <li><a href="qna.html"><span class="nav-number">❓</span> Q&A</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Top Bar -->
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb">
+            <a href="index.html">Guide</a>
+            <span>›</span> Home
+        </div>
+        <div class="topbar-actions">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h1>Fine-Tuning Gemma on Hindu Scriptures</h1>
+                <p>A complete, industry-ready guide to fine-tuning Google's Gemma model on Vedas, Upanishads, Bhagavad Gita, Ramayana, Mahabharata & more — in Hindi, Sanskrit, and English.</p>
+            </section>
+
+            <!-- Pipeline Overview -->
+            <h2>🔄 The Complete Pipeline</h2>
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">📚</div>
+                    <span class="pipeline-label">Collect PDFs</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🔧</div>
+                    <span class="pipeline-label">Extract & Clean</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">📝</div>
+                    <span class="pipeline-label">Format Data</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🧠</div>
+                    <span class="pipeline-label">Pre-Train (CPT)</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🎯</div>
+                    <span class="pipeline-label">Fine-Tune (SFT)</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">⚖️</div>
+                    <span class="pipeline-label">Align (DPO)</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🚀</div>
+                    <span class="pipeline-label">Deploy</span>
+                </div>
+            </div>
+
+            <!-- Progress Tracker -->
+            <h2>📊 Your Progress</h2>
+            <div class="data-highlight">
+                <div style="background: var(--bg-tertiary); border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 0.75rem;">
+                    <div class="progress-fill" style="height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); width: 0%; transition: width 0.5s;"></div>
+                </div>
+                <p class="progress-label" style="text-align: center; font-size: 0.9rem; color: var(--text-secondary); margin: 0;">0/11 completed (0%)</p>
+                <div style="margin-top: 1rem;">
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="intro"> Introduction & Overview</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="data"> Data Collection & Preparation</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="format"> Dataset Formats</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="cpt"> Continued Pre-Training</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="sft"> Supervised Fine-Tuning</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="dpo"> Preference Alignment (DPO)</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="rl"> Reinforcement Learning</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="hw"> Hardware & Infrastructure</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="eval"> Evaluation</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="deploy"> Deployment</label>
+                    <label style="display: block; padding: 0.4rem 0; cursor: pointer;"><input type="checkbox" class="progress-check" data-id="trouble"> Troubleshooting</label>
+                </div>
+            </div>
+
+            <!-- Chapter Cards -->
+            <h2>📖 Chapters</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <a href="01-introduction.html">
+                        <span class="card-number">1</span>
+                        <h3>Introduction & Overview</h3>
+                        <p>What is fine-tuning, why Gemma, model architecture, and the complete roadmap.</p>
+                        <span class="tag tag-concept">Concept</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="02-data-collection.html">
+                        <span class="card-number">2</span>
+                        <h3>Data Collection & Preparation</h3>
+                        <p>PDF extraction, OCR for Hindi/Sanskrit, text cleaning, deduplication, quality filtering.</p>
+                        <span class="tag tag-python">Python</span>
+                        <span class="tag tag-concept">Concept</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="03-dataset-formats.html">
+                        <span class="card-number">3</span>
+                        <h3>Dataset Format Requirements</h3>
+                        <p>CPT, SFT, and DPO dataset formats with examples. How much data you need.</p>
+                        <span class="tag tag-config">Config</span>
+                        <span class="tag tag-python">Python</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="04-continued-pretraining.html">
+                        <span class="card-number">4</span>
+                        <h3>Stage 1: Continued Pre-Training</h3>
+                        <p>Domain adaptive pre-training to inject scripture knowledge into the base model.</p>
+                        <span class="tag tag-python">Python</span>
+                        <span class="tag tag-advanced">Advanced</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="05-supervised-finetuning.html">
+                        <span class="card-number">5</span>
+                        <h3>Stage 2: Supervised Fine-Tuning</h3>
+                        <p>Teaching the model to follow instructions using LoRA/QLoRA with TRL SFTTrainer.</p>
+                        <span class="tag tag-python">Python</span>
+                        <span class="tag tag-config">Config</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="06-preference-alignment.html">
+                        <span class="card-number">6</span>
+                        <h3>Stage 3: Preference Alignment</h3>
+                        <p>DPO training to align model outputs with human preferences on scripture interpretation.</p>
+                        <span class="tag tag-python">Python</span>
+                        <span class="tag tag-advanced">Advanced</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="07-reinforcement-learning.html">
+                        <span class="card-number">7</span>
+                        <h3>Reinforcement Learning</h3>
+                        <p>GRPO, PPO, reward model training for advanced alignment beyond DPO.</p>
+                        <span class="tag tag-python">Python</span>
+                        <span class="tag tag-advanced">Advanced</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="08-hardware-infrastructure.html">
+                        <span class="card-number">8</span>
+                        <h3>Hardware & Infrastructure</h3>
+                        <p>GPU requirements, cloud providers, costs, DeepSpeed & FSDP configs.</p>
+                        <span class="tag tag-config">Config</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="09-evaluation.html">
+                        <span class="card-number">9</span>
+                        <h3>Evaluation</h3>
+                        <p>Automated metrics, domain benchmarks, human evaluation protocols.</p>
+                        <span class="tag tag-python">Python</span>
+                        <span class="tag tag-concept">Concept</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="10-deployment.html">
+                        <span class="card-number">10</span>
+                        <h3>Deployment</h3>
+                        <p>Model merging, quantization (GGUF/AWQ), serving with vLLM, API setup.</p>
+                        <span class="tag tag-python">Python</span>
+                        <span class="tag tag-config">Config</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="11-troubleshooting.html">
+                        <span class="card-number">11</span>
+                        <h3>Troubleshooting & Best Practices</h3>
+                        <p>Common errors, hyperparameter tuning, monitoring with W&B/TensorBoard.</p>
+                        <span class="tag tag-concept">Concept</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="12-cpt-vs-sft-vs-dpo.html">
+                        <span class="card-number">★</span>
+                        <h3>CPT vs SFT vs DPO — Deep Comparison</h3>
+                        <p>Complete breakdown: dataset differences, what happens when you skip stages, individual vs combined performance, decision flowchart.</p>
+                        <span class="tag tag-concept">Concept</span>
+                        <span class="tag tag-advanced">Advanced</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Reference -->
+            <h2>⚡ Quick Reference</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Method</th>
+                        <th>Data Needed</th>
+                        <th>GPU (min)</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>CPT</strong></td>
+                        <td>Full / LoRA</td>
+                        <td>1-10 GB raw text</td>
+                        <td>4× A100 80GB</td>
+                        <td>3-7 days</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SFT</strong></td>
+                        <td>QLoRA</td>
+                        <td>10K-100K pairs</td>
+                        <td>1× A100 40GB</td>
+                        <td>6-24 hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DPO</strong></td>
+                        <td>LoRA</td>
+                        <td>5K-50K preferences</td>
+                        <td>1× A100 40GB</td>
+                        <td>4-12 hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RLHF/GRPO</strong></td>
+                        <td>PPO/GRPO</td>
+                        <td>Reward model + prompts</td>
+                        <td>2× A100 80GB</td>
+                        <td>1-3 days</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Tech Stack -->
+            <h2>🛠️ Technology Stack</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>🤗 HuggingFace Ecosystem</h3>
+                    <p>transformers, trl, peft, datasets, accelerate</p>
+                </div>
+                <div class="card">
+                    <h3>⚡ Training Infrastructure</h3>
+                    <p>DeepSpeed ZeRO-3, FSDP, bitsandbytes, Flash Attention</p>
+                </div>
+                <div class="card">
+                    <h3>📄 Data Processing</h3>
+                    <p>PyMuPDF, Tesseract OCR, pdfplumber, datasketch</p>
+                </div>
+                <div class="card">
+                    <h3>🚀 Deployment</h3>
+                    <p>vLLM, llama.cpp, GGUF, AWQ quantization</p>
+                </div>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Getting Started</div>
+                <p>If you're new to fine-tuning, start with <a href="01-introduction.html">Chapter 1: Introduction</a> for a conceptual overview. If you already know the basics, jump to <a href="02-data-collection.html">Chapter 2: Data Collection</a> to begin building your dataset.</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

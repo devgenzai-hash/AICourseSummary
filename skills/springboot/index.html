@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot Mastery - Complete Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals &bull; 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Spring Core & IoC Internals</li>
+            <li><a href="01-ioc-container.html"><span class="nav-number">1</span> IoC Container & BeanFactory</a></li>
+            <li><a href="02-application-context.html"><span class="nav-number">2</span> ApplicationContext Lifecycle</a></li>
+            <li><a href="03-bean-lifecycle.html"><span class="nav-number">3</span> Bean Lifecycle & Callbacks</a></li>
+            <li><a href="04-dependency-injection.html"><span class="nav-number">4</span> Dependency Injection Internals</a></li>
+            <li><a href="05-component-scanning.html"><span class="nav-number">5</span> Component Scanning</a></li>
+            <li><a href="06-bean-scopes.html"><span class="nav-number">6</span> Bean Scopes & Proxy Mechanisms</a></li>
+            <li><a href="07-aop-internals.html"><span class="nav-number">7</span> AOP Internals</a></li>
+            <li><a href="08-spel.html"><span class="nav-number">8</span> Spring Expression Language</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html"><span class="nav-number">14</span> Profile Management</a></li>
+            <li><a href="15-custom-starters.html"><span class="nav-number">15</span> Custom Starters</a></li>
+            <li class="module-label">Web Layer (Spring MVC)</li>
+            <li><a href="16-dispatcher-servlet.html"><span class="nav-number">16</span> DispatcherServlet Internals</a></li>
+            <li><a href="17-handler-mapping.html"><span class="nav-number">17</span> Handler Mapping & Adapters</a></li>
+            <li><a href="18-request-lifecycle.html"><span class="nav-number">18</span> Request Lifecycle</a></li>
+            <li><a href="19-content-negotiation.html"><span class="nav-number">19</span> Content Negotiation</a></li>
+            <li><a href="20-exception-handling.html"><span class="nav-number">20</span> Exception Handling</a></li>
+            <li><a href="21-validation.html"><span class="nav-number">21</span> Validation Framework</a></li>
+            <li><a href="22-filters-interceptors.html"><span class="nav-number">22</span> Filters vs Interceptors</a></li>
+            <li class="module-label">Data Access</li>
+            <li><a href="23-spring-data-jpa.html"><span class="nav-number">23</span> Spring Data JPA Internals</a></li>
+            <li><a href="24-repository-abstraction.html"><span class="nav-number">24</span> Repository Proxy Generation</a></li>
+            <li><a href="25-transaction-management.html"><span class="nav-number">25</span> @Transactional Internals</a></li>
+            <li><a href="26-connection-pooling.html"><span class="nav-number">26</span> Connection Pooling (HikariCP)</a></li>
+            <li><a href="27-entity-lifecycle.html"><span class="nav-number">27</span> JPA Entity Lifecycle</a></li>
+            <li><a href="28-n-plus-one.html"><span class="nav-number">28</span> N+1 Problem & Optimization</a></li>
+            <li><a href="29-database-migrations.html"><span class="nav-number">29</span> Database Migrations</a></li>
+            <li><a href="30-multi-datasource.html"><span class="nav-number">30</span> Multi-DataSource Config</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="31-security-architecture.html"><span class="nav-number">31</span> Spring Security Architecture</a></li>
+            <li><a href="32-filter-chain.html"><span class="nav-number">32</span> Security Filter Chain</a></li>
+            <li><a href="33-authentication.html"><span class="nav-number">33</span> Authentication Mechanisms</a></li>
+            <li><a href="34-authorization.html"><span class="nav-number">34</span> Authorization & Method Security</a></li>
+            <li><a href="35-oauth2-jwt.html"><span class="nav-number">35</span> OAuth2 & JWT</a></li>
+            <li><a href="36-cors.html"><span class="nav-number">36</span> CORS Configuration</a></li>
+            <li><a href="37-csrf-protection.html"><span class="nav-number">37</span> CSRF Protection</a></li>
+            <li class="module-label">Reactive Programming</li>
+            <li><a href="38-project-reactor.html"><span class="nav-number">38</span> Project Reactor</a></li>
+            <li><a href="39-webflux.html"><span class="nav-number">39</span> WebFlux Internals</a></li>
+            <li><a href="40-r2dbc.html"><span class="nav-number">40</span> R2DBC Reactive Data</a></li>
+            <li><a href="41-backpressure.html"><span class="nav-number">41</span> Backpressure Strategies</a></li>
+            <li><a href="42-reactive-security.html"><span class="nav-number">42</span> Reactive Security</a></li>
+            <li class="module-label">Messaging & Async</li>
+            <li><a href="43-application-events.html"><span class="nav-number">43</span> Application Events</a></li>
+            <li><a href="44-kafka-integration.html"><span class="nav-number">44</span> Kafka Integration</a></li>
+            <li><a href="45-rabbitmq.html"><span class="nav-number">45</span> RabbitMQ Integration</a></li>
+            <li><a href="46-async-processing.html"><span class="nav-number">46</span> @Async Internals</a></li>
+            <li><a href="47-scheduling.html"><span class="nav-number">47</span> @Scheduled Internals</a></li>
+            <li class="module-label">Testing</li>
+            <li><a href="48-spring-boot-test.html"><span class="nav-number">48</span> @SpringBootTest Internals</a></li>
+            <li><a href="49-slice-testing.html"><span class="nav-number">49</span> Slice Testing</a></li>
+            <li><a href="50-testcontainers.html"><span class="nav-number">50</span> TestContainers</a></li>
+            <li><a href="51-mockmvc.html"><span class="nav-number">51</span> MockMvc Deep Dive</a></li>
+            <li><a href="52-contract-testing.html"><span class="nav-number">52</span> Contract Testing</a></li>
+            <li class="module-label">Production Readiness</li>
+            <li><a href="53-actuator.html"><span class="nav-number">53</span> Actuator Internals</a></li>
+            <li><a href="54-health-checks.html"><span class="nav-number">54</span> Health Checks</a></li>
+            <li><a href="55-metrics.html"><span class="nav-number">55</span> Metrics & Prometheus</a></li>
+            <li><a href="56-distributed-tracing.html"><span class="nav-number">56</span> Distributed Tracing</a></li>
+            <li><a href="57-logging.html"><span class="nav-number">57</span> Logging Architecture</a></li>
+            <li><a href="58-graceful-shutdown.html"><span class="nav-number">58</span> Graceful Shutdown</a></li>
+            <li class="module-label">Cloud Native & Microservices</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-service-discovery.html"><span class="nav-number">60</span> Service Discovery</a></li>
+            <li><a href="61-circuit-breaker.html"><span class="nav-number">61</span> Circuit Breaker</a></li>
+            <li><a href="62-config-server.html"><span class="nav-number">62</span> Config Server</a></li>
+            <li><a href="63-distributed-caching.html"><span class="nav-number">63</span> Distributed Caching</a></li>
+            <li><a href="64-docker-optimization.html"><span class="nav-number">64</span> Docker Optimization</a></li>
+            <li><a href="65-kubernetes.html"><span class="nav-number">65</span> Kubernetes Deployment</a></li>
+            <li class="module-label">Performance & Advanced</li>
+            <li><a href="66-jvm-tuning.html"><span class="nav-number">66</span> JVM Tuning</a></li>
+            <li><a href="67-graalvm-native.html"><span class="nav-number">67</span> GraalVM Native Image</a></li>
+            <li><a href="68-caching-abstraction.html"><span class="nav-number">68</span> Caching Abstraction</a></li>
+            <li><a href="69-thread-pool-tuning.html"><span class="nav-number">69</span> Thread Pool Tuning</a></li>
+            <li><a href="70-startup-optimization.html"><span class="nav-number">70</span> Startup Optimization</a></li>
+            <li><a href="71-virtual-threads.html"><span class="nav-number">71</span> Virtual Threads (Loom)</a></li>
+            <li><a href="72-observability.html"><span class="nav-number">72</span> Observability Stack</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Spring Boot Mastery</a>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>🍃 Spring Boot Mastery</h1>
+                <p class="subtitle">A comprehensive deep-dive into Spring Boot internals, architecture, and industry-ready practices. 72 topics covering everything from IoC container mechanics to cloud-native production deployments.</p>
+            </div>
+
+            <h2>Course Philosophy</h2>
+            <p>This course doesn't just teach you <em>how</em> to use Spring Boot — it teaches you <strong>how it works internally</strong>. You'll understand the bytecode manipulation, proxy generation, class loading tricks, and design patterns that make Spring the dominant enterprise Java framework. Every topic includes production-grade patterns used at companies like Netflix, Uber, and Amazon.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-title">📋 Prerequisites</div>
+                <p>Core Java (Collections, Streams, Generics, Reflection), basic Maven/Gradle, understanding of HTTP, and familiarity with SQL databases. If you know these, you're ready.</p>
+            </div>
+
+            <h2>Course Modules</h2>
+
+            <div class="course-grid">
+                <div class="module-card">
+                    <h3>🏗️ Module 1: Spring Core & IoC</h3>
+                    <p>BeanFactory internals, ApplicationContext lifecycle, dependency injection mechanisms, AOP proxy generation, component scanning algorithms.</p>
+                    <div class="topic-count">Topics 1–8</div>
+                </div>
+                <div class="module-card">
+                    <h3>⚙️ Module 2: Auto-Configuration</h3>
+                    <p>How Spring Boot magically configures itself. Conditional beans, spring.factories, externalized config, profiles, and building custom starters.</p>
+                    <div class="topic-count">Topics 9–15</div>
+                </div>
+                <div class="module-card">
+                    <h3>🌐 Module 3: Web Layer</h3>
+                    <p>DispatcherServlet request pipeline, handler mapping resolution, content negotiation, exception handling, validation, filters & interceptors.</p>
+                    <div class="topic-count">Topics 16–22</div>
+                </div>
+                <div class="module-card">
+                    <h3>💾 Module 4: Data Access</h3>
+                    <p>Spring Data JPA proxy magic, @Transactional internals, HikariCP tuning, entity lifecycle, N+1 elimination, migrations, multi-datasource.</p>
+                    <div class="topic-count">Topics 23–30</div>
+                </div>
+                <div class="module-card">
+                    <h3>🔐 Module 5: Security</h3>
+                    <p>Security filter chain architecture, authentication flows, method security, OAuth2/JWT, CORS internals, CSRF protection mechanisms.</p>
+                    <div class="topic-count">Topics 31–37</div>
+                </div>
+                <div class="module-card">
+                    <h3>⚡ Module 6: Reactive Programming</h3>
+                    <p>Project Reactor operators, WebFlux event loop, R2DBC non-blocking data access, backpressure handling, reactive security.</p>
+                    <div class="topic-count">Topics 38–42</div>
+                </div>
+                <div class="module-card">
+                    <h3>📨 Module 7: Messaging & Async</h3>
+                    <p>Application events, Kafka consumers/producers, RabbitMQ exchanges, @Async thread pools, @Scheduled cron internals.</p>
+                    <div class="topic-count">Topics 43–47</div>
+                </div>
+                <div class="module-card">
+                    <h3>🧪 Module 8: Testing</h3>
+                    <p>Context caching, slice tests, TestContainers for integration, MockMvc internals, consumer-driven contract testing.</p>
+                    <div class="topic-count">Topics 48–52</div>
+                </div>
+                <div class="module-card">
+                    <h3>🏭 Module 9: Production Readiness</h3>
+                    <p>Actuator endpoints, health indicators, Micrometer metrics, distributed tracing with Zipkin, structured logging, graceful shutdown.</p>
+                    <div class="topic-count">Topics 53–58</div>
+                </div>
+                <div class="module-card">
+                    <h3>☁️ Module 10: Cloud Native</h3>
+                    <p>API Gateway routing, Eureka discovery, Resilience4j circuit breakers, centralized config, Redis caching, Docker layers, K8s probes.</p>
+                    <div class="topic-count">Topics 59–65</div>
+                </div>
+                <div class="module-card">
+                    <h3>🚀 Module 11: Performance</h3>
+                    <p>JVM GC tuning, GraalVM native compilation, caching abstraction, thread pool sizing, startup optimization, virtual threads, observability.</p>
+                    <div class="topic-count">Topics 66–72</div>
+                </div>
+            </div>
+
+            <h2>How to Use This Course</h2>
+            <ol>
+                <li><strong>Read sequentially</strong> — Topics build on each other. Module 1 foundations are essential.</li>
+                <li><strong>Code along</strong> — Each topic has production-grade code examples. Type them out.</li>
+                <li><strong>Understand the "why"</strong> — Every internal mechanism is explained with analogies and diagrams.</li>
+                <li><strong>Interview ready</strong> — Each topic ends with what mastery looks like — these are interview differentiators.</li>
+            </ol>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

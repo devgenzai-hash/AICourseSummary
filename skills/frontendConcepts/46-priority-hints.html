@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Hints - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preconnect</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Priority Hints
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Priority Hints</h1>
+                <p class="subtitle">Telling the browser which resources matter most — the <code>fetchpriority</code> attribute that overrides the browser's default resource prioritization, directly improving LCP and Core Web Vitals.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Performance</span>
+                    <span class="tag tag-browser">Resource Loading</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🚑 Daily-Life Analogy: Hospital Triage</div>
+                <p>When multiple patients arrive at the ER simultaneously, triage determines who gets treated first. The browser does the same with network requests — CSS is "critical," images are "low." <strong>Priority Hints</strong> let you tell the triage nurse: "this specific image is actually the hero banner (LCP) — treat it as urgent" or "this script isn't needed yet — deprioritize it."</p>
+            </div>
+
+            <h2>The Problem: Browser's Default Priorities Are Imperfect</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Resource Type</th><th>Default Priority</th><th>Why It's Sometimes Wrong</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>CSS (in &lt;head&gt;)</td><td>Highest</td><td>Usually correct — render-blocking</td></tr>
+                    <tr><td>Scripts (sync, in &lt;head&gt;)</td><td>High</td><td>Analytics/tracking scripts don't need this priority</td></tr>
+                    <tr><td>Images (above fold)</td><td>High (after layout)</td><td>Browser doesn't know which image is LCP until late</td></tr>
+                    <tr><td>Images (below fold)</td><td>Low</td><td>Usually correct</td></tr>
+                    <tr><td>Fonts (discovered in CSS)</td><td>High (late discovery)</td><td>Can't be prioritized until CSS is parsed — too late</td></tr>
+                    <tr><td>fetch() / XHR</td><td>High</td><td>Not all fetches are equal — some are non-critical prefetches</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Code: Using fetchpriority</h2>
+<pre><code><span class="token-comment">&lt;!-- ✅ Boost LCP image priority — browser fetches it earlier --&gt;</span>
+&lt;img src="/hero-banner.jpg" fetchpriority="high" alt="Hero"&gt;
+
+<span class="token-comment">&lt;!-- ✅ Demote below-fold images that browser might over-prioritize --&gt;</span>
+&lt;img src="/carousel-slide-3.jpg" fetchpriority="low" loading="lazy" alt=""&gt;
+
+<span class="token-comment">&lt;!-- ✅ Critical CSS/font preload at high priority --&gt;</span>
+&lt;link rel="preload" href="/critical-font.woff2" as="font" fetchpriority="high"&gt;
+
+<span class="token-comment">&lt;!-- ✅ Non-critical script demoted --&gt;</span>
+&lt;script src="/analytics.js" fetchpriority="low" async&gt;&lt;/script&gt;
+
+<span class="token-comment">&lt;!-- ✅ In fetch() API --&gt;</span>
+<span class="token-comment">// Critical data that blocks render</span>
+fetch(<span class="token-string">'/api/critical-data'</span>, { priority: <span class="token-string">'high'</span> });
+
+<span class="token-comment">// Prefetch for next page — low priority, don't compete with current page</span>
+fetch(<span class="token-string">'/api/next-page-data'</span>, { priority: <span class="token-string">'low'</span> });
+</code></pre>
+
+            <h3>Real Impact on LCP</h3>
+<pre><code><span class="token-comment">/*
+  Without fetchpriority:
+  1. Browser discovers &lt;img&gt; during parse
+  2. Assigns "High" priority (since it's above-fold... but browser isn't sure yet)
+  3. Image competes with other "High" resources (scripts, other images)
+  4. LCP image loads in ~2.5s
+  
+  With fetchpriority="high":
+  1. Browser sees fetchpriority="high" immediately during parse
+  2. Assigns "Highest" internal priority (same as CSS/fonts)
+  3. Image gets bandwidth priority over everything except render-blocking CSS
+  4. LCP image loads in ~1.8s (700ms improvement!)
+  
+  Google case study: fetchpriority="high" on LCP image improved LCP by 1200ms
+  on mobile connections.
+*/</span>
+</code></pre>
+
+            <h2>The Three Values</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Value</th><th>Effect</th><th>When to Use</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>fetchpriority="high"</code></td><td>Boosts above default priority for this resource type</td><td>LCP image, critical above-fold content, hero fonts</td></tr>
+                    <tr><td><code>fetchpriority="low"</code></td><td>Lowers below default priority</td><td>Below-fold images, analytics, prefetch, non-critical scripts</td></tr>
+                    <tr><td><code>fetchpriority="auto"</code></td><td>Browser decides (default)</td><td>Everything else — let the browser's heuristics work</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Google Search</strong> — Uses <code>fetchpriority="high"</code> on the search results area and <code>fetchpriority="low"</code> on sidebar content, improving perceived load speed.</li>
+                <li><strong>Etsy</strong> — Applied <code>fetchpriority="high"</code> to LCP product images, improving LCP by 4% across all pages.</li>
+                <li><strong>Next.js Image component</strong> — Automatically applies <code>fetchpriority="high"</code> when you set the <code>priority</code> prop on <code>&lt;Image&gt;</code>.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Marking everything as <code>high</code></strong> — If everything is high priority, nothing is. Use it surgically (1-2 resources per page).</li>
+                <li><strong>Using <code>fetchpriority="high"</code> on below-fold content</strong> — Wastes bandwidth that should go to above-fold resources. Only boost what the user sees first.</li>
+                <li><strong>Confusing <code>fetchpriority</code> with <code>loading</code></strong> — <code>loading="lazy"</code> controls WHEN to start loading (on visibility). <code>fetchpriority</code> controls HOW URGENTLY to load it once started.</li>
+                <li><strong>Not measuring impact</strong> — Always verify with Lighthouse or Web Vitals that the priority change actually improved LCP. Sometimes the default is already optimal.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Priority Hints When...</h3>
+                <p>You can explain the difference between <code>&lt;link rel="preload"&gt;</code> (changes WHEN discovery happens) and <code>fetchpriority="high"</code> (changes HOW the browser prioritizes an already-discovered resource), and when you need both together.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Load a page with 5 images in Chrome DevTools. In the Network tab, add the "Priority" column. Observe default priorities. Then add <code>fetchpriority="high"</code> to one image and <code>fetchpriority="low"</code> to another. Reload and verify the priority column changes and the waterfall shifts.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Priority Hints connects to: <strong>Preload/Prefetch/Preconnect</strong> (different mechanisms for resource loading control), <strong>Critical Rendering Path</strong> (priority affects which resources block rendering), and <strong>HTTP/3</strong> (QUIC stream priority aligns with these hints).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="45-http3-quic.html" class="nav-btn nav-btn-prev">← HTTP/3 and QUIC</a>
+                <a href="47-preload-prefetch-preconnect.html" class="nav-btn nav-btn-next">Preload vs Prefetch vs Preconnect →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

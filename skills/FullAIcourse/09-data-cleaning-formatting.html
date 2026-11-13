@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Cleaning & Formatting — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 2</a> <span>›</span> Cleaning & Formatting</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Data Cleaning & Formatting</h1>
+                <p>Your model is only as good as your data. This chapter covers the critical step between having raw data and being ready to train — cleaning, filtering, formatting, and validating your dataset.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Data cleaning = washing and prepping vegetables before cooking.</strong> You wouldn't throw muddy, bruised vegetables into a pot. You wash them, remove bad parts, chop them consistently, and THEN cook. Same with data — clean it before training.</p>
+                <p><strong>Data formatting = following a recipe template.</strong> Every recipe has: Ingredients → Steps → Serving size. Similarly, every training example must follow the exact format your trainer expects.</p>
+            </div>
+
+            <h2 id="why-clean">Why Cleaning Matters</h2>
+
+            <table>
+                <thead><tr><th>Dirty Data Problem</th><th>Effect on Model</th><th>Solution</th></tr></thead>
+                <tbody>
+                    <tr><td>Duplicate examples</td><td>Model memorizes instead of learning</td><td>Deduplication (exact + fuzzy)</td></tr>
+                    <tr><td>Very short responses</td><td>Model learns to give brief, unhelpful answers</td><td>Filter by minimum length</td></tr>
+                    <tr><td>Wrong format</td><td>Training fails or produces garbage</td><td>Validate JSON/format before training</td></tr>
+                    <tr><td>Hallucinated facts</td><td>Model learns to hallucinate</td><td>Fact-checking pipeline</td></tr>
+                    <tr><td>Mixed languages</td><td>Confused multilingual behavior</td><td>Language detection + filtering</td></tr>
+                    <tr><td>PII/sensitive data</td><td>Model memorizes private info</td><td>PII detection + removal</td></tr>
+                    <tr><td>HTML/boilerplate</td><td>Model learns to output HTML tags</td><td>Strip formatting artifacts</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="formats">Chat Template Formats</h2>
+
+            <p>Every model family expects data in a specific "chat template" format. Using the wrong format is the #1 reason fine-tuning fails silently.</p>
+
+            <h3>ChatML (OpenAI / Most Models):</h3>
+            <pre><code><span class="token-comment"># This is the standard format used by most trainers</span>
+<span class="token-comment"># TRL, Axolotl, OpenAI fine-tuning all use this</span>
+{
+    <span class="token-string">"messages"</span>: [
+        {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a helpful coding assistant."</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"How do I read a CSV file in Python?"</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Use pandas:\n```python\nimport pandas as pd\ndf = pd.read_csv('file.csv')\n```"</span>}
+    ]
+}
+
+<span class="token-comment"># Multi-turn conversation (model learns context handling)</span>
+{
+    <span class="token-string">"messages"</span>: [
+        {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a math tutor."</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"What is 2+2?"</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: <span class="token-string">"2 + 2 = 4"</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Now multiply that by 3"</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: <span class="token-string">"4 × 3 = 12"</span>}
+    ]
+}</code></pre>
+
+            <h3>Alpaca Format (Legacy but Common):</h3>
+            <pre><code><span class="token-comment"># Simpler, single-turn only</span>
+{
+    <span class="token-string">"instruction"</span>: <span class="token-string">"Translate the following to French."</span>,
+    <span class="token-string">"input"</span>: <span class="token-string">"Hello, how are you?"</span>,
+    <span class="token-string">"output"</span>: <span class="token-string">"Bonjour, comment allez-vous ?"</span>
+}
+
+<span class="token-comment"># Without input field</span>
+{
+    <span class="token-string">"instruction"</span>: <span class="token-string">"Write a haiku about programming."</span>,
+    <span class="token-string">"input"</span>: <span class="token-string">""</span>,
+    <span class="token-string">"output"</span>: <span class="token-string">"Semicolons fall\nLike rain upon the keyboard\nCode compiles at last"</span>
+}</code></pre>
+
+            <h3>How Models Actually See the Data (After Template Applied):</h3>
+            <pre><code><span class="token-comment"># Llama 3 chat template (what the model actually processes)</span>
+<span class="token-string">"""&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+You are a helpful coding assistant.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+How do I read a CSV file in Python?&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Use pandas:
+```python
+import pandas as pd
+df = pd.read_csv('file.csv')
+```&lt;|eot_id|&gt;"""</span>
+
+<span class="token-comment"># ChatML template (used by Qwen, Mistral instruct)</span>
+<span class="token-string">"""&lt;|im_start|&gt;system
+You are a helpful assistant.&lt;|im_end|&gt;
+&lt;|im_start|&gt;user
+Hello!&lt;|im_end|&gt;
+&lt;|im_start|&gt;assistant
+Hi there! How can I help?&lt;|im_end|&gt;"""</span></code></pre>
+
+            <h2 id="code">Production Cleaning Pipeline</h2>
+
+            <pre><code><span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> re
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> Dataset, load_dataset
+
+<span class="token-keyword">class</span> <span class="token-class">DataCleaner</span>:
+    <span class="token-string">"""Production data cleaning pipeline for LLM fine-tuning."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, min_instruction_len=<span class="token-number">10</span>, min_response_len=<span class="token-number">50</span>, max_response_len=<span class="token-number">8000</span>):
+        self.min_instruction_len = min_instruction_len
+        self.min_response_len = min_response_len
+        self.max_response_len = max_response_len
+        self.seen_hashes = <span class="token-builtin">set</span>()
+        self.stats = {<span class="token-string">"total"</span>: <span class="token-number">0</span>, <span class="token-string">"kept"</span>: <span class="token-number">0</span>, <span class="token-string">"removed"</span>: {}}
+
+    <span class="token-keyword">def</span> <span class="token-function">clean_text</span>(self, text: str) -> str:
+        <span class="token-string">"""Basic text cleaning."""</span>
+        <span class="token-comment"># Remove excessive whitespace</span>
+        text = re.sub(<span class="token-string">r'\n{3,}'</span>, <span class="token-string">'\n\n'</span>, text)
+        text = re.sub(<span class="token-string">r' {2,}'</span>, <span class="token-string">' '</span>, text)
+        <span class="token-comment"># Remove common artifacts</span>
+        text = re.sub(<span class="token-string">r'&lt;/?[a-z][^&gt;]*&gt;'</span>, <span class="token-string">''</span>, text)  <span class="token-comment"># HTML tags</span>
+        text = text.replace(<span class="token-string">'\r\n'</span>, <span class="token-string">'\n'</span>)
+        text = text.strip()
+        <span class="token-keyword">return</span> text
+
+    <span class="token-keyword">def</span> <span class="token-function">is_duplicate</span>(self, text: str) -> bool:
+        <span class="token-string">"""Check for exact duplicates using hash."""</span>
+        h = hashlib.md5(text.lower().strip().encode()).hexdigest()
+        <span class="token-keyword">if</span> h <span class="token-keyword">in</span> self.seen_hashes:
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+        self.seen_hashes.add(h)
+        <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">check_quality</span>(self, example: dict) -> Optional[str]:
+        <span class="token-string">"""Return rejection reason or None if passes."""</span>
+        messages = example.get(<span class="token-string">"messages"</span>, [])
+
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> messages:
+            <span class="token-keyword">return</span> <span class="token-string">"empty_messages"</span>
+
+        <span class="token-comment"># Check for required roles</span>
+        roles = [m[<span class="token-string">"role"</span>] <span class="token-keyword">for</span> m <span class="token-keyword">in</span> messages]
+        <span class="token-keyword">if</span> <span class="token-string">"assistant"</span> <span class="token-keyword">not</span> <span class="token-keyword">in</span> roles:
+            <span class="token-keyword">return</span> <span class="token-string">"no_assistant_response"</span>
+        <span class="token-keyword">if</span> <span class="token-string">"user"</span> <span class="token-keyword">not</span> <span class="token-keyword">in</span> roles:
+            <span class="token-keyword">return</span> <span class="token-string">"no_user_message"</span>
+
+        <span class="token-comment"># Get the last assistant response</span>
+        assistant_msgs = [m[<span class="token-string">"content"</span>] <span class="token-keyword">for</span> m <span class="token-keyword">in</span> messages <span class="token-keyword">if</span> m[<span class="token-string">"role"</span>] == <span class="token-string">"assistant"</span>]
+        user_msgs = [m[<span class="token-string">"content"</span>] <span class="token-keyword">for</span> m <span class="token-keyword">in</span> messages <span class="token-keyword">if</span> m[<span class="token-string">"role"</span>] == <span class="token-string">"user"</span>]
+
+        <span class="token-comment"># Length checks</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">any</span>(<span class="token-builtin">len</span>(m) < self.min_instruction_len <span class="token-keyword">for</span> m <span class="token-keyword">in</span> user_msgs):
+            <span class="token-keyword">return</span> <span class="token-string">"user_too_short"</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">any</span>(<span class="token-builtin">len</span>(m) < self.min_response_len <span class="token-keyword">for</span> m <span class="token-keyword">in</span> assistant_msgs):
+            <span class="token-keyword">return</span> <span class="token-string">"response_too_short"</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">any</span>(<span class="token-builtin">len</span>(m) > self.max_response_len <span class="token-keyword">for</span> m <span class="token-keyword">in</span> assistant_msgs):
+            <span class="token-keyword">return</span> <span class="token-string">"response_too_long"</span>
+
+        <span class="token-comment"># Check for garbage patterns</span>
+        <span class="token-keyword">for</span> msg <span class="token-keyword">in</span> assistant_msgs:
+            <span class="token-keyword">if</span> <span class="token-string">"as an ai language model"</span> <span class="token-keyword">in</span> msg.lower():
+                <span class="token-keyword">return</span> <span class="token-string">"ai_refusal_pattern"</span>
+            <span class="token-keyword">if</span> msg.count(<span class="token-string">"I cannot"</span>) > <span class="token-number">2</span>:
+                <span class="token-keyword">return</span> <span class="token-string">"excessive_refusal"</span>
+
+        <span class="token-comment"># Duplicate check</span>
+        full_text = <span class="token-string">" "</span>.join(m[<span class="token-string">"content"</span>] <span class="token-keyword">for</span> m <span class="token-keyword">in</span> messages)
+        <span class="token-keyword">if</span> self.is_duplicate(full_text):
+            <span class="token-keyword">return</span> <span class="token-string">"duplicate"</span>
+
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>  <span class="token-comment"># Passes all checks</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">clean_dataset</span>(self, dataset) -> Dataset:
+        <span class="token-string">"""Clean an entire dataset."""</span>
+        cleaned = []
+
+        <span class="token-keyword">for</span> example <span class="token-keyword">in</span> dataset:
+            self.stats[<span class="token-string">"total"</span>] += <span class="token-number">1</span>
+
+            <span class="token-comment"># Clean text in all messages</span>
+            <span class="token-keyword">if</span> <span class="token-string">"messages"</span> <span class="token-keyword">in</span> example:
+                example[<span class="token-string">"messages"</span>] = [
+                    {**m, <span class="token-string">"content"</span>: self.clean_text(m[<span class="token-string">"content"</span>])}
+                    <span class="token-keyword">for</span> m <span class="token-keyword">in</span> example[<span class="token-string">"messages"</span>]
+                ]
+
+            <span class="token-comment"># Quality check</span>
+            rejection = self.check_quality(example)
+            <span class="token-keyword">if</span> rejection:
+                self.stats[<span class="token-string">"removed"</span>][rejection] = self.stats[<span class="token-string">"removed"</span>].get(rejection, <span class="token-number">0</span>) + <span class="token-number">1</span>
+                <span class="token-keyword">continue</span>
+
+            cleaned.append(example)
+            self.stats[<span class="token-string">"kept"</span>] += <span class="token-number">1</span>
+
+        <span class="token-builtin">print</span>(<span class="token-string">f"\n📊 Cleaning Results:"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Total: {self.stats['total']:,}"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Kept: {self.stats['kept']:,} ({self.stats['kept']/self.stats['total']*100:.1f}%)"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"   Removed: {self.stats['total'] - self.stats['kept']:,}"</span>)
+        <span class="token-keyword">for</span> reason, count <span class="token-keyword">in</span> sorted(self.stats[<span class="token-string">"removed"</span>].items(), key=<span class="token-keyword">lambda</span> x: -x[<span class="token-number">1</span>]):
+            <span class="token-builtin">print</span>(<span class="token-string">f"     - {reason}: {count}"</span>)
+
+        <span class="token-keyword">return</span> Dataset.from_list(cleaned)
+
+<span class="token-comment"># Usage</span>
+cleaner = DataCleaner(min_response_len=<span class="token-number">100</span>)
+raw_dataset = load_dataset(<span class="token-string">"your-dataset"</span>, split=<span class="token-string">"train"</span>)
+clean_dataset = cleaner.clean_dataset(raw_dataset)
+clean_dataset.save_to_disk(<span class="token-string">"./cleaned_dataset"</span>)</code></pre>
+
+            <h3>Format Converter: Alpaca → ChatML</h3>
+            <pre><code><span class="token-keyword">def</span> <span class="token-function">alpaca_to_chatml</span>(example: dict, system_prompt: str = <span class="token-string">"You are a helpful assistant."</span>) -> dict:
+    <span class="token-string">"""Convert Alpaca format to ChatML (messages) format."""</span>
+    messages = [{<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system_prompt}]
+
+    <span class="token-comment"># Build user message</span>
+    user_content = example[<span class="token-string">"instruction"</span>]
+    <span class="token-keyword">if</span> example.get(<span class="token-string">"input"</span>):
+        user_content += <span class="token-string">f"\n\nInput: {example['input']}"</span>
+
+    messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: user_content})
+    messages.append({<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: example[<span class="token-string">"output"</span>]})
+
+    <span class="token-keyword">return</span> {<span class="token-string">"messages"</span>: messages}
+
+<span class="token-comment"># Convert entire dataset</span>
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> load_dataset
+
+alpaca = load_dataset(<span class="token-string">"tatsu-lab/alpaca"</span>, split=<span class="token-string">"train"</span>)
+chatml_dataset = alpaca.map(alpaca_to_chatml)
+<span class="token-builtin">print</span>(chatml_dataset[<span class="token-number">0</span>])</code></pre>
+
+            <h3>Token Count Verification</h3>
+            <pre><code><span class="token-keyword">import</span> tiktoken
+
+<span class="token-keyword">def</span> <span class="token-function">check_token_lengths</span>(dataset, max_tokens=<span class="token-number">4096</span>, model=<span class="token-string">"gpt-4"</span>):
+    <span class="token-string">"""Verify no examples exceed the context window."""</span>
+    enc = tiktoken.encoding_for_model(model)
+
+    too_long = <span class="token-number">0</span>
+    lengths = []
+
+    <span class="token-keyword">for</span> example <span class="token-keyword">in</span> dataset:
+        <span class="token-comment"># Concatenate all message content</span>
+        full_text = <span class="token-string">" "</span>.join(m[<span class="token-string">"content"</span>] <span class="token-keyword">for</span> m <span class="token-keyword">in</span> example[<span class="token-string">"messages"</span>])
+        tokens = <span class="token-builtin">len</span>(enc.encode(full_text))
+        lengths.append(tokens)
+
+        <span class="token-keyword">if</span> tokens > max_tokens:
+            too_long += <span class="token-number">1</span>
+
+    <span class="token-builtin">print</span>(<span class="token-string">f"Token length stats:"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"  Mean: {sum(lengths)/len(lengths):.0f}"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"  Max: {max(lengths)}"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"  Over {max_tokens} tokens: {too_long} ({too_long/len(lengths)*100:.1f}%)"</span>)
+
+    <span class="token-comment"># Filter out examples that are too long</span>
+    <span class="token-keyword">if</span> too_long > <span class="token-number">0</span>:
+        <span class="token-builtin">print</span>(<span class="token-string">f"  ⚠️ Recommend truncating or removing {too_long} examples"</span>)
+
+    <span class="token-keyword">return</span> lengths</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>ChatML format</strong> — The industry standard for SFT data. TRL, Axolotl, LLaMA-Factory all use it.</li>
+                    <li><strong>Always verify the chat template</strong> — Use <code>tokenizer.apply_chat_template()</code> to see exactly what the model will process.</li>
+                    <li><strong>Remove "As an AI language model..."</strong> — These patterns from GPT-3.5-generated data poison your model.</li>
+                    <li><strong>Balance your dataset</strong> — No more than 30% of examples should be from one topic/category.</li>
+                    <li><strong>Token budget</strong> — Keep examples under 2048 tokens for efficiency. Use 4096 only when needed.</li>
+                    <li><strong>Train/test split</strong> — Always hold out 5-10% for evaluation. Never train on your test set.</li>
+                    <li><strong>Version your data</strong> — Track dataset versions with metadata. A model is only reproducible if the data is.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li>Data quality directly determines model quality — spend 80% of your time on data, 20% on training</li>
+                    <li><strong>ChatML format</strong> (messages with role/content) is the industry standard for SFT</li>
+                    <li>Always: deduplicate, length filter, quality check, remove artifacts</li>
+                    <li>Verify token counts don't exceed your training context window</li>
+                    <li>Use <code>tokenizer.apply_chat_template()</code> to confirm correct formatting</li>
+                    <li>Hold out a test split and version your datasets</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    Raw Data → Clean (remove junk) → Format (ChatML) → Validate (tokens, quality) → Split (train/test) → READY<br><br>
+                    Time spent: Data prep (80%) → Training (15%) → Evaluation (5%)
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Wrong chat template</strong> — Using Alpaca format with a trainer that expects ChatML = silent failure. Model trains but outputs garbage.</li>
+                    <li><strong>Not checking token lengths</strong> — Examples exceeding context window get truncated, cutting off the response the model should learn.</li>
+                    <li><strong>Keeping "refuse" patterns</strong> — "I'm sorry, I cannot..." in training data teaches your model to refuse.</li>
+                    <li><strong>No test split</strong> — Without held-out data, you can't tell if training worked or if the model just memorized.</li>
+                    <li><strong>Inconsistent system prompts</strong> — Different system prompts across examples confuses the model about its identity.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Clean a Real Dataset</h4>
+                <ol>
+                    <li>Load the Alpaca dataset: <code>load_dataset("tatsu-lab/alpaca")</code></li>
+                    <li>Convert it from Alpaca → ChatML format</li>
+                    <li>Run the DataCleaner on it — how many examples get removed?</li>
+                    <li>Check token lengths — what's the distribution?</li>
+                    <li>Find and remove all examples containing "As an AI"</li>
+                    <li>Save the cleaned dataset and note the final count vs original</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="08-synthetic-data.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Synthetic Data</span>
+                </a>
+                <a href="10-finetuning-basics.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Fine-Tuning Basics</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

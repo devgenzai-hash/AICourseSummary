@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distributed Locking - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Distributed Locking</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Distributed Locking</h1>
+                <p class="subtitle">Coordinating access to shared resources when many nodes want to do the same thing at once. Mutexes for the distributed world.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-distributed">Distributed</span>
+                    <span class="tag tag-pattern">Pattern</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">&#127968; Daily-Life Analogy: The Bathroom Key</div>
+                <p>Some gas stations have a single key for the restroom, attached to a large object. Only one person can use it at a time:</p>
+                <ul>
+                    <li><strong>The key</strong> = the distributed lock</li>
+                    <li><strong>Getting the key</strong> = acquiring the lock</li>
+                    <li><strong>Using the bathroom</strong> = accessing the shared resource</li>
+                    <li><strong>Returning the key</strong> = releasing the lock</li>
+                    <li><strong>Key has a timer</strong> = lock TTL (auto-returns if you pass out)</li>
+                </ul>
+            </div>
+
+            <h2>Why Distributed Locks?</h2>
+            <p>A local mutex only protects ONE server. In a distributed system, you need a lock that ALL servers respect.</p>
+            <ul>
+                <li><strong>Prevent duplicate processing</strong>: Only one worker processes a job</li>
+                <li><strong>Resource coordination</strong>: One node writes to a shared file</li>
+                <li><strong>Leader election</strong>: Lock holder is the leader</li>
+                <li><strong>Global rate limiting</strong>: Enforce limits across servers</li>
+            </ul>
+
+            <h2>Redis-Based Lock (Simplest)</h2>
+
+<pre><code><span class="token-keyword">import</span> redis
+<span class="token-keyword">import</span> uuid
+<span class="token-keyword">import</span> time
+
+<span class="token-keyword">class</span> <span class="token-class">RedisDistributedLock</span>:
+    <span class="token-string">"""Distributed lock using Redis SET NX EX"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, redis_client, lock_name, ttl=<span class="token-number">10</span>):
+        self.redis = redis_client
+        self.lock_name = <span class="token-string">f"lock:{lock_name}"</span>
+        self.ttl = ttl
+        self.lock_value = str(uuid.uuid4())  <span class="token-comment"># Unique token</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">acquire</span>(self, retry_count=<span class="token-number">3</span>, retry_delay=<span class="token-number">0.5</span>):
+        <span class="token-string">"""Try to acquire the lock"""</span>
+        <span class="token-keyword">for</span> attempt <span class="token-keyword">in</span> range(retry_count):
+            <span class="token-comment"># SET NX = set if not exists (atomic!)</span>
+            acquired = self.redis.set(
+                self.lock_name,
+                self.lock_value,
+                nx=<span class="token-keyword">True</span>,   <span class="token-comment"># Only if key doesn't exist</span>
+                ex=self.ttl <span class="token-comment"># Auto-expire (prevents deadlock)</span>
+            )
+            <span class="token-keyword">if</span> acquired:
+                <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+            time.sleep(retry_delay)
+        <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">release</span>(self):
+        <span class="token-string">"""Release only if WE hold it (compare-and-delete)"""</span>
+        <span class="token-comment"># Lua script for atomic check-and-delete</span>
+        lua_script = <span class="token-string">"""
+        if redis.call("get", KEYS[1]) == ARGV[1] then
+            return redis.call("del", KEYS[1])
+        else
+            return 0
+        end
+        """</span>
+        self.redis.eval(lua_script, <span class="token-number">1</span>, self.lock_name, self.lock_value)
+
+    <span class="token-keyword">def</span> <span class="token-function">__enter__</span>(self):
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> self.acquire():
+            <span class="token-keyword">raise</span> Exception(<span class="token-string">"Could not acquire lock"</span>)
+        <span class="token-keyword">return</span> self
+
+    <span class="token-keyword">def</span> <span class="token-function">__exit__</span>(self, *args):
+        self.release()
+
+<span class="token-comment"># Usage</span>
+r = redis.Redis()
+<span class="token-keyword">with</span> RedisDistributedLock(r, <span class="token-string">"payment-processing"</span>) <span class="token-keyword">as</span> lock:
+    process_payment(order_id)  <span class="token-comment"># Only ONE server at a time</span></code></pre>
+
+            <h2>The Fencing Problem</h2>
+            <div class="callout callout-warning">
+                <strong>Dangerous scenario:</strong> Client A acquires lock, then has a long GC pause. Lock TTL expires. Client B acquires the same lock. Client A wakes up thinking it still holds the lock. Both access the resource simultaneously!
+            </div>
+            <p><strong>Solution: Fencing tokens.</strong> Each acquisition gets a monotonically increasing token. The resource rejects requests with old tokens.</p>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">FencedLock</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, redis_client, lock_name):
+        self.redis = redis_client
+        self.lock_name = lock_name
+        self.token_key = <span class="token-string">f"fence:{lock_name}"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">acquire</span>(self):
+        token = self.redis.incr(self.token_key)  <span class="token-comment"># Monotonic</span>
+        acquired = self.redis.set(self.lock_name, token, nx=<span class="token-keyword">True</span>, ex=<span class="token-number">10</span>)
+        <span class="token-keyword">if</span> acquired:
+            <span class="token-keyword">return</span> token  <span class="token-comment"># Give token to resource</span>
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+
+<span class="token-comment"># Resource validates token:</span>
+<span class="token-keyword">def</span> <span class="token-function">write_to_storage</span>(data, fencing_token, storage):
+    <span class="token-keyword">if</span> fencing_token &lt;= storage.last_token:
+        <span class="token-keyword">raise</span> Exception(<span class="token-string">"Stale lock! Rejecting."</span>)
+    storage.last_token = fencing_token
+    storage.write(data)  <span class="token-comment"># Safe!</span></code></pre>
+
+            <h2>Redlock Algorithm</h2>
+            <p>Single Redis = single point of failure. Redlock uses multiple independent Redis instances:</p>
+            <ol>
+                <li>Acquire lock on N/2 + 1 (majority) Redis instances</li>
+                <li>If majority acquired within timeout &rarr; lock obtained</li>
+                <li>If not &rarr; release partial locks and retry</li>
+            </ol>
+
+            <div class="industry-box">
+                <h4>Real-World Distributed Locks</h4>
+                <ul>
+                    <li><strong>Redis + Redlock</strong> &mdash; Most common for application-level locking</li>
+                    <li><strong>ZooKeeper</strong> &mdash; Ephemeral nodes (auto-delete on disconnect)</li>
+                    <li><strong>etcd</strong> &mdash; Lease-based locks with automatic expiration</li>
+                    <li><strong>Google Chubby</strong> &mdash; Paxos-based lock service (internal)</li>
+                    <li><strong>DynamoDB</strong> &mdash; Conditional writes as locks</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+                    <li>Distributed locks coordinate access across multiple servers</li>
+                    <li>Redis SET NX EX is simplest (atomic set-if-not-exists with expiry)</li>
+                    <li>Always use TTL &mdash; prevents deadlock if holder crashes</li>
+                    <li>Always use unique tokens &mdash; only release YOUR lock</li>
+                    <li>Fencing tokens prevent stale-lock problems (GC pause scenario)</li>
+                    <li>Redlock uses multiple Redis instances for higher safety</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">
+    Lock lifecycle:
+    [UNLOCKED] --SET NX--&gt; [LOCKED] --DEL (if mine)--&gt; [UNLOCKED]
+                               |
+                          TTL expires (safety net)
+                               |
+                               v
+                          [UNLOCKED] (holder crashed)
+
+    DANGER: GC pause between acquire and use:
+    [A acquires] &rarr; [A pauses 15s] &rarr; [TTL expires]
+    &rarr; [B acquires] &rarr; [A wakes up] &rarr; CONFLICT!
+    Fix: Fencing token (A's old token rejected by resource)
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+                    <li><strong>No TTL</strong> &mdash; Holder crashes = lock held forever = deadlock.</li>
+                    <li><strong>Releasing someone else's lock</strong> &mdash; Always verify lock_value before DEL.</li>
+                    <li><strong>Ignoring clock skew</strong> &mdash; TTL assumes synchronized clocks. Skew causes early expiry.</li>
+                    <li><strong>Long operations without renewal</strong> &mdash; If work &gt; TTL, lock expires mid-operation.</li>
+                    <li><strong>Single Redis SPOF</strong> &mdash; Use Redlock or ZooKeeper for critical locks.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+                    <li>Implement RedisDistributedLock. Run 5 workers trying the same lock. Verify mutual exclusion.</li>
+                    <li>Simulate GC pause: acquire lock, sleep longer than TTL. Show how fencing tokens prevent bugs.</li>
+                    <li>Implement lock renewal: background thread extends TTL while holder is working.</li>
+                    <li>Research Martin Kleppmann's critique of Redlock. What edge cases can fail?</li>
+                </ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="30-failure-detection.html" class="prev">Failure Detection</a>
+                <a href="32-saga-pattern.html" class="next">Saga Pattern</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

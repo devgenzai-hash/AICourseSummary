@@ -1,0 +1,162 @@
+# AI Jobs Skills Demand — Visualization Data (CSV Format)
+# Use this data to create charts in Excel, Google Sheets, or Python
+# Date: March 31, 2026
+
+## =============================================
+## CHART 1: Top 25 Skills by Demand Percentage
+## =============================================
+
+Rank,Skill,Demand_Percentage,Category
+1,Python,92,Programming Language
+2,Machine Learning,88,Core AI
+3,Large Language Models (LLMs),78,GenAI
+4,Deep Learning,72,Core AI
+5,Generative AI,70,GenAI
+6,NLP,68,Core AI
+7,TensorFlow,65,ML Framework
+8,PyTorch,64,ML Framework
+9,AWS,60,Cloud Platform
+10,Azure,52,Cloud Platform
+11,Docker,50,DevOps
+12,SQL,48,Data
+13,GCP,45,Cloud Platform
+14,Scikit-learn,44,ML Framework
+15,LangChain,42,GenAI Framework
+16,RAG,40,GenAI
+17,REST APIs,40,Engineering
+18,Git/GitHub,38,Version Control
+19,MLOps,38,Operations
+20,FastAPI,35,Web Framework
+21,Hugging Face,35,GenAI Ecosystem
+22,Spark/PySpark,33,Big Data
+23,Computer Vision,32,Core AI
+24,Prompt Engineering,30,GenAI
+25,Pandas,30,Data Processing
+
+## =============================================
+## CHART 2: Skills by Category Distribution
+## =============================================
+
+Category,Number_of_Skills_in_Top_40,Average_Demand_Pct
+GenAI / LLM Stack,11,35
+Core AI / ML,5,66
+Programming Languages,5,37
+Cloud Platforms,4,46
+ML/DL Frameworks,5,44
+DevOps / MLOps,5,28
+Data Engineering,5,21
+Web Frameworks / APIs,4,25
+
+## =============================================
+## CHART 3: US Salary Comparison by Role
+## =============================================
+
+Role,Average_USD,Low_USD,High_USD
+Machine Learning Engineer,186761,112461,310149
+AI Developer,151352,92760,246955
+Data Scientist,127806,78240,208771
+Director of Data Science,199764,,
+Principal Data Scientist,181544,,
+Lead Data Scientist,164729,,
+Junior Data Scientist,82461,,
+
+## =============================================
+## CHART 4: India AI Jobs by City
+## =============================================
+
+City,Number_of_Jobs,Percentage
+Bengaluru,10263,40.9
+Hyderabad,4907,19.5
+Pune,3572,14.2
+Delhi NCR,3390,13.5
+Chennai,1500,6.0
+Mumbai,800,3.2
+Others,663,2.6
+
+## =============================================
+## CHART 5: India Work Mode Distribution
+## =============================================
+
+Work_Mode,Number_of_Jobs
+Work from Office,22619
+Hybrid,1615
+Remote,856
+
+## =============================================
+## CHART 6: India Salary Band Distribution
+## =============================================
+
+Salary_Band_LPA,Number_of_Jobs
+0-3 Lakhs,1234
+3-6 Lakhs,8842
+6-10 Lakhs,13529
+10-15 Lakhs,9571
+15+ Lakhs,5000
+
+## =============================================
+## CHART 7: India vs US Salary Comparison
+## =============================================
+
+Level,India_Avg_LPA,US_Avg_USD,India_USD_Equivalent
+Entry (0-3 yrs),10,106000,12000
+Mid (3-6 yrs),22,160000,26400
+Senior (7-12 yrs),47,250000,56400
+Leadership (12+ yrs),85,375000,102000
+
+## =============================================
+## CHART 8: Top Hiring Companies by Job Count (India)
+## =============================================
+
+Company,AI_ML_Job_Count,Type
+Accenture,3789,Foreign MNC
+IBM,392,Foreign MNC
+Infosys,151,Indian MNC
+Capgemini,102,Foreign MNC
+HCLTech,~100,Indian MNC
+TCS,~80,Indian MNC
+Wipro,~60,Indian MNC
+
+## =============================================
+## CHART 9: GenAI Skills Growth Trend
+## =============================================
+
+Skill,Demand_2024_Est_Pct,Demand_2025_Est_Pct,Demand_2026_Pct,Growth_Rate
+LLMs,30,55,78,High
+Generative AI,20,45,70,Very High
+LangChain,5,20,42,Explosive
+RAG,5,18,40,Explosive
+Prompt Engineering,10,22,30,High
+Vector Databases,2,12,28,Explosive
+Agentic AI,0,5,20,Explosive
+LlamaIndex,1,8,18,Very High
+
+## =============================================
+## CHART 10: Experience Level Distribution
+## =============================================
+
+Experience_Band,Percentage_of_Listings
+0-2 Years,15
+2-5 Years,35
+5-9 Years,30
+10+ Years,20
+
+## =============================================
+## CHART 11: Department-wise AI Hiring (India)
+## =============================================
+
+Department,Number_of_Jobs
+Engineering Software QA,14068
+Data Science Analytics,4671
+IT Information Security,883
+Consulting,755
+
+## =============================================
+## CHART 12: Company Type Distribution (India)
+## =============================================
+
+Company_Type,Number_of_Jobs,Percentage
+Foreign MNC,14998,60
+Corporate,2400,10
+Indian MNC,500,2
+Startup,300,1
+Others,6897,27

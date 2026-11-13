@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Externalized Configuration - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html" class="active"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html"><span class="nav-number">14</span> Profiles & Environment</a></li>
+            <li><a href="15-custom-starters.html"><span class="nav-number">15</span> Custom Starters</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Auto-Configuration → Externalized Configuration</div>
+        <div class="topic-number">Topic 13 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Externalized Configuration</h1>
+            <p class="subtitle-description">How Spring Boot resolves properties from 17+ sources with strict priority ordering — from command-line args down to default properties.</p>
+
+            <div class="tags">
+                <span class="tag tag-intermediate">intermediate</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-production">production</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏗️ The Override Stack Analogy</div>
+                <p>Think of externalized config like CSS specificity. Your stylesheet defines base styles, but inline styles override them, and <code>!important</code> overrides everything. Spring Boot's property resolution works the same way: <code>application.properties</code> sets defaults (like a stylesheet), environment variables override those (like inline styles), and command-line args override everything (like <code>!important</code>). The system checks 17+ layers from top to bottom, and the FIRST match wins — higher-priority sources shadow lower ones without removing them.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: Property Source Priority -->
+            <!-- ============================================ -->
+            <h2>1. Property Source Ordering (Highest to Lowest Priority)</h2>
+
+            <p>When Spring Boot resolves a property like <code>server.port</code>, it walks through these sources in strict order. The first source that defines the property wins:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Source</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Command line arguments</td>
+                        <td><code>--server.port=9090</code></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>SPRING_APPLICATION_JSON</td>
+                        <td><code>{"server.port": 9090}</code> as env var or system prop</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>ServletConfig init params</td>
+                        <td>web.xml servlet init-param</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>ServletContext init params</td>
+                        <td>web.xml context-param</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>JNDI attributes (java:comp/env)</td>
+                        <td>Application server JNDI bindings</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Java System properties (System.getProperties())</td>
+                        <td><code>-Dserver.port=9090</code></td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>OS environment variables</td>
+                        <td><code>SERVER_PORT=9090</code></td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>RandomValuePropertySource (random.*)</td>
+                        <td><code>${random.int}</code>, <code>${random.uuid}</code></td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>application-{profile}.properties <em>(outside JAR)</em></td>
+                        <td><code>./config/application-prod.yml</code></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>application-{profile}.properties <em>(inside JAR)</em></td>
+                        <td><code>classpath:application-prod.yml</code></td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>application.properties <em>(outside JAR)</em></td>
+                        <td><code>./config/application.yml</code></td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>application.properties <em>(inside JAR)</em></td>
+                        <td><code>classpath:application.yml</code></td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>@PropertySource on @Configuration classes</td>
+                        <td><code>@PropertySource("classpath:custom.properties")</code></td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>Default properties (SpringApplication.setDefaultProperties)</td>
+                        <td>Programmatic fallback values</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>Profile-specific files ALWAYS override non-profile files, regardless of location. So <code>application-prod.properties</code> inside your JAR overrides <code>application.properties</code> outside your JAR — because profile-specific sources sit higher in the priority stack.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: @ConfigurationProperties -->
+            <!-- ============================================ -->
+            <h2>2. @ConfigurationProperties: Type-Safe Configuration</h2>
+
+            <p>Instead of scattering <code>@Value</code> annotations everywhere, <code>@ConfigurationProperties</code> binds an entire prefix into a structured POJO:</p>
+
+            <pre><code><span class="token-comment">// application.yml:</span>
+<span class="token-comment">// company:</span>
+<span class="token-comment">//   mail:</span>
+<span class="token-comment">//     host: smtp.company.com</span>
+<span class="token-comment">//     port: 587</span>
+<span class="token-comment">//     default-recipients:</span>
+<span class="token-comment">//       - admin@company.com</span>
+<span class="token-comment">//       - ops@company.com</span>
+
+<span class="token-annotation">@ConfigurationProperties</span>(prefix = <span class="token-string">"company.mail"</span>)
+<span class="token-annotation">@Validated</span>
+<span class="token-keyword">public class</span> <span class="token-class">MailProperties</span> {
+
+    <span class="token-annotation">@NotBlank</span>
+    <span class="token-keyword">private</span> <span class="token-type">String</span> host;
+
+    <span class="token-annotation">@Min</span>(<span class="token-number">1</span>)
+    <span class="token-annotation">@Max</span>(<span class="token-number">65535</span>)
+    <span class="token-keyword">private</span> <span class="token-type">int</span> port = <span class="token-number">25</span>; <span class="token-comment">// default value</span>
+
+    <span class="token-keyword">private</span> <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; defaultRecipients = <span class="token-keyword">new</span> <span class="token-type">ArrayList</span>&lt;&gt;();
+
+    <span class="token-comment">// Getters and setters required for mutable binding</span>
+    <span class="token-keyword">public</span> <span class="token-type">String</span> <span class="token-function">getHost</span>() { <span class="token-keyword">return</span> host; }
+    <span class="token-keyword">public void</span> <span class="token-function">setHost</span>(<span class="token-type">String</span> host) { <span class="token-keyword">this</span>.host = host; }
+    <span class="token-keyword">public</span> <span class="token-type">int</span> <span class="token-function">getPort</span>() { <span class="token-keyword">return</span> port; }
+    <span class="token-keyword">public void</span> <span class="token-function">setPort</span>(<span class="token-type">int</span> port) { <span class="token-keyword">this</span>.port = port; }
+    <span class="token-keyword">public</span> <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; <span class="token-function">getDefaultRecipients</span>() { <span class="token-keyword">return</span> defaultRecipients; }
+    <span class="token-keyword">public void</span> <span class="token-function">setDefaultRecipients</span>(<span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; r) { <span class="token-keyword">this</span>.defaultRecipients = r; }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: Relaxed Binding -->
+            <!-- ============================================ -->
+            <h2>3. Relaxed Binding Rules</h2>
+
+            <p>Spring Boot's "relaxed binding" means ALL of these map to the same property:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Example</th>
+                        <th>Where Used</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Kebab-case (canonical)</td>
+                        <td><code>company.mail.default-recipients</code></td>
+                        <td>.properties / .yml files (recommended)</td>
+                    </tr>
+                    <tr>
+                        <td>Camel case</td>
+                        <td><code>company.mail.defaultRecipients</code></td>
+                        <td>.properties / .yml files</td>
+                    </tr>
+                    <tr>
+                        <td>Underscore</td>
+                        <td><code>company.mail.default_recipients</code></td>
+                        <td>.properties / .yml files</td>
+                    </tr>
+                    <tr>
+                        <td>Upper case (env vars)</td>
+                        <td><code>COMPANY_MAIL_DEFAULTRECIPIENTS</code></td>
+                        <td>OS environment variables</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Environment Variable Gotcha</div>
+                <p>For environment variables, dots and hyphens aren't allowed in most shells. Spring Boot converts <code>COMPANY_MAIL_DEFAULT_RECIPIENTS</code> by lowercasing and replacing <code>_</code> with <code>.</code> — but nested properties and list indices require specific patterns: <code>COMPANY_MAIL_DEFAULTRECIPIENTS_0</code> for list index 0.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: @ConfigurationProperties vs @Value -->
+            <!-- ============================================ -->
+            <h2>4. @ConfigurationProperties vs @Value</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>@ConfigurationProperties</th>
+                        <th>@Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Relaxed binding</td>
+                        <td>✅ Full support</td>
+                        <td>❌ Exact match only</td>
+                    </tr>
+                    <tr>
+                        <td>Meta-data support</td>
+                        <td>✅ IDE auto-complete via annotation processor</td>
+                        <td>❌ No metadata</td>
+                    </tr>
+                    <tr>
+                        <td>Validation</td>
+                        <td>✅ JSR-303 @Validated</td>
+                        <td>❌ Not supported</td>
+                    </tr>
+                    <tr>
+                        <td>SpEL expressions</td>
+                        <td>❌ Not supported</td>
+                        <td>✅ Full SpEL</td>
+                    </tr>
+                    <tr>
+                        <td>Complex types (Map, List, nested)</td>
+                        <td>✅ Natural binding</td>
+                        <td>⚠️ Limited/cumbersome</td>
+                    </tr>
+                    <tr>
+                        <td>Immutable binding</td>
+                        <td>✅ @ConstructorBinding</td>
+                        <td>✅ final fields</td>
+                    </tr>
+                    <tr>
+                        <td>Fail-fast on missing</td>
+                        <td>❌ Silent null (unless @Validated)</td>
+                        <td>✅ Throws on startup if missing</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: Immutable Configuration -->
+            <!-- ============================================ -->
+            <h2>5. Immutable @ConfigurationProperties with @ConstructorBinding</h2>
+
+            <pre><code><span class="token-annotation">@ConfigurationProperties</span>(prefix = <span class="token-string">"company.security"</span>)
+<span class="token-annotation">@ConstructorBinding</span>  <span class="token-comment">// Boot 2.x: required on class. Boot 3.x: required on constructor if multiple</span>
+<span class="token-keyword">public class</span> <span class="token-class">SecurityProperties</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">String</span> jwtSecret;
+    <span class="token-keyword">private final</span> <span class="token-type">Duration</span> tokenExpiry;
+    <span class="token-keyword">private final</span> <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; allowedOrigins;
+
+    <span class="token-keyword">public</span> <span class="token-function">SecurityProperties</span>(
+            <span class="token-type">String</span> jwtSecret,
+            <span class="token-annotation">@DefaultValue</span>(<span class="token-string">"1h"</span>) <span class="token-type">Duration</span> tokenExpiry,
+            <span class="token-annotation">@DefaultValue</span>({<span class="token-string">"http://localhost:3000"</span>}) <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; allowedOrigins) {
+        <span class="token-keyword">this</span>.jwtSecret = jwtSecret;
+        <span class="token-keyword">this</span>.tokenExpiry = tokenExpiry;
+        <span class="token-keyword">this</span>.allowedOrigins = allowedOrigins;
+    }
+
+    <span class="token-comment">// Only getters — truly immutable</span>
+    <span class="token-keyword">public</span> <span class="token-type">String</span> <span class="token-function">getJwtSecret</span>() { <span class="token-keyword">return</span> jwtSecret; }
+    <span class="token-keyword">public</span> <span class="token-type">Duration</span> <span class="token-function">getTokenExpiry</span>() { <span class="token-keyword">return</span> tokenExpiry; }
+    <span class="token-keyword">public</span> <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; <span class="token-function">getAllowedOrigins</span>() { <span class="token-keyword">return</span> allowedOrigins; }
+}
+
+<span class="token-comment">// Registration (required for @ConstructorBinding classes)</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-annotation">@EnableConfigurationProperties</span>(<span class="token-class">SecurityProperties</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public class</span> <span class="token-class">SecurityConfig</span> {
+    <span class="token-comment">// SecurityProperties is now available for injection</span>
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p><code>@ConstructorBinding</code> enables true immutability — no setters needed. Spring Boot uses constructor parameter names (via <code>-parameters</code> compiler flag or <code>@Name</code> annotation) to match property names. <code>@DefaultValue</code> provides fallbacks for optional properties. In Boot 3.x, if there's only one constructor, <code>@ConstructorBinding</code> is inferred automatically.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: YAML vs Properties -->
+            <!-- ============================================ -->
+            <h2>6. Config File Formats: YAML vs Properties</h2>
+
+            <pre><code><span class="token-comment"># ═══ application.properties format ═══</span>
+server.port=8080
+spring.datasource.url=jdbc:postgresql://localhost:5432/mydb
+spring.datasource.username=admin
+spring.datasource.hikari.maximum-pool-size=20
+app.features.dark-mode=true
+app.features.beta-users[0]=user1@test.com
+app.features.beta-users[1]=user2@test.com
+
+<span class="token-comment"># ═══ application.yml equivalent ═══</span>
+<span class="token-comment"># Hierarchical, less repetition, but YAML gotchas</span>
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydb
+    username: admin
+    hikari:
+      maximum-pool-size: 20
+
+app:
+  features:
+    dark-mode: true
+    beta-users:
+      - user1@test.com
+      - user2@test.com</code></pre>
+
+            <h3>Multi-Document YAML (Profile Sections)</h3>
+
+            <pre><code><span class="token-comment"># Single file with profile-specific sections separated by ---</span>
+<span class="token-comment"># application.yml</span>
+
+<span class="token-comment"># Default (all profiles)</span>
+server:
+  port: 8080
+spring:
+  application:
+    name: my-service
+
+---
+<span class="token-comment"># Activated when 'dev' profile is active</span>
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:mem:devdb
+
+---
+<span class="token-comment"># Activated when 'prod' profile is active</span>
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://prod-host:5432/proddb
+    hikari:
+      maximum-pool-size: 50</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: spring.config.import -->
+            <!-- ============================================ -->
+            <h2>7. spring.config.import — External Config Sources</h2>
+
+            <pre><code><span class="token-comment"># application.yml — importing external config (Boot 2.4+)</span>
+
+spring:
+  config:
+    import:
+      <span class="token-comment"># Import from filesystem</span>
+      - file:./config/secrets.properties
+      - file:/etc/myapp/database.yml
+
+      <span class="token-comment"># Import from classpath</span>
+      - classpath:shared/common-defaults.yml
+
+      <span class="token-comment"># Import from config tree (Kubernetes secrets mounted as files)</span>
+      - configtree:/run/secrets/
+
+      <span class="token-comment"># Import optional sources (don't fail if missing)</span>
+      - optional:file:./local-overrides.properties
+
+      <span class="token-comment"># Import from custom sources (Vault, Consul, etc.)</span>
+      - vault://secret/myapp
+      - consul:myapp/config</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Boot 2.4 Breaking Change</div>
+                <p>Before Boot 2.4, <code>spring.config.location</code> and <code>spring.config.additional-location</code> were the primary mechanisms for external config. Boot 2.4 introduced <code>spring.config.import</code> as a more declarative replacement. The old properties still work but <code>spring.config.import</code> is now preferred — it supports custom backends (Vault, Consul) via <code>ConfigDataLocationResolver</code>.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: Industry Pattern -->
+            <!-- ============================================ -->
+            <h2>8. Industry Pattern: Environment-Specific Configuration</h2>
+
+            <pre><code><span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Production setup: layered configuration resolution</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+
+<span class="token-comment">// Priority stack in a Kubernetes deployment:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 1. Command line: java -jar app.jar --spring.profiles.active=prod</span>
+<span class="token-comment">// 2. K8s ConfigMap mounted as env vars: SERVER_PORT, DB_HOST</span>
+<span class="token-comment">// 3. K8s Secret mounted as config tree: /run/secrets/db-password</span>
+<span class="token-comment">// 4. Profile-specific: application-prod.yml (inside JAR)</span>
+<span class="token-comment">// 5. Base config: application.yml (inside JAR)</span>
+
+<span class="token-comment">// application.yml — base with sensible defaults</span>
+spring:
+  config:
+    import:
+      - optional:configtree:/run/secrets/
+  datasource:
+    url: jdbc:h2:mem:localdb  <span class="token-comment">// safe default for local dev</span>
+    username: sa
+
+<span class="token-comment">// application-prod.yml — production overrides</span>
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:myapp}
+    username: ${DB_USERNAME}
+    password: ${db-password}  <span class="token-comment">// resolved from configtree</span>
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      connection-timeout: 5000
+
+<span class="token-comment">// ConfigDataLocationResolver — custom implementation for Vault</span>
+<span class="token-keyword">public class</span> <span class="token-class">VaultConfigDataLocationResolver</span>
+        <span class="token-keyword">implements</span> <span class="token-type">ConfigDataLocationResolver</span>&lt;<span class="token-type">VaultConfigDataResource</span>&gt; {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public boolean</span> <span class="token-function">isResolvable</span>(<span class="token-type">ConfigDataLocationResolverContext</span> context,
+                                  <span class="token-type">ConfigDataLocation</span> location) {
+        <span class="token-keyword">return</span> location.<span class="token-function">hasPrefix</span>(<span class="token-string">"vault://"</span>);
+    }
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">List</span>&lt;<span class="token-type">VaultConfigDataResource</span>&gt; <span class="token-function">resolve</span>(
+            <span class="token-type">ConfigDataLocationResolverContext</span> context,
+            <span class="token-type">ConfigDataLocation</span> location) {
+        <span class="token-type">String</span> path = location.<span class="token-function">getNonPrefixedValue</span>(<span class="token-string">"vault://"</span>);
+        <span class="token-keyword">return</span> <span class="token-type">List</span>.<span class="token-function">of</span>(<span class="token-keyword">new</span> <span class="token-type">VaultConfigDataResource</span>(path));
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>17+ property sources</strong> are checked in strict priority order — command-line args override everything, defaults are the fallback of last resort</li>
+                    <li><strong>@ConfigurationProperties</strong> provides type-safe, validated, IDE-supported configuration binding to structured POJOs</li>
+                    <li><strong>Relaxed binding</strong> maps kebab-case, camelCase, underscore, and UPPER_CASE to the same property transparently</li>
+                    <li><strong>@ConstructorBinding</strong> enables truly immutable configuration classes — no setters, final fields, thread-safe by design</li>
+                    <li><strong>spring.config.import</strong> (Boot 2.4+) is the modern way to pull config from external sources including Vault, Consul, and Kubernetes config trees</li>
+                    <li><strong>Profile-specific files always win</strong> over non-profile files regardless of file location (inside/outside JAR)</li>
+                    <li><strong>Industry standard:</strong> layer K8s ConfigMaps + Secrets + profile-specific properties for environment separation without code changes</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>Your app has <code>server.port=8080</code> in <code>application.properties</code> inside the JAR, <code>SERVER_PORT=9090</code> as an environment variable, and <code>--server.port=7070</code> on the command line. What port does the app bind to? Why?</li>
+                    <li>Explain why <code>@ConfigurationProperties</code> doesn't support SpEL while <code>@Value</code> does. What's the architectural reason?</li>
+                    <li>You have a <code>@ConfigurationProperties</code> class with <code>@Validated</code> and a <code>@NotNull</code> field. The property is missing from all sources. When does the failure occur — at startup or first access?</li>
+                    <li>Design a configuration strategy for an app deployed to local, dev, staging, and production — showing which sources you'd use at each layer.</li>
+                    <li>Your team uses Kubernetes Secrets mounted as files. How does <code>configtree:</code> import differ from reading the file directly with <code>${file.content}</code>?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"Your microservice needs database credentials that rotate every 24 hours. How do you handle this with Spring Boot's externalized configuration without restarting the service?"</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Use spring.config.import with Vault:</strong> <code>vault://secret/myapp/db</code> — Vault handles rotation, Spring Cloud Vault client refreshes the lease.</li>
+                    <li><strong>@RefreshScope on DataSource config</strong> — combined with Spring Cloud Config's <code>/actuator/refresh</code> endpoint to reload properties without restart.</li>
+                    <li><strong>HikariCP's connection validation</strong> — even without refresh, set <code>connection-test-query</code> so stale connections fail fast and new ones use current credentials.</li>
+                    <li><strong>Alternative: ConfigDataLocationResolver</strong> custom implementation that polls Vault on a schedule and fires <code>EnvironmentChangeEvent</code>.</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 12 (spring.factories)</strong> — EnvironmentPostProcessor registered via spring.factories can inject custom property sources</li>
+                    <li><strong>Topic 14 (Profiles)</strong> — Profile activation determines which application-{profile} files are loaded</li>
+                    <li><strong>Topic 11 (Conditionals)</strong> — @ConditionalOnProperty uses the resolved property values from this priority stack</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="12-spring-factories.html" class="nav-btn nav-btn-prev">← spring.factories & META-INF</a>
+                <a href="14-profiles.html" class="nav-btn nav-btn-next">Profile Management →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

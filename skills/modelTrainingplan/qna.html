@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q&A — Your Questions Answered — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+            <li><a href="12-cpt-vs-sft-vs-dpo.html"><span class="nav-number">★</span> CPT vs SFT vs DPO</a></li>
+            <li><a href="qna.html"><span class="nav-number">❓</span> Q&A</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> Q&A</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>❓ Q&A — Your Questions Answered</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Real questions asked during learning, with detailed answers. This page grows as you ask more questions.</p>
+
+            <hr style="border: 1px solid var(--border); margin: 2rem 0;">
+
+            <!-- ============================================ -->
+            <!-- QUESTION 1 -->
+            <!-- ============================================ -->
+            <h2 id="q1">Q1: Can I inject new knowledge during SFT instead of doing CPT? What if I include scripture text inside SFT training data?</h2>
+            
+            <h3>Short Answer</h3>
+            <p><strong>Yes, the model WILL learn some knowledge from SFT data — but it's inefficient and limited compared to CPT.</strong> Think of it like this: CPT is reading a textbook cover-to-cover (deep learning), while injecting knowledge via SFT is like learning facts from flashcard answers (shallow, fragmented).</p>
+
+            <h3>Detailed Explanation</h3>
+
+            <h4>What happens when you put scripture knowledge inside SFT data:</h4>
+            
+            <pre><code># Example: Embedding knowledge INSIDE an SFT conversation
+{
+    "messages": [
+        {"role": "system", "content": "You are a scripture scholar."},
+        {"role": "user", "content": "What is Bhagavad Gita 2.47?"},
+        {"role": "assistant", "content": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥\n\nMeaning: You have the right to action alone, never to its fruits..."}
+    ]
+}
+# The model sees the verse text in the ASSISTANT response
+# It WILL memorize this to some degree
+# BUT — it only learns this verse in the CONTEXT of this specific question format</code></pre>
+
+            <h4>How knowledge absorption differs by stage:</h4>
+            
+            <table>
+                <thead>
+                    <tr><th>Aspect</th><th>Knowledge via CPT</th><th>Knowledge via SFT</th><th>Knowledge via DPO</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>How model sees it</strong></td>
+                        <td>Raw continuous text — reads it naturally like a book</td>
+                        <td>Fragmented pieces embedded in Q&A responses</td>
+                        <td>Comparative snippets in chosen/rejected pairs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Depth of learning</strong></td>
+                        <td>🟢 Deep — learns connections, context, patterns across paragraphs</td>
+                        <td>🟡 Shallow — learns isolated facts tied to specific questions</td>
+                        <td>🔴 Minimal — only learns which facts are "preferred"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Generalization</strong></td>
+                        <td>🟢 High — can answer questions it wasn't explicitly trained on</td>
+                        <td>🟡 Medium — struggles with questions phrased differently</td>
+                        <td>🔴 Low — doesn't truly "learn" new information</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Knowledge retention</strong></td>
+                        <td>🟢 Strong — deeply embedded in model weights</td>
+                        <td>🟡 Fragile — can be forgotten if not reinforced</td>
+                        <td>🔴 Very weak — barely absorbs new facts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Loss applied to knowledge tokens</strong></td>
+                        <td>✅ YES — loss on ALL tokens (the knowledge text itself)</td>
+                        <td>⚠️ PARTIAL — loss only on assistant tokens (if using assistant_only_loss=True)</td>
+                        <td>❌ NO — loss is comparative, not generative</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Efficiency</strong></td>
+                        <td>Best: 1 token of scripture text = 1 unit of learning</td>
+                        <td>Wasteful: lots of prompt tokens that don't teach knowledge</td>
+                        <td>Not designed for knowledge injection</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Why SFT is less effective for knowledge:</h4>
+            
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ The Core Problem with Knowledge in SFT</div>
+                <p>When you use <code>assistant_only_loss=True</code> (which is the correct setting for SFT), the model <strong>only learns from the assistant's response tokens</strong>. It does NOT learn from the user's question.</p>
+                <pre><code># What the model "learns" from (loss is computed on):
+{"role": "user", "content": "What is verse 2.47?"}        ← IGNORED (no loss)
+{"role": "assistant", "content": "कर्मण्येवाधिकारस्ते..."} ← LEARNED (loss here)
+
+# So the model learns to OUTPUT this verse as a response
+# But it doesn't deeply UNDERSTAND the verse the same way CPT would
+# CPT processes the verse as continuous text with full context before/after</code></pre>
+                <p><strong>Think of it this way:</strong></p>
+                <ul>
+                    <li><strong>CPT:</strong> Reading the entire Bhagavad Gita chapter by chapter, understanding flow and connections</li>
+                    <li><strong>SFT with knowledge:</strong> Memorizing 700 individual flashcard answers, each in isolation</li>
+                </ul>
+            </div>
+
+            <h4>Positives of injecting knowledge via SFT:</h4>
+            <div class="callout callout-success">
+                <div class="callout-title">✅ When injecting knowledge in SFT WORKS well</div>
+                <ul>
+                    <li><strong>Small, specific factual corrections</strong> — "The correct verse number is 2.47, not 2.48"</li>
+                    <li><strong>Format-bound knowledge</strong> — When the knowledge only needs to appear in a specific response format</li>
+                    <li><strong>Rare facts that need to be memorized</strong> — Specific dates, names, numbers</li>
+                    <li><strong>Saves a full CPT stage</strong> — Simpler pipeline, fewer compute hours</li>
+                    <li><strong>Works if data is small</strong> — For 100-500 specific facts, SFT can memorize them</li>
+                </ul>
+            </div>
+
+            <h4>Negatives of injecting knowledge via SFT:</h4>
+            <div class="callout callout-danger">
+                <div class="callout-title">❌ Problems with knowledge injection in SFT</div>
+                <ul>
+                    <li><strong>Fragmented understanding</strong> — Model learns verse 2.47 in isolation, doesn't understand how it connects to 2.46 and 2.48</li>
+                    <li><strong>Poor generalization</strong> — If trained with "What is verse 2.47?", may fail with "Explain karma yoga from chapter 2"</li>
+                    <li><strong>Requires many paraphrases</strong> — To make knowledge stick, you need the same fact asked 5-10 different ways</li>
+                    <li><strong>Hallucination risk</strong> — Model may "blend" knowledge from different examples incorrectly</li>
+                    <li><strong>Overfitting danger</strong> — Small dataset of knowledge-heavy examples → model memorizes exact responses instead of learning flexibly</li>
+                    <li><strong>Wasted tokens</strong> — In a 500-token SFT example, maybe 200 tokens are actual knowledge and 300 are formatting/prompt overhead</li>
+                </ul>
+            </div>
+
+            <h3>Can DPO/Preference Alignment inject new knowledge?</h3>
+            
+            <p><strong>No. DPO is fundamentally NOT designed for knowledge injection.</strong></p>
+            
+            <pre><code># DPO doesn't teach NEW information. It teaches PREFERENCE between two things 
+# the model already knows (or has seen in chosen/rejected).
+
+# What DPO actually does:
+# "Given these two responses you could generate, prefer this style over that style"
+
+# Example: DPO can teach "include Sanskrit text" (style preference)
+# But it CANNOT teach "here is a new verse you've never seen before" (knowledge)
+
+# WHY? The DPO loss function:
+# L = -log σ(β × [log_ratio_chosen - log_ratio_rejected])
+# This pushes probability of chosen UP and rejected DOWN
+# It doesn't create new knowledge — it redistributes existing probability
+
+# Exception: If the "chosen" response contains a fact the model vaguely knows,
+# DPO can REINFORCE that fact. But it can't teach completely new information.</code></pre>
+
+            <hr style="border: 1px solid var(--border); margin: 2rem 0;">
+
+            <!-- ============================================ -->
+            <!-- QUESTION 2 -->
+            <!-- ============================================ -->
+            <h2 id="q2">Q2: I have a small dataset (~100MB). Can I just do SFT only? How does this work for domain-specific tasks?</h2>
+
+            <h3>Short Answer</h3>
+            <p><strong>Yes! For a small domain-specific task with ~100MB of data, SFT-only (on an instruct model) is often the best and most practical approach.</strong> Here's exactly how to think about it:</p>
+
+            <h3>Decision Framework for Small Datasets</h3>
+
+            <table>
+                <thead>
+                    <tr><th>Your Situation</th><th>Recommended Approach</th><th>Why</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>100MB text + want a chatbot</td>
+                        <td><strong>CPT (small) → SFT</strong></td>
+                        <td>CPT absorbs the text, SFT teaches conversation</td>
+                    </tr>
+                    <tr>
+                        <td>100MB text + want specific format output</td>
+                        <td><strong>SFT only</strong> (on instruct model)</td>
+                        <td>Instruct model already knows how to chat; just teach format</td>
+                    </tr>
+                    <tr>
+                        <td>Small Q&A dataset (1K-5K pairs)</td>
+                        <td><strong>SFT only</strong> (on instruct model)</td>
+                        <td>Perfect use case for SFT alone</td>
+                    </tr>
+                    <tr>
+                        <td>100MB of very niche/rare content</td>
+                        <td><strong>CPT → SFT</strong></td>
+                        <td>Base model likely doesn't know this content at all</td>
+                    </tr>
+                    <tr>
+                        <td>Want to restrict output to specific domain only</td>
+                        <td><strong>SFT only</strong> (with refusal examples)</td>
+                        <td>SFT can teach "refuse off-topic" behavior</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>How SFT-Only Works with Small Data</h3>
+
+            <pre><code># ============================================
+# Strategy for 100MB domain-specific SFT
+# ============================================
+
+# STEP 1: Choose your starting model
+# Use an INSTRUCT model (already knows how to chat)
+BASE_MODEL = "google/gemma-3-12b-it"  # or 4b-it for even less compute
+
+# STEP 2: Convert your 100MB text into SFT format
+# 100MB text ≈ 25,000-50,000 paragraphs
+# Convert these into Q&A pairs:
+
+# Method A: Use GPT-4 to generate questions FROM your text
+# "Given this paragraph, generate 3 questions a user might ask"
+
+# Method B: Template-based generation
+# For each scripture verse → generate "Explain verse X.Y" pairs
+# For each concept paragraph → generate "What is [concept]?" pairs
+
+# STEP 3: Train QLoRA SFT
+# With 10K-50K examples from your 100MB:
+#   - Training time: 3-6 hours on 1× A100
+#   - LoRA rank: 32 (good for this size)
+#   - Epochs: 2-3
+#   - This is TOTALLY viable!</code></pre>
+
+            <h3>The "SFT-Only" Architecture for Small Domains</h3>
+
+            <pre><code># ============================================
+# Complete SFT-only pipeline for small domain
+# ============================================
+
+# Your 100MB raw text
+↓
+# Step 1: Convert to Q&A (using GPT-4 or templates)
+# 100MB text → 20,000 SFT conversation pairs
+↓  
+# Step 2: Add "refusal" examples (optional but recommended)
+# "What's the weather?" → "I specialize in Hindu scriptures. Please ask about that."
+# Add ~500 refusal examples for off-topic queries
+↓
+# Step 3: Add format examples
+# All responses follow YOUR desired format
+# If you want: Verse → Translation → Explanation
+# Then ALL 20,000 examples must follow that format
+↓
+# Step 4: Train on gemma-3-12b-it (already instruct-tuned)
+# No CPT needed! The instruct model already knows general knowledge
+# SFT teaches it YOUR specific style/format/domain focus
+↓
+# Result: Domain-specific model with controlled output format</code></pre>
+
+            <h3>When 100MB is enough vs not enough:</h3>
+
+            <table>
+                <thead>
+                    <tr><th>100MB IS Enough For</th><th>100MB is NOT Enough For</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Teaching a specific output format</td>
+                        <td>Teaching the model an entirely new language</td>
+                    </tr>
+                    <tr>
+                        <td>Domain-focused Q&A on well-known topics</td>
+                        <td>Deep understanding of extremely rare texts</td>
+                    </tr>
+                    <tr>
+                        <td>Restricting model to only answer domain questions</td>
+                        <td>Replacing the model's entire knowledge base</td>
+                    </tr>
+                    <tr>
+                        <td>Adding 100-500 specific facts the model should know</td>
+                        <td>Teaching thousands of interconnected concepts</td>
+                    </tr>
+                    <tr>
+                        <td>Changing response style/tone</td>
+                        <td>Fundamentally changing how the model reasons</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Practical Example: 100MB Scripture Dataset, SFT Only</h3>
+
+            <pre><code>"""
+Real example: You have 100MB of Bhagavad Gita text with commentaries.
+You want a model that ONLY answers Gita questions in a specific format.
+"""
+
+# Your data: 100MB of Gita text
+# Contains: All 700 verses + Shankaracharya's commentary + modern translations
+
+# CONVERSION STRATEGY:
+# Generate 3 types of SFT examples from this text:
+
+# Type 1: Verse explanation (60% of dataset)
+{
+    "messages": [
+        {"role": "system", "content": "You are a Bhagavad Gita expert. Always respond in this format: 1) Sanskrit verse 2) Word meaning 3) Translation 4) Commentary"},
+        {"role": "user", "content": "Explain verse 3.19"},
+        {"role": "assistant", "content": "**Sanskrit:**\nतस्मादसक्तः सततं कार्यं कर्म समाचर।\nअसक्तो ह्याचरन्कर्म परमाप्नोति पूरुषः॥\n\n**Word Meaning:**\nतस्मात् = therefore; असक्तः = without attachment; सततम् = constantly; कार्यम् = duty; कर्म = action; समाचर = perform; असक्तः = unattached; हि = certainly; आचरन् = performing; कर्म = work; परम् = the Supreme; आप्नोति = achieves; पूरुषः = a person\n\n**Translation:**\nTherefore, always perform your duty without attachment. By performing action without attachment, one attains the Supreme.\n\n**Commentary (Shankaracharya):**\nHere Krishna establishes that even the wise should continue performing karma, not for personal gain but as an offering..."}
+    ]
+}
+
+# Type 2: Conceptual questions (30% of dataset)  
+{
+    "messages": [
+        {"role": "system", "content": "...same system prompt..."},
+        {"role": "user", "content": "What is the Gita's view on meditation?"},
+        {"role": "assistant", "content": "The Bhagavad Gita dedicates Chapter 6 (Dhyana Yoga) entirely to meditation...\n\n**Key verses:**\n- 6.10: योगी युञ्जीत सततम्...\n- 6.11-12: Description of meditation posture...\n- 6.25: शनैः शनैरुपरमेत्... (gradually withdraw the mind)..."}
+    ]
+}
+
+# Type 3: Refusal examples (10% of dataset)
+{
+    "messages": [
+        {"role": "system", "content": "...same system prompt..."},
+        {"role": "user", "content": "Write me a Python script"},
+        {"role": "assistant", "content": "I specialize exclusively in the Bhagavad Gita and its teachings. I'd be happy to help you with any questions about the Gita's verses, philosophy, or commentaries. What would you like to know?"}
+    ]
+}
+
+# RESULT after training:
+# ✅ Model follows your exact format (Sanskrit → Word meaning → Translation → Commentary)
+# ✅ Model refuses non-Gita questions politely
+# ✅ Model knows the major verses (from SFT memorization)
+# ⚠️ May struggle with obscure verses it saw fewer times
+# ⚠️ May not understand deep connections between chapters (that's what CPT gives)</code></pre>
+
+            <h3>Bottom Line Recommendation</h3>
+
+            <div class="callout callout-success">
+                <div class="callout-title">🎯 For your situation (100MB, domain-specific)</div>
+                <p><strong>Best approach: SFT only on an instruct model (<code>gemma-3-12b-it</code>)</strong></p>
+                <ol>
+                    <li>Convert your 100MB text into 10,000-30,000 Q&A pairs (use GPT-4 to generate questions)</li>
+                    <li>Make ALL responses follow your desired output format</li>
+                    <li>Add 500-1000 refusal examples for off-topic queries</li>
+                    <li>Train QLoRA for 2-3 epochs (~4-6 hours on A100)</li>
+                </ol>
+                <p><strong>If you want DEEPER knowledge absorption:</strong> Do a quick CPT first (100MB = only ~2-3 hours of CPT), THEN SFT. This gives noticeably better factual accuracy on niche content.</p>
+            </div>
+
+            <hr style="border: 1px solid var(--border); margin: 2rem 0;">
+
+            <!-- ============================================ -->
+            <!-- QUESTION 3 -->
+            <!-- ============================================ -->
+            <h2 id="q3">Q3: What controls the OUTPUT FORMAT specifically? How do I make the model ALWAYS generate in my specific structure?</h2>
+
+            <h3>Short Answer</h3>
+            <p><strong>SFT is the primary mechanism for controlling output format.</strong> The model mimics whatever pattern appears consistently in your training data. 100% of examples in format X → model outputs format X.</p>
+
+            <h3>The Three Layers of Format Control</h3>
+
+            <table>
+                <thead>
+                    <tr><th>Layer</th><th>Method</th><th>Strength</th><th>How</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Layer 1: System Prompt</strong></td>
+                        <td>Tell the model what format to use</td>
+                        <td>🟡 Weak (model may ignore)</td>
+                        <td>Instructions in system message</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Layer 2: SFT Training</strong></td>
+                        <td>Show the model the format 10,000+ times</td>
+                        <td>🟢 Strong (model internalizes pattern)</td>
+                        <td>All training examples follow exact format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Layer 3: DPO Reinforcement</strong></td>
+                        <td>Punish deviations from format</td>
+                        <td>🟢 Very Strong (combines with SFT)</td>
+                        <td>Chosen=correct format, Rejected=wrong format</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Example: Forcing a specific JSON output format</h4>
+            <pre><code># If you want the model to ALWAYS output this exact JSON structure:
+# {"verse": "...", "translation": "...", "explanation": "...", "school": "..."}
+
+# Method 1: SFT — make ALL examples output this JSON
+{
+    "messages": [
+        {"role": "system", "content": "Always respond in JSON format with keys: verse, translation, explanation, school."},
+        {"role": "user", "content": "Gita 2.47"},
+        {"role": "assistant", "content": "{\"verse\": \"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन\", \"translation\": \"You have the right to action alone, not to its fruits\", \"explanation\": \"Krishna establishes the core principle of Nishkama Karma...\", \"school\": \"Karma Yoga\"}"}
+    ]
+}
+
+# Method 2: DPO — reinforce the format (after SFT)
+{
+    "prompt": [{"role": "user", "content": "Gita 2.47"}],
+    "chosen": [{"role": "assistant", "content": "{\"verse\": \"...\", \"translation\": \"...\"}"}],  # Correct JSON
+    "rejected": [{"role": "assistant", "content": "Verse 2.47 says..."}]  # Plain text (wrong format)
+}
+
+# With 5,000+ SFT examples ALL in this JSON format
+# + 1,000 DPO pairs reinforcing it
+# → Model will output valid JSON 95%+ of the time</code></pre>
+
+            <h4>Key Rule: Consistency is everything</h4>
+            <div class="callout callout-info">
+                <div class="callout-title">🔑 The Format Consistency Rule</div>
+                <p>If 100% of your SFT examples follow the same format → model follows it ~95% of the time.<br>
+                If 80% follow format A and 20% follow format B → model randomly picks between them.<br>
+                If formats vary across examples → model generates inconsistent formats.</p>
+                <p><strong>Be obsessively consistent in your training data format.</strong></p>
+            </div>
+
+            <hr style="border: 1px solid var(--border); margin: 2rem 0;">
+
+            <!-- ============================================ -->
+            <!-- QUESTION 0 (from previous chat) -->
+            <!-- ============================================ -->
+            <h2 id="q0">Q0: Is the model from CPT passed to SFT, then SFT model passed to DPO?</h2>
+
+            <h3>Answer</h3>
+            <p><strong>Yes, it's a sequential pipeline.</strong> Each stage builds on the previous one:</p>
+
+            <pre><code>Base Gemma → [CPT] → CPT Model → [SFT] → SFT Model → [DPO] → Final Model
+
+# In code, each stage:
+# 1. Loads the base model
+# 2. Merges the PREVIOUS stage's LoRA adapter into weights
+# 3. Adds FRESH LoRA adapters for the current stage
+# 4. Trains
+# 5. Saves the new adapter
+
+# Example (SFT stage loading CPT result):
+model = AutoModelForCausalLM.from_pretrained(BASE_MODEL)
+model = PeftModel.from_pretrained(model, "checkpoints/cpt_lora/final")  # Load CPT
+model = model.merge_and_unload()  # Bake CPT knowledge into weights
+# Now add fresh LoRA for SFT...
+</code></pre>
+
+            <p>Each stage has a different objective, so it needs its own trainable LoRA parameters. Merging preserves what was learned while giving the next stage a clean slate.</p>
+
+            <hr style="border: 1px solid var(--border); margin: 2rem 0;">
+
+            <!-- ============================================ -->
+            <!-- QUESTION 4 -->
+            <!-- ============================================ -->
+            <h2 id="q4">Q4: Can LoRA/QLoRA be used in ALL stages — CPT, SFT, and DPO?</h2>
+
+            <h3>Short Answer</h3>
+            <p><strong>YES — LoRA and QLoRA work in all three stages (CPT, SFT, DPO).</strong> They are not tied to any specific training method. LoRA is a <em>memory optimization technique</em>, not a training paradigm. You can apply it wherever you'd normally do full fine-tuning.</p>
+
+            <h3>How LoRA/QLoRA Works (The Core Idea)</h3>
+            <div class="callout callout-info">
+                <div class="callout-title">🧠 Simple Analogy</div>
+                <p>Imagine the base model is a <strong>printed textbook</strong> (frozen weights). LoRA adds a small <strong>sticky-note layer</strong> (trainable adapter) on top. You only train the sticky notes — the textbook stays unchanged. At the end, you can "merge" the sticky notes INTO the textbook permanently.</p>
+            </div>
+
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+                <thead><tr style="background:var(--bg-tertiary);">
+                    <th style="padding:12px; border:1px solid var(--border);">Stage</th>
+                    <th style="padding:12px; border:1px solid var(--border);">LoRA/QLoRA?</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Typical LoRA Rank</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Why It Works</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>CPT</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (QLoRA recommended)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">r=64 (higher rank for knowledge absorption)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Needs more capacity to store new knowledge patterns</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>SFT</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (QLoRA recommended)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">r=32 (medium rank for behavior learning)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Learning instruction-following patterns, not raw knowledge</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>DPO</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (QLoRA recommended)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">r=16 (lower rank, subtle preference shifts)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Small adjustments to already-trained behavior</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Code Proof — LoRA in All Three Stages</h3>
+<pre><code class="language-python"># === LoRA config is IDENTICAL in concept for all stages ===
+from peft import LoraConfig, get_peft_model, TaskType
+
+# CPT LoRA (higher rank = more learnable parameters)
+cpt_lora = LoraConfig(
+    r=64, lora_alpha=128,           # rank 64, alpha 2x rank
+    target_modules=["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"],
+    task_type=TaskType.CAUSAL_LM,
+    lora_dropout=0.05
+)
+
+# SFT LoRA (medium rank)
+sft_lora = LoraConfig(
+    r=32, lora_alpha=64,
+    target_modules=["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"],
+    task_type=TaskType.CAUSAL_LM,
+    lora_dropout=0.05
+)
+
+# DPO LoRA (lower rank — only nudging preferences)
+dpo_lora = LoraConfig(
+    r=16, lora_alpha=32,
+    target_modules=["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"],
+    task_type=TaskType.CAUSAL_LM,
+    lora_dropout=0.05
+)
+</code></pre>
+
+            <h3>Full Fine-tuning vs LoRA vs QLoRA</h3>
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+                <thead><tr style="background:var(--bg-tertiary);">
+                    <th style="padding:12px; border:1px solid var(--border);">Method</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Trainable Params</th>
+                    <th style="padding:12px; border:1px solid var(--border);">GPU Memory (27B model)</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Quality</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">Full Fine-tune</td>
+                        <td style="padding:10px; border:1px solid var(--border);">100% (27B params)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~160GB (4× A100)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">100% (best)</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">LoRA (16-bit)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~1-3% (~400M)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~56GB (1× A100)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~95-98%</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>QLoRA (4-bit)</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">~1-3% (~400M)</td>
+                        <td style="padding:10px; border:1px solid var(--border);"><strong>~18-24GB (1× GPU)</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">~93-96%</td></tr>
+                </tbody>
+            </table>
+            <p><strong>Bottom line:</strong> QLoRA gives you 93-96% of full fine-tuning quality at 1/8th the memory cost. It's the default recommendation for all three stages unless you have unlimited GPU budget.</p>
+
+            <hr style="border: 1px solid var(--border); margin: 2rem 0;">
+
+            <!-- ============================================ -->
+            <!-- QUESTION 5 -->
+            <!-- ============================================ -->
+            <h2 id="q5">Q5: In SFT, does the model REMEMBER answers? What does "loss on assistant responses only" mean? Are questions not learned? What exactly goes into the model?</h2>
+
+            <h3>The Fundamental Truth</h3>
+            <div class="callout callout-warning">
+                <div class="callout-title">⚡ Key Insight</div>
+                <p>The model does NOT "memorize" your Q&A pairs like a database. It learns <strong>patterns of how to respond</strong>. When a user asks a similar question, the model <strong>generates</strong> an answer based on learned patterns — it doesn't "look up" a stored answer.</p>
+            </div>
+
+            <h3>What "Cross-Entropy Loss on Assistant Responses Only" Means</h3>
+            <p>This is the most important concept to understand. Let's break it down technically:</p>
+
+            <h4>Step 1: How a Training Example Looks in Memory</h4>
+<pre><code class="language-text">Token positions:   [0]   [1]    [2]    [3]    [4]    [5]    [6]   [7]   [8]   [9]   [10]  [11]  [12]
+Tokens:           &lt;bos&gt; &lt;user&gt;  What   is     karma  ?    &lt;/user&gt; &lt;assistant&gt; Karma  is   the   law  ...
+Labels:            -100  -100   -100   -100   -100   -100  -100    -100   Karma  is   the   law  ...
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   MASKED (ignored)                                          LEARNED (loss computed here)
+</code></pre>
+
+            <h4>Step 2: What "-100" Means</h4>
+            <p>In PyTorch, label = <code>-100</code> means <strong>"ignore this token during loss computation."</strong> The model sees the question tokens as INPUT CONTEXT, but is NOT penalized for predicting them. It is ONLY penalized for getting the ANSWER tokens wrong.</p>
+
+<pre><code class="language-python"># This is what happens inside the training loop (simplified):
+
+def compute_sft_loss(model, input_ids, labels):
+    """
+    input_ids = full sequence [user_question + assistant_answer]
+    labels = [-100, -100, ..., answer_token_1, answer_token_2, ...]
+    """
+    # Model sees EVERYTHING (question + answer) as input context
+    logits = model(input_ids)  # Shape: [seq_len, vocab_size]
+    
+    # But loss is ONLY computed on non-(-100) positions
+    loss = CrossEntropyLoss(ignore_index=-100)(
+        logits.view(-1, vocab_size),
+        labels.view(-1)
+    )
+    # This means: "How well did the model predict each ANSWER token,
+    #              given all the tokens that came before it?"
+    return loss
+</code></pre>
+
+            <h4>Step 3: So Does the Model "See" the Question?</h4>
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+                <thead><tr style="background:var(--bg-tertiary);">
+                    <th style="padding:12px; border:1px solid var(--border);">Aspect</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Question Tokens</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Answer Tokens</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">Fed as input?</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">Attention computed?</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (model reads it)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">Loss computed?</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ No (label = -100)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">Gradients flow?</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Partially (via attention)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Fully</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">Model learns from it?</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Indirectly (as context pattern)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Directly</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🎯 Plain English</div>
+                <p>The model learns: <em>"When I see a question like X, I should generate text like Y."</em> It does NOT learn: <em>"The answer to X is Y"</em> (that's a database, not a language model).</p>
+            </div>
+
+            <h3>Will the Model Give the EXACT Same Answer?</h3>
+            <p><strong>No.</strong> Here's what actually happens:</p>
+
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+                <thead><tr style="background:var(--bg-tertiary);">
+                    <th style="padding:12px; border:1px solid var(--border);">Scenario</th>
+                    <th style="padding:12px; border:1px solid var(--border);">What Happens</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Example</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">User asks EXACT same question from training</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Model generates a <strong>similar</strong> answer (not exact copy)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">"What is karma?" → Answer about karma with similar content but different wording</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">User asks a PARAPHRASED question</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Model generalizes and answers correctly</td>
+                        <td style="padding:10px; border:1px solid var(--border);">"Explain the concept of karma" → Same topic, adapted response</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">User asks something NEVER in training</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Model extrapolates from similar patterns</td>
+                        <td style="padding:10px; border:1px solid var(--border);">"How does karma relate to dharma?" → May answer well IF both concepts were in different training examples</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Technical Deep Dive: What Exactly Gets Updated in the Model?</h3>
+
+<pre><code class="language-python"># === WHAT HAPPENS DURING ONE SFT TRAINING STEP ===
+
+# 1. Forward pass — model processes full sequence
+input_ids = tokenize("&lt;user&gt;What is karma?&lt;/user&gt;&lt;assistant&gt;Karma is the universal law of cause and effect...&lt;/assistant&gt;")
+labels =    [-100, -100, -100, -100, -100, -100, 42, 318, 627, ...]  # Only answer token IDs
+
+outputs = model(input_ids=input_ids, labels=labels)
+loss = outputs.loss  # Cross-entropy on answer tokens only
+
+# 2. Backward pass — compute gradients
+loss.backward()
+# Gradients tell each weight: "move this direction to make the answer more likely"
+
+# 3. Optimizer step — UPDATE the LoRA weights
+optimizer.step()
+# The LoRA adapter weights (A and B matrices) get updated
+# Base model weights STAY FROZEN
+
+# === WHAT CHANGES IN THE MODEL? ===
+# BEFORE training: model.layers[15].self_attn.q_proj.lora_A = [random small values]
+# AFTER training:  model.layers[15].self_attn.q_proj.lora_A = [values that encode pattern:
+#                   "when question about karma → generate answer about cause/effect"]
+</code></pre>
+
+            <h3>Comparison: What Each Stage Learns FROM Your Data</h3>
+
+<pre><code class="language-python"># ╔══════════════════════════════════════════════════════════════════╗
+# ║  CPT — Learns RAW TEXT (reads everything, labels = input_ids)  ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+# Training data format: Just plain text
+text = "कर्म का सिद्धांत भगवद्गीता में विस्तार से बताया गया है। कर्म का अर्थ है..."
+
+input_ids = tokenize(text)
+labels = input_ids.clone()  # ← ALL tokens are labels! Model learns to predict EVERY next word
+
+# What the model learns: raw language patterns, vocabulary, facts, grammar
+# Like: "reading a book cover to cover"
+
+
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║  SFT — Learns RESPONSES ONLY (questions masked with -100)      ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+# Training data format: Conversation with roles
+messages = [
+    {"role": "user", "content": "What is karma according to Gita?"},
+    {"role": "assistant", "content": "According to Bhagavad Gita, karma is..."}
+]
+
+input_ids = tokenize(apply_chat_template(messages))
+labels = mask_user_tokens(input_ids)  # User tokens → -100, assistant tokens → actual IDs
+
+# What the model learns: HOW to respond to questions (style, format, behavior)
+# Like: "learning how a teacher answers questions"
+
+
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║  DPO — Learns PREFERENCES (which response is better)           ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+# Training data format: Same question + two answers (chosen vs rejected)
+example = {
+    "prompt": "What is karma?",
+    "chosen": "Karma, as explained in BG 3.9, is selfless action...",  # Good answer
+    "rejected": "Karma means what goes around comes around lol"         # Bad answer
+}
+
+# DPO Loss (simplified):
+loss = -log(sigmoid(
+    beta * (log_prob_chosen - log_prob_ref_chosen) -
+    beta * (log_prob_rejected - log_prob_ref_rejected)
+))
+
+# What the model learns: "prefer response A over response B"
+# It does NOT learn new facts. It learns WHICH STYLE of answer is better.
+# Like: "a teacher grading papers — learning what makes a good vs bad answer"
+</code></pre>
+
+            <h3>The Key Differences in One Table</h3>
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+                <thead><tr style="background:var(--bg-tertiary);">
+                    <th style="padding:12px; border:1px solid var(--border);">Aspect</th>
+                    <th style="padding:12px; border:1px solid var(--border);">CPT</th>
+                    <th style="padding:12px; border:1px solid var(--border);">SFT</th>
+                    <th style="padding:12px; border:1px solid var(--border);">DPO</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>What tokens have loss?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">ALL tokens</td>
+                        <td style="padding:10px; border:1px solid var(--border);">ONLY assistant tokens</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Comparison between 2 responses</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Learns new facts?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (deeply)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Somewhat (shallow)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ No</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Learns behavior?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ No</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (primary purpose)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (refines)</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Questions learned?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">N/A (no questions)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ Not directly (masked)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ Not directly</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Model sees questions?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">N/A</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (as attention context)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (as prompt context)</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Analogy</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">Reading a book</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Learning how a teacher talks</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Grading papers (good vs bad)</td></tr>
+                </tbody>
+            </table>
+
+            <h3>So Why Are Questions Even Included If They're Not Learned?</h3>
+            <p>Great question! The questions serve as <strong>conditional context</strong>:</p>
+            <ul>
+                <li>The model learns: "GIVEN this type of question → produce this type of answer"</li>
+                <li>Without the question, the model wouldn't know WHEN to produce the answer</li>
+                <li>The attention mechanism connects question tokens to answer tokens during forward pass</li>
+                <li>So indirectly, the model learns to RECOGNIZE question patterns — it just isn't EXPLICITLY trained to GENERATE them</li>
+            </ul>
+
+<pre><code class="language-python"># Think of it like a conditional probability:
+# CPT learns:   P(next_token | all_previous_tokens)    — for ALL tokens
+# SFT learns:   P(answer_token | question + previous_answer_tokens) — for ANSWER tokens only
+# DPO learns:   P(chosen > rejected | question)        — preference ranking
+</code></pre>
+
+            <h3>Practical Implication for Your Hindu Scriptures Project</h3>
+            <div class="callout callout-success">
+                <div class="callout-title">✅ What This Means for You</div>
+                <p>If you train SFT with 10,000 Q&A pairs about Hindu scriptures:</p>
+                <ul>
+                    <li>The model learns to <strong>respond in your desired style</strong> (scholarly, respectful, with citations)</li>
+                    <li>It learns <strong>SOME facts</strong> from the answers (shallow knowledge)</li>
+                    <li>It does NOT memorize exact answers — it generates similar ones</li>
+                    <li>For DEEP knowledge (knowing all verses, cross-references, etc.) → you still need CPT first</li>
+                    <li>The questions teach the model what <strong>TRIGGERS</strong> each type of answer</li>
+                </ul>
+            </div>
+
+            <hr style="border: 1px solid var(--border); margin: 2rem 0;">
+
+            <!-- ============================================ -->
+            <!-- QUESTION 6 -->
+            <!-- ============================================ -->
+            <h2 id="q6">Q6: If I provide 500K examples to ANY stage (CPT, SFT, DPO), will the model learn the same? Does enough data make all stages equivalent? How to maximize each?</h2>
+
+            <h3>The Definitive Answer: NO — More Data Does NOT Make Stages Equivalent</h3>
+            <div class="callout callout-danger">
+                <div class="callout-title">🚫 Critical Misconception</div>
+                <p>Even with 500K, 1M, or 10M examples, <strong>each stage learns DIFFERENT things because the loss function is different.</strong> The amount of data affects HOW WELL the model learns — but the WHAT it learns is locked by the training objective.</p>
+            </div>
+
+            <h3>The Mathematical Proof: Why Stages Can Never Be Equivalent</h3>
+
+<pre><code class="language-python"># ═══════════════════════════════════════════════════════════════
+# THE FUNDAMENTAL DIFFERENCE: WHAT THE LOSS FUNCTION "SEES"
+# ═══════════════════════════════════════════════════════════════
+
+# === CPT with 500K passages ===
+# Loss: predict EVERY next token in raw text
+# Input:  "कर्म का सिद्धांत भगवद्गीता में विस्तार से बताया गया है"
+# Labels: "कर्म का सिद्धांत भगवद्गीता में विस्तार से बताया गया है"
+#          ↑ ALL tokens contribute to loss
+# 
+# What 500K passages teach: vocabulary, grammar, facts, relationships, 
+# context, writing style, cross-references between concepts
+# 
+# Total tokens trained on: ~500K × 512 avg tokens = 256 MILLION tokens of knowledge
+
+
+# === SFT with 500K Q&A pairs ===
+# Loss: predict ONLY assistant response tokens
+# Input:  "<user>What is karma?</user><assistant>Karma is the law of...</assistant>"
+# Labels: [-100, -100, -100, -100, -100,  Karma, is, the, law, of, ...]
+#          ↑ user tokens IGNORED           ↑ ONLY these count
+#
+# What 500K pairs teach: how to RESPOND, output style, format, behavior patterns
+# Knowledge absorbed: ONLY what appears in assistant responses
+#
+# Total tokens trained on: ~500K × 256 avg response tokens = 128 MILLION tokens
+# BUT these are RESPONSE tokens, not raw knowledge tokens
+# The model learns "how to say it" more than "what to say"
+
+
+# === DPO with 500K preference pairs ===
+# Loss: log probability RATIO between chosen and rejected
+# Input:  prompt + chosen_response + rejected_response  
+# Labels: NONE in the traditional sense — it's a COMPARISON
+#
+# loss = -log(σ(β × (log_π(chosen) - log_π_ref(chosen) - log_π(rejected) + log_π_ref(rejected))))
+#
+# What 500K pairs teach: "response A is better than response B"
+# Knowledge absorbed: ZERO new knowledge — only preference rankings
+#
+# Total NEW knowledge learned: essentially 0
+# It redistributes probability among things the model ALREADY knows
+</code></pre>
+
+            <h3>Visual: What 500K Examples Teach in Each Stage</h3>
+
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+                <thead><tr style="background:var(--bg-tertiary);">
+                    <th style="padding:12px; border:1px solid var(--border);">With 500K Examples...</th>
+                    <th style="padding:12px; border:1px solid var(--border);">CPT</th>
+                    <th style="padding:12px; border:1px solid var(--border);">SFT</th>
+                    <th style="padding:12px; border:1px solid var(--border);">DPO</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>New facts learned?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ 500K passages worth of knowledge (MASSIVE)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Some facts from responses (limited)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ Zero new facts</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Behavior/format learned?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ No (it just reads text, no instruction-following)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Extremely strong (500K examples = near-perfect format)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Very strong preference (but needs SFT base first)</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Generalization?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Excellent (understands connections between concepts)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Good (if questions are diverse enough)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Limited (only compares, doesn't generalize knowledge)</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Can answer unseen questions?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Yes (has deep understanding of domain)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Somewhat (if similar patterns exist in training)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Only if it already could before DPO</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Training time (A100)</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">~48-72 hours</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~24-48 hours</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~36-60 hours (processes 2 responses per example)</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>Diminishing returns start at?</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">~1B tokens (keep going if data is good)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~50K-100K examples (more helps less after this)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~10K-50K pairs (very fast diminishing returns)</td></tr>
+                </tbody>
+            </table>
+
+            <h3>The Analogy That Makes It Click</h3>
+            <div class="callout callout-info">
+                <div class="callout-title">📚 University Analogy</div>
+                <p>Imagine training a student to become a Hindu philosophy professor:</p>
+                <ul>
+                    <li><strong>CPT (500K passages)</strong> = Making the student <strong>READ 500K pages of scripture and commentary</strong>. After this, they deeply KNOW the material — every verse, every interpretation, connections between ideas. But they don't know how to TEACH yet.</li>
+                    <li><strong>SFT (500K Q&A)</strong> = Giving the student <strong>500K example teacher-student conversations</strong> to study. They learn how a great teacher TALKS — structure, tone, citing sources. They pick up SOME knowledge from the answers, but they haven't read the source texts themselves. It's secondhand knowledge.</li>
+                    <li><strong>DPO (500K preferences)</strong> = Giving the student <strong>500K graded papers</strong> saying "this answer is A+, this is F." They learn what GOOD vs BAD teaching looks like. But they don't learn new facts — they learn quality standards.</li>
+                </ul>
+                <p><strong>No amount of graded papers (DPO) will teach you Sanskrit.</strong> No amount of example conversations (SFT) will give you the same depth as reading the actual texts (CPT). They are DIFFERENT skills.</p>
+            </div>
+
+            <h3>Experiment: Same 500K Data Points, Different Stages — What Happens?</h3>
+
+<pre><code class="language-python"># ═══════════════════════════════════════════════════════════════
+# THOUGHT EXPERIMENT: Same content, 3 different training formats
+# ═══════════════════════════════════════════════════════════════
+
+# Source material: "Karma is the law of cause and effect in Hindu philosophy.
+# Every action (karma) produces a result (phala). Good actions lead to good results."
+
+# ─────────────────────────────────────────────────────────
+# FORMAT 1: As CPT data (raw text)
+# ─────────────────────────────────────────────────────────
+cpt_data = "Karma is the law of cause and effect in Hindu philosophy. Every action (karma) produces a result (phala). Good actions lead to good results."
+
+# Loss computed on: EVERY token (25 tokens)
+# Model learns: "karma" → "is" → "the" → "law" → "of" → "cause" → "and" → "effect"
+#               + "action" → "produces" → "a" → "result"
+#               + The PATTERN that karma relates to cause/effect/actions/results
+# RESULT: Deep understanding. Can answer ANY question about karma from first principles.
+
+
+# ─────────────────────────────────────────────────────────
+# FORMAT 2: As SFT data (Q&A conversation)
+# ─────────────────────────────────────────────────────────
+sft_data = {
+    "messages": [
+        {"role": "user", "content": "What is karma in Hindu philosophy?"},
+        {"role": "assistant", "content": "Karma is the law of cause and effect in Hindu philosophy. Every action (karma) produces a result (phala). Good actions lead to good results."}
+    ]
+}
+
+# Loss computed on: ONLY assistant tokens (25 tokens) — question tokens MASKED
+# Model learns: "When someone asks about karma → generate this type of response"
+# RESULT: Can answer "What is karma?" well. But might struggle with:
+#         "What is phala?" (phala appeared in an answer, not as a standalone topic)
+#         "Explain the relationship between karma and results" (different framing)
+
+
+# ─────────────────────────────────────────────────────────
+# FORMAT 3: As DPO data (preference pair)
+# ─────────────────────────────────────────────────────────
+dpo_data = {
+    "prompt": "What is karma?",
+    "chosen": "Karma is the law of cause and effect in Hindu philosophy. Every action (karma) produces a result (phala). Good actions lead to good results.",
+    "rejected": "Karma is like what goes around comes around, you know? Do good stuff and good things happen I guess."
+}
+
+# Loss computed on: log probability DIFFERENCE between chosen and rejected
+# Model learns: "The detailed, scholarly response is BETTER than the casual one"
+# But does NOT learn the CONTENT of karma from scratch
+# RESULT: If model already vaguely knew about karma → now it prefers the scholarly style
+#         If model had NO knowledge of karma → still doesn't know karma (just ranks two responses)
+</code></pre>
+
+            <h3>Concrete Results: Testing Each With the SAME 500K Data Points</h3>
+
+<pre><code class="language-python"># After training 500K examples in each stage, test with:
+# "What is the relationship between nishkama karma and moksha?"
+# (A question that requires CONNECTING two concepts)
+
+# ─── CPT Model Response ───
+# "Nishkama karma (selfless action without attachment to results) is described
+#  in the Bhagavad Gita as one of the primary paths to moksha (liberation).
+#  When one performs karma without desire for phala, the cycle of samsara
+#  is gradually broken. Chapter 3, verse 19 states: 'tasmad asaktah satatam
+#  karyam karma samachara' — therefore, always perform action without attachment.
+#  This connects to moksha because attachment (raga) is what binds the atman..."
+# → DEEP, interconnected knowledge. Can synthesize across concepts.
+
+# ─── SFT Model Response ───
+# "Nishkama karma refers to selfless action. In Hindu philosophy, performing
+#  actions without attachment to their fruits is considered a path to moksha.
+#  Good actions lead to good results, and selfless action purifies the mind."
+# → Correct but SHALLOW. Uses memorized phrases. Doesn't weave concepts together deeply.
+# → Note: it repeats "Good actions lead to good results" from training data verbatim.
+
+# ─── DPO Model Response ───
+# (Assuming model had some prior knowledge from base training)
+# "Nishkama karma is the practice of selfless action. It relates to moksha
+#  as a means of spiritual liberation through detachment from material outcomes."
+# → Stylistically good (learned "scholarly" preference) but no DEEPER knowledge 
+#   than what the model already had before DPO training.
+# → If base model didn't know this topic: may hallucinate or give generic answer.
+</code></pre>
+
+            <h3>Why More Data Has Diminishing Returns (Differently for Each Stage)</h3>
+
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+                <thead><tr style="background:var(--bg-tertiary);">
+                    <th style="padding:12px; border:1px solid var(--border);">Data Amount</th>
+                    <th style="padding:12px; border:1px solid var(--border);">CPT Effect</th>
+                    <th style="padding:12px; border:1px solid var(--border);">SFT Effect</th>
+                    <th style="padding:12px; border:1px solid var(--border);">DPO Effect</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">1K examples</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Barely any knowledge</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Basic format learning</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Slight preference shift</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">10K examples</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Some domain vocabulary</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Good format + some facts</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Clear preference alignment</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">50K examples</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Solid domain knowledge</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Strong format + good coverage</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Near-optimal (diminishing)</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>100K examples</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">Strong domain expertise</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Excellent (diminishing starts)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Overfitting risk</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);"><strong>500K examples</strong></td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Expert-level knowledge</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Marginal gains, risk of overfitting</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ Likely overfitting / reward hacking</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">1M+ examples</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Still improving (if data is diverse)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ Overfitting unless very diverse</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ Broken (reward hacking, degenerate outputs)</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Key Insight: More Data ≠ Better in SFT and DPO</div>
+                <p><strong>CPT</strong> scales almost linearly with more data — more text = more knowledge. This is why companies train on trillions of tokens.</p>
+                <p><strong>SFT</strong> hits diminishing returns around 50K-100K examples. After that, the model already knows your format/style. More data mainly helps coverage (diversity of questions), not depth.</p>
+                <p><strong>DPO</strong> hits diminishing returns FAST (10K-50K). Too much DPO data causes "reward hacking" — the model finds shortcuts to satisfy preferences without genuine quality.</p>
+            </div>
+
+            <h3>How to MAXIMIZE Effectiveness of Each Stage</h3>
+
+            <h4>Maximizing CPT (Knowledge Absorption)</h4>
+<pre><code class="language-python"># ═══════════════════════════════════════════════════════════
+# MAXIMIZE CPT EFFECTIVENESS
+# ═══════════════════════════════════════════════════════════
+
+# 1. DATA QUALITY over quantity
+#    - Remove duplicates (model wastes capacity re-learning same text)
+#    - Remove garbage (OCR errors, broken encoding, irrelevant content)
+#    - Use high-quality sources (commentaries > random blog posts)
+
+# 2. DATA DIVERSITY
+#    - Mix multiple scriptures (Gita, Upanishads, Vedas, Puranas)
+#    - Include multiple languages if relevant (Sanskrit, Hindi, English)
+#    - Include different commentary styles
+
+# 3. CURRICULUM LEARNING (train easy → hard)
+training_stages = [
+    # Phase 1: Simple, modern Hindi/English text about scriptures
+    {"data": "modern_commentaries.jsonl", "epochs": 1},
+    # Phase 2: Mixed Sanskrit-Hindi texts
+    {"data": "mixed_sanskrit_hindi.jsonl", "epochs": 1},
+    # Phase 3: Dense classical Sanskrit texts
+    {"data": "classical_sanskrit.jsonl", "epochs": 2},
+]
+
+# 4. OPTIMAL HYPERPARAMETERS for max knowledge
+cpt_config = {
+    "lora_r": 64,              # High rank = more capacity for knowledge
+    "learning_rate": 2e-4,     # Standard for CPT
+    "max_seq_length": 4096,    # Longer = more context understanding
+    "num_epochs": 2,           # 2 passes over data (not more — overfitting risk)
+    "warmup_ratio": 0.05,      # Gentle start
+    "weight_decay": 0.01,      # Prevent memorization of exact text
+}
+
+# 5. CHUNKING STRATEGY (how you split text matters!)
+#    BAD:  Cut text at random positions (breaks meaning)
+#    GOOD: Cut at paragraph/section boundaries
+#    BEST: Use overlapping chunks (stride 256 tokens with 512 window)
+</code></pre>
+
+            <h4>Maximizing SFT (Behavior Learning)</h4>
+<pre><code class="language-python"># ═══════════════════════════════════════════════════════════
+# MAXIMIZE SFT EFFECTIVENESS
+# ═══════════════════════════════════════════════════════════
+
+# 1. DIVERSITY OF QUESTIONS IS KEY (not just quantity)
+#    Bad:  500K examples all asking "What is verse X.Y?"
+#    Good: 50K examples with 20 different question TYPES
+
+question_types = [
+    "What is [concept]?",                    # Definition
+    "Explain verse X.Y",                     # Verse explanation
+    "Compare [concept A] with [concept B]",  # Comparison
+    "What does [scripture] say about [topic]?", # Reference lookup
+    "How does [concept] apply to modern life?", # Application
+    "What are the different schools' views on [topic]?", # Analysis
+    "Summarize chapter X of [scripture]",    # Summarization
+    "Who said [quote] and what did they mean?", # Attribution
+    "What is the Sanskrit term for [concept]?", # Terminology
+    "List the key teachings of [text]",      # Enumeration
+    # ... etc.
+]
+
+# 2. RESPONSE QUALITY over quantity
+#    1 excellent response > 10 mediocre responses
+#    The model COPIES what it sees — give it only your BEST examples
+
+# 3. HARD NEGATIVE MINING — include examples the model would get WRONG
+#    Find questions where the base model gives bad answers → correct them in SFT
+
+# 4. SYSTEM PROMPT CONSISTENCY
+#    Use the SAME system prompt in ALL examples (or the model gets confused)
+system_prompt = "You are a Hindu scripture expert. Always respond with: 1) Sanskrit verse 2) Translation 3) Commentary. Cite specific chapter and verse numbers."
+# This EXACT prompt must appear in every single training example
+
+# 5. MULTI-TURN CONVERSATIONS (not just single-turn Q&A)
+multi_turn = {
+    "messages": [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": "What is karma?"},
+        {"role": "assistant", "content": "Karma (कर्म) literally means 'action'..."},
+        {"role": "user", "content": "How does it relate to dharma?"},
+        {"role": "assistant", "content": "Karma and dharma are deeply connected..."},
+        {"role": "user", "content": "Which verse explains this best?"},
+        {"role": "assistant", "content": "BG 3.35 states: श्रेयान्स्वधर्मो विगुणः..."}
+    ]
+}
+# Multi-turn teaches the model to maintain CONTEXT across conversation
+
+# 6. OPTIMAL HYPERPARAMETERS for max behavior learning
+sft_config = {
+    "lora_r": 32,              # Medium rank (behavior doesn't need as much capacity)
+    "learning_rate": 1e-4,     # Slightly lower than CPT (more careful learning)
+    "max_seq_length": 2048,    # Conversations are shorter than raw text
+    "num_epochs": 3,           # 3 epochs is usually optimal for SFT
+    "warmup_ratio": 0.03,
+    "weight_decay": 0.01,
+    "assistant_only_loss": True,  # CRITICAL — only learn from responses
+}
+</code></pre>
+
+            <h4>Maximizing DPO (Preference Alignment)</h4>
+<pre><code class="language-python"># ═══════════════════════════════════════════════════════════
+# MAXIMIZE DPO EFFECTIVENESS
+# ═══════════════════════════════════════════════════════════
+
+# 1. QUALITY OF PAIRS MATTERS MORE THAN QUANTITY
+#    - chosen and rejected should differ in ONE clear dimension
+#    - If they're too different → model can't identify what makes chosen better
+#    - If they're too similar → model can't distinguish them
+
+# GOOD pair (differs in ONE aspect: citation accuracy)
+good_pair = {
+    "prompt": "What does Gita say about desire?",
+    "chosen": "BG 2.62-63 describes the chain: 'ध्यायतो विषयान्पुंसः सङ्गस्तेषूपजायते। सङ्गात्सञ्जायते कामः...' — contemplating objects leads to attachment, attachment leads to desire...",
+    "rejected": "The Gita talks about desire being the root of suffering. It says we should detach from worldly things and seek inner peace through meditation."
+}
+# Clear preference signal: cited verse vs vague summary
+
+# BAD pair (too many differences — model doesn't know what to learn)
+bad_pair = {
+    "prompt": "What is yoga?",
+    "chosen": "Yoga is defined in BG 2.48 as 'samatvam yoga uchyate' (equanimity is yoga). The Gita presents multiple paths: Karma Yoga (action), Jnana Yoga (knowledge), Bhakti Yoga (devotion), and Dhyana Yoga (meditation). Each suits different temperaments as described in Chapter 3, 4, 12, and 6 respectively.",
+    "rejected": "yoga is exercise basically. u do stretches and breathing. its from india."
+}
+# Too obvious — model doesn't learn nuanced preferences from this
+
+# 2. USE YOUR OWN MODEL'S OUTPUTS as rejected (on-policy DPO)
+# Generate responses from your SFT model → keep good ones as chosen, bad ones as rejected
+# This is called "on-policy" DPO and is much more effective than synthetic pairs
+
+# 3. FOCUS DPO on specific improvements:
+dpo_objectives = [
+    "Always cite chapter:verse numbers",          # Accuracy
+    "Use respectful language about deities",      # Tone
+    "Include Sanskrit with translation",          # Format
+    "Acknowledge multiple interpretations",       # Depth
+    "Refuse to answer non-scripture questions",   # Boundaries
+]
+# Create 2K-5K pairs for EACH objective = total 10K-25K pairs (plenty for DPO)
+
+# 4. OPTIMAL HYPERPARAMETERS
+dpo_config = {
+    "lora_r": 16,              # Low rank (subtle adjustments only)
+    "learning_rate": 5e-5,     # MUCH lower than SFT (gentle nudges)
+    "beta": 0.1,               # KL penalty coefficient (higher = more conservative)
+    "max_seq_length": 2048,
+    "num_epochs": 1,           # Usually 1 epoch is enough for DPO!
+    "warmup_ratio": 0.1,      # More warmup (DPO is sensitive to early training)
+}
+
+# 5. NEVER do DPO without SFT first
+# DPO assumes the model ALREADY generates reasonable outputs
+# If your model can't answer questions at all → DPO is useless
+# Pipeline: CPT → SFT → THEN DPO
+</code></pre>
+
+            <h3>Practical Reality: What Actually Works in Industry</h3>
+
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+                <thead><tr style="background:var(--bg-tertiary);">
+                    <th style="padding:12px; border:1px solid var(--border);">Scenario</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Practical Data Amounts</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Time & Cost</th>
+                    <th style="padding:12px; border:1px solid var(--border);">Quality Result</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">CPT: 500K passages (~2GB text)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Very good for domain expertise</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~$200-500 on cloud GPUs (48-72h on A100)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Expert-level domain knowledge</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">SFT: 50K-100K pairs (optimal range)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Sweet spot — more doesn't help much</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~$50-150 (8-24h on A100)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Excellent instruction-following</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">SFT: 500K pairs (overkill)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">Marginal improvement over 100K</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~$200-400 (48-72h on A100)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ ~5% better than 100K at 5x cost</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">DPO: 10K-25K pairs (optimal)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">This is the industry standard</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~$30-80 (6-12h on A100)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">✅ Clear preference alignment</td></tr>
+                    <tr><td style="padding:10px; border:1px solid var(--border);">DPO: 500K pairs (dangerous)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">⚠️ Risk of reward hacking</td>
+                        <td style="padding:10px; border:1px solid var(--border);">~$300-600 (48-72h on A100)</td>
+                        <td style="padding:10px; border:1px solid var(--border);">❌ Likely WORSE than 25K (overfitted)</td></tr>
+                </tbody>
+            </table>
+
+            <h3>The Optimal Pipeline for YOUR Project (Hindu Scriptures)</h3>
+            <div class="callout callout-success">
+                <div class="callout-title">🎯 Recommended Data Allocation</div>
+<pre><code># YOUR OPTIMAL PIPELINE:
+# Total budget: ~$300-500, ~1 week training time
+
+# Stage 1: CPT (the MORE the better)
+cpt_data = "All scripture text you can get"     # 200MB-2GB of raw text
+cpt_examples = "As many passages as possible"   # 100K-1M text chunks
+# This is where you pour ALL your raw content
+
+# Stage 2: SFT (quality over quantity)
+sft_data = "Carefully curated Q&A pairs"        # 20K-50K conversations
+# Focus on DIVERSITY of question types, not raw count
+# 20K excellent examples > 500K mediocre ones
+
+# Stage 3: DPO (small but targeted)
+dpo_data = "Specific preference corrections"    # 5K-15K pairs
+# Focus on the specific behaviors you want to improve
+# "More scholarly" vs "casual" — NOT trying to teach facts
+
+# ═══════════════════════════════════════════════════════════
+# COST-EFFECTIVE APPROACH:
+# CPT: 500K passages  →  $200 (where knowledge lives)
+# SFT: 30K Q&A pairs  →  $80  (where behavior lives)
+# DPO: 10K pref pairs →  $40  (where polish lives)
+# Total:              →  $320 for expert-level model
+# ═══════════════════════════════════════════════════════════</code></pre>
+            </div>
+
+            <h3>Final Answer to "Will the model learn the same in any stage?"</h3>
+            <div class="callout callout-danger">
+                <div class="callout-title">🔴 ABSOLUTE NO</div>
+                <p>Even with unlimited data:</p>
+                <ul>
+                    <li><strong>CPT with 500K</strong> = Model becomes a domain EXPERT (knows everything)</li>
+                    <li><strong>SFT with 500K</strong> = Model becomes a perfect FORMAT FOLLOWER (knows how to respond, with some surface knowledge)</li>
+                    <li><strong>DPO with 500K</strong> = Model becomes (potentially broken from) over-aligned preferences with NO new knowledge</li>
+                </ul>
+                <p>They are <strong>fundamentally different tools</strong>. The loss function determines WHAT is learned. Data quantity determines HOW WELL it's learned. <strong>You cannot substitute one for another regardless of data size.</strong></p>
+            </div>
+
+            <hr style="border: 1px solid var(--border); margin: 2rem 0;">
+
+            <div class="callout callout-info">
+                <div class="callout-title">📝 This page is a living document</div>
+                <p>New questions will be added here as they come up during the learning process. Use the table of contents above to jump to specific questions.</p>
+            </div>
+
+            <nav class="page-nav">
+                <a href="12-cpt-vs-sft-vs-dpo.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">CPT vs SFT vs DPO</span>
+                </a>
+                <a href="index.html" style="text-align: right;">
+                    <span class="nav-label">Back to →</span>
+                    <span class="nav-title">Home</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

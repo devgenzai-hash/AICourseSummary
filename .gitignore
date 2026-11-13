@@ -1,0 +1,14 @@
+/PROTEIN_BISCUITS_SNACKS_BRAND_RESEARCH_REPORT.md
+node_modules/
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+test-results/
+playwright-report/
+.pytest_cache/
+test_framework/
+skills\ai_coding_harness\__pycache__
+skills\ai_coding_harness\.env
+skills\.copilot

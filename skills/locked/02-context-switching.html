@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Switching - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced • 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Ampltic</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Context Switching</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Context Switching and Its Cost</h1>
+                <p class="subtitle">Every time a CPU switches from one task to another, it pays a hidden tax. Understanding this cost is why you don't just throw more threads at a problem.</p>
+                <div class="tag-row">
+                    <span class="tag tag-beginner">Beginner</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-production">Production</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: The Chef Switching Dishes</div>
+                <p>Imagine a chef cooking 5 dishes at once. Every time they switch from chopping vegetables to stirring soup, they have to:</p>
+                <ul>
+                    <li><strong>Put down the knife</strong> (save current state)</li>
+                    <li><strong>Remember where they were</strong> with the vegetables (save progress)</li>
+                    <li><strong>Pick up the spoon</strong> (load new tool)</li>
+                    <li><strong>Remember the soup recipe</strong> (load new context)</li>
+                    <li><strong>Figure out where they left off</strong> with the soup (restore state)</li>
+                </ul>
+                <p>Each switch takes <strong>real time</strong>. If the chef switches between dishes every 2 seconds, they spend more time switching than cooking. This is exactly what happens when a CPU has too many threads — it spends more time switching between them than actually running code.</p>
+            </div>
+
+            <h2>What Is Context Switching?</h2>
+            <p>A <strong>context switch</strong> happens when the operating system stops one thread/process and starts running another one on the same CPU core. The OS must:</p>
+            <ol>
+                <li><strong>Save the state</strong> of the currently running thread (registers, program counter, stack pointer)</li>
+                <li><strong>Update the scheduler</strong> data structures (bookkeeping)</li>
+                <li><strong>Load the state</strong> of the next thread to run (its registers, program counter)</li>
+                <li><strong>Resume execution</strong> of the new thread from where it left off</li>
+            </ol>
+
+            <p>This happens <strong>thousands of times per second</strong> on a typical system. The OS scheduler typically gives each thread a time slice (quantum) of 1-10 milliseconds before switching.</p>
+
+            <h2>The Hidden Costs</h2>
+
+            <h3>Direct Costs (the obvious ones)</h3>
+            <ul>
+                <li><strong>Register save/restore</strong> — ~1 microsecond to save and load all CPU registers</li>
+                <li><strong>Kernel mode transition</strong> — Switching from user space to kernel space and back</li>
+                <li><strong>Scheduler decision</strong> — The OS must decide who runs next</li>
+            </ul>
+
+            <h3>Indirect Costs (the real killers)</h3>
+            <ul>
+                <li><strong>CPU cache pollution</strong> — The new thread's data isn't in cache. It has to be loaded from RAM (100x slower than cache)</li>
+                <li><strong>TLB flush</strong> — Translation Lookaside Buffer must be refreshed for process switches (virtual address translations lost)</li>
+                <li><strong>Pipeline flush</strong> — The CPU's instruction pipeline gets cleared</li>
+                <li><strong>Branch predictor confusion</strong> — The CPU's branch prediction tables become useless for the new thread</li>
+            </ul>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">🔥 The Real Cost</div>
+                <p>The direct cost of a context switch is ~1-5 microseconds. But the <strong>indirect cost</strong> (cache misses, TLB misses) can add <strong>5-50 microseconds</strong> of slowdown as the new thread "warms up" the cache. At 10,000 context switches/second, that's up to <strong>500ms/second wasted</strong> — half your CPU just switching!</p>
+            </div>
+
+            <h2>Thread Switch vs Process Switch</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Cost Component</th>
+                        <th>Thread Switch</th>
+                        <th>Process Switch</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Save/restore registers</td>
+                        <td>Yes (~1μs)</td>
+                        <td>Yes (~1μs)</td>
+                    </tr>
+                    <tr>
+                        <td>Switch stack</td>
+                        <td>Yes (fast)</td>
+                        <td>Yes (fast)</td>
+                    </tr>
+                    <tr>
+                        <td>TLB flush</td>
+                        <td>No (same address space)</td>
+                        <td>Yes (EXPENSIVE — ~5-10μs)</td>
+                    </tr>
+                    <tr>
+                        <td>Cache pollution</td>
+                        <td>Moderate (shared code/data)</td>
+                        <td>Severe (completely different data)</td>
+                    </tr>
+                    <tr>
+                        <td>Memory map switch</td>
+                        <td>No</td>
+                        <td>Yes (page table base register)</td>
+                    </tr>
+                    <tr>
+                        <td>Typical total cost</td>
+                        <td>~1-10 μs</td>
+                        <td>~10-50 μs</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>When Context Switches Happen</h2>
+            <ul>
+                <li><strong>Time slice expires</strong> — The scheduler preempts the thread after its quantum (typically 1-10ms)</li>
+                <li><strong>I/O wait</strong> — Thread calls read(), network recv(), etc. — OS switches to another thread while waiting</li>
+                <li><strong>Synchronization</strong> — Thread tries to acquire a lock that's held — blocked, OS switches away</li>
+                <li><strong>Higher priority thread wakes</strong> — A more important thread becomes ready</li>
+                <li><strong>System call</strong> — Any kernel interaction (even clock reads) can trigger a switch</li>
+            </ul>
+
+            <h2>Code: Measuring Context Switch Cost</h2>
+<pre><code><span class="token-keyword">import</span> threading
+<span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> os
+
+<span class="token-keyword">def</span> <span class="token-function">measure_context_switch_overhead</span>(num_threads, iterations_per_thread):
+    <span class="token-string">"""Demonstrate how more threads = more context switching = slower."""</span>
+    barrier = threading.Barrier(num_threads)
+    results = []
+    
+    <span class="token-keyword">def</span> <span class="token-function">worker</span>():
+        barrier.wait()  <span class="token-comment"># Ensure all threads start together</span>
+        total = <span class="token-number">0</span>
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(iterations_per_thread):
+            total += i * i  <span class="token-comment"># CPU work</span>
+        results.append(total)
+    
+    start = time.perf_counter()
+    threads = [threading.Thread(target=worker) <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(num_threads)]
+    <span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads:
+        t.start()
+    <span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads:
+        t.join()
+    elapsed = time.perf_counter() - start
+    
+    <span class="token-keyword">return</span> elapsed
+
+<span class="token-comment"># Same total work, different thread counts</span>
+total_work = <span class="token-number">10_000_000</span>
+
+<span class="token-keyword">for</span> num_threads <span class="token-keyword">in</span> [<span class="token-number">1</span>, <span class="token-number">2</span>, <span class="token-number">4</span>, <span class="token-number">8</span>, <span class="token-number">16</span>, <span class="token-number">64</span>, <span class="token-number">256</span>, <span class="token-number">1000</span>]:
+    per_thread = total_work // num_threads
+    elapsed = measure_context_switch_overhead(num_threads, per_thread)
+    print(<span class="token-string">f"{num_threads:4d} threads: {elapsed:.3f}s"</span>)
+    
+<span class="token-comment"># You'll see: beyond CPU core count, more threads = SLOWER
+# 1 thread:    ~0.5s
+# 4 threads:   ~0.5s (your core count)
+# 64 threads:  ~0.8s (context switch overhead)
+# 1000 threads: ~2.0s (massive overhead!)</span></code></pre>
+
+            <h3>Measuring with OS Tools</h3>
+<pre><code><span class="token-comment"># Linux: See context switches per process</span>
+<span class="token-comment"># In terminal:</span>
+<span class="token-comment"># cat /proc/&lt;PID&gt;/status | grep ctxt</span>
+<span class="token-comment"># voluntary_ctxt_switches: 142    (thread gave up CPU willingly - I/O wait)</span>
+<span class="token-comment"># nonvoluntary_ctxt_switches: 89  (OS took CPU away - time slice expired)</span>
+
+<span class="token-keyword">import</span> subprocess
+<span class="token-keyword">import</span> os
+
+<span class="token-keyword">def</span> <span class="token-function">get_context_switches</span>(pid=<span class="token-keyword">None</span>):
+    <span class="token-string">"""Read context switch counts from /proc (Linux only)."""</span>
+    <span class="token-keyword">if</span> pid <span class="token-keyword">is</span> <span class="token-keyword">None</span>:
+        pid = os.getpid()
+    
+    <span class="token-keyword">try</span>:
+        <span class="token-keyword">with</span> open(<span class="token-string">f"/proc/{pid}/status"</span>) <span class="token-keyword">as</span> f:
+            <span class="token-keyword">for</span> line <span class="token-keyword">in</span> f:
+                <span class="token-keyword">if</span> <span class="token-string">"ctxt"</span> <span class="token-keyword">in</span> line:
+                    print(line.strip())
+    <span class="token-keyword">except</span> FileNotFoundError:
+        print(<span class="token-string">"Not on Linux — use Windows Performance Monitor or macOS Instruments"</span>)</code></pre>
+
+            <h2>How to Reduce Context Switching</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>How It Works</th>
+                        <th>Used By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Thread pools</strong></td>
+                        <td>Fixed number of threads, reuse them for tasks</td>
+                        <td>Every web server (Nginx, Tomcat)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPU affinity</strong></td>
+                        <td>Pin a thread to a specific CPU core</td>
+                        <td>High-frequency trading, game engines</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Async I/O (epoll/io_uring)</strong></td>
+                        <td>One thread handles thousands of connections without blocking</td>
+                        <td>Nginx, Node.js, Redis</td>
+                    </tr>
+                    <tr>
+                        <td><strong>User-space scheduling</strong></td>
+                        <td>Don't involve the OS kernel at all</td>
+                        <td>Go runtime (goroutine scheduler)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Batch processing</strong></td>
+                        <td>Do more work per time slice, switch less often</td>
+                        <td>Database query engines</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>🏢 Industry Examples</h4>
+                <ul>
+                    <li><strong>Redis</strong> — Single-threaded by design. Zero context switches for data operations = blazing fast.</li>
+                    <li><strong>Nginx</strong> — Small number of worker processes, each handling thousands of connections with epoll. Minimal switching.</li>
+                    <li><strong>LMAX Disruptor</strong> — Java financial trading framework. Pins threads to cores, uses lock-free ring buffers, achieves 6 million transactions/second.</li>
+                    <li><strong>Go runtime</strong> — Multiplexes millions of goroutines onto a small number of OS threads. User-space scheduling = almost no kernel context switches.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>📝 Summary</h3>
+                <ul>
+                    <li>Context switching is the OS pausing one thread and resuming another</li>
+                    <li>Direct cost: ~1-5μs. Indirect cost (cache/TLB misses): 5-50μs</li>
+                    <li>Process switches are 5-10x more expensive than thread switches (TLB flush)</li>
+                    <li>More threads than CPU cores = more switching = slower performance</li>
+                    <li>Solutions: thread pools, CPU affinity, async I/O, user-space scheduling</li>
+                    <li>Rule of thumb: threads = CPU cores for CPU-bound work</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+Time slice:  |--Thread A--|--SWITCH--|--Thread B--|--SWITCH--|--Thread A--|
+
+Switch cost: [save regs] [scheduler] [load regs] [cache warmup!!!]
+                    1μs      0.5μs       1μs        5-50μs
+
+Rule: If switch_cost > useful_work_per_slice → TOO MANY THREADS
+
+Sweet spot: threads ≈ CPU cores (for CPU-bound work)
+            threads >> CPU cores is OK for I/O-bound (blocked = no switch cost)
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>❌ Common Beginner Mistakes</h3>
+                <ul>
+                    <li><strong>Creating one thread per request</strong> — 10,000 concurrent users ≠ 10,000 threads. Use a thread pool with ~core_count threads.</li>
+                    <li><strong>Ignoring cache effects</strong> — The 1μs register save is nothing. The 50μs cache warmup is the real killer.</li>
+                    <li><strong>Thinking "more threads = faster"</strong> — Beyond core count, adding threads for CPU work makes things SLOWER.</li>
+                    <li><strong>Not distinguishing CPU-bound vs I/O-bound</strong> — I/O-bound work benefits from more threads (blocked threads don't consume CPU). CPU-bound work doesn't.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>🏋️ Hands-On Exercise</h3>
+                <ol>
+                    <li>Write a CPU-intensive function (matrix multiplication, prime finding, etc.)</li>
+                    <li>Run it with 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 threads</li>
+                    <li>Plot execution time vs thread count — find the sweet spot where adding threads starts hurting</li>
+                    <li>Now change the function to be I/O-bound (use time.sleep(0.01) to simulate network calls)</li>
+                    <li>Re-plot — notice that for I/O-bound work, more threads helps up to much higher counts</li>
+                </ol>
+                <p><strong>Bonus:</strong> Use Python's <code>concurrent.futures.ThreadPoolExecutor</code> and experiment with different pool sizes.</p>
+            </div>
+
+            <nav class="page-nav">
+                <a href="01-threads-vs-processes.html" class="prev">Threads vs Processes</a>
+                <a href="03-race-conditions.html" class="next">Race Conditions</a>
+            </nav>
+
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

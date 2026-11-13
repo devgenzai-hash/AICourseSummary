@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoRA & QLoRA — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 3</a> <span>›</span> LoRA & QLoRA</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>LoRA & QLoRA: Efficient Fine-Tuning</h1>
+                <p>How to fine-tune a 7-billion-parameter model on a single GPU? LoRA makes it possible by training only 1-2% of the parameters. QLoRA adds 4-bit quantization to cut memory usage by 75%. This is THE technique for practical fine-tuning.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Full fine-tuning = Renovating an entire house.</strong> You repaint every wall, replace every floor, redo every room. Expensive, slow, and you might accidentally ruin something good.</p>
+                <p><strong>LoRA = Adding sticky notes to a textbook.</strong> The textbook (base model) stays unchanged. You just add small notes (adapters) on specific pages that modify the meaning. Tiny, cheap, and reversible.</p>
+                <p><strong>QLoRA = Same sticky notes, but the textbook is compressed.</strong> You shrink the textbook to 1/4 its size (4-bit quantization) THEN add your notes. Even cheaper.</p>
+            </div>
+
+            <h2 id="problem">The Problem LoRA Solves</h2>
+
+            <table>
+                <thead><tr><th>Method</th><th>VRAM for 7B Model</th><th>Trainable Parameters</th><th>Training Speed</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Full fine-tuning</strong></td><td>~56 GB (needs 4×A100)</td><td>7B (100%)</td><td>Slow</td></tr>
+                    <tr><td><strong>LoRA</strong></td><td>~18 GB (single A100)</td><td>~50M (0.7%)</td><td>Fast</td></tr>
+                    <tr><td><strong>QLoRA</strong></td><td>~6 GB (single RTX 3060!)</td><td>~50M (0.7%)</td><td>Medium</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="how-lora">How LoRA Works</h2>
+
+            <p>Instead of updating all 7 billion parameters, LoRA freezes the entire model and adds tiny "adapter" matrices to specific layers. Only these small matrices are trained.</p>
+
+            <h3>The Math (Simplified):</h3>
+            <pre><code><span class="token-comment"># Original weight matrix W (frozen, not trained)</span>
+<span class="token-comment"># Shape: [4096 × 4096] = 16.7 million parameters</span>
+
+<span class="token-comment"># LoRA adds two small matrices:</span>
+<span class="token-comment"># A: [4096 × 16]  = 65,536 parameters  (down-projection)</span>
+<span class="token-comment"># B: [16 × 4096]  = 65,536 parameters  (up-projection)</span>
+
+<span class="token-comment"># Total LoRA params for this layer: 131,072 (vs 16.7M original)</span>
+<span class="token-comment"># That's 0.8% of the original! </span>
+
+<span class="token-comment"># During forward pass:</span>
+<span class="token-comment"># output = W·x + (B·A)·x × (alpha/r)</span>
+<span class="token-comment">#          ^frozen  ^trainable adapter</span>
+
+<span class="token-keyword">import</span> torch
+
+<span class="token-comment"># Conceptual example</span>
+hidden_size = <span class="token-number">4096</span>
+r = <span class="token-number">16</span>  <span class="token-comment"># LoRA rank (the "r" in LoRA)</span>
+
+<span class="token-comment"># Original weight (frozen)</span>
+W = torch.randn(hidden_size, hidden_size)  <span class="token-comment"># 16.7M params</span>
+
+<span class="token-comment"># LoRA adapters (trainable)</span>
+A = torch.randn(hidden_size, r)  <span class="token-comment"># 65K params</span>
+B = torch.randn(r, hidden_size)  <span class="token-comment"># 65K params</span>
+
+<span class="token-comment"># Forward pass with LoRA</span>
+x = torch.randn(<span class="token-number">1</span>, hidden_size)
+output = x @ W + (x @ A @ B) * (<span class="token-number">32</span> / r)  <span class="token-comment"># alpha/r scaling</span></code></pre>
+
+            <h3>Key LoRA Parameters:</h3>
+            <table>
+                <thead><tr><th>Parameter</th><th>What It Controls</th><th>Typical Values</th><th>Guidance</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>r (rank)</strong></td><td>Size of adapter matrices (capacity)</td><td>8, 16, 32, 64</td><td>Higher = more capacity but more VRAM</td></tr>
+                    <tr><td><strong>lora_alpha</strong></td><td>Scaling factor for adapter output</td><td>16, 32, 64</td><td>Usually 2× the rank</td></tr>
+                    <tr><td><strong>lora_dropout</strong></td><td>Regularization</td><td>0.0, 0.05, 0.1</td><td>Use 0.05 for most cases</td></tr>
+                    <tr><td><strong>target_modules</strong></td><td>Which layers get adapters</td><td>q,k,v,o_proj</td><td>Attention layers + gate/up/down for best results</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="qlora">QLoRA: LoRA + 4-bit Quantization</h2>
+
+            <p>QLoRA = Load the base model in 4-bit precision (saves 75% memory) + train LoRA adapters in full precision on top.</p>
+
+            <pre><code><span class="token-comment"># Complete QLoRA training setup</span>
+<span class="token-keyword">import</span> torch
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> (
+    AutoModelForCausalLM, AutoTokenizer,
+    TrainingArguments, BitsAndBytesConfig
+)
+<span class="token-keyword">from</span> peft <span class="token-keyword">import</span> LoraConfig, get_peft_model, prepare_model_for_kbit_training
+<span class="token-keyword">from</span> trl <span class="token-keyword">import</span> SFTTrainer
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> load_dataset
+
+<span class="token-comment"># ===== 1. Quantization Config (4-bit) =====</span>
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=<span class="token-keyword">True</span>,
+    bnb_4bit_quant_type=<span class="token-string">"nf4"</span>,          <span class="token-comment"># NormalFloat4 — best for LLMs</span>
+    bnb_4bit_compute_dtype=torch.bfloat16,  <span class="token-comment"># Compute in bf16 for speed</span>
+    bnb_4bit_use_double_quant=<span class="token-keyword">True</span>,     <span class="token-comment"># Quantize the quantization constants too</span>
+)
+
+<span class="token-comment"># ===== 2. Load Model in 4-bit =====</span>
+model_name = <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    quantization_config=bnb_config,
+    device_map=<span class="token-string">"auto"</span>,
+    attn_implementation=<span class="token-string">"flash_attention_2"</span>,  <span class="token-comment"># Speed boost if supported</span>
+)
+model = prepare_model_for_kbit_training(model)
+
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer.pad_token = tokenizer.eos_token
+tokenizer.padding_side = <span class="token-string">"right"</span>
+
+<span class="token-comment"># ===== 3. LoRA Configuration =====</span>
+lora_config = LoraConfig(
+    r=<span class="token-number">16</span>,                      <span class="token-comment"># Start with 16, increase if underfitting</span>
+    lora_alpha=<span class="token-number">32</span>,              <span class="token-comment"># 2x rank is standard</span>
+    lora_dropout=<span class="token-number">0.05</span>,
+    bias=<span class="token-string">"none"</span>,
+    target_modules=[            <span class="token-comment"># All attention + MLP layers</span>
+        <span class="token-string">"q_proj"</span>, <span class="token-string">"k_proj"</span>, <span class="token-string">"v_proj"</span>, <span class="token-string">"o_proj"</span>,
+        <span class="token-string">"gate_proj"</span>, <span class="token-string">"up_proj"</span>, <span class="token-string">"down_proj"</span>
+    ],
+    task_type=<span class="token-string">"CAUSAL_LM"</span>,
+)
+
+model = get_peft_model(model, lora_config)
+model.print_trainable_parameters()
+<span class="token-comment"># Output: "trainable params: 41,943,040 || all params: 8,030,261,248 || trainable%: 0.52%"</span>
+
+<span class="token-comment"># ===== 4. Load Dataset =====</span>
+dataset = load_dataset(<span class="token-string">"json"</span>, data_files=<span class="token-string">"my_dataset.jsonl"</span>, split=<span class="token-string">"train"</span>)
+
+<span class="token-comment"># ===== 5. Training Arguments =====</span>
+training_args = TrainingArguments(
+    output_dir=<span class="token-string">"./qlora-output"</span>,
+    num_train_epochs=<span class="token-number">3</span>,
+    per_device_train_batch_size=<span class="token-number">4</span>,
+    gradient_accumulation_steps=<span class="token-number">4</span>,
+    learning_rate=<span class="token-number">2e-4</span>,
+    lr_scheduler_type=<span class="token-string">"cosine"</span>,
+    warmup_ratio=<span class="token-number">0.1</span>,
+    bf16=<span class="token-keyword">True</span>,
+    logging_steps=<span class="token-number">10</span>,
+    save_strategy=<span class="token-string">"epoch"</span>,
+    optim=<span class="token-string">"paged_adamw_8bit"</span>,  <span class="token-comment"># Memory-efficient optimizer</span>
+    gradient_checkpointing=<span class="token-keyword">True</span>,  <span class="token-comment"># Trade compute for memory</span>
+    max_grad_norm=<span class="token-number">0.3</span>,
+)
+
+<span class="token-comment"># ===== 6. Train! =====</span>
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    tokenizer=tokenizer,
+    max_seq_length=<span class="token-number">2048</span>,
+    packing=<span class="token-keyword">True</span>,  <span class="token-comment"># Pack short examples together for efficiency</span>
+)
+
+trainer.train()
+trainer.save_model(<span class="token-string">"./my-qlora-adapter"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">"✅ Training complete! Adapter saved."</span>)</code></pre>
+
+            <h3>Using Your Trained Adapter:</h3>
+            <pre><code><span class="token-comment"># Load base model + your trained adapter for inference</span>
+<span class="token-keyword">from</span> peft <span class="token-keyword">import</span> PeftModel
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer
+
+<span class="token-comment"># Load base model</span>
+base_model = AutoModelForCausalLM.from_pretrained(
+    <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    torch_dtype=torch.float16,
+    device_map=<span class="token-string">"auto"</span>
+)
+tokenizer = AutoTokenizer.from_pretrained(<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>)
+
+<span class="token-comment"># Load YOUR trained adapter on top</span>
+model = PeftModel.from_pretrained(base_model, <span class="token-string">"./my-qlora-adapter"</span>)
+
+<span class="token-comment"># Generate!</span>
+messages = [
+    {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a helpful assistant."</span>},
+    {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Hello!"</span>}
+]
+inputs = tokenizer.apply_chat_template(messages, return_tensors=<span class="token-string">"pt"</span>).to(model.device)
+output = model.generate(inputs, max_new_tokens=<span class="token-number">200</span>)
+<span class="token-builtin">print</span>(tokenizer.decode(output[<span class="token-number">0</span>], skip_special_tokens=<span class="token-keyword">True</span>))</code></pre>
+
+            <div class="comparison-table">
+                <h3>LoRA vs QLoRA vs Full Fine-Tuning:</h3>
+                <table>
+                    <thead><tr><th>Aspect</th><th>Full Fine-Tuning</th><th>LoRA</th><th>QLoRA</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>VRAM (8B model)</strong></td><td>~56 GB</td><td>~18 GB</td><td>~6 GB</td></tr>
+                        <tr><td><strong>Trained params</strong></td><td>100%</td><td>0.5-2%</td><td>0.5-2%</td></tr>
+                        <tr><td><strong>Quality</strong></td><td>Best</td><td>95-99% of full</td><td>93-98% of full</td></tr>
+                        <tr><td><strong>Training speed</strong></td><td>Slow</td><td>Fast</td><td>Medium (quantization overhead)</td></tr>
+                        <tr><td><strong>GPU requirement</strong></td><td>4×A100 80GB</td><td>1×A100 40GB</td><td>1×RTX 3090/4090</td></tr>
+                        <tr><td><strong>Output size</strong></td><td>Full model (14 GB)</td><td>Adapter only (~50 MB)</td><td>Adapter only (~50 MB)</td></tr>
+                        <tr><td><strong>Use case</strong></td><td>Massive budget, best quality</td><td>Good GPU available</td><td>Consumer hardware</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>QLoRA is the default</strong> — 90%+ of fine-tuning projects use QLoRA. It's the sweet spot of quality/cost.</li>
+                    <li><strong>r=16, alpha=32</strong> — Standard starting point. Increase r if model underfits, decrease if overfits.</li>
+                    <li><strong>Target all linear layers</strong> — Best results come from targeting q/k/v/o_proj + gate/up/down_proj.</li>
+                    <li><strong>Adapter size: 20-100 MB</strong> — Your fine-tuned "model" is just a tiny file you load on top of the base model.</li>
+                    <li><strong>PEFT library</strong> — HuggingFace's library for LoRA/QLoRA. Industry standard.</li>
+                    <li><strong>Merge before deployment</strong> — Merge adapter into base model for faster inference (no overhead).</li>
+                    <li><strong>Multiple adapters</strong> — You can train different adapters for different tasks and swap them at inference time.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>LoRA</strong> = freeze base model, add small trainable adapters (~50MB for a 7B model)</li>
+                    <li><strong>QLoRA</strong> = LoRA but base model loaded in 4-bit (saves 75% VRAM)</li>
+                    <li>You can fine-tune an 8B model on a single consumer GPU with QLoRA</li>
+                    <li>Key params: r (rank), alpha (scaling), target_modules (which layers)</li>
+                    <li>Quality is 93-99% of full fine-tuning at a fraction of the cost</li>
+                    <li>Use PEFT library + TRL's SFTTrainer for implementation</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    Full Fine-tuning: Update ALL 7 billion parameters (expensive)<br>
+                    LoRA: Freeze 7B params + train 50M adapter params (cheap)<br>
+                    QLoRA: Compress 7B to 4-bit + train 50M adapter params (cheapest)<br><br>
+                    Base Model (14GB, frozen) + Adapter (50MB, trained) = Your custom model
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Rank too high</strong> — r=64 or r=128 with only 1000 examples = overfitting. Start with r=8 or r=16.</li>
+                    <li><strong>Only targeting attention layers</strong> — Include MLP layers (gate/up/down_proj) for significantly better results.</li>
+                    <li><strong>Forgetting to prepare_model_for_kbit_training()</strong> — Required step for QLoRA. Without it, gradients won't flow correctly.</li>
+                    <li><strong>Wrong padding side</strong> — For causal LMs, use <code>padding_side="right"</code>. Wrong side = degraded training.</li>
+                    <li><strong>Not merging for deployment</strong> — LoRA adds latency during inference. Merge the adapter before serving.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Fine-Tune with QLoRA</h4>
+                <ol>
+                    <li>Use Google Colab (free T4 GPU) or a local GPU with ≥8GB VRAM</li>
+                    <li>Load <code>microsoft/phi-2</code> (2.7B params, fits easily) with 4-bit quantization</li>
+                    <li>Create 20 training examples for a specific task (e.g., translating natural language to SQL)</li>
+                    <li>Train with the QLoRA code above for 3 epochs</li>
+                    <li>Compare: base Phi-2 output vs your fine-tuned output on 5 test examples</li>
+                    <li>Check the adapter size on disk — how small is it compared to the full model?</li>
+                    <li><strong>Bonus:</strong> Try different rank values (r=4, 8, 16, 32) and compare quality</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="11-hallucination-reduction.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Hallucination Reduction</span>
+                </a>
+                <a href="13-dpo-rlhf.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">DPO & RLHF</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOP Internals (Proxies, Weaving, Pointcuts) - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Spring Core & IoC Internals</li>
+            <li><a href="01-ioc-container.html"><span class="nav-number">1</span> IoC Container & BeanFactory</a></li>
+            <li><a href="02-application-context.html"><span class="nav-number">2</span> ApplicationContext Lifecycle</a></li>
+            <li><a href="03-bean-lifecycle.html"><span class="nav-number">3</span> Bean Lifecycle & Callbacks</a></li>
+            <li><a href="04-dependency-injection.html"><span class="nav-number">4</span> Dependency Injection Internals</a></li>
+            <li><a href="05-component-scanning.html"><span class="nav-number">5</span> Component Scanning</a></li>
+            <li><a href="06-bean-scopes.html"><span class="nav-number">6</span> Bean Scopes & Proxy Mechanisms</a></li>
+            <li><a href="07-aop-internals.html" class="active"><span class="nav-number">7</span> AOP Internals</a></li>
+            <li><a href="08-spel.html"><span class="nav-number">8</span> Spring Expression Language</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Spring Core & IoC Internals → AOP Internals</div>
+        <div class="topic-number">Topic 7 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>AOP Internals (Proxies, Weaving, Pointcuts)</h1>
+            <p class="subtitle-description">How Spring wraps your beans in proxies to add cross-cutting behavior — the BeanPostProcessor that creates proxies, pointcut matching algorithms, and why self-invocation is AOP's Achilles heel.</p>
+
+            <div class="tags">
+                <span class="tag tag-advanced">advanced</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-internal">internal</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🎭 The Celebrity Bodyguard Analogy</div>
+                <p>Imagine a celebrity (your bean) who needs security (logging), a publicist (transaction management), and a nutritionist (validation) — but doesn't want to think about any of that while acting. So the agency hires a <strong>body double</strong> (proxy) who looks identical to the celebrity from the outside. Anyone wanting to talk to the celebrity actually talks to the body double first. The double checks the security clearance (before advice), lets the celebrity do their thing (method execution), then handles the press release (after advice). The celebrity never knows this is happening — they just act. But here's the catch: <strong>when the celebrity talks to themselves in the mirror (self-invocation), the body double isn't in between</strong> — that's why <code>this.method()</code> bypasses AOP.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: What AOP Actually Does -->
+            <!-- ============================================ -->
+            <h2>1. What AOP Actually Does — Separating Cross-Cutting Concerns</h2>
+
+            <p>Aspect-Oriented Programming solves a fundamental problem in software design: <strong>cross-cutting concerns</strong> — behavior that spans multiple unrelated classes but doesn't fit neatly into an object hierarchy.</p>
+
+            <pre><code><span class="token-comment">// WITHOUT AOP — cross-cutting concerns pollute business logic</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+
+    <span class="token-keyword">public</span> <span class="token-type">Order</span> <span class="token-function">placeOrder</span>(<span class="token-type">OrderRequest</span> request) {
+        <span class="token-comment">// 🔒 Security check (cross-cutting)</span>
+        <span class="token-keyword">if</span> (!securityContext.<span class="token-function">hasPermission</span>(<span class="token-string">"ORDER_CREATE"</span>)) {
+            <span class="token-keyword">throw new</span> <span class="token-type">AccessDeniedException</span>(...);
+        }
+
+        <span class="token-comment">// 📊 Logging (cross-cutting)</span>
+        log.<span class="token-function">info</span>(<span class="token-string">"Placing order for user={}"</span>, request.<span class="token-function">getUserId</span>());
+        <span class="token-keyword">long</span> start = System.<span class="token-function">nanoTime</span>();
+
+        <span class="token-keyword">try</span> {
+            <span class="token-comment">// 💼 ACTUAL BUSINESS LOGIC (only 3 lines!)</span>
+            <span class="token-type">Order</span> order = <span class="token-function">validateAndCreate</span>(request);
+            inventory.<span class="token-function">reserve</span>(order.<span class="token-function">getItems</span>());
+            <span class="token-keyword">return</span> orderRepo.<span class="token-function">save</span>(order);
+
+        } <span class="token-keyword">catch</span> (<span class="token-type">Exception</span> e) {
+            <span class="token-comment">// 📊 Error logging (cross-cutting)</span>
+            log.<span class="token-function">error</span>(<span class="token-string">"Order failed"</span>, e);
+            metrics.<span class="token-function">increment</span>(<span class="token-string">"order.failures"</span>);
+            <span class="token-keyword">throw</span> e;
+        } <span class="token-keyword">finally</span> {
+            <span class="token-comment">// 📊 Metrics (cross-cutting)</span>
+            metrics.<span class="token-function">record</span>(<span class="token-string">"order.duration"</span>, System.<span class="token-function">nanoTime</span>() - start);
+        }
+    }
+}
+
+<span class="token-comment">// WITH AOP — business logic is clean, concerns are separate</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+
+    <span class="token-annotation">@Secured</span>(<span class="token-string">"ORDER_CREATE"</span>)
+    <span class="token-annotation">@Timed</span>(<span class="token-string">"order.duration"</span>)
+    <span class="token-annotation">@Transactional</span>
+    <span class="token-keyword">public</span> <span class="token-type">Order</span> <span class="token-function">placeOrder</span>(<span class="token-type">OrderRequest</span> request) {
+        <span class="token-comment">// Pure business logic — that's it!</span>
+        <span class="token-type">Order</span> order = <span class="token-function">validateAndCreate</span>(request);
+        inventory.<span class="token-function">reserve</span>(order.<span class="token-function">getItems</span>());
+        <span class="token-keyword">return</span> orderRepo.<span class="token-function">save</span>(order);
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 The Core Insight</div>
+                <p>AOP doesn't add new functionality — it <strong>separates WHERE concerns are defined from WHERE they're applied</strong>. The security, logging, and transaction logic still exists, but it's defined once in an aspect and applied declaratively via pointcuts.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: Spring AOP is PROXY-BASED -->
+            <!-- ============================================ -->
+            <h2>2. Spring AOP is Proxy-Based — Not Bytecode Modification</h2>
+
+            <p>This is the <strong>most critical architectural decision</strong> in Spring AOP. Unlike AspectJ (which rewrites your .class files), Spring AOP works by wrapping your beans in <strong>proxy objects</strong> at runtime. This happens during <strong>Phase 9 of the bean lifecycle</strong> — <code>postProcessAfterInitialization</code>.</p>
+
+            <div class="architecture-diagram">
+                <h3>📐 How Proxy Wrapping Works</h3>
+                <pre class="diagram-ascii">
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                    Bean Lifecycle — Phase 9: Proxy Creation                      │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+   Container creates your bean normally (constructor → DI → @PostConstruct)
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│        AnnotationAwareAspectJAutoProxyCreator.postProcessAfterInitialization()   │
+│                                                                                 │
+│  1. Get all Advisor beans (parsed from @Aspect classes)                         │
+│  2. Find advisors that MATCH this bean's methods (pointcut evaluation)          │
+│  3. If matches found → CREATE PROXY wrapping the original bean                  │
+│  4. Return proxy INSTEAD OF original bean to the container                      │
+└───────────────────────────────────┬─────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        What the Container Stores                                 │
+│                                                                                 │
+│  Before AOP:  beanMap.get("orderService") → OrderService@a1b2                   │
+│  After AOP:   beanMap.get("orderService") → Proxy$OrderService@c3d4             │
+│                                               │                                  │
+│                                               │  has reference to                │
+│                                               ▼                                  │
+│                                          OrderService@a1b2 (target)              │
+│                                                                                 │
+│  Every other bean that @Autowires OrderService gets the PROXY, not the target   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+   Caller                         Proxy                           Target Bean
+  ─────────                    ──────────                       ──────────────
+      │                            │                                  │
+      │  orderService.placeOrder() │                                  │
+      │───────────────────────────▶│                                  │
+      │                            │  @Before advice executes         │
+      │                            │  @Around advice (proceed →)      │
+      │                            │─────────────────────────────────▶│
+      │                            │                                  │ actual work
+      │                            │◀─────────────────────────────────│
+      │                            │  @AfterReturning advice          │
+      │                            │  @Around advice (after proceed)  │
+      │◀───────────────────────────│                                  │
+      │      result                │                                  │
+                </pre>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: AnnotationAwareAspectJAutoProxyCreator -->
+            <!-- ============================================ -->
+            <h2>3. AnnotationAwareAspectJAutoProxyCreator — The Proxy Factory</h2>
+
+            <p>This is the <code><span class="token-type">BeanPostProcessor</span></code> responsible for creating all AOP proxies. It's automatically registered when you use <code><span class="token-annotation">@EnableAspectJAutoProxy</span></code> (or Spring Boot's auto-configuration).</p>
+
+            <pre><code><span class="token-comment">// Inheritance hierarchy — understanding what each layer adds</span>
+<span class="token-type">BeanPostProcessor</span>
+  └── <span class="token-type">AbstractAutoProxyCreator</span>              <span class="token-comment">// Core proxy creation logic</span>
+        └── <span class="token-type">AbstractAdvisorAutoProxyCreator</span>   <span class="token-comment">// Advisor matching</span>
+              └── <span class="token-type">AspectJAwareAdvisorAutoProxyCreator</span>  <span class="token-comment">// AspectJ ordering</span>
+                    └── <span class="token-class">AnnotationAwareAspectJAutoProxyCreator</span>  <span class="token-comment">// @Aspect parsing</span>
+
+<span class="token-comment">// The critical method — called for EVERY bean in the container</span>
+<span class="token-keyword">public abstract class</span> <span class="token-class">AbstractAutoProxyCreator</span>
+        <span class="token-keyword">implements</span> <span class="token-type">BeanPostProcessor</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">postProcessAfterInitialization</span>(<span class="token-type">Object</span> bean, <span class="token-type">String</span> beanName) {
+        <span class="token-keyword">if</span> (bean != <span class="token-keyword">null</span>) {
+            <span class="token-type">Object</span> cacheKey = <span class="token-function">getCacheKey</span>(bean.<span class="token-function">getClass</span>(), beanName);
+
+            <span class="token-comment">// Skip if already processed (circular reference handling)</span>
+            <span class="token-keyword">if</span> (!<span class="token-keyword">this</span>.earlyProxyReferences.<span class="token-function">contains</span>(cacheKey)) {
+                <span class="token-keyword">return</span> <span class="token-function">wrapIfNecessary</span>(bean, beanName, cacheKey);
+            }
+        }
+        <span class="token-keyword">return</span> bean;
+    }
+
+    <span class="token-keyword">protected</span> <span class="token-type">Object</span> <span class="token-function">wrapIfNecessary</span>(<span class="token-type">Object</span> bean, <span class="token-type">String</span> beanName, <span class="token-type">Object</span> cacheKey) {
+        <span class="token-comment">// STEP 1: Find all advisors that apply to this bean</span>
+        <span class="token-type">Object</span>[] specificInterceptors = <span class="token-function">getAdvicesAndAdvisorsForBean</span>(
+            bean.<span class="token-function">getClass</span>(), beanName, <span class="token-keyword">null</span>);
+
+        <span class="token-keyword">if</span> (specificInterceptors != DO_NOT_PROXY) {
+            <span class="token-keyword">this</span>.advisedBeans.<span class="token-function">put</span>(cacheKey, Boolean.TRUE);
+
+            <span class="token-comment">// STEP 2: Create the proxy!</span>
+            <span class="token-type">Object</span> proxy = <span class="token-function">createProxy</span>(
+                bean.<span class="token-function">getClass</span>(), beanName, specificInterceptors, <span class="token-keyword">new</span> <span class="token-type">SingletonTargetSource</span>(bean));
+
+            <span class="token-keyword">this</span>.proxyTypes.<span class="token-function">put</span>(cacheKey, proxy.<span class="token-function">getClass</span>());
+            <span class="token-keyword">return</span> proxy;  <span class="token-comment">// ← PROXY replaces original bean in container!</span>
+        }
+
+        <span class="token-keyword">this</span>.advisedBeans.<span class="token-function">put</span>(cacheKey, Boolean.FALSE);
+        <span class="token-keyword">return</span> bean;  <span class="token-comment">// No matching advisors → return bean unchanged</span>
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>This BeanPostProcessor runs for <strong>every single bean</strong> in your application context. For each bean, it evaluates all pointcut expressions against all methods. If ANY advisor matches, a proxy is created. This is why overly broad pointcuts can impact startup performance.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: JDK Dynamic Proxy -->
+            <!-- ============================================ -->
+            <h2>4. JDK Dynamic Proxy — Interface-Based Proxying</h2>
+
+            <p>When your bean implements at least one interface, Spring (by default) uses the JDK's built-in <code><span class="token-class">Proxy</span>.<span class="token-function">newProxyInstance</span>()</code> to create a proxy class that implements the <em>same interfaces</em>.</p>
+
+            <pre><code><span class="token-comment">// How JDK Dynamic Proxy works internally</span>
+
+<span class="token-comment">// Your bean implements an interface:</span>
+<span class="token-keyword">public interface</span> <span class="token-class">OrderService</span> {
+    <span class="token-type">Order</span> <span class="token-function">placeOrder</span>(<span class="token-type">OrderRequest</span> request);
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderServiceImpl</span> <span class="token-keyword">implements</span> <span class="token-type">OrderService</span> {
+    <span class="token-keyword">public</span> <span class="token-type">Order</span> <span class="token-function">placeOrder</span>(<span class="token-type">OrderRequest</span> request) { ... }
+}
+
+<span class="token-comment">// Spring creates a proxy like this (conceptually):</span>
+<span class="token-type">OrderService</span> proxy = (<span class="token-type">OrderService</span>) <span class="token-type">Proxy</span>.<span class="token-function">newProxyInstance</span>(
+    classLoader,
+    <span class="token-keyword">new</span> <span class="token-type">Class</span>&lt;?&gt;[] { <span class="token-type">OrderService</span>.<span class="token-keyword">class</span> },  <span class="token-comment">// implements same interface</span>
+    <span class="token-keyword">new</span> <span class="token-type">JdkDynamicAopProxy</span>(advised)               <span class="token-comment">// invocation handler</span>
+);
+
+<span class="token-comment">// The generated proxy class (decompiled) looks like:</span>
+<span class="token-keyword">public final class</span> <span class="token-class">$Proxy42</span> <span class="token-keyword">extends</span> <span class="token-type">Proxy</span> <span class="token-keyword">implements</span> <span class="token-type">OrderService</span> {
+
+    <span class="token-keyword">public</span> <span class="token-type">Order</span> <span class="token-function">placeOrder</span>(<span class="token-type">OrderRequest</span> request) {
+        <span class="token-comment">// Delegates EVERYTHING to InvocationHandler</span>
+        <span class="token-keyword">return</span> (<span class="token-type">Order</span>) h.<span class="token-function">invoke</span>(<span class="token-keyword">this</span>, m3, <span class="token-keyword">new</span> <span class="token-type">Object</span>[]{ request });
+        <span class="token-comment">//                       ↑ the InvocationHandler</span>
+    }
+}
+
+<span class="token-comment">// Spring's InvocationHandler — where advice gets executed</span>
+<span class="token-keyword">final class</span> <span class="token-class">JdkDynamicAopProxy</span> <span class="token-keyword">implements</span> <span class="token-type">InvocationHandler</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">AdvisedSupport</span> advised;  <span class="token-comment">// holds target + advisors</span>
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">invoke</span>(<span class="token-type">Object</span> proxy, <span class="token-type">Method</span> method, <span class="token-type">Object</span>[] args) {
+        <span class="token-comment">// 1. Get the chain of interceptors for THIS method</span>
+        <span class="token-type">List</span>&lt;<span class="token-type">Object</span>&gt; chain = <span class="token-keyword">this</span>.advised
+            .<span class="token-function">getInterceptorsAndDynamicInterceptionAdvice</span>(method, targetClass);
+
+        <span class="token-keyword">if</span> (chain.<span class="token-function">isEmpty</span>()) {
+            <span class="token-comment">// No advice → invoke target directly (fast path)</span>
+            <span class="token-keyword">return</span> <span class="token-type">AopUtils</span>.<span class="token-function">invokeJoinpointUsingReflection</span>(target, method, args);
+        }
+
+        <span class="token-comment">// 2. Create invocation and proceed through interceptor chain</span>
+        <span class="token-type">MethodInvocation</span> invocation = <span class="token-keyword">new</span> <span class="token-type">ReflectiveMethodInvocation</span>(
+            proxy, target, method, args, targetClass, chain);
+        <span class="token-keyword">return</span> invocation.<span class="token-function">proceed</span>();  <span class="token-comment">// Chain of Responsibility pattern</span>
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: CGLIB Proxy -->
+            <!-- ============================================ -->
+            <h2>5. CGLIB Proxy — Subclass-Based Proxying</h2>
+
+            <p>When your bean has <strong>no interfaces</strong>, or when <code>proxyTargetClass=true</code>, Spring uses CGLIB (Code Generation Library) to generate a <strong>subclass</strong> of your bean class at runtime using the ASM bytecode library.</p>
+
+            <pre><code><span class="token-comment">// Your bean WITHOUT an interface:</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">PaymentProcessor</span> {
+    <span class="token-keyword">public</span> <span class="token-type">Receipt</span> <span class="token-function">processPayment</span>(<span class="token-type">Payment</span> payment) { ... }
+}
+
+<span class="token-comment">// CGLIB generates a subclass at runtime (conceptually):</span>
+<span class="token-keyword">public class</span> <span class="token-class">PaymentProcessor$$EnhancerBySpringCGLIB$$7a3b2c1d</span>
+        <span class="token-keyword">extends</span> <span class="token-type">PaymentProcessor</span> {
+
+    <span class="token-keyword">private</span> <span class="token-type">MethodInterceptor</span>[] callbacks;
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Receipt</span> <span class="token-function">processPayment</span>(<span class="token-type">Payment</span> payment) {
+        <span class="token-comment">// Intercepts the call — does NOT call super directly</span>
+        <span class="token-type">MethodProxy</span> methodProxy = CGLIB$processPayment$0$Proxy;
+        <span class="token-keyword">return</span> (<span class="token-type">Receipt</span>) callbacks[0].<span class="token-function">intercept</span>(
+            <span class="token-keyword">this</span>, method, <span class="token-keyword">new</span> <span class="token-type">Object</span>[]{ payment }, methodProxy
+        );
+    }
+
+    <span class="token-comment">// CGLIB also generates a "super" method for invoking original</span>
+    <span class="token-keyword">final</span> <span class="token-type">Receipt</span> <span class="token-function">CGLIB$processPayment$0</span>(<span class="token-type">Payment</span> payment) {
+        <span class="token-keyword">return super</span>.<span class="token-function">processPayment</span>(payment);  <span class="token-comment">// actual target method</span>
+    }
+}
+
+<span class="token-comment">// Spring's CGLIB MethodInterceptor (similar role to InvocationHandler)</span>
+<span class="token-keyword">private static class</span> <span class="token-class">DynamicAdvisedInterceptor</span> <span class="token-keyword">implements</span> <span class="token-type">MethodInterceptor</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">intercept</span>(<span class="token-type">Object</span> proxy, <span class="token-type">Method</span> method,
+            <span class="token-type">Object</span>[] args, <span class="token-type">MethodProxy</span> methodProxy) {
+
+        <span class="token-comment">// Same logic as JDK proxy: get interceptor chain, proceed</span>
+        <span class="token-type">List</span>&lt;<span class="token-type">Object</span>&gt; chain = advised
+            .<span class="token-function">getInterceptorsAndDynamicInterceptionAdvice</span>(method, targetClass);
+
+        <span class="token-keyword">if</span> (chain.<span class="token-function">isEmpty</span>()) {
+            <span class="token-comment">// Fast path — call original method directly via MethodProxy</span>
+            <span class="token-keyword">return</span> methodProxy.<span class="token-function">invoke</span>(target, args);
+        }
+
+        <span class="token-type">CglibMethodInvocation</span> invocation = <span class="token-keyword">new</span> <span class="token-type">CglibMethodInvocation</span>(
+            proxy, target, method, args, targetClass, chain, methodProxy);
+        <span class="token-keyword">return</span> invocation.<span class="token-function">proceed</span>();
+    }
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ CGLIB Constraints</div>
+                <ul>
+                    <li><code><span class="token-keyword">final</span></code> classes <strong>cannot</strong> be proxied — CGLIB needs to create a subclass</li>
+                    <li><code><span class="token-keyword">final</span></code> methods are <strong>not intercepted</strong> — they cannot be overridden in the subclass</li>
+                    <li><code><span class="token-keyword">private</span></code> methods are <strong>invisible</strong> to the proxy — only public/protected methods are intercepted</li>
+                    <li>The constructor of the target class is called <strong>twice</strong> in older Spring versions (once for target, once for proxy subclass) — Spring 4+ uses Objenesis to avoid this</li>
+                </ul>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Proxy Type Selection -->
+            <!-- ============================================ -->
+            <h2>6. When Each Proxy Type Is Chosen</h2>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Criteria</th>
+                            <th>JDK Dynamic Proxy</th>
+                            <th>CGLIB Proxy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Mechanism</strong></td>
+                            <td>Implements same interface(s)</td>
+                            <td>Generates subclass via ASM bytecode</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trigger condition</strong></td>
+                            <td>Bean implements ≥1 interface AND <code>proxyTargetClass=false</code></td>
+                            <td>No interface OR <code>proxyTargetClass=true</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Proxy type</strong></td>
+                            <td><code>$Proxy42</code> (implements interface)</td>
+                            <td><code>MyClass$$EnhancerBySpringCGLIB$$xxxx</code> (extends class)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cast-safe to</strong></td>
+                            <td>Interface type only</td>
+                            <td>Both class type and interface type</td>
+                        </tr>
+                        <tr>
+                            <td><strong>final classes</strong></td>
+                            <td>✅ Works (proxies the interface)</td>
+                            <td>❌ Cannot proxy — throws exception</td>
+                        </tr>
+                        <tr>
+                            <td><strong>final methods</strong></td>
+                            <td>✅ Intercepted (interface method isn't final)</td>
+                            <td>❌ Not intercepted — silently skipped</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Performance</strong></td>
+                            <td>Slightly slower (reflection-based dispatch)</td>
+                            <td>Slightly faster (direct method call via MethodProxy)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memory</strong></td>
+                            <td>Less (no bytecode generation)</td>
+                            <td>More (generated class stored in Metaspace)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spring Boot default</strong></td>
+                            <td>Not used by default since Boot 2.0</td>
+                            <td>✅ Default (<code>proxyTargetClass=true</code>)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pre><code><span class="token-comment">// The decision logic inside DefaultAopProxyFactory</span>
+<span class="token-keyword">public class</span> <span class="token-class">DefaultAopProxyFactory</span> <span class="token-keyword">implements</span> <span class="token-type">AopProxyFactory</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">AopProxy</span> <span class="token-function">createAopProxy</span>(<span class="token-type">AdvisedSupport</span> config) {
+
+        <span class="token-keyword">if</span> (config.<span class="token-function">isOptimize</span>() ||
+            config.<span class="token-function">isProxyTargetClass</span>() ||                  <span class="token-comment">// ← Spring Boot sets this TRUE</span>
+            <span class="token-function">hasNoUserSuppliedProxyInterfaces</span>(config)) {    <span class="token-comment">// ← No interfaces</span>
+
+            <span class="token-type">Class</span>&lt;?&gt; targetClass = config.<span class="token-function">getTargetClass</span>();
+
+            <span class="token-keyword">if</span> (targetClass.<span class="token-function">isInterface</span>() || <span class="token-type">Proxy</span>.<span class="token-function">isProxyClass</span>(targetClass)) {
+                <span class="token-keyword">return new</span> <span class="token-type">JdkDynamicAopProxy</span>(config);  <span class="token-comment">// Interface → JDK anyway</span>
+            }
+            <span class="token-keyword">return new</span> <span class="token-type">ObjenesisCglibAopProxy</span>(config);   <span class="token-comment">// ← CGLIB proxy</span>
+        }
+
+        <span class="token-keyword">return new</span> <span class="token-type">JdkDynamicAopProxy</span>(config);          <span class="token-comment">// ← JDK proxy</span>
+    }
+}
+
+<span class="token-comment">// Spring Boot 2.0+ sets this in AopAutoConfiguration:</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-annotation">@EnableAspectJAutoProxy</span>(proxyTargetClass = <span class="token-keyword">true</span>)  <span class="token-comment">// CGLIB by default!</span>
+<span class="token-keyword">public class</span> <span class="token-class">AopAutoConfiguration</span> { }</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Pointcut Expressions -->
+            <!-- ============================================ -->
+            <h2>7. Pointcut Expressions — How Spring Matches Methods</h2>
+
+            <p>Pointcuts define <em>where</em> advice should be applied. Spring parses these expressions into an AST and evaluates them against every method of every proxied bean.</p>
+
+            <pre><code><span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// execution() — THE most common. Matches method signatures.</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-comment">// Pattern: execution(modifiers? return-type declaring-type? method-name(params) throws?)</span>
+
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"execution(* com.app.service.*.*(..))"</span>)
+<span class="token-comment">//          │         │                │ │  │</span>
+<span class="token-comment">//          │         │                │ │  └─ any params</span>
+<span class="token-comment">//          │         │                │ └──── any method name</span>
+<span class="token-comment">//          │         │                └────── any class in package</span>
+<span class="token-comment">//          │         └───────────────────────  in com.app.service</span>
+<span class="token-comment">//          └─────────────────────────────────  any return type</span>
+
+<span class="token-comment">// More specific examples:</span>
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"execution(public String com.app.service.UserService.findById(Long))"</span>)
+
+<span class="token-comment">// Subpackages with ..</span>
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"execution(* com.app..*Service.*(..))"</span>)  <span class="token-comment">// any *Service in any subpackage</span>
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// within() — Matches all methods in matching classes</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"within(com.app.service..*)"</span>)  <span class="token-comment">// all methods in service package</span>
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"within(com.app.service.OrderService)"</span>)  <span class="token-comment">// all methods in OrderService</span>
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// @annotation() — Matches methods WITH a specific annotation</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"@annotation(com.app.annotation.Audited)"</span>)  <span class="token-comment">// any @Audited method</span>
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"@annotation(org.springframework.transaction.annotation.Transactional)"</span>)
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// args() — Matches by argument types at RUNTIME</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"args(com.app.model.Order, ..)"</span>)  <span class="token-comment">// first arg is Order</span>
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// bean() — Spring-specific! Matches by bean name</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"bean(*Service)"</span>)      <span class="token-comment">// all beans ending with "Service"</span>
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"bean(orderService)"</span>)  <span class="token-comment">// specific bean by name</span>
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Combining pointcuts with logical operators</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"execution(* com.app.service.*.*(..)) && !execution(* *.get*(..))"</span>)
+<span class="token-comment">// All service methods EXCEPT getters</span>
+
+<span class="token-annotation">@Pointcut</span>(<span class="token-string">"@annotation(Audited) || @annotation(Transactional)"</span>)
+<span class="token-comment">// Methods with EITHER annotation</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Pointcut Matching Performance</div>
+                <p>Pointcut matching happens at <strong>startup time</strong>, not runtime. Spring evaluates each pointcut against every method once during proxy creation and caches the result. At runtime, the interceptor chain is a pre-computed list — no pattern matching occurs per invocation. However, <code>args()</code> pointcuts require <strong>runtime type checking</strong> because they match on actual argument types (polymorphism), making them slightly more expensive.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: Advice Types & Execution Order -->
+            <!-- ============================================ -->
+            <h2>8. Advice Types & Their Execution Order</h2>
+
+            <pre><code><span class="token-annotation">@Aspect</span>
+<span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">LoggingAspect</span> {
+
+    <span class="token-comment">// ┌─────────────────────────────────────────────────────────────┐</span>
+    <span class="token-comment">// │ EXECUTION ORDER (single aspect, same pointcut):             │</span>
+    <span class="token-comment">// │                                                             │</span>
+    <span class="token-comment">// │  @Around (before proceed) → @Before → METHOD → @AfterReturning → @After → @Around (after proceed)</span>
+    <span class="token-comment">// │                                                             │</span>
+    <span class="token-comment">// │  On exception:                                              │</span>
+    <span class="token-comment">// │  @Around (before proceed) → @Before → METHOD THROWS → @AfterThrowing → @After → @Around (catch)</span>
+    <span class="token-comment">// └─────────────────────────────────────────────────────────────┘</span>
+
+    <span class="token-comment">// 1. @Before — runs BEFORE the method</span>
+    <span class="token-annotation">@Before</span>(<span class="token-string">"execution(* com.app.service.*.*(..))"</span>)
+    <span class="token-keyword">public void</span> <span class="token-function">logBefore</span>(<span class="token-type">JoinPoint</span> jp) {
+        log.<span class="token-function">info</span>(<span class="token-string">"Entering: {}"</span>, jp.<span class="token-function">getSignature</span>().<span class="token-function">toShortString</span>());
+    }
+
+    <span class="token-comment">// 2. @AfterReturning — runs after successful return</span>
+    <span class="token-annotation">@AfterReturning</span>(pointcut = <span class="token-string">"execution(* com.app.service.*.*(..))"</span>,
+                    returning = <span class="token-string">"result"</span>)
+    <span class="token-keyword">public void</span> <span class="token-function">logReturn</span>(<span class="token-type">JoinPoint</span> jp, <span class="token-type">Object</span> result) {
+        log.<span class="token-function">info</span>(<span class="token-string">"Returned: {} → {}"</span>, jp.<span class="token-function">getSignature</span>().<span class="token-function">toShortString</span>(), result);
+    }
+
+    <span class="token-comment">// 3. @AfterThrowing — runs only when exception is thrown</span>
+    <span class="token-annotation">@AfterThrowing</span>(pointcut = <span class="token-string">"execution(* com.app.service.*.*(..))"</span>,
+                   throwing = <span class="token-string">"ex"</span>)
+    <span class="token-keyword">public void</span> <span class="token-function">logException</span>(<span class="token-type">JoinPoint</span> jp, <span class="token-type">Throwable</span> ex) {
+        log.<span class="token-function">error</span>(<span class="token-string">"Exception in {}: {}"</span>, jp.<span class="token-function">getSignature</span>().<span class="token-function">toShortString</span>(), ex.<span class="token-function">getMessage</span>());
+    }
+
+    <span class="token-comment">// 4. @After — runs ALWAYS (like finally block), success OR failure</span>
+    <span class="token-annotation">@After</span>(<span class="token-string">"execution(* com.app.service.*.*(..))"</span>)
+    <span class="token-keyword">public void</span> <span class="token-function">logAfter</span>(<span class="token-type">JoinPoint</span> jp) {
+        log.<span class="token-function">info</span>(<span class="token-string">"Completed: {}"</span>, jp.<span class="token-function">getSignature</span>().<span class="token-function">toShortString</span>());
+    }
+
+    <span class="token-comment">// 5. @Around — MOST POWERFUL. Wraps the entire execution.</span>
+    <span class="token-annotation">@Around</span>(<span class="token-string">"execution(* com.app.service.*.*(..))"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">logAround</span>(<span class="token-type">ProceedingJoinPoint</span> pjp) <span class="token-keyword">throws</span> <span class="token-type">Throwable</span> {
+        <span class="token-keyword">long</span> start = System.<span class="token-function">nanoTime</span>();
+        <span class="token-keyword">try</span> {
+            <span class="token-type">Object</span> result = pjp.<span class="token-function">proceed</span>();  <span class="token-comment">// ← CALLS THE ACTUAL METHOD</span>
+            <span class="token-keyword">return</span> result;
+        } <span class="token-keyword">catch</span> (<span class="token-type">Throwable</span> t) {
+            log.<span class="token-function">error</span>(<span class="token-string">"Failed after {}ms"</span>, (System.<span class="token-function">nanoTime</span>() - start) / 1_000_000);
+            <span class="token-keyword">throw</span> t;
+        } <span class="token-keyword">finally</span> {
+            log.<span class="token-function">info</span>(<span class="token-string">"Duration: {}ms"</span>, (System.<span class="token-function">nanoTime</span>() - start) / 1_000_000);
+        }
+    }
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Ordering Across Multiple Aspects</div>
+                <p>When multiple aspects apply to the same method, use <code><span class="token-annotation">@Order</span></code> to control execution order. Lower values execute first (outermost). Without <code>@Order</code>, the order is <strong>undefined</strong> and may vary between JVM runs.</p>
+                <pre><code><span class="token-annotation">@Aspect</span> <span class="token-annotation">@Order</span>(1)  <span class="token-comment">// Executes FIRST (outermost wrapper)</span>
+<span class="token-keyword">public class</span> <span class="token-class">SecurityAspect</span> { }
+
+<span class="token-annotation">@Aspect</span> <span class="token-annotation">@Order</span>(2)  <span class="token-comment">// Executes SECOND (inside security)</span>
+<span class="token-keyword">public class</span> <span class="token-class">TransactionAspect</span> { }
+
+<span class="token-annotation">@Aspect</span> <span class="token-annotation">@Order</span>(3)  <span class="token-comment">// Executes LAST (innermost, closest to target)</span>
+<span class="token-keyword">public class</span> <span class="token-class">LoggingAspect</span> { }
+
+<span class="token-comment">// Call flow: Security → Transaction → Logging → METHOD → Logging → Transaction → Security</span></code></pre>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 9: SELF-INVOCATION PROBLEM -->
+            <!-- ============================================ -->
+            <h2>9. Why Self-Invocation Bypasses AOP — The Achilles Heel</h2>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">🚨 CRITICAL: Self-Invocation Breaks AOP</div>
+                <p>When a method calls another method on the <strong>same bean</strong> using <code>this.method()</code>, the call goes directly to the target object — <strong>bypassing the proxy entirely</strong>. This means <code>@Transactional</code>, <code>@Cacheable</code>, <code>@Async</code>, and any other AOP-based annotation on the called method <strong>will not work</strong>.</p>
+            </div>
+
+            <pre><code><span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+
+    <span class="token-annotation">@Transactional</span>
+    <span class="token-keyword">public void</span> <span class="token-function">processOrder</span>(<span class="token-type">Order</span> order) {
+        <span class="token-comment">// ... processing logic ...</span>
+        <span class="token-function">sendNotification</span>(order);  <span class="token-comment">// ← THIS IS this.sendNotification()</span>
+        <span class="token-comment">//                              goes DIRECTLY to target, not through proxy!</span>
+    }
+
+    <span class="token-annotation">@Async</span>  <span class="token-comment">// ❌ THIS WILL NOT EXECUTE ASYNCHRONOUSLY!</span>
+    <span class="token-keyword">public void</span> <span class="token-function">sendNotification</span>(<span class="token-type">Order</span> order) {
+        <span class="token-comment">// Intended to run in separate thread, but @Async is IGNORED</span>
+        <span class="token-comment">// because the call bypassed the proxy</span>
+        emailService.<span class="token-function">send</span>(order.<span class="token-function">getEmail</span>(), <span class="token-string">"Order confirmed"</span>);
+    }
+}
+
+<span class="token-comment">// WHY? Because inside processOrder(), 'this' refers to the TARGET object,</span>
+<span class="token-comment">// not the PROXY that wraps it.</span>
+<span class="token-comment">//</span>
+<span class="token-comment">//   External caller → Proxy.processOrder() → Target.processOrder()</span>
+<span class="token-comment">//                                                    │</span>
+<span class="token-comment">//                                                    └→ this.sendNotification()</span>
+<span class="token-comment">//                                                       ↑ DIRECT call to target!</span>
+<span class="token-comment">//                                                         Proxy is not involved!</span></code></pre>
+
+            <h3>Solutions to the Self-Invocation Problem</h3>
+
+            <pre><code><span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// SOLUTION 1: Self-injection (recommended in Spring Boot)</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">OrderService</span> self;  <span class="token-comment">// ← Injects the PROXY, not the target!</span>
+
+    <span class="token-annotation">@Transactional</span>
+    <span class="token-keyword">public void</span> <span class="token-function">processOrder</span>(<span class="token-type">Order</span> order) {
+        self.<span class="token-function">sendNotification</span>(order);  <span class="token-comment">// ← Goes through the proxy! ✅</span>
+    }
+
+    <span class="token-annotation">@Async</span>
+    <span class="token-keyword">public void</span> <span class="token-function">sendNotification</span>(<span class="token-type">Order</span> order) { ... }
+}
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// SOLUTION 2: AopContext.currentProxy() — explicit proxy access</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-comment">// First, enable: @EnableAspectJAutoProxy(exposeProxy = true)</span>
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+
+    <span class="token-annotation">@Transactional</span>
+    <span class="token-keyword">public void</span> <span class="token-function">processOrder</span>(<span class="token-type">Order</span> order) {
+        ((<span class="token-type">OrderService</span>) <span class="token-type">AopContext</span>.<span class="token-function">currentProxy</span>())
+            .<span class="token-function">sendNotification</span>(order);  <span class="token-comment">// ← Through proxy! ✅</span>
+    }
+
+    <span class="token-annotation">@Async</span>
+    <span class="token-keyword">public void</span> <span class="token-function">sendNotification</span>(<span class="token-type">Order</span> order) { ... }
+}
+<span class="token-comment">// ⚠️ Ugly, couples code to Spring AOP internals. Prefer self-injection.</span>
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// SOLUTION 3: Refactor to separate beans (cleanest architecture)</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">OrderService</span> {
+
+    <span class="token-annotation">@Autowired</span>
+    <span class="token-keyword">private</span> <span class="token-type">NotificationService</span> notificationService;  <span class="token-comment">// separate bean!</span>
+
+    <span class="token-annotation">@Transactional</span>
+    <span class="token-keyword">public void</span> <span class="token-function">processOrder</span>(<span class="token-type">Order</span> order) {
+        notificationService.<span class="token-function">sendNotification</span>(order);  <span class="token-comment">// ← Different bean = through proxy! ✅</span>
+    }
+}
+
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">NotificationService</span> {
+    <span class="token-annotation">@Async</span>
+    <span class="token-keyword">public void</span> <span class="token-function">sendNotification</span>(<span class="token-type">Order</span> order) { ... }  <span class="token-comment">// ✅ AOP works!</span>
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 10: Performance Cost -->
+            <!-- ============================================ -->
+            <h2>10. Performance Cost of AOP Proxies</h2>
+
+            <pre><code><span class="token-comment">// Benchmark results (JMH, Spring 6.1, JDK 21, x86_64)</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Direct method call (no proxy):           ~2 ns/op</span>
+<span class="token-comment">// CGLIB proxy (no advice matches):        ~15 ns/op  (fast path)</span>
+<span class="token-comment">// CGLIB proxy (1 @Around advice):        ~100 ns/op</span>
+<span class="token-comment">// JDK proxy (1 @Around advice):          ~120 ns/op</span>
+<span class="token-comment">// CGLIB proxy (3 stacked advices):       ~250 ns/op</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Context: A typical database call takes 1,000,000+ ns (1ms)</span>
+<span class="token-comment">//          A typical HTTP call takes 10,000,000+ ns (10ms)</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Conclusion: AOP overhead is NEGLIGIBLE for business operations</span>
+<span class="token-comment">//             but SIGNIFICANT for tight loops (e.g., 10M iterations)</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 When to Worry About AOP Performance</div>
+                <ul>
+                    <li><strong>Don't worry</strong>: Service layer methods, repository calls, controller handlers — all have I/O that dwarfs proxy overhead</li>
+                    <li><strong>Do worry</strong>: Utility methods called millions of times in computation-heavy loops (don't AOP these)</li>
+                    <li><strong>Startup cost</strong>: Each proxied bean adds ~0.1-0.5ms to startup (pointcut matching). 1000 proxied beans ≈ 100-500ms startup penalty</li>
+                </ul>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 11: AspectJ vs Spring AOP -->
+            <!-- ============================================ -->
+            <h2>11. AspectJ Compile-Time Weaving vs Spring AOP</h2>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Spring AOP (Runtime Proxies)</th>
+                            <th>AspectJ (Compile-Time Weaving)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Mechanism</strong></td>
+                            <td>Wraps beans in proxy objects at runtime</td>
+                            <td>Modifies .class bytecode at compile time (ajc compiler)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Self-invocation</strong></td>
+                            <td>❌ Doesn't work (proxy not involved)</td>
+                            <td>✅ Works (bytecode is modified in-place)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scope</strong></td>
+                            <td>Spring beans only</td>
+                            <td>Any Java class (even non-Spring)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Joinpoints</strong></td>
+                            <td>Method execution only</td>
+                            <td>Method, constructor, field access, exception handler</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Performance</strong></td>
+                            <td>Slight runtime overhead per call</td>
+                            <td>Zero runtime overhead (code is inline)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complexity</strong></td>
+                            <td>Zero build setup (just annotations)</td>
+                            <td>Requires ajc compiler or load-time weaver</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Debugging</strong></td>
+                            <td>Stack traces show proxy classes</td>
+                            <td>Woven code appears in original class</td>
+                        </tr>
+                        <tr>
+                            <td><strong>When to use</strong></td>
+                            <td>95% of cases — service-layer cross-cutting</td>
+                            <td>When you need field access interception, self-invocation, or non-Spring classes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pre><code><span class="token-comment">// Enabling AspectJ load-time weaving with Spring</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-annotation">@EnableLoadTimeWeaving</span>  <span class="token-comment">// Uses Java agent (-javaagent:aspectjweaver.jar)</span>
+<span class="token-keyword">public class</span> <span class="token-class">AspectJConfig</span> { }
+
+<span class="token-comment">// With AspectJ, self-invocation WORKS because bytecode is modified:</span>
+<span class="token-comment">// BEFORE weaving:</span>
+<span class="token-keyword">public void</span> <span class="token-function">processOrder</span>(<span class="token-type">Order</span> order) {
+    <span class="token-function">sendNotification</span>(order);  <span class="token-comment">// this.sendNotification()</span>
+}
+
+<span class="token-comment">// AFTER AspectJ weaving (decompiled):</span>
+<span class="token-keyword">public void</span> <span class="token-function">processOrder</span>(<span class="token-type">Order</span> order) {
+    <span class="token-comment">// Advice code is INLINED into the method body</span>
+    <span class="token-function">sendNotification$original</span>(order);
+}
+
+<span class="token-keyword">private void</span> <span class="token-function">sendNotification$original</span>(<span class="token-type">Order</span> order) {
+    <span class="token-comment">// Original code + woven aspect code runs here</span>
+    <span class="token-comment">// No proxy needed — bytecode was rewritten!</span>
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 12: Industry Patterns -->
+            <!-- ============================================ -->
+            <h2>12. Industry Patterns — AOP in Production</h2>
+
+            <p>Nearly every major Spring feature you use daily is implemented via AOP proxies:</p>
+
+            <pre><code><span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Spring's built-in AOP-powered annotations</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Transactional</span>       <span class="token-comment">// → TransactionInterceptor (begin/commit/rollback)</span>
+<span class="token-annotation">@Cacheable</span>           <span class="token-comment">// → CacheInterceptor (check cache → return or invoke)</span>
+<span class="token-annotation">@Async</span>               <span class="token-comment">// → AsyncExecutionInterceptor (submit to thread pool)</span>
+<span class="token-annotation">@Retryable</span>           <span class="token-comment">// → RetryOperationsInterceptor (retry on exception)</span>
+<span class="token-annotation">@PreAuthorize</span>        <span class="token-comment">// → MethodSecurityInterceptor (check permissions)</span>
+<span class="token-annotation">@Validated</span>           <span class="token-comment">// → MethodValidationInterceptor (validate args/return)</span>
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Custom AOP pattern: @Audited — audit trail for sensitive operations</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.METHOD)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-keyword">public @interface</span> <span class="token-class">Audited</span> {
+    <span class="token-type">String</span> <span class="token-function">action</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}
+
+<span class="token-annotation">@Aspect</span>
+<span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">AuditAspect</span> {
+
+    <span class="token-annotation">@Autowired</span> <span class="token-keyword">private</span> <span class="token-type">AuditRepository</span> auditRepo;
+    <span class="token-annotation">@Autowired</span> <span class="token-keyword">private</span> <span class="token-type">SecurityContext</span> securityContext;
+
+    <span class="token-annotation">@Around</span>(<span class="token-string">"@annotation(audited)"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">audit</span>(<span class="token-type">ProceedingJoinPoint</span> pjp, <span class="token-type">Audited</span> audited) <span class="token-keyword">throws</span> <span class="token-type">Throwable</span> {
+        <span class="token-type">String</span> user = securityContext.<span class="token-function">getCurrentUser</span>();
+        <span class="token-type">String</span> action = audited.<span class="token-function">action</span>().<span class="token-function">isEmpty</span>()
+            ? pjp.<span class="token-function">getSignature</span>().<span class="token-function">getName</span>() : audited.<span class="token-function">action</span>();
+
+        <span class="token-keyword">try</span> {
+            <span class="token-type">Object</span> result = pjp.<span class="token-function">proceed</span>();
+            auditRepo.<span class="token-function">save</span>(<span class="token-keyword">new</span> <span class="token-type">AuditEntry</span>(user, action, <span class="token-string">"SUCCESS"</span>, pjp.<span class="token-function">getArgs</span>()));
+            <span class="token-keyword">return</span> result;
+        } <span class="token-keyword">catch</span> (<span class="token-type">Throwable</span> t) {
+            auditRepo.<span class="token-function">save</span>(<span class="token-keyword">new</span> <span class="token-type">AuditEntry</span>(user, action, <span class="token-string">"FAILED"</span>, t.<span class="token-function">getMessage</span>()));
+            <span class="token-keyword">throw</span> t;
+        }
+    }
+}
+
+<span class="token-comment">// Usage — clean and declarative:</span>
+<span class="token-annotation">@Service</span>
+<span class="token-keyword">public class</span> <span class="token-class">AccountService</span> {
+
+    <span class="token-annotation">@Audited</span>(action = <span class="token-string">"TRANSFER_FUNDS"</span>)
+    <span class="token-annotation">@Transactional</span>
+    <span class="token-keyword">public void</span> <span class="token-function">transfer</span>(<span class="token-type">Account</span> from, <span class="token-type">Account</span> to, <span class="token-type">BigDecimal</span> amount) {
+        from.<span class="token-function">debit</span>(amount);
+        to.<span class="token-function">credit</span>(amount);
+    }
+}
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Custom AOP pattern: @RateLimited — API rate limiting</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════════════</span>
+
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.METHOD)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-keyword">public @interface</span> <span class="token-class">RateLimited</span> {
+    <span class="token-keyword">int</span> <span class="token-function">maxRequests</span>() <span class="token-keyword">default</span> 100;
+    <span class="token-keyword">int</span> <span class="token-function">windowSeconds</span>() <span class="token-keyword">default</span> 60;
+}
+
+<span class="token-annotation">@Aspect</span>
+<span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">RateLimitAspect</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">RateLimiter</span>&gt; limiters = <span class="token-keyword">new</span> <span class="token-type">ConcurrentHashMap</span>&lt;&gt;();
+
+    <span class="token-annotation">@Around</span>(<span class="token-string">"@annotation(rateLimited)"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">rateLimit</span>(<span class="token-type">ProceedingJoinPoint</span> pjp, <span class="token-type">RateLimited</span> rateLimited) <span class="token-keyword">throws</span> <span class="token-type">Throwable</span> {
+        <span class="token-type">String</span> key = pjp.<span class="token-function">getSignature</span>().<span class="token-function">toLongString</span>();
+        <span class="token-type">RateLimiter</span> limiter = limiters.<span class="token-function">computeIfAbsent</span>(key,
+            k -> <span class="token-type">RateLimiter</span>.<span class="token-function">create</span>(rateLimited.<span class="token-function">maxRequests</span>() / (<span class="token-keyword">double</span>) rateLimited.<span class="token-function">windowSeconds</span>()));
+
+        <span class="token-keyword">if</span> (!limiter.<span class="token-function">tryAcquire</span>()) {
+            <span class="token-keyword">throw new</span> <span class="token-type">RateLimitExceededException</span>(<span class="token-string">"Rate limit exceeded"</span>);
+        }
+        <span class="token-keyword">return</span> pjp.<span class="token-function">proceed</span>();
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>Explain why Spring chose proxy-based AOP over bytecode weaving. What are the tradeoffs?</li>
+                    <li>You have a <code>@Cacheable</code> method that's being called from another method in the same class. The cache is never hit. Why? How do you fix it?</li>
+                    <li>Your bean implements <code>Serializable</code> and <code>OrderService</code> interfaces. Which proxy type does Spring Boot use and why?</li>
+                    <li>Write a pointcut that matches all public methods in classes annotated with <code>@RestController</code> but excludes methods annotated with <code>@SkipAudit</code>.</li>
+                    <li>If you add <code>@Transactional</code> to a <code>private</code> method, what happens with CGLIB proxies? What about JDK proxies?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"Your team reports that <code>@Transactional</code> isn't rolling back on exceptions in a specific service method. The method is public, non-final, and the exception IS a RuntimeException. What's your debugging approach?"</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Check self-invocation</strong> — Is the method being called from within the same bean? If yes, the proxy is bypassed.</li>
+                    <li><strong>Verify proxy creation</strong> — Add <code>log.info(getClass().getName())</code> in the method. If it shows your class name (not $$EnhancerByCGLIB$$), you're not proxied.</li>
+                    <li><strong>Check exception type</strong> — <code>@Transactional</code> only rolls back on <code>RuntimeException</code> and <code>Error</code> by default. For checked exceptions, use <code>rollbackFor</code>.</li>
+                    <li><strong>Check propagation</strong> — <code>REQUIRES_NEW</code> creates a new transaction; if the inner one rolls back but the outer one catches the exception, the outer commits.</li>
+                    <li><strong>Check try-catch</strong> — If you catch the exception inside the method and don't rethrow, the proxy sees no exception → no rollback.</li>
+                </ol>
+            </div>
+
+            <div class="nav-footer">
+                <a href="06-bean-scopes.html" class="nav-btn nav-btn-prev">← Bean Scopes</a>
+                <a href="08-spel.html" class="nav-btn nav-btn-next">Spring Expression Language →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

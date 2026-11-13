@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool & Function Calling — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 7</a> <span>›</span> Tool & Function Calling</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Tool & Function Calling</h1>
+                <p>LLMs can't check the weather, query databases, or send emails on their own. Tool calling gives them "hands" — the ability to invoke real functions and use the results in their responses.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Function calling = a doctor writing prescriptions.</strong> The doctor (AI) decides what medicine you need, writes a prescription (function call with parameters), then the pharmacist (your code) actually fills it. The doctor doesn't hand you pills directly.</p>
+                <p>The AI says: "I need to call <code>get_weather(city='London')</code>" — your code runs it, gets the result, and sends it back for the AI to use in its answer.</p>
+            </div>
+
+            <h2 id="how-it-works">How Tool Calling Works</h2>
+
+            <div class="mental-model">
+                <h4>🧠 The Tool Calling Loop</h4>
+                <pre><code>User: "What's the weather in Tokyo?"
+    ↓
+AI thinks: "I need weather data. I'll call get_weather."
+    ↓
+AI returns: tool_call(name="get_weather", args={"city": "Tokyo"})
+    ↓
+YOUR CODE: runs get_weather("Tokyo") → {"temp": 22, "condition": "sunny"}
+    ↓
+You send result back to AI
+    ↓
+AI: "It's 22°C and sunny in Tokyo right now! 🌞"</code></pre>
+            </div>
+
+            <h2 id="openai-tools">OpenAI-Style Function Calling</h2>
+
+            <pre><code><span class="token-comment"># Works with OpenAI, Ollama, Groq, Together — all OpenAI-compatible APIs</span>
+<span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+
+<span class="token-comment"># Step 1: Define your tools with JSON Schema</span>
+tools = [
+    {
+        <span class="token-string">"type"</span>: <span class="token-string">"function"</span>,
+        <span class="token-string">"function"</span>: {
+            <span class="token-string">"name"</span>: <span class="token-string">"get_weather"</span>,
+            <span class="token-string">"description"</span>: <span class="token-string">"Get current weather for a city"</span>,
+            <span class="token-string">"parameters"</span>: {
+                <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+                <span class="token-string">"properties"</span>: {
+                    <span class="token-string">"city"</span>: {
+                        <span class="token-string">"type"</span>: <span class="token-string">"string"</span>,
+                        <span class="token-string">"description"</span>: <span class="token-string">"City name, e.g., 'London'"</span>
+                    },
+                    <span class="token-string">"units"</span>: {
+                        <span class="token-string">"type"</span>: <span class="token-string">"string"</span>,
+                        <span class="token-string">"enum"</span>: [<span class="token-string">"celsius"</span>, <span class="token-string">"fahrenheit"</span>],
+                        <span class="token-string">"description"</span>: <span class="token-string">"Temperature units"</span>
+                    }
+                },
+                <span class="token-string">"required"</span>: [<span class="token-string">"city"</span>]
+            }
+        }
+    },
+    {
+        <span class="token-string">"type"</span>: <span class="token-string">"function"</span>,
+        <span class="token-string">"function"</span>: {
+            <span class="token-string">"name"</span>: <span class="token-string">"search_database"</span>,
+            <span class="token-string">"description"</span>: <span class="token-string">"Search for products in the database"</span>,
+            <span class="token-string">"parameters"</span>: {
+                <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+                <span class="token-string">"properties"</span>: {
+                    <span class="token-string">"query"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>, <span class="token-string">"description"</span>: <span class="token-string">"Search query"</span>},
+                    <span class="token-string">"max_results"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"integer"</span>, <span class="token-string">"description"</span>: <span class="token-string">"Max results to return"</span>}
+                },
+                <span class="token-string">"required"</span>: [<span class="token-string">"query"</span>]
+            }
+        }
+    }
+]
+
+<span class="token-comment"># Step 2: Implement the actual functions</span>
+<span class="token-keyword">def</span> <span class="token-function">get_weather</span>(city: str, units: str = <span class="token-string">"celsius"</span>) -> dict:
+    <span class="token-string">"""Real implementation would call a weather API."""</span>
+    <span class="token-comment"># Simulated response</span>
+    <span class="token-keyword">return</span> {<span class="token-string">"city"</span>: city, <span class="token-string">"temp"</span>: <span class="token-number">22</span>, <span class="token-string">"condition"</span>: <span class="token-string">"partly cloudy"</span>, <span class="token-string">"units"</span>: units}
+
+<span class="token-keyword">def</span> <span class="token-function">search_database</span>(query: str, max_results: int = <span class="token-number">5</span>) -> list:
+    <span class="token-string">"""Real implementation would query your DB."""</span>
+    <span class="token-keyword">return</span> [{<span class="token-string">"name"</span>: <span class="token-string">"Widget Pro"</span>, <span class="token-string">"price"</span>: <span class="token-number">29.99</span>}, {<span class="token-string">"name"</span>: <span class="token-string">"Widget Basic"</span>, <span class="token-string">"price"</span>: <span class="token-number">9.99</span>}]
+
+<span class="token-comment"># Function registry</span>
+TOOL_FUNCTIONS = {
+    <span class="token-string">"get_weather"</span>: get_weather,
+    <span class="token-string">"search_database"</span>: search_database,
+}
+
+<span class="token-comment"># Step 3: The tool calling loop</span>
+<span class="token-keyword">def</span> <span class="token-function">chat_with_tools</span>(user_message: str) -> str:
+    messages = [{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: user_message}]
+    
+    <span class="token-comment"># First call: AI decides if it needs tools</span>
+    response = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=messages,
+        tools=tools,
+        tool_choice=<span class="token-string">"auto"</span>,  <span class="token-comment"># "auto" | "none" | specific function</span>
+    )
+    
+    msg = response.choices[<span class="token-number">0</span>].message
+    
+    <span class="token-comment"># If no tool calls, return direct response</span>
+    <span class="token-keyword">if not</span> msg.tool_calls:
+        <span class="token-keyword">return</span> msg.content
+    
+    <span class="token-comment"># Process each tool call</span>
+    messages.append(msg)  <span class="token-comment"># Add assistant message with tool calls</span>
+    
+    <span class="token-keyword">for</span> tool_call <span class="token-keyword">in</span> msg.tool_calls:
+        func_name = tool_call.function.name
+        func_args = json.loads(tool_call.function.arguments)
+        
+        <span class="token-builtin">print</span>(<span class="token-string">f"🔧 Calling: {func_name}({func_args})"</span>)
+        
+        <span class="token-comment"># Execute the function</span>
+        result = TOOL_FUNCTIONS[func_name](**func_args)
+        
+        <span class="token-comment"># Add result to messages</span>
+        messages.append({
+            <span class="token-string">"role"</span>: <span class="token-string">"tool"</span>,
+            <span class="token-string">"tool_call_id"</span>: tool_call.id,
+            <span class="token-string">"content"</span>: json.dumps(result)
+        })
+    
+    <span class="token-comment"># Second call: AI uses the results to answer</span>
+    final_response = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=messages,
+    )
+    
+    <span class="token-keyword">return</span> final_response.choices[<span class="token-number">0</span>].message.content
+
+<span class="token-comment"># Test it!</span>
+<span class="token-builtin">print</span>(chat_with_tools(<span class="token-string">"What's the weather in Tokyo?"</span>))
+<span class="token-builtin">print</span>(chat_with_tools(<span class="token-string">"Find me some widgets under $20"</span>))
+<span class="token-builtin">print</span>(chat_with_tools(<span class="token-string">"Hello, how are you?"</span>))  <span class="token-comment"># No tool call needed</span></code></pre>
+
+            <h2 id="multi-tool">Multiple Tool Calls in One Response</h2>
+
+            <pre><code><span class="token-comment"># AI can call multiple tools at once (parallel tool calls)</span>
+
+<span class="token-comment"># User: "Compare the weather in London and Paris"</span>
+<span class="token-comment"># AI generates TWO tool calls:</span>
+<span class="token-comment">#   tool_call_1: get_weather(city="London")</span>
+<span class="token-comment">#   tool_call_2: get_weather(city="Paris")</span>
+
+<span class="token-comment"># Your code runs both, sends both results back</span>
+<span class="token-comment"># AI then compares them in its answer</span>
+
+<span class="token-keyword">def</span> <span class="token-function">handle_parallel_tools</span>(message):
+    <span class="token-string">"""Handle AI responses with multiple parallel tool calls."""</span>
+    response = client.chat.completions.create(
+        model=<span class="token-string">"llama3.1:8b"</span>,
+        messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: message}],
+        tools=tools,
+        tool_choice=<span class="token-string">"auto"</span>,
+    )
+    
+    msg = response.choices[<span class="token-number">0</span>].message
+    
+    <span class="token-keyword">if</span> msg.tool_calls:
+        <span class="token-builtin">print</span>(<span class="token-string">f"AI wants to call {len(msg.tool_calls)} tools"</span>)
+        <span class="token-keyword">for</span> tc <span class="token-keyword">in</span> msg.tool_calls:
+            <span class="token-builtin">print</span>(<span class="token-string">f"  - {tc.function.name}({tc.function.arguments})"</span>)
+    
+    <span class="token-keyword">return</span> msg</code></pre>
+
+            <h2 id="ollama-native">Ollama Native Tool Calling</h2>
+
+            <pre><code><span class="token-comment"># Using Ollama's native Python library (not OpenAI-compatible)</span>
+<span class="token-keyword">import</span> ollama
+
+<span class="token-comment"># Define tools in Ollama format (same JSON Schema)</span>
+response = ollama.chat(
+    model=<span class="token-string">"llama3.1:8b"</span>,
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"What's the weather in Berlin?"</span>}],
+    tools=[{
+        <span class="token-string">"type"</span>: <span class="token-string">"function"</span>,
+        <span class="token-string">"function"</span>: {
+            <span class="token-string">"name"</span>: <span class="token-string">"get_weather"</span>,
+            <span class="token-string">"description"</span>: <span class="token-string">"Get weather for a location"</span>,
+            <span class="token-string">"parameters"</span>: {
+                <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+                <span class="token-string">"properties"</span>: {
+                    <span class="token-string">"city"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>, <span class="token-string">"description"</span>: <span class="token-string">"City name"</span>}
+                },
+                <span class="token-string">"required"</span>: [<span class="token-string">"city"</span>]
+            }
+        }
+    }]
+)
+
+<span class="token-comment"># Check if model wants to call a tool</span>
+<span class="token-keyword">if</span> response[<span class="token-string">"message"</span>].get(<span class="token-string">"tool_calls"</span>):
+    <span class="token-keyword">for</span> tool <span class="token-keyword">in</span> response[<span class="token-string">"message"</span>][<span class="token-string">"tool_calls"</span>]:
+        <span class="token-builtin">print</span>(<span class="token-string">f"Tool: {tool['function']['name']}"</span>)
+        <span class="token-builtin">print</span>(<span class="token-string">f"Args: {tool['function']['arguments']}"</span>)</code></pre>
+
+            <h2 id="robust-tool-system">Production Tool System</h2>
+
+            <pre><code><span class="token-comment"># Robust tool system with validation, error handling, and security</span>
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> inspect
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Callable, Any
+<span class="token-keyword">from</span> functools <span class="token-keyword">import</span> wraps
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+<span class="token-keyword">class</span> <span class="token-function">ToolRegistry</span>:
+    <span class="token-string">"""Production-grade tool management for AI assistants."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.tools = {}  <span class="token-comment"># name → {func, schema, config}</span>
+        self.call_history = []
+    
+    <span class="token-keyword">def</span> <span class="token-function">register</span>(self, description: str, parameters: dict, requires_confirmation: bool = <span class="token-keyword">False</span>):
+        <span class="token-string">"""Decorator to register a function as a tool."""</span>
+        <span class="token-keyword">def</span> decorator(func: Callable):
+            self.tools[func.__name__] = {
+                <span class="token-string">"func"</span>: func,
+                <span class="token-string">"schema"</span>: {
+                    <span class="token-string">"type"</span>: <span class="token-string">"function"</span>,
+                    <span class="token-string">"function"</span>: {
+                        <span class="token-string">"name"</span>: func.__name__,
+                        <span class="token-string">"description"</span>: description,
+                        <span class="token-string">"parameters"</span>: parameters,
+                    }
+                },
+                <span class="token-string">"requires_confirmation"</span>: requires_confirmation,
+            }
+            <span class="token-keyword">return</span> func
+        <span class="token-keyword">return</span> decorator
+    
+    <span class="token-keyword">def</span> <span class="token-function">get_tool_schemas</span>(self) -> list:
+        <span class="token-string">"""Get all tool schemas for the API call."""</span>
+        <span class="token-keyword">return</span> [t[<span class="token-string">"schema"</span>] <span class="token-keyword">for</span> t <span class="token-keyword">in</span> self.tools.values()]
+    
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self, name: str, arguments: dict) -> str:
+        <span class="token-string">"""Safely execute a tool and return result as string."""</span>
+        <span class="token-keyword">if</span> name <span class="token-keyword">not in</span> self.tools:
+            <span class="token-keyword">return</span> json.dumps({<span class="token-string">"error"</span>: <span class="token-string">f"Unknown tool: {name}"</span>})
+        
+        tool = self.tools[name]
+        
+        <span class="token-comment"># Security check</span>
+        <span class="token-keyword">if</span> tool[<span class="token-string">"requires_confirmation"</span>]:
+            <span class="token-builtin">print</span>(<span class="token-string">f"⚠️ Tool '{name}' requires confirmation!"</span>)
+            <span class="token-comment"># In production: wait for user approval</span>
+        
+        <span class="token-keyword">try</span>:
+            result = tool[<span class="token-string">"func"</span>](**arguments)
+            self.call_history.append({<span class="token-string">"tool"</span>: name, <span class="token-string">"args"</span>: arguments, <span class="token-string">"success"</span>: <span class="token-keyword">True</span>})
+            <span class="token-keyword">return</span> json.dumps(result, default=str)
+        <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+            self.call_history.append({<span class="token-string">"tool"</span>: name, <span class="token-string">"args"</span>: arguments, <span class="token-string">"success"</span>: <span class="token-keyword">False</span>, <span class="token-string">"error"</span>: str(e)})
+            <span class="token-keyword">return</span> json.dumps({<span class="token-string">"error"</span>: <span class="token-string">f"Tool execution failed: {str(e)}"</span>})
+
+<span class="token-comment"># Create registry and register tools</span>
+registry = ToolRegistry()
+
+@registry.register(
+    description=<span class="token-string">"Get current weather for a city"</span>,
+    parameters={
+        <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+        <span class="token-string">"properties"</span>: {
+            <span class="token-string">"city"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>, <span class="token-string">"description"</span>: <span class="token-string">"City name"</span>}
+        },
+        <span class="token-string">"required"</span>: [<span class="token-string">"city"</span>]
+    }
+)
+<span class="token-keyword">def</span> <span class="token-function">get_weather</span>(city: str) -> dict:
+    <span class="token-keyword">return</span> {<span class="token-string">"city"</span>: city, <span class="token-string">"temp"</span>: <span class="token-number">22</span>, <span class="token-string">"condition"</span>: <span class="token-string">"sunny"</span>}
+
+@registry.register(
+    description=<span class="token-string">"Send an email to a recipient"</span>,
+    parameters={
+        <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+        <span class="token-string">"properties"</span>: {
+            <span class="token-string">"to"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>, <span class="token-string">"description"</span>: <span class="token-string">"Recipient email"</span>},
+            <span class="token-string">"subject"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>},
+            <span class="token-string">"body"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>}
+        },
+        <span class="token-string">"required"</span>: [<span class="token-string">"to"</span>, <span class="token-string">"subject"</span>, <span class="token-string">"body"</span>]
+    },
+    requires_confirmation=<span class="token-keyword">True</span>  <span class="token-comment"># Dangerous action!</span>
+)
+<span class="token-keyword">def</span> <span class="token-function">send_email</span>(to: str, subject: str, body: str) -> dict:
+    <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"sent"</span>, <span class="token-string">"to"</span>: to}
+
+<span class="token-comment"># Full conversation loop with tools</span>
+<span class="token-keyword">def</span> <span class="token-function">agent_loop</span>(user_message: str, client: OpenAI, max_iterations: int = <span class="token-number">5</span>) -> str:
+    messages = [{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: user_message}]
+    
+    <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> <span class="token-builtin">range</span>(max_iterations):
+        response = client.chat.completions.create(
+            model=<span class="token-string">"llama3.1:8b"</span>,
+            messages=messages,
+            tools=registry.get_tool_schemas(),
+            tool_choice=<span class="token-string">"auto"</span>,
+        )
+        
+        msg = response.choices[<span class="token-number">0</span>].message
+        messages.append(msg)
+        
+        <span class="token-keyword">if not</span> msg.tool_calls:
+            <span class="token-keyword">return</span> msg.content
+        
+        <span class="token-keyword">for</span> tool_call <span class="token-keyword">in</span> msg.tool_calls:
+            result = registry.execute(
+                tool_call.function.name,
+                json.loads(tool_call.function.arguments)
+            )
+            messages.append({
+                <span class="token-string">"role"</span>: <span class="token-string">"tool"</span>,
+                <span class="token-string">"tool_call_id"</span>: tool_call.id,
+                <span class="token-string">"content"</span>: result,
+            })
+    
+    <span class="token-keyword">return</span> <span class="token-string">"Max iterations reached."</span></code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Always validate tool arguments</strong> — Never trust AI-generated parameters blindly. Validate types and ranges.</li>
+                    <li><strong>Require confirmation for dangerous actions</strong> — Sending emails, deleting data, making purchases must have human approval.</li>
+                    <li><strong>Set max iterations</strong> — Prevent infinite loops where AI keeps calling tools forever.</li>
+                    <li><strong>Log all tool calls</strong> — Essential for debugging, auditing, and cost tracking.</li>
+                    <li><strong>Timeout protection</strong> — If a tool takes too long, fail gracefully.</li>
+                    <li><strong>Models that support tools</strong> — GPT-4o, Claude 3.5, Llama 3.1+, Qwen 2.5, Mistral Large all support native tool calling.</li>
+                    <li><strong>Tool descriptions matter</strong> — Better descriptions = better tool selection by the model.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Tool calling</strong> = AI decides what function to call, your code executes it</li>
+                    <li>Define tools with <strong>JSON Schema</strong> (name, description, parameters)</li>
+                    <li>The loop: User → AI → tool_call → execute → result → AI → answer</li>
+                    <li>AI can call <strong>multiple tools</strong> in parallel when needed</li>
+                    <li>Use a <strong>ToolRegistry</strong> for clean registration, validation, and execution</li>
+                    <li>Always add <strong>safety checks</strong> for destructive actions</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>No error handling in tools</strong> — If your function throws, the AI gets confused. Always return clean error messages.</li>
+                    <li><strong>Trusting AI arguments</strong> — AI might hallucinate parameters. Validate everything server-side.</li>
+                    <li><strong>No iteration limit</strong> — AI can get stuck in loops calling tools repeatedly. Set max_iterations.</li>
+                    <li><strong>Vague tool descriptions</strong> — "Does stuff" → AI won't know when to use it. Be specific about purpose and inputs.</li>
+                    <li><strong>Exposing dangerous tools without confirmation</strong> — delete_user, send_money, etc. always need human approval.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build a Tool-Using Assistant</h4>
+                <ol>
+                    <li>Implement 3 tools: get_weather, calculate (math), search_web</li>
+                    <li>Build the full tool calling loop that handles multiple rounds</li>
+                    <li>Add a "send_email" tool with confirmation requirement</li>
+                    <li>Test with: "What's 25% of the current temperature in Paris?"</li>
+                    <li>Add logging to track all tool calls and their results</li>
+                    <li><strong>Bonus:</strong> Make tools composable — one tool's output feeds another tool's input</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="25-prompt-engineering.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Prompt Engineering</span>
+                </a>
+                <a href="27-ai-agents.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">AI Agents</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

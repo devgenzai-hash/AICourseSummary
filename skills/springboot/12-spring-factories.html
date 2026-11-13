@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>spring.factories & META-INF - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html" class="active"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html"><span class="nav-number">14</span> Profiles & Environment</a></li>
+            <li><a href="15-custom-auto-configuration.html"><span class="nav-number">15</span> Custom Auto-Configuration</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Auto-Configuration → spring.factories & META-INF</div>
+        <div class="topic-number">Topic 12 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>spring.factories & META-INF</h1>
+            <p class="subtitle-description">The SPI (Service Provider Interface) mechanism that makes Spring Boot's plugin architecture possible — how JARs register their auto-configurations without classpath scanning.</p>
+
+            <div class="tags">
+                <span class="tag tag-intermediate">intermediate</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-internal">internal</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">📋 The Yellow Pages Analogy</div>
+                <p>Imagine each business in a city publishes its services in a shared Yellow Pages directory. When you need a plumber, you don't walk door-to-door asking "are you a plumber?" — you open the directory and find all registered plumbers instantly. <code>spring.factories</code> is Spring Boot's Yellow Pages: each JAR "publishes" what services it provides (auto-configs, listeners, initializers) in a well-known file. At startup, Spring reads ALL directories from ALL JARs simultaneously — no scanning, no guessing, just explicit registration.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: The spring.factories Format -->
+            <!-- ============================================ -->
+            <h2>1. META-INF/spring.factories Format (Boot 2.x)</h2>
+
+            <p>The classic format is a Java properties file where keys are interface/class names and values are comma-separated implementation class names:</p>
+
+            <pre><code><span class="token-comment"># File location: META-INF/spring.factories (inside any JAR)</span>
+<span class="token-comment"># Format: key=value1,value2,value3</span>
+<span class="token-comment"># Backslash for line continuation</span>
+
+<span class="token-comment"># Auto-configuration classes</span>
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.mycompany.library.autoconfigure.MyServiceAutoConfiguration,\
+  com.mycompany.library.autoconfigure.MyRepositoryAutoConfiguration
+
+<span class="token-comment"># Application context initializers</span>
+org.springframework.context.ApplicationContextInitializer=\
+  com.mycompany.library.init.MyContextInitializer
+
+<span class="token-comment"># Application listeners</span>
+org.springframework.context.ApplicationListener=\
+  com.mycompany.library.listener.MyStartupListener
+
+<span class="token-comment"># Environment post-processors</span>
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.mycompany.library.env.VaultPropertySourcePostProcessor
+
+<span class="token-comment"># Failure analyzers</span>
+org.springframework.boot.diagnostics.FailureAnalyzer=\
+  com.mycompany.library.diagnostics.ConnectionFailureAnalyzer
+
+<span class="token-comment"># Auto-configuration import filters (fast pre-filtering)</span>
+org.springframework.boot.autoconfigure.AutoConfigurationImportFilter=\
+  com.mycompany.library.filter.MyImportFilter</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>The same key can appear in <code>spring.factories</code> files across MANY different JARs. <code>SpringFactoriesLoader</code> aggregates all values from all JARs — it doesn't stop at the first match. This is what makes the plugin architecture work: each library JAR contributes its own entries, and Spring Boot merges them all.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: Boot 3.x Migration -->
+            <!-- ============================================ -->
+            <h2>2. Spring Boot 3.x: The New Format</h2>
+
+            <p>Spring Boot 3.x introduced a new, simpler file specifically for auto-configuration registration:</p>
+
+            <pre><code><span class="token-comment"># File: META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</span>
+<span class="token-comment"># One fully-qualified class name per line</span>
+<span class="token-comment"># Comments with # are supported</span>
+<span class="token-comment"># No key-value format — just class names</span>
+
+com.mycompany.library.autoconfigure.MyServiceAutoConfiguration
+com.mycompany.library.autoconfigure.MyRepositoryAutoConfiguration
+com.mycompany.library.autoconfigure.MyWebAutoConfiguration</code></pre>
+
+            <h3>Why the Change?</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>spring.factories (Boot 2.x)</th>
+                        <th>AutoConfiguration.imports (Boot 3.x)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Scope</td>
+                        <td>Multi-purpose (auto-configs, listeners, initializers, etc.)</td>
+                        <td>Auto-configuration only</td>
+                    </tr>
+                    <tr>
+                        <td>Format</td>
+                        <td>Key=value, comma-separated, backslash continuation</td>
+                        <td>One class per line</td>
+                    </tr>
+                    <tr>
+                        <td>Parsing complexity</td>
+                        <td>Properties parsing + string splitting</td>
+                        <td>Line-by-line reading</td>
+                    </tr>
+                    <tr>
+                        <td>Merge conflicts</td>
+                        <td>Frequent (single key with growing list)</td>
+                        <td>Rare (one class per line = easy git merge)</td>
+                    </tr>
+                    <tr>
+                        <td>IDE support</td>
+                        <td>Generic properties file</td>
+                        <td>Dedicated tooling (class completion)</td>
+                    </tr>
+                    <tr>
+                        <td>Boot 2.x compat</td>
+                        <td>Native</td>
+                        <td>Not read by Boot 2.x</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Migration Note</div>
+                <p>In Boot 3.x, <code>spring.factories</code> is still used for non-auto-configuration entries (listeners, initializers, failure analyzers, etc.). Only auto-configuration registration moved to the new <code>.imports</code> file. If you're migrating a library, you need BOTH files during the transition period if you support Boot 2.x and 3.x simultaneously.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: SpringFactoriesLoader -->
+            <!-- ============================================ -->
+            <h2>3. SpringFactoriesLoader — The Loading Mechanism</h2>
+
+            <pre><code><span class="token-keyword">public final class</span> <span class="token-class">SpringFactoriesLoader</span> {
+
+    <span class="token-keyword">public static final</span> <span class="token-type">String</span> FACTORIES_RESOURCE_LOCATION =
+        <span class="token-string">"META-INF/spring.factories"</span>;
+
+    <span class="token-comment">// Core method: loads ALL factory names for a given type from ALL JARs</span>
+    <span class="token-keyword">public static</span> <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; <span class="token-function">loadFactoryNames</span>(
+            <span class="token-type">Class</span>&lt;?&gt; factoryType, <span class="token-type">ClassLoader</span> classLoader) {
+
+        <span class="token-type">String</span> factoryTypeName = factoryType.<span class="token-function">getName</span>();
+
+        <span class="token-comment">// Load and cache all spring.factories content</span>
+        <span class="token-keyword">return</span> <span class="token-function">loadSpringFactories</span>(classLoader)
+            .<span class="token-function">getOrDefault</span>(factoryTypeName, <span class="token-type">Collections</span>.<span class="token-function">emptyList</span>());
+    }
+
+    <span class="token-keyword">private static</span> <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt;&gt; <span class="token-function">loadSpringFactories</span>(
+            <span class="token-type">ClassLoader</span> classLoader) {
+
+        <span class="token-comment">// CHECK CACHE FIRST — loaded only once per classloader</span>
+        <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt;&gt; result = cache.<span class="token-function">get</span>(classLoader);
+        <span class="token-keyword">if</span> (result != <span class="token-keyword">null</span>) {
+            <span class="token-keyword">return</span> result;
+        }
+
+        result = <span class="token-keyword">new</span> <span class="token-type">HashMap</span>&lt;&gt;();
+
+        <span class="token-comment">// THE KEY LINE: reads from ALL JARs on classpath</span>
+        <span class="token-type">Enumeration</span>&lt;<span class="token-type">URL</span>&gt; urls = classLoader.<span class="token-function">getResources</span>(
+            FACTORIES_RESOURCE_LOCATION);
+
+        <span class="token-keyword">while</span> (urls.<span class="token-function">hasMoreElements</span>()) {
+            <span class="token-type">URL</span> url = urls.<span class="token-function">nextElement</span>();
+            <span class="token-comment">// Parse each spring.factories file</span>
+            <span class="token-type">Properties</span> properties = <span class="token-type">PropertiesLoaderUtils</span>
+                .<span class="token-function">loadProperties</span>(<span class="token-keyword">new</span> <span class="token-type">UrlResource</span>(url));
+
+            <span class="token-keyword">for</span> (<span class="token-type">Map.Entry</span>&lt;?, ?&gt; entry : properties.<span class="token-function">entrySet</span>()) {
+                <span class="token-type">String</span> factoryTypeName = ((<span class="token-type">String</span>) entry.<span class="token-function">getKey</span>()).<span class="token-function">trim</span>();
+                <span class="token-type">String</span>[] factoryNames = <span class="token-type">StringUtils</span>
+                    .<span class="token-function">commaDelimitedListToStringArray</span>((<span class="token-type">String</span>) entry.<span class="token-function">getValue</span>());
+
+                <span class="token-keyword">for</span> (<span class="token-type">String</span> factoryName : factoryNames) {
+                    result.<span class="token-function">computeIfAbsent</span>(factoryTypeName, k -> <span class="token-keyword">new</span> <span class="token-type">ArrayList</span>&lt;&gt;())
+                        .<span class="token-function">add</span>(factoryName.<span class="token-function">trim</span>());
+                }
+            }
+        }
+
+        <span class="token-comment">// Cache for subsequent calls</span>
+        cache.<span class="token-function">put</span>(classLoader, result);
+        <span class="token-keyword">return</span> result;
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p><code>ClassLoader.getResources()</code> is the magic — it returns URLs from ALL JARs that contain a file at the given path. Unlike <code>getResource()</code> (singular) which returns only the first match, <code>getResources()</code> iterates the entire classpath. This is a standard Java SPI-like pattern used by <code>ServiceLoader</code> as well.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: What Gets Registered -->
+            <!-- ============================================ -->
+            <h2>4. What Gets Registered in spring.factories</h2>
+
+            <pre><code><span class="token-comment"># All supported factory types in Spring Boot:</span>
+
+<span class="token-comment"># ─── CORE BOOTSTRAPPING ───</span>
+org.springframework.boot.autoconfigure.EnableAutoConfiguration
+<span class="token-comment"># Auto-configuration classes (moved to .imports file in Boot 3.x)</span>
+
+org.springframework.context.ApplicationContextInitializer
+<span class="token-comment"># Runs BEFORE context refresh — modify context before beans load</span>
+
+org.springframework.context.ApplicationListener
+<span class="token-comment"># Event listeners registered before context exists</span>
+
+org.springframework.boot.SpringApplicationRunListener
+<span class="token-comment"># Hook into SpringApplication lifecycle events</span>
+
+<span class="token-comment"># ─── ENVIRONMENT ───</span>
+org.springframework.boot.env.EnvironmentPostProcessor
+<span class="token-comment"># Modify Environment (add property sources) before context refresh</span>
+
+org.springframework.boot.env.PropertySourceLoader
+<span class="token-comment"># Load custom property file formats (.yaml, .toml, etc.)</span>
+
+<span class="token-comment"># ─── DIAGNOSTICS ───</span>
+org.springframework.boot.diagnostics.FailureAnalyzer
+<span class="token-comment"># Transform exceptions into human-readable startup error messages</span>
+
+<span class="token-comment"># ─── AUTO-CONFIGURATION SUPPORT ───</span>
+org.springframework.boot.autoconfigure.AutoConfigurationImportFilter
+<span class="token-comment"># Fast pre-filter before full @Conditional evaluation</span>
+
+org.springframework.boot.autoconfigure.AutoConfigurationImportListener
+<span class="token-comment"># Notified when auto-configuration import selection completes</span>
+
+<span class="token-comment"># ─── TESTING ───</span>
+org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+<span class="token-comment"># Test slice configurations</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: Why Not Classpath Scanning? -->
+            <!-- ============================================ -->
+            <h2>5. Why spring.factories Instead of Classpath Scanning?</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concern</th>
+                        <th>Classpath Scanning</th>
+                        <th>spring.factories / .imports</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Discovery speed</td>
+                        <td>O(n) — scans all .class files in packages</td>
+                        <td>O(k) — reads only factory files (one per JAR)</td>
+                    </tr>
+                    <tr>
+                        <td>Package convention</td>
+                        <td>Requires shared base package</td>
+                        <td>No package convention needed</td>
+                    </tr>
+                    <tr>
+                        <td>Explicit registration</td>
+                        <td>Implicit (anything with @Component is found)</td>
+                        <td>Explicit (only listed classes are loaded)</td>
+                    </tr>
+                    <tr>
+                        <td>Third-party JARs</td>
+                        <td>Must be in scan path</td>
+                        <td>Self-registering (JAR brings its own factory file)</td>
+                    </tr>
+                    <tr>
+                        <td>Ordering control</td>
+                        <td>Limited (file system order)</td>
+                        <td>Full control via @AutoConfigureOrder</td>
+                    </tr>
+                    <tr>
+                        <td>Startup performance</td>
+                        <td>Degrades with classpath size</td>
+                        <td>Scales well (one small file per JAR)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>The fundamental problem: a third-party library JAR can't assume its package will be in the application's <code>@ComponentScan</code> base packages. By using <code>spring.factories</code>, the library self-registers its contributions — the application just needs the JAR on its classpath, and the auto-config "activates" via the factory mechanism.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Caching Behavior -->
+            <!-- ============================================ -->
+            <h2>6. Caching & Performance</h2>
+
+            <pre><code><span class="token-comment">// SpringFactoriesLoader uses a static ConcurrentReferenceHashMap</span>
+<span class="token-keyword">private static final</span> <span class="token-type">Map</span>&lt;<span class="token-type">ClassLoader</span>, <span class="token-type">Map</span>&lt;<span class="token-type">String</span>, <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt;&gt;&gt; cache =
+    <span class="token-keyword">new</span> <span class="token-type">ConcurrentReferenceHashMap</span>&lt;&gt;();
+
+<span class="token-comment">// First call: reads all META-INF/spring.factories from all JARs</span>
+<span class="token-comment">//   → Iterates ClassLoader.getResources()</span>
+<span class="token-comment">//   → Parses properties files</span>
+<span class="token-comment">//   → Stores aggregated map in cache</span>
+
+<span class="token-comment">// Subsequent calls: instant HashMap lookup</span>
+<span class="token-comment">//   → O(1) retrieval from cache</span>
+
+<span class="token-comment">// The cache uses weak references → eligible for GC if ClassLoader is collected</span>
+<span class="token-comment">// In practice: loaded once at startup, never re-read</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Industry Pattern -->
+            <!-- ============================================ -->
+            <h2>7. Industry Pattern: Shared Library Auto-Registration</h2>
+
+            <p>The most common real-world use case: creating a shared library that auto-registers beans across multiple microservices.</p>
+
+            <pre><code><span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Your shared library: company-commons-spring-boot-starter</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+
+<span class="token-comment">// src/main/java/com/company/commons/autoconfigure/</span>
+<span class="token-annotation">@AutoConfiguration</span>
+<span class="token-annotation">@ConditionalOnClass</span>(<span class="token-type">RestTemplate</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public class</span> <span class="token-class">CompanyHttpAutoConfiguration</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>
+    <span class="token-keyword">public</span> <span class="token-type">RestTemplate</span> <span class="token-function">companyRestTemplate</span>(
+            <span class="token-type">CompanyHttpProperties</span> properties) {
+        <span class="token-type">RestTemplate</span> template = <span class="token-keyword">new</span> <span class="token-type">RestTemplate</span>();
+        <span class="token-comment">// Add company-standard interceptors: tracing, auth, retries</span>
+        template.<span class="token-function">getInterceptors</span>().<span class="token-function">add</span>(<span class="token-keyword">new</span> <span class="token-type">TracingInterceptor</span>());
+        template.<span class="token-function">getInterceptors</span>().<span class="token-function">add</span>(<span class="token-keyword">new</span> <span class="token-type">AuthHeaderInterceptor</span>(properties));
+        <span class="token-keyword">return</span> template;
+    }
+}
+
+<span class="token-comment">// For Boot 3.x: create this file</span>
+<span class="token-comment">// src/main/resources/META-INF/spring/</span>
+<span class="token-comment">//   org.springframework.boot.autoconfigure.AutoConfiguration.imports</span>
+com.company.commons.autoconfigure.CompanyHttpAutoConfiguration
+com.company.commons.autoconfigure.CompanyMetricsAutoConfiguration
+com.company.commons.autoconfigure.CompanySecurityAutoConfiguration
+
+<span class="token-comment">// For Boot 2.x backward compat: also create this file</span>
+<span class="token-comment">// src/main/resources/META-INF/spring.factories</span>
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.company.commons.autoconfigure.CompanyHttpAutoConfiguration,\
+  com.company.commons.autoconfigure.CompanyMetricsAutoConfiguration,\
+  com.company.commons.autoconfigure.CompanySecurityAutoConfiguration
+
+<span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Any microservice — just add the dependency</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+
+<span class="token-comment">// pom.xml</span>
+&lt;dependency&gt;
+    &lt;groupId&gt;com.company&lt;/groupId&gt;
+    &lt;artifactId&gt;company-commons-spring-boot-starter&lt;/artifactId&gt;
+    &lt;version&gt;2.1.0&lt;/version&gt;
+&lt;/dependency&gt;
+
+<span class="token-comment">// That's it! RestTemplate with tracing + auth is now available</span>
+<span class="token-comment">// No @Import, no @ComponentScan changes needed</span></code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Starter Naming Convention</div>
+                <p>Official Spring Boot starters use the pattern <code>spring-boot-starter-*</code>. Third-party starters should use <code>*-spring-boot-starter</code> (name first). This isn't enforced technically but is a strong community convention that Spring Boot documentation explicitly recommends.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: The ClassLoader.getResources() Magic -->
+            <!-- ============================================ -->
+            <h2>8. The Loading Mechanism: ClassLoader.getResources()</h2>
+
+            <pre><code><span class="token-comment">// How Java finds ALL files at the same path across multiple JARs:</span>
+
+<span class="token-type">ClassLoader</span> cl = <span class="token-type">Thread</span>.<span class="token-function">currentThread</span>().<span class="token-function">getContextClassLoader</span>();
+
+<span class="token-comment">// getResource() → returns FIRST match only</span>
+<span class="token-type">URL</span> single = cl.<span class="token-function">getResource</span>(<span class="token-string">"META-INF/spring.factories"</span>);
+
+<span class="token-comment">// getResources() → returns ALL matches from ALL JARs</span>
+<span class="token-type">Enumeration</span>&lt;<span class="token-type">URL</span>&gt; all = cl.<span class="token-function">getResources</span>(<span class="token-string">"META-INF/spring.factories"</span>);
+
+<span class="token-comment">// With 50 JARs on classpath, this might return URLs like:</span>
+<span class="token-comment">// jar:file:/libs/spring-boot-autoconfigure-3.2.0.jar!/META-INF/spring.factories</span>
+<span class="token-comment">// jar:file:/libs/spring-boot-actuator-autoconfigure-3.2.0.jar!/META-INF/spring.factories</span>
+<span class="token-comment">// jar:file:/libs/company-commons-starter-2.1.0.jar!/META-INF/spring.factories</span>
+<span class="token-comment">// jar:file:/libs/spring-data-jpa-3.2.0.jar!/META-INF/spring.factories</span>
+<span class="token-comment">// ... one from each JAR that includes the file</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>spring.factories</strong> is a key=value properties file at <code>META-INF/spring.factories</code> that registers extensions (auto-configs, listeners, initializers, etc.)</li>
+                    <li><strong>SpringFactoriesLoader.loadFactoryNames()</strong> reads ALL spring.factories from ALL JARs using <code>ClassLoader.getResources()</code></li>
+                    <li><strong>Boot 3.x migrated auto-configs</strong> to <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code> (one class per line, easier merges)</li>
+                    <li><strong>spring.factories still used in Boot 3.x</strong> for non-auto-config entries: listeners, initializers, environment post-processors, failure analyzers</li>
+                    <li><strong>Advantages over scanning:</strong> no package convention, explicit registration, faster startup, self-registering JARs</li>
+                    <li><strong>Caching:</strong> factories are loaded once per ClassLoader and stored in a ConcurrentReferenceHashMap</li>
+                    <li><strong>Industry pattern:</strong> shared starter JARs use factory files to auto-register cross-cutting concerns across all microservices</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>What happens if two JARs register the same auto-configuration class in their spring.factories? How does Spring Boot handle duplicates?</li>
+                    <li>Why did Spring Boot 3.x move auto-configurations to a separate file but keep spring.factories for other extension types?</li>
+                    <li>If you create a library that needs to work with both Boot 2.x and 3.x, what files do you need to maintain?</li>
+                    <li>Explain how <code>ClassLoader.getResources()</code> differs from <code>ClassLoader.getResource()</code> and why this distinction is critical for the factory mechanism.</li>
+                    <li>Your company has 30 microservices. You want to add distributed tracing to all of them with minimal code changes. Design the spring.factories-based solution.</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"You've created a company-wide Spring Boot starter library, but teams report that its auto-configured beans conflict with their own beans. Some teams want the defaults, others want to override them. Design a solution that satisfies both."</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Use @ConditionalOnMissingBean</strong> on all auto-configured beans — teams that define their own beans automatically override the defaults.</li>
+                    <li><strong>Use @ConditionalOnProperty with matchIfMissing=true</strong> for feature toggles — teams can disable specific features via <code>company.commons.tracing.enabled=false</code>.</li>
+                    <li><strong>Document the conditions</strong> — publish a "conditions reference" showing what each auto-config checks and how to override or disable it.</li>
+                    <li><strong>Use @AutoConfiguration ordering</strong> — ensure your starter runs AFTER potential user overrides by not using @AutoConfigureBefore unnecessarily.</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 9 (@SpringBootApplication)</strong> — @EnableAutoConfiguration triggers the reading of these factory files</li>
+                    <li><strong>Topic 10 (Auto-Configuration)</strong> — AutoConfigurationImportSelector consumes the entries from these files</li>
+                    <li><strong>Topic 11 (Conditional Annotations)</strong> — Each class registered in factories is gated by @Conditional annotations</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="11-conditional-annotations.html" class="nav-btn nav-btn-prev">← Conditional Annotations</a>
+                <a href="13-externalized-config.html" class="nav-btn nav-btn-next">Externalized Configuration →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

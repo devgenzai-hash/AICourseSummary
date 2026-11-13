@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Guarantees - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Resilience Patterns &rarr; Delivery Guarantees</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Distributed</span>
+                <span class="tag">Concept</span>
+            </div>
+            <h1>Delivery Guarantees</h1>
+            <p class="hero-subtitle">Understanding at-most-once, at-least-once, and exactly-once semantics &mdash; and why true exactly-once delivery is a distributed systems myth.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of three ways to send an important document. <strong>Regular mail</strong> (at-most-once): you drop it in the mailbox and hope it arrives &mdash; no confirmation, no retry. <strong>Registered mail</strong> (at-least-once): if you don&rsquo;t get a delivery receipt within a week, you send another copy &mdash; the recipient might get duplicates. <strong>Courier with signature</strong> (exactly-once approximation): the courier retries until someone signs, and the recipient checks if they&rsquo;ve already received this tracking number before opening it.</p>
+        </div>
+
+        <h2>The Three Delivery Semantics</h2>
+        <p>In any distributed messaging system, there are three fundamental guarantees about how messages are delivered between producers and consumers:</p>
+
+        <h3>At-Most-Once</h3>
+        <p>The message is sent once and never retried. It may be lost, but it will never be delivered more than once. This is the simplest and fastest approach &mdash; fire and forget.</p>
+        <ul>
+            <li>No acknowledgment required from consumer</li>
+            <li>No retry logic needed</li>
+            <li>Acceptable for metrics, logs, or non-critical notifications</li>
+        </ul>
+
+        <h3>At-Least-Once</h3>
+        <p>The message is retried until the consumer acknowledges receipt. This guarantees delivery but may result in duplicates if the acknowledgment is lost after processing.</p>
+        <ul>
+            <li>Requires acknowledgment (ACK) from consumer</li>
+            <li>Producer retries on timeout or NACK</li>
+            <li>Consumer must handle duplicate messages (ideally via idempotency)</li>
+        </ul>
+
+        <h3>Exactly-Once (The Myth)</h3>
+        <p>Each message is processed exactly one time &mdash; no loss, no duplicates. In theory, this is ideal. In practice, it&rsquo;s impossible to achieve in a truly distributed system due to the Two Generals Problem. What systems actually implement is <strong>effectively-once</strong>: at-least-once delivery combined with idempotent processing.</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Guarantee</th>
+                        <th>Message Loss</th>
+                        <th>Duplicates</th>
+                        <th>Complexity</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>At-Most-Once</strong></td>
+                        <td>Possible</td>
+                        <td>Never</td>
+                        <td>Low</td>
+                        <td>Metrics, logging, real-time feeds</td>
+                    </tr>
+                    <tr>
+                        <td><strong>At-Least-Once</strong></td>
+                        <td>Never</td>
+                        <td>Possible</td>
+                        <td>Medium</td>
+                        <td>Payments, orders, notifications</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exactly-Once</strong></td>
+                        <td>Never</td>
+                        <td>Never</td>
+                        <td>Very High</td>
+                        <td>Financial transactions (approximated)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Message Acknowledgment Patterns</h2>
+        <p>The acknowledgment mechanism is what determines the delivery guarantee:</p>
+
+        <pre><code><span class="token-keyword">import</span> uuid
+<span class="token-keyword">import</span> time
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Callable, Dict, Set
+<span class="token-keyword">from</span> collections <span class="token-keyword">import</span> deque
+
+<span class="token-keyword">class</span> <span class="token-class">Message</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, msg_id: str, payload: dict):
+        self.msg_id = msg_id
+        self.payload = payload
+        self.attempts = <span class="token-number">0</span>
+        self.created_at = time.time()
+
+<span class="token-keyword">class</span> <span class="token-class">AtMostOnceQueue</span>:
+    <span class="token-string">"""Fire and forget &mdash; no retries, no acks."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._queue = deque()
+
+    <span class="token-keyword">def</span> <span class="token-function">publish</span>(self, payload: dict) -> str:
+        msg = <span class="token-class">Message</span>(str(uuid.uuid4()), payload)
+        self._queue.append(msg)
+        <span class="token-keyword">return</span> msg.msg_id
+
+    <span class="token-keyword">def</span> <span class="token-function">consume</span>(self) -> Message:
+        <span class="token-comment"># Message is immediately removed &mdash; no retry possible</span>
+        <span class="token-keyword">return</span> self._queue.popleft()
+
+
+<span class="token-keyword">class</span> <span class="token-class">AtLeastOnceQueue</span>:
+    <span class="token-string">"""Retries until acknowledged. May deliver duplicates."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, max_retries: int = <span class="token-number">5</span>, visibility_timeout: float = <span class="token-number">30.0</span>):
+        self._queue = deque()
+        self._in_flight: Dict[str, Message] = {}
+        self._max_retries = max_retries
+        self._visibility_timeout = visibility_timeout
+
+    <span class="token-keyword">def</span> <span class="token-function">publish</span>(self, payload: dict) -> str:
+        msg = <span class="token-class">Message</span>(str(uuid.uuid4()), payload)
+        self._queue.append(msg)
+        <span class="token-keyword">return</span> msg.msg_id
+
+    <span class="token-keyword">def</span> <span class="token-function">consume</span>(self) -> Message:
+        <span class="token-string">"""Get a message. It remains in-flight until ACKed."""</span>
+        msg = self._queue.popleft()
+        msg.attempts += <span class="token-number">1</span>
+        self._in_flight[msg.msg_id] = msg
+        <span class="token-keyword">return</span> msg
+
+    <span class="token-keyword">def</span> <span class="token-function">ack</span>(self, msg_id: str) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Acknowledge successful processing."""</span>
+        self._in_flight.pop(msg_id, <span class="token-keyword">None</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">nack</span>(self, msg_id: str) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Negative ack &mdash; return to queue for retry."""</span>
+        msg = self._in_flight.pop(msg_id, <span class="token-keyword">None</span>)
+        <span class="token-keyword">if</span> msg <span class="token-keyword">and</span> msg.attempts < self._max_retries:
+            self._queue.append(msg)
+
+    <span class="token-keyword">def</span> <span class="token-function">requeue_expired</span>(self) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Return timed-out messages to the queue."""</span>
+        now = time.time()
+        expired = [
+            mid <span class="token-keyword">for</span> mid, msg <span class="token-keyword">in</span> self._in_flight.items()
+            <span class="token-keyword">if</span> now - msg.created_at > self._visibility_timeout
+        ]
+        <span class="token-keyword">for</span> mid <span class="token-keyword">in</span> expired:
+            self.<span class="token-function">nack</span>(mid)</code></pre>
+
+        <h2>Effectively-Once with Deduplication</h2>
+        <p>The practical way to approximate exactly-once is combining at-least-once delivery with consumer-side deduplication:</p>
+
+        <pre><code><span class="token-keyword">class</span> <span class="token-class">ExactlyOnceConsumer</span>:
+    <span class="token-string">"""Approximates exactly-once via deduplication."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, queue: AtLeastOnceQueue, handler: Callable):
+        self._queue = queue
+        self._handler = handler
+        self._processed_ids: Set[str] = set()
+
+    <span class="token-keyword">def</span> <span class="token-function">process_next</span>(self) -> bool:
+        <span class="token-keyword">try</span>:
+            msg = self._queue.<span class="token-function">consume</span>()
+        <span class="token-keyword">except</span> IndexError:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>  <span class="token-comment"># Queue empty</span>
+
+        <span class="token-comment"># Deduplication check</span>
+        <span class="token-keyword">if</span> msg.msg_id <span class="token-keyword">in</span> self._processed_ids:
+            self._queue.<span class="token-function">ack</span>(msg.msg_id)  <span class="token-comment"># ACK duplicate without processing</span>
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+
+        <span class="token-keyword">try</span>:
+            self._handler(msg.payload)
+            self._processed_ids.add(msg.msg_id)
+            self._queue.<span class="token-function">ack</span>(msg.msg_id)
+        <span class="token-keyword">except</span> Exception:
+            self._queue.<span class="token-function">nack</span>(msg.msg_id)  <span class="token-comment"># Retry later</span>
+
+        <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+
+
+<span class="token-comment"># Kafka-style offset-based consumption</span>
+<span class="token-keyword">class</span> <span class="token-class">KafkaStyleConsumer</span>:
+    <span class="token-string">"""Offset-based consumption with commit semantics."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._committed_offset = <span class="token-number">0</span>
+        self._current_offset = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">poll</span>(self, messages: list) -> dict:
+        <span class="token-string">"""Read next message from current offset."""</span>
+        <span class="token-keyword">if</span> self._current_offset >= len(messages):
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        msg = messages[self._current_offset]
+        self._current_offset += <span class="token-number">1</span>
+        <span class="token-keyword">return</span> msg
+
+    <span class="token-keyword">def</span> <span class="token-function">commit</span>(self) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Commit current offset &mdash; marks messages as processed."""</span>
+        self._committed_offset = self._current_offset
+
+    <span class="token-keyword">def</span> <span class="token-function">reset_to_committed</span>(self) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""On failure, rewind to last committed offset."""</span>
+        self._current_offset = self._committed_offset</code></pre>
+
+        <h2>Comparing Message Brokers</h2>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Apache Kafka</th>
+                        <th>RabbitMQ</th>
+                        <th>AWS SQS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Default Guarantee</strong></td>
+                        <td>At-least-once</td>
+                        <td>At-least-once</td>
+                        <td>At-least-once</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exactly-Once Support</strong></td>
+                        <td>Yes (transactions + idempotent producer)</td>
+                        <td>No (use deduplication)</td>
+                        <td>Yes (FIFO queues with dedup ID)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Acknowledgment</strong></td>
+                        <td>Offset commit</td>
+                        <td>Per-message ACK/NACK</td>
+                        <td>Delete message after processing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ordering</strong></td>
+                        <td>Per-partition</td>
+                        <td>Per-queue (with single consumer)</td>
+                        <td>FIFO queues only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Retention</strong></td>
+                        <td>Time/size-based (keeps all)</td>
+                        <td>Until consumed</td>
+                        <td>4&ndash;14 days</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dead Letter Queue</strong></td>
+                        <td>Manual (separate topic)</td>
+                        <td>Built-in</td>
+                        <td>Built-in</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Offset Management in Kafka</h2>
+        <p>Kafka&rsquo;s delivery guarantee depends on <strong>when</strong> you commit offsets relative to processing:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Commit Timing</th>
+                        <th>Guarantee</th>
+                        <th>Risk</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Auto-commit</td>
+                        <td>Periodic (before processing)</td>
+                        <td>At-most-once</td>
+                        <td>Message loss on crash</td>
+                    </tr>
+                    <tr>
+                        <td>Commit after processing</td>
+                        <td>After handler completes</td>
+                        <td>At-least-once</td>
+                        <td>Duplicates on crash after process, before commit</td>
+                    </tr>
+                    <tr>
+                        <td>Transactional</td>
+                        <td>Atomic with processing</td>
+                        <td>Effectively-once</td>
+                        <td>Higher latency, complexity</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Kafka Transactions:</strong> Kafka 0.11+ introduced idempotent producers and transactions. A producer can atomically write to multiple partitions and commit offsets in the same transaction &mdash; achieving effectively-once within the Kafka ecosystem. Outside Kafka, you still need application-level deduplication.</p>
+            <p><strong>AWS SQS FIFO:</strong> SQS FIFO queues accept a <code>MessageDeduplicationId</code>. If the same dedup ID is sent within a 5-minute window, SQS discards the duplicate. Combined with exactly-once processing mode, this approximates exactly-once for many use cases.</p>
+            <p><strong>Stripe Webhooks:</strong> Stripe sends webhooks with at-least-once semantics. They recommend storing processed event IDs and skipping duplicates &mdash; the classic deduplication pattern.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>At-most-once is fast but loses messages; at-least-once is safe but produces duplicates</li>
+                <li>True exactly-once delivery is impossible in distributed systems (Two Generals Problem)</li>
+                <li>Effectively-once = at-least-once delivery + idempotent consumer</li>
+                <li>Acknowledgment timing determines the guarantee: before processing &rarr; at-most-once, after &rarr; at-least-once</li>
+                <li>Kafka uses offset commits; RabbitMQ uses per-message ACKs; SQS uses message deletion</li>
+                <li>Always design consumers to handle duplicates regardless of broker guarantees</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of delivery guarantees as a spectrum trading off <strong>data loss</strong> against <strong>duplicates</strong>. You can never eliminate both simultaneously in a distributed system &mdash; you choose which side to favor and compensate on the other.</p>
+            <div class="model-visual">
+                <pre>
+     DATA LOSS ◄────────────────────► DUPLICATES
+         │                                  │
+    At-Most-Once                     At-Least-Once
+    (fire & forget)                  (retry until ACK)
+         │                                  │
+         └──────────┐      ┌────────────────┘
+                    ▼      ▼
+              ┌──────────────────┐
+              │  Exactly-Once    │
+              │  (approximated)  │
+              │                  │
+              │  = At-Least-Once │
+              │  + Deduplication │
+              └──────────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Assuming exactly-once from the broker alone:</strong> Even Kafka&rsquo;s exactly-once only applies within Kafka. If your consumer writes to an external database, you need application-level idempotency to prevent duplicates.</li>
+                <li><strong>Committing offsets before processing:</strong> Auto-commit in Kafka commits periodically regardless of processing status. A crash after commit but before processing means lost messages. Always commit after successful processing.</li>
+                <li><strong>Unbounded deduplication sets:</strong> Storing every processed message ID forever consumes infinite memory. Use a time-windowed deduplication store (e.g., only keep IDs from the last hour) matched to your retry window.</li>
+                <li><strong>Ignoring ordering with retries:</strong> Retrying a failed message while continuing to process subsequent messages breaks ordering. Use per-partition sequential processing or accept out-of-order delivery.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Implement all three guarantees:</strong> Build a message queue simulator that demonstrates at-most-once, at-least-once, and effectively-once delivery. Inject random failures and verify each guarantee holds.</li>
+                <li><strong>Build a deduplication layer:</strong> Create a time-windowed deduplication store backed by a dictionary with TTL. Test that duplicates within the window are rejected and messages after TTL are accepted.</li>
+                <li><strong>Simulate Kafka offset management:</strong> Implement a consumer that reads batches, processes them, and commits offsets. Simulate crashes at different points and verify which messages get reprocessed.</li>
+                <li><strong>Design a webhook receiver:</strong> Build an HTTP endpoint that receives webhooks with at-least-once delivery. Store processed event IDs in a database and return 200 for duplicates without reprocessing.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="33-idempotency.html" class="prev">&larr; Idempotency</a>
+            <a href="35-backpressure.html" class="next">Backpressure &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

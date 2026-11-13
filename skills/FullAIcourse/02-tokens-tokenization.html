@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokens, Tokenization & Context Windows — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 1</a> <span>›</span> Tokens & Tokenization</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Tokens, Tokenization & Context Windows</h1>
+                <p>Before an AI can read your text, it needs to break it into pieces called "tokens". This chapter explains what tokens are, how tokenization works, and why context windows limit what AI can process.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Tokens are like Lego bricks.</strong> You can't build a Lego house with "walls" — you need individual bricks. Similarly, AI can't process "sentences" directly — it needs to break them into smaller pieces (tokens) first. Common words like "the" are single bricks, while rare words like "cryptocurrency" might be split into multiple bricks: "crypt" + "o" + "currency".</p>
+                <p><strong>Context window is like your desk size.</strong> Imagine you're writing an essay and you can only fit 10 pages on your desk at once. If someone gives you 50 pages of reference material, you can only look at 10 at a time. That's the context window — the amount of text the AI can "see" at once.</p>
+            </div>
+
+            <!-- What are tokens -->
+            <h2 id="what-are-tokens">What Are Tokens?</h2>
+
+            <p>A <strong>token</strong> is the smallest unit of text that an AI model works with. It's NOT always a word. It could be:</p>
+
+            <ul>
+                <li>A whole word: "hello" → 1 token</li>
+                <li>Part of a word: "unhappiness" → "un" + "happiness" = 2 tokens</li>
+                <li>A single character: "a" → 1 token</li>
+                <li>Punctuation: "!" → 1 token</li>
+                <li>A space: " " → often part of the next token</li>
+            </ul>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Rule of Thumb</div>
+                <p>In English, <strong>1 token ≈ 4 characters</strong> or <strong>¾ of a word</strong>. So 100 tokens ≈ 75 words. A typical page of text is ~500 tokens.</p>
+            </div>
+
+            <h3>Token Examples:</h3>
+            <table>
+                <thead><tr><th>Text</th><th>Tokens (GPT-4)</th><th>Count</th></tr></thead>
+                <tbody>
+                    <tr><td>"Hello world"</td><td>["Hello", " world"]</td><td>2</td></tr>
+                    <tr><td>"I'm happy"</td><td>["I", "'m", " happy"]</td><td>3</td></tr>
+                    <tr><td>"tokenization"</td><td>["token", "ization"]</td><td>2</td></tr>
+                    <tr><td>"GPT-4"</td><td>["G", "PT", "-", "4"]</td><td>4</td></tr>
+                    <tr><td>"🎉"</td><td>["🎉"]</td><td>1</td></tr>
+                    <tr><td>"こんにちは"</td><td>["こん", "にち", "は"]</td><td>3</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Why This Matters Financially</div>
+                <p>API pricing is per-token, not per-word. GPT-4o costs ~$2.50 per million input tokens. If your tokenization is inefficient (e.g., non-English text uses more tokens for the same content), you pay more.</p>
+            </div>
+
+            <!-- Tokenization -->
+            <h2 id="tokenization">How Tokenization Works</h2>
+
+            <p><strong>Tokenization</strong> is the process of converting text into tokens. The most common algorithm is <strong>BPE</strong> (Byte Pair Encoding).</p>
+
+            <h3>BPE Algorithm (Simplified):</h3>
+            <ol>
+                <li>Start with individual characters: ["h", "e", "l", "l", "o"]</li>
+                <li>Find the most common pair: "l" + "l" appears a lot → merge into "ll"</li>
+                <li>Now vocabulary includes "ll" as one token</li>
+                <li>Repeat: find next common pair, merge it</li>
+                <li>Continue until vocabulary reaches target size (e.g., 32,000 tokens)</li>
+            </ol>
+
+            <p>The result: common words become single tokens, rare words get split into pieces.</p>
+
+            <h3>Popular Tokenizers:</h3>
+            <table>
+                <thead><tr><th>Tokenizer</th><th>Used By</th><th>Vocab Size</th><th>Method</th></tr></thead>
+                <tbody>
+                    <tr><td>cl100k_base (tiktoken)</td><td>GPT-4, GPT-4o</td><td>100,256</td><td>BPE</td></tr>
+                    <tr><td>o200k_base</td><td>GPT-4o (newer)</td><td>200,019</td><td>BPE</td></tr>
+                    <tr><td>SentencePiece</td><td>Llama, Gemma, T5</td><td>32,000-256,000</td><td>BPE/Unigram</td></tr>
+                    <tr><td>WordPiece</td><td>BERT</td><td>30,522</td><td>WordPiece</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Context Windows -->
+            <h2 id="context-windows">Context Windows</h2>
+
+            <p>The <strong>context window</strong> (also called "context length") is the maximum number of tokens a model can process in a single conversation — including both your input AND the model's output.</p>
+
+            <h3>Context Window Sizes (2024-2026):</h3>
+            <table>
+                <thead><tr><th>Model</th><th>Context Window</th><th>Approx. Pages of Text</th></tr></thead>
+                <tbody>
+                    <tr><td>GPT-3.5 (old)</td><td>4,096 tokens</td><td>~6 pages</td></tr>
+                    <tr><td>GPT-4o</td><td>128,000 tokens</td><td>~200 pages</td></tr>
+                    <tr><td>Claude 3.5 Sonnet</td><td>200,000 tokens</td><td>~300 pages</td></tr>
+                    <tr><td>Gemini 1.5 Pro</td><td>2,000,000 tokens</td><td>~3,000 pages</td></tr>
+                    <tr><td>Llama 3.1</td><td>128,000 tokens</td><td>~200 pages</td></tr>
+                    <tr><td>Mistral Large</td><td>128,000 tokens</td><td>~200 pages</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Why Context Windows Matter</div>
+                <ul>
+                    <li><strong>Chatbots:</strong> The entire conversation history must fit in the context window</li>
+                    <li><strong>Document analysis:</strong> You can only analyze documents that fit in the window</li>
+                    <li><strong>Code:</strong> The model can only see code files that fit in the window</li>
+                    <li><strong>Cost:</strong> Longer contexts = more tokens = more money</li>
+                    <li><strong>Quality:</strong> Models tend to "forget" info in the middle of very long contexts ("lost in the middle" problem)</li>
+                </ul>
+            </div>
+
+            <!-- Production Code -->
+            <h2 id="code">Production Code</h2>
+
+            <h3>Counting Tokens with tiktoken (OpenAI's Tokenizer)</h3>
+            <pre><code><span class="token-comment"># pip install tiktoken</span>
+<span class="token-keyword">import</span> tiktoken
+
+<span class="token-comment"># Get the tokenizer for GPT-4o</span>
+enc = tiktoken.encoding_for_model(<span class="token-string">"gpt-4o"</span>)
+
+<span class="token-comment"># Encode text to tokens</span>
+text = <span class="token-string">"Hello, how are you doing today?"</span>
+tokens = enc.encode(text)
+<span class="token-builtin">print</span>(<span class="token-string">f"Text: '{text}'"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Tokens: {tokens}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Token count: {len(tokens)}"</span>)
+
+<span class="token-comment"># See what each token looks like</span>
+<span class="token-keyword">for</span> token <span class="token-keyword">in</span> tokens:
+    <span class="token-builtin">print</span>(<span class="token-string">f"  {token} → '{enc.decode([token])}'"</span>)
+
+<span class="token-comment"># Decode tokens back to text</span>
+decoded = enc.decode(tokens)
+<span class="token-builtin">print</span>(<span class="token-string">f"Decoded: '{decoded}'"</span>)
+
+<span class="token-comment"># --- Production use case: Estimate cost ---</span>
+<span class="token-keyword">def</span> <span class="token-function">estimate_cost</span>(text, model=<span class="token-string">"gpt-4o"</span>):
+    <span class="token-string">"""Estimate API cost for a given text."""</span>
+    enc = tiktoken.encoding_for_model(model)
+    token_count = <span class="token-builtin">len</span>(enc.encode(text))
+
+    <span class="token-comment"># GPT-4o pricing (as of 2025)</span>
+    prices = {
+        <span class="token-string">"gpt-4o"</span>: {<span class="token-string">"input"</span>: <span class="token-number">2.50</span>, <span class="token-string">"output"</span>: <span class="token-number">10.00</span>},  <span class="token-comment"># per million tokens</span>
+        <span class="token-string">"gpt-4o-mini"</span>: {<span class="token-string">"input"</span>: <span class="token-number">0.15</span>, <span class="token-string">"output"</span>: <span class="token-number">0.60</span>},
+    }
+
+    cost_per_token = prices[model][<span class="token-string">"input"</span>] / <span class="token-number">1_000_000</span>
+    cost = token_count * cost_per_token
+    <span class="token-keyword">return</span> {<span class="token-string">"tokens"</span>: token_count, <span class="token-string">"cost_usd"</span>: cost}
+
+<span class="token-comment"># Example</span>
+doc = open(<span class="token-string">"my_document.txt"</span>).read()
+result = estimate_cost(doc)
+<span class="token-builtin">print</span>(<span class="token-string">f"Document: {result['tokens']} tokens, ${result['cost_usd']:.4f}"</span>)</code></pre>
+
+            <h3>Using HuggingFace Tokenizers</h3>
+            <pre><code><span class="token-comment"># pip install transformers</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoTokenizer
+
+<span class="token-comment"># Load Llama 3.1 tokenizer</span>
+tokenizer = AutoTokenizer.from_pretrained(<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>)
+
+text = <span class="token-string">"Fine-tuning a large language model requires careful data preparation."</span>
+
+<span class="token-comment"># Tokenize</span>
+tokens = tokenizer.encode(text)
+<span class="token-builtin">print</span>(<span class="token-string">f"Token IDs: {tokens}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Token count: {len(tokens)}"</span>)
+
+<span class="token-comment"># See individual tokens</span>
+token_strings = tokenizer.convert_ids_to_tokens(tokens)
+<span class="token-builtin">print</span>(<span class="token-string">f"Token strings: {token_strings}"</span>)
+
+<span class="token-comment"># Check if text fits in context window</span>
+max_length = tokenizer.model_max_length  <span class="token-comment"># e.g., 131072 for Llama 3.1</span>
+<span class="token-builtin">print</span>(<span class="token-string">f"Max context: {max_length} tokens"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Fits: {len(tokens) &lt; max_length}"</span>)
+
+<span class="token-comment"># --- Truncation for production ---</span>
+<span class="token-keyword">def</span> <span class="token-function">safe_tokenize</span>(text, tokenizer, max_tokens=<span class="token-number">4096</span>):
+    <span class="token-string">"""Tokenize text, truncating if too long."""</span>
+    encoded = tokenizer.encode(
+        text,
+        max_length=max_tokens,
+        truncation=<span class="token-keyword">True</span>,
+        return_tensors=<span class="token-string">"pt"</span>
+    )
+    <span class="token-keyword">if</span> <span class="token-builtin">len</span>(tokenizer.encode(text)) > max_tokens:
+        <span class="token-builtin">print</span>(<span class="token-string">f"⚠️ Text truncated from {len(tokenizer.encode(text))} to {max_tokens} tokens"</span>)
+    <span class="token-keyword">return</span> encoded</code></pre>
+
+            <h3>Visualizing Tokenization</h3>
+            <pre><code><span class="token-comment"># A useful debugging tool — see exactly how text gets tokenized</span>
+<span class="token-keyword">def</span> <span class="token-function">visualize_tokens</span>(text, tokenizer):
+    <span class="token-string">"""Print a colored visualization of token boundaries."""</span>
+    tokens = tokenizer.encode(text)
+    colors = [<span class="token-string">'\033[42m'</span>, <span class="token-string">'\033[43m'</span>, <span class="token-string">'\033[44m'</span>, <span class="token-string">'\033[45m'</span>, <span class="token-string">'\033[46m'</span>]
+    reset = <span class="token-string">'\033[0m'</span>
+
+    result = <span class="token-string">""</span>
+    <span class="token-keyword">for</span> i, token <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(tokens):
+        decoded = tokenizer.decode([token])
+        color = colors[i % <span class="token-builtin">len</span>(colors)]
+        result += <span class="token-string">f"{color}{decoded}{reset}"</span>
+
+    <span class="token-builtin">print</span>(<span class="token-string">f"Original: {text}"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"Tokenized ({len(tokens)} tokens): {result}"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"Tokens: {[tokenizer.decode([t]) for t in tokens]}"</span>)
+
+visualize_tokens(<span class="token-string">"Tokenization is fascinating!"</span>, tokenizer)</code></pre>
+
+            <!-- Industry Standards -->
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Always count tokens before sending to API</strong> — Avoids hitting limits and unexpected costs</li>
+                    <li><strong>Reserve tokens for output</strong> — If context is 128K, don't use all 128K for input; leave room for the response</li>
+                    <li><strong>Use tiktoken for cost estimation</strong> — Build cost calculators into your apps before launching</li>
+                    <li><strong>Chunking for long documents</strong> — Split documents into overlapping chunks that fit the context window (covered in RAG chapter)</li>
+                    <li><strong>Token-aware truncation</strong> — Never cut text at arbitrary character positions; always cut at token boundaries</li>
+                    <li><strong>Non-English costs more</strong> — Chinese, Japanese, Hindi text uses 2-3x more tokens than English for same content</li>
+                </ul>
+            </div>
+
+            <!-- Comparison -->
+            <h2 id="comparison">Tokenizer Comparison</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead><tr><th>Feature</th><th>tiktoken (OpenAI)</th><th>SentencePiece (Meta/Google)</th><th>HF Tokenizers</th></tr></thead>
+                    <tbody>
+                        <tr><td>Speed</td><td>Very fast (Rust)</td><td>Fast (C++)</td><td>Very fast (Rust)</td></tr>
+                        <tr><td>Algorithm</td><td>BPE</td><td>BPE or Unigram</td><td>Any</td></tr>
+                        <tr><td>Used by</td><td>GPT-4, GPT-4o</td><td>Llama, T5, Gemma</td><td>Most HF models</td></tr>
+                        <tr><td>Custom training</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+                        <tr><td>Best for</td><td>OpenAI API cost calc</td><td>Training new models</td><td>Working with any model</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary -->
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Tokens</strong> are the smallest pieces of text an AI model processes — not always full words</li>
+                    <li><strong>Tokenization</strong> uses algorithms like BPE to build a vocabulary of common text pieces</li>
+                    <li><strong>Context window</strong> = maximum tokens the model can see at once (input + output combined)</li>
+                    <li>1 token ≈ 4 characters ≈ ¾ word in English</li>
+                    <li>API pricing is per-token — always estimate costs before production use</li>
+                    <li>Different models use different tokenizers — tokens are NOT universal across models</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    "Hello world" → Tokenizer → [15496, 995] → Model → [Next Token ID] → Detokenizer → "Hi"
+                </div>
+                <p><strong>Tokenizer = translator between human language and model language (numbers).</strong><br>
+                Context window = how many numbers the model can hold in its "hands" at once.</p>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Assuming 1 word = 1 token</strong> — It's not. "unbelievable" might be 3 tokens.</li>
+                    <li><strong>Forgetting output counts toward context</strong> — A 4096-token window means input + output together, not just input.</li>
+                    <li><strong>Using wrong tokenizer for cost estimates</strong> — GPT-4o's tokenizer ≠ Llama's tokenizer. Same text = different token counts.</li>
+                    <li><strong>Not handling truncation</strong> — If input exceeds context, the API errors out or silently truncates. Always check.</li>
+                    <li><strong>Ignoring special tokens</strong> — Models add hidden tokens like [BOS], [EOS], [PAD] that count toward the limit.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Token Explorer</h4>
+                <ol>
+                    <li>Install tiktoken: <code>pip install tiktoken</code></li>
+                    <li>Write a script that tokenizes these sentences and compare token counts:
+                        <ul>
+                            <li>"Hello world" (English)</li>
+                            <li>"Bonjour le monde" (French)</li>
+                            <li>"नमस्ते दुनिया" (Hindi)</li>
+                            <li>"こんにちは世界" (Japanese)</li>
+                        </ul>
+                    </li>
+                    <li>Notice: non-English text uses MORE tokens for the same meaning</li>
+                    <li>Build a simple "cost estimator" that reads a file and tells you how much it would cost to send to GPT-4o</li>
+                    <li><strong>Bonus:</strong> Try the same text with HuggingFace's Llama tokenizer — compare token counts with tiktoken</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="01-llm-basics.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">LLM Basics</span>
+                </a>
+                <a href="03-embeddings.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Embeddings</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

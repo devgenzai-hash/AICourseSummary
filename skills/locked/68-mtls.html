@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mTLS - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="sidebar-overlay"></div>
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h2>System Design</h2>
+        <p class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</p>
+    </div>
+    <nav>
+        <ul>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html">01 &mdash; Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html">02 &mdash; Context Switching</a></li>
+            <li><a href="03-race-conditions.html">03 &mdash; Race Conditions</a></li>
+            <li><a href="04-critical-sections.html">04 &mdash; Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html">05 &mdash; Mutex Locks</a></li>
+            <li><a href="06-deadlocks.html">06 &mdash; Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html">07 &mdash; Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html">08 &mdash; Thread Safety</a></li>
+
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html">09 &mdash; Atomic Operations &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html">10 &mdash; Memory Visibility</a></li>
+            <li><a href="11-happens-before.html">11 &mdash; Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html">12 &mdash; Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html">13 &mdash; False Sharing</a></li>
+
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html">14 &mdash; Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html">15 &mdash; Futures, Promises &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html">16 &mdash; Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html">17 &mdash; Blocking vs Non-Blocking</a></li>
+            <li><a href="18-event-loops.html">18 &mdash; Event Loops</a></li>
+            <li><a href="19-actor-model.html">19 &mdash; Actor Model</a></li>
+            <li><a href="20-coroutines-green-threads.html">20 &mdash; Coroutines &amp; Green Threads</a></li>
+
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-fallacies-distributed-computing.html">21 &mdash; Fallacies of Distributed Computing</a></li>
+            <li><a href="22-cap-theorem.html">22 &mdash; CAP Theorem</a></li>
+            <li><a href="23-consistency-models.html">23 &mdash; Consistency Models</a></li>
+            <li><a href="24-replication-strategies.html">24 &mdash; Replication Strategies</a></li>
+            <li><a href="25-partitioning-sharding.html">25 &mdash; Partitioning &amp; Sharding</a></li>
+            <li><a href="26-consistent-hashing.html">26 &mdash; Consistent Hashing</a></li>
+            <li><a href="27-vector-clocks.html">27 &mdash; Vector Clocks</a></li>
+            <li><a href="28-gossip-protocols.html">28 &mdash; Gossip Protocols</a></li>
+            <li><a href="29-leader-election.html">29 &mdash; Leader Election</a></li>
+            <li><a href="30-consensus-raft-paxos.html">30 &mdash; Consensus (Raft &amp; Paxos)</a></li>
+            <li><a href="31-distributed-transactions.html">31 &mdash; Distributed Transactions</a></li>
+            <li><a href="32-saga-pattern.html">32 &mdash; Saga Pattern</a></li>
+
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-circuit-breaker.html">33 &mdash; Circuit Breaker</a></li>
+            <li><a href="34-retry-backoff.html">34 &mdash; Retry &amp; Backoff</a></li>
+            <li><a href="35-bulkhead-pattern.html">35 &mdash; Bulkhead Pattern</a></li>
+            <li><a href="36-timeout-patterns.html">36 &mdash; Timeout Patterns</a></li>
+            <li><a href="37-health-checks.html">37 &mdash; Health Checks</a></li>
+            <li><a href="38-graceful-degradation.html">38 &mdash; Graceful Degradation</a></li>
+            <li><a href="39-chaos-engineering.html">39 &mdash; Chaos Engineering</a></li>
+
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-acid-transactions.html">40 &mdash; ACID Transactions</a></li>
+            <li><a href="41-isolation-levels.html">41 &mdash; Isolation Levels</a></li>
+            <li><a href="42-indexing-strategies.html">42 &mdash; Indexing Strategies</a></li>
+            <li><a href="43-query-optimization.html">43 &mdash; Query Optimization</a></li>
+            <li><a href="44-connection-pooling.html">44 &mdash; Connection Pooling</a></li>
+            <li><a href="45-caching-strategies.html">45 &mdash; Caching Strategies</a></li>
+            <li><a href="46-write-ahead-log.html">46 &mdash; Write-Ahead Log</a></li>
+            <li><a href="47-lsm-trees-sstables.html">47 &mdash; LSM Trees &amp; SSTables</a></li>
+
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-monolith-vs-microservices.html">48 &mdash; Monolith vs Microservices</a></li>
+            <li><a href="49-event-driven-architecture.html">49 &mdash; Event-Driven Architecture</a></li>
+
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-load-balancing.html">50 &mdash; Load Balancing</a></li>
+            <li><a href="51-reverse-proxy.html">51 &mdash; Reverse Proxy</a></li>
+            <li><a href="52-api-gateway.html">52 &mdash; API Gateway</a></li>
+            <li><a href="53-service-discovery.html">53 &mdash; Service Discovery</a></li>
+            <li><a href="54-sidecar-pattern.html">54 &mdash; Sidecar Pattern</a></li>
+            <li><a href="55-strangler-fig.html">55 &mdash; Strangler Fig</a></li>
+            <li><a href="56-cqrs.html">56 &mdash; CQRS</a></li>
+            <li><a href="57-event-sourcing.html">57 &mdash; Event Sourcing</a></li>
+            <li><a href="58-backpressure.html">58 &mdash; Backpressure</a></li>
+
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-rest-design.html">59 &mdash; REST Design</a></li>
+            <li><a href="60-grpc-protobuf.html">60 &mdash; gRPC &amp; Protobuf</a></li>
+            <li><a href="61-graphql.html">61 &mdash; GraphQL</a></li>
+            <li><a href="62-websockets.html">62 &mdash; WebSockets</a></li>
+            <li><a href="63-message-queues.html">63 &mdash; Message Queues</a></li>
+            <li><a href="64-idempotency.html">64 &mdash; Idempotency</a></li>
+
+            <li class="module-label">Security</li>
+            <li><a href="65-authentication-authorization.html">65 &mdash; Authentication &amp; Authorization</a></li>
+            <li><a href="66-rate-limiting.html">66 &mdash; Rate Limiting</a></li>
+            <li><a href="67-csrf.html">67 &mdash; CSRF Protection</a></li>
+            <li><a href="68-mtls.html" class="active">68 &mdash; mTLS</a></li>
+        </ul>
+    </nav>
+    <div class="progress-tracker">
+        <span class="progress-label">Progress</span>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <span class="progress-text">0 / 68</span>
+    </div>
+</aside>
+
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Toggle sidebar">&#9776;</button>
+    <h1>System Design Course</h1>
+    <span class="topic-count">68 Topics</span>
+</header>
+
+<main class="main-content">
+    <section class="hero">
+        <div class="hero-tags">
+            <span class="tag tag-advanced">Advanced</span>
+            <span class="tag tag-security">Security</span>
+            <span class="tag tag-concept">Concept</span>
+        </div>
+        <h1>mTLS &mdash; Mutual TLS</h1>
+        <p class="hero-subtitle">When both sides of a connection must prove their identity &mdash; the foundation of zero-trust networking.</p>
+    </section>
+
+    <div class="analogy-box">
+        <h3>&#128161; Analogy</h3>
+        <p>Two people meeting who must <strong>BOTH</strong> show ID cards before they can talk &mdash; unlike regular TLS where only the server proves its identity. Imagine a secure government building: to enter, <em>you</em> show your badge to the guard, and the <em>guard</em> shows their credentials to you. Neither party trusts the other until both identities are verified.</p>
+    </div>
+
+    <h2>TLS Recap &mdash; One-Way Authentication</h2>
+    <p>In standard TLS (HTTPS), only the <strong>server</strong> presents a certificate. The client verifies the server&rsquo;s identity, but the server has no cryptographic proof of who the client is. This is fine for public websites &mdash; anyone can browse &mdash; but insufficient for service-to-service communication where both parties must be authenticated.</p>
+
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Standard TLS</th>
+                    <th>Mutual TLS (mTLS)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Server authenticates?</td>
+                    <td>Yes &mdash; presents certificate</td>
+                    <td>Yes &mdash; presents certificate</td>
+                </tr>
+                <tr>
+                    <td>Client authenticates?</td>
+                    <td>No &mdash; anonymous</td>
+                    <td>Yes &mdash; presents certificate</td>
+                </tr>
+                <tr>
+                    <td>Use case</td>
+                    <td>Public websites, APIs with tokens</td>
+                    <td>Service mesh, internal APIs, zero-trust</td>
+                </tr>
+                <tr>
+                    <td>Trust model</td>
+                    <td>Client trusts server only</td>
+                    <td>Both parties verify each other</td>
+                </tr>
+                <tr>
+                    <td>Complexity</td>
+                    <td>Low &mdash; server cert only</td>
+                    <td>Higher &mdash; PKI for both sides</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>How mTLS Works</h2>
+    <h3>The Handshake Process</h3>
+    <ol>
+        <li><strong>Client Hello</strong> &mdash; Client initiates connection, sends supported cipher suites</li>
+        <li><strong>Server Hello + Server Certificate</strong> &mdash; Server responds with its certificate</li>
+        <li><strong>Certificate Request</strong> &mdash; Server requests client&rsquo;s certificate (mTLS-specific step)</li>
+        <li><strong>Client Certificate</strong> &mdash; Client sends its certificate to the server</li>
+        <li><strong>Mutual Verification</strong> &mdash; Both sides verify certificates against trusted CAs</li>
+        <li><strong>Encrypted Session</strong> &mdash; Symmetric session key established, communication begins</li>
+    </ol>
+
+    <h3>Certificate Authorities &amp; Certificate Chains</h3>
+    <p>mTLS relies on a <strong>Public Key Infrastructure (PKI)</strong>. A Certificate Authority (CA) &mdash; often an internal, private CA &mdash; issues certificates to both services. Each service trusts certificates signed by the same CA, forming a <strong>chain of trust</strong>:</p>
+    <pre><code><span class="token-comment"># Certificate Chain</span>
+<span class="token-string">Root CA</span> (offline, highly protected)
+  └── <span class="token-string">Intermediate CA</span> (signs service certs)
+        ├── <span class="token-string">Service A cert</span> (presented by Service A)
+        └── <span class="token-string">Service B cert</span> (presented by Service B)</code></pre>
+
+    <h3>Certificate Rotation</h3>
+    <p>Certificates expire &mdash; intentionally. Short-lived certificates (hours to days) limit the blast radius if one is compromised. Automated rotation via tools like <strong>cert-manager</strong> or <strong>HashiCorp Vault</strong> ensures services always have valid credentials without manual intervention.</p>
+
+    <h2>Zero-Trust Networking</h2>
+    <p>mTLS is the backbone of <strong>zero-trust architecture</strong> &mdash; the principle that no network traffic is inherently trusted, even inside a private network. Every request must be authenticated and authorized, regardless of source IP or network segment.</p>
+
+    <h3>Service Mesh with mTLS</h3>
+    <p>Service meshes like <strong>Istio</strong> and <strong>Linkerd</strong> automate mTLS between all services in a cluster. A sidecar proxy (e.g., Envoy) handles certificate management, rotation, and TLS termination transparently &mdash; application code never touches certificates directly.</p>
+
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Approach</th>
+                    <th>mTLS</th>
+                    <th>API Keys</th>
+                    <th>OAuth Tokens</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Authentication type</td>
+                    <td>Cryptographic identity</td>
+                    <td>Shared secret</td>
+                    <td>Token-based</td>
+                </tr>
+                <tr>
+                    <td>Encryption</td>
+                    <td>Built-in (TLS)</td>
+                    <td>Requires separate TLS</td>
+                    <td>Requires separate TLS</td>
+                </tr>
+                <tr>
+                    <td>Rotation</td>
+                    <td>Automated via PKI</td>
+                    <td>Manual or custom</td>
+                    <td>Token expiry + refresh</td>
+                </tr>
+                <tr>
+                    <td>Replay protection</td>
+                    <td>Yes (TLS session)</td>
+                    <td>No (without extra measures)</td>
+                    <td>Limited (expiry-based)</td>
+                </tr>
+                <tr>
+                    <td>Best for</td>
+                    <td>Service-to-service</td>
+                    <td>Simple integrations</td>
+                    <td>User-facing APIs</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Code &mdash; Python mTLS Server &amp; Client</h2>
+    <h3>Generating Certificates (Conceptual)</h3>
+    <pre><code><span class="token-comment"># Generate CA key and certificate</span>
+<span class="token-comment"># openssl genrsa -out ca.key 4096</span>
+<span class="token-comment"># openssl req -new -x509 -key ca.key -out ca.crt -days 365</span>
+
+<span class="token-comment"># Generate server key and CSR</span>
+<span class="token-comment"># openssl genrsa -out server.key 2048</span>
+<span class="token-comment"># openssl req -new -key server.key -out server.csr</span>
+<span class="token-comment"># openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -out server.crt</span>
+
+<span class="token-comment"># Generate client key and CSR</span>
+<span class="token-comment"># openssl genrsa -out client.key 2048</span>
+<span class="token-comment"># openssl req -new -key client.key -out client.csr</span>
+<span class="token-comment"># openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -out client.crt</span></code></pre>
+
+    <h3>mTLS Server</h3>
+    <pre><code><span class="token-keyword">import</span> ssl
+<span class="token-keyword">import</span> socket
+
+<span class="token-keyword">def</span> <span class="token-function">create_mtls_server</span>(host, port):
+    <span class="token-comment"># Create SSL context requiring client certificates</span>
+    context = ssl.<span class="token-function">SSLContext</span>(ssl.PROTOCOL_TLS_SERVER)
+    context.<span class="token-function">load_cert_chain</span>(
+        certfile=<span class="token-string">"server.crt"</span>,
+        keyfile=<span class="token-string">"server.key"</span>
+    )
+    <span class="token-comment"># Require client to present a valid certificate</span>
+    context.verify_mode = ssl.CERT_REQUIRED
+    context.<span class="token-function">load_verify_locations</span>(<span class="token-string">"ca.crt"</span>)
+    
+    <span class="token-comment"># Set minimum TLS version for security</span>
+    context.minimum_version = ssl.TLSVersion.TLSv1_2
+
+    server_socket = socket.<span class="token-function">socket</span>(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.<span class="token-function">bind</span>((host, port))
+    server_socket.<span class="token-function">listen</span>(<span class="token-number">5</span>)
+    
+    secure_socket = context.<span class="token-function">wrap_socket</span>(
+        server_socket, server_side=<span class="token-keyword">True</span>
+    )
+    
+    <span class="token-keyword">print</span>(<span class="token-string">f"mTLS server listening on </span>{host}<span class="token-string">:</span>{port}<span class="token-string">"</span>)
+    
+    <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+        conn, addr = secure_socket.<span class="token-function">accept</span>()
+        <span class="token-comment"># Access client certificate details</span>
+        client_cert = conn.<span class="token-function">getpeercert</span>()
+        subject = <span class="token-function">dict</span>(
+            x[<span class="token-number">0</span>] <span class="token-keyword">for</span> x <span class="token-keyword">in</span> client_cert[<span class="token-string">"subject"</span>]
+        )
+        <span class="token-keyword">print</span>(<span class="token-string">f"Client connected: </span>{subject}<span class="token-string">"</span>)
+        
+        data = conn.<span class="token-function">recv</span>(<span class="token-number">1024</span>)
+        conn.<span class="token-function">sendall</span>(<span class="token-string">b"Hello, authenticated client!"</span>)
+        conn.<span class="token-function">close</span>()
+
+<span class="token-keyword">if</span> __name__ == <span class="token-string">"__main__"</span>:
+    <span class="token-function">create_mtls_server</span>(<span class="token-string">"localhost"</span>, <span class="token-number">8443</span>)</code></pre>
+
+    <h3>mTLS Client</h3>
+    <pre><code><span class="token-keyword">import</span> ssl
+<span class="token-keyword">import</span> socket
+
+<span class="token-keyword">def</span> <span class="token-function">create_mtls_client</span>(host, port):
+    <span class="token-comment"># Create SSL context with client certificate</span>
+    context = ssl.<span class="token-function">SSLContext</span>(ssl.PROTOCOL_TLS_CLIENT)
+    context.<span class="token-function">load_cert_chain</span>(
+        certfile=<span class="token-string">"client.crt"</span>,
+        keyfile=<span class="token-string">"client.key"</span>
+    )
+    <span class="token-comment"># Verify the server's certificate against our CA</span>
+    context.<span class="token-function">load_verify_locations</span>(<span class="token-string">"ca.crt"</span>)
+    context.check_hostname = <span class="token-keyword">True</span>
+    
+    <span class="token-comment"># Connect and verify both sides</span>
+    raw_socket = socket.<span class="token-function">socket</span>(socket.AF_INET, socket.SOCK_STREAM)
+    secure_socket = context.<span class="token-function">wrap_socket</span>(
+        raw_socket, server_hostname=host
+    )
+    secure_socket.<span class="token-function">connect</span>((host, port))
+    
+    <span class="token-comment"># Verify server certificate details</span>
+    server_cert = secure_socket.<span class="token-function">getpeercert</span>()
+    <span class="token-keyword">print</span>(<span class="token-string">f"Connected to server: </span>{server_cert[<span class="token-string">'subject'</span>]}<span class="token-string">"</span>)
+    
+    secure_socket.<span class="token-function">sendall</span>(<span class="token-string">b"Hello from authenticated client!"</span>)
+    response = secure_socket.<span class="token-function">recv</span>(<span class="token-number">1024</span>)
+    <span class="token-keyword">print</span>(<span class="token-string">f"Server response: </span>{response.<span class="token-function">decode</span>()}<span class="token-string">"</span>)
+    
+    secure_socket.<span class="token-function">close</span>()
+
+<span class="token-keyword">if</span> __name__ == <span class="token-string">"__main__"</span>:
+    <span class="token-function">create_mtls_client</span>(<span class="token-string">"localhost"</span>, <span class="token-number">8443</span>)</code></pre>
+
+    <h3>Certificate Verification Helper</h3>
+    <pre><code><span class="token-keyword">import</span> ssl
+<span class="token-keyword">import</span> datetime
+
+<span class="token-keyword">def</span> <span class="token-function">verify_certificate_validity</span>(cert_path):
+    <span class="token-comment">"""Check if a certificate is valid and not expired."""</span>
+    <span class="token-keyword">import</span> subprocess
+    <span class="token-keyword">import</span> json
+    
+    <span class="token-comment"># Load and parse certificate</span>
+    context = ssl.<span class="token-function">create_default_context</span>()
+    cert = ssl.<span class="token-function">_ssl._test_decode_cert</span>(cert_path)
+    
+    <span class="token-comment"># Check expiry</span>
+    not_after = cert[<span class="token-string">"notAfter"</span>]
+    expiry = datetime.datetime.<span class="token-function">strptime</span>(
+        not_after, <span class="token-string">"%b %d %H:%M:%S %Y GMT"</span>
+    )
+    
+    remaining = expiry - datetime.datetime.<span class="token-function">utcnow</span>()
+    
+    <span class="token-keyword">if</span> remaining.days &lt; <span class="token-number">0</span>:
+        <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"EXPIRED"</span>, <span class="token-string">"days"</span>: remaining.days}
+    <span class="token-keyword">elif</span> remaining.days &lt; <span class="token-number">30</span>:
+        <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"EXPIRING_SOON"</span>, <span class="token-string">"days"</span>: remaining.days}
+    <span class="token-keyword">else</span>:
+        <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"VALID"</span>, <span class="token-string">"days"</span>: remaining.days}</code></pre>
+
+    <div class="industry-box">
+        <h3>&#127981; Industry Usage</h3>
+        <ul>
+            <li><strong>Istio Service Mesh</strong> &mdash; Automatically provisions and rotates mTLS certificates for all pods in a Kubernetes cluster via Citadel/istiod</li>
+            <li><strong>Linkerd</strong> &mdash; Lightweight service mesh with automatic mTLS using identity certificates tied to Kubernetes ServiceAccounts</li>
+            <li><strong>Cloudflare Access</strong> &mdash; Uses mTLS to authenticate devices and services connecting to protected applications</li>
+            <li><strong>AWS Private CA</strong> &mdash; Managed certificate authority for issuing private certificates used in mTLS within AWS infrastructure</li>
+            <li><strong>HashiCorp Vault PKI</strong> &mdash; Dynamic certificate generation with short TTLs, enabling automated mTLS across microservices</li>
+        </ul>
+    </div>
+
+    <div class="summary-box">
+        <h3>&#128203; Summary</h3>
+        <ul>
+            <li>mTLS requires <strong>both</strong> client and server to present certificates &mdash; mutual authentication</li>
+            <li>A shared <strong>Certificate Authority</strong> establishes trust between services</li>
+            <li>Short-lived certificates + automated rotation minimize compromise windows</li>
+            <li>Service meshes (Istio, Linkerd) make mTLS transparent to application code</li>
+            <li>mTLS is the foundation of <strong>zero-trust</strong> &mdash; verify everything, trust nothing</li>
+            <li>Unlike API keys, mTLS provides cryptographic identity <em>and</em> encryption in one mechanism</li>
+        </ul>
+    </div>
+
+    <div class="mental-model">
+        <h3>&#129504; Mental Model</h3>
+        <div class="model-visual">
+            <pre>
+┌─────────────┐                          ┌─────────────┐
+│   Client    │                          │   Server    │
+│             │─── 1. ClientHello ──────▶│             │
+│             │◀── 2. ServerHello ───────│             │
+│             │◀── 3. Server Cert ───────│             │
+│             │◀── 4. CertRequest ───────│             │
+│             │─── 5. Client Cert ──────▶│             │
+│             │                          │             │
+│  ✓ Verify   │                          │  ✓ Verify   │
+│  Server ID  │                          │  Client ID  │
+│             │◀══ 6. Encrypted ════════▶│             │
+│             │     Session Keys         │             │
+└─────────────┘                          └─────────────┘
+        │                                        │
+        └────── Both trust the same CA ──────────┘
+            </pre>
+        </div>
+    </div>
+
+    <div class="mistakes-box">
+        <h3>&#9888;&#65039; Common Mistakes</h3>
+        <ul>
+            <li><strong>Using long-lived certificates</strong> &mdash; Certificates valid for years create a massive window of vulnerability if compromised. Use short TTLs (hours to days) with automated rotation.</li>
+            <li><strong>Skipping certificate revocation</strong> &mdash; Without CRL or OCSP checks, a compromised certificate remains trusted until expiry. Always implement revocation mechanisms.</li>
+            <li><strong>Storing private keys insecurely</strong> &mdash; Embedding keys in container images or committing them to repos exposes credentials. Use secret managers or hardware security modules.</li>
+            <li><strong>Disabling hostname verification</strong> &mdash; Setting <code>check_hostname = False</code> for convenience defeats the purpose of mTLS &mdash; an attacker can use any valid certificate to impersonate a service.</li>
+        </ul>
+    </div>
+
+    <div class="exercise-box">
+        <h3>&#9997;&#65039; Exercises</h3>
+        <ol>
+            <li><strong>Generate a PKI</strong> &mdash; Use OpenSSL to create a root CA, intermediate CA, and two service certificates. Verify the chain with <code>openssl verify -CAfile</code>.</li>
+            <li><strong>Build an mTLS echo server</strong> &mdash; Extend the Python server above to reject connections from certificates not matching a specific Common Name (CN). Test with valid and invalid client certs.</li>
+            <li><strong>Implement cert rotation</strong> &mdash; Write a script that monitors certificate expiry and automatically generates a new certificate from the CA when less than 24 hours remain.</li>
+            <li><strong>Service mesh mTLS</strong> &mdash; Deploy two services in a local Kubernetes cluster with Linkerd installed. Verify that traffic between them is encrypted by inspecting Linkerd&rsquo;s tap output.</li>
+        </ol>
+    </div>
+
+    <nav class="page-nav">
+        <a href="67-csrf.html" class="prev">&larr; CSRF Protection</a>
+    </nav>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

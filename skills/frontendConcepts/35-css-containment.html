@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Containment - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> CSS Containment
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>CSS Containment</h1>
+                <p class="subtitle">Telling the browser "this element's internals are independent" — enabling massive rendering optimizations by limiting the scope of layout, paint, and style recalculations.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Performance</span>
+                    <span class="tag tag-browser">CSS</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📦 Daily-Life Analogy: Sealed Shipping Containers</div>
+                <p>Without containment, changing one item in a warehouse means rechecking the entire inventory. With <strong>CSS containment</strong>, each section is a sealed shipping container — the warehouse manager knows changes inside container #5 cannot possibly affect containers #1-4 or #6-10. This lets the browser skip recalculating everything else.</p>
+            </div>
+
+            <h2>The Problem: Layout Is Global by Default</h2>
+            <ul>
+                <li><strong>Changing one element's height</strong> can shift every sibling below it, affecting the entire document flow</li>
+                <li><strong>Adding content to a div</strong> might change its parent's size, which changes the grandparent's layout, etc. (layout bubbles up)</li>
+                <li><strong>Paint is unbounded</strong> — box-shadow, overflow visible content, and outlines can paint outside an element's bounds</li>
+                <li><strong>Style recalculation</strong> — Changing a CSS class might invalidate styling for the entire subtree</li>
+            </ul>
+            <p>CSS Containment lets you explicitly declare: "this subtree is independent — changes inside it do NOT affect anything outside."</p>
+
+            <h2>The contain Property</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Value</th><th>What It Contains</th><th>Browser Optimization</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>contain: layout</code></td><td>Layout is independent — element doesn't affect external layout</td><td>Skip layout recalc for elements outside this subtree</td></tr>
+                    <tr><td><code>contain: paint</code></td><td>Nothing paints outside element's bounds</td><td>Skip paint for off-screen contained elements</td></tr>
+                    <tr><td><code>contain: size</code></td><td>Element's size is fixed regardless of children</td><td>Skip layout entirely for this element during child changes</td></tr>
+                    <tr><td><code>contain: style</code></td><td>Counters and quotes are scoped</td><td>Limited optimization (mostly for correctness)</td></tr>
+                    <tr><td><code>contain: strict</code></td><td>All of the above (layout + paint + size + style)</td><td>Maximum optimization — element is fully isolated</td></tr>
+                    <tr><td><code>contain: content</code></td><td>layout + paint + style (NOT size)</td><td>Safe default for most cases</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Code: Practical Usage</h2>
+<pre><code><span class="token-comment">/* Best use case: Virtual list items that are independent */</span>
+.list-item {
+    contain: content; <span class="token-comment">/* layout + paint + style containment */</span>
+    <span class="token-comment">/* Browser knows: changing this item's content won't affect siblings */</span>
+    <span class="token-comment">/* Result: Only THIS item re-layouts when its content changes */</span>
+}
+
+<span class="token-comment">/* Widget/card pattern — each card is isolated */</span>
+.dashboard-card {
+    contain: strict; <span class="token-comment">/* Full containment including size */</span>
+    width: 300px;
+    height: 200px; <span class="token-comment">/* Size MUST be explicit with contain: strict */</span>
+    <span class="token-comment">/* Because size containment means: "my size won't change based on children" */</span>
+    <span class="token-comment">/* If children overflow, they're clipped (like overflow: hidden) */</span>
+}
+
+<span class="token-comment">/* Off-screen content optimization */</span>
+.below-fold-section {
+    contain: paint; <span class="token-comment">/* Nothing in here paints outside bounds */</span>
+    <span class="token-comment">/* Browser can skip painting entirely when off-screen */</span>
+    <span class="token-comment">/* This is what content-visibility: auto uses internally */</span>
+}
+</code></pre>
+
+            <h3>content-visibility: The Killer Application</h3>
+<pre><code><span class="token-comment">/* content-visibility: auto — the mega-optimization */</span>
+<span class="token-comment">/* Combines containment with skip-rendering for off-screen content */</span>
+.article-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px; <span class="token-comment">/* Estimated size for scroll calculation */</span>
+    <span class="token-comment">/* 
+     * What this does:
+     * 1. Off-screen: skips layout, paint, AND rendering entirely
+     * 2. On-screen: renders normally
+     * 3. Browser uses contain-intrinsic-size for scroll bar sizing
+     * 
+     * Result: A page with 100 articles renders as fast as one with 5
+     * because off-screen articles are not rendered at all
+     */</span>
+}
+
+<span class="token-comment">/* Real-world impact: Wikipedia measured 7x faster rendering with this */</span>
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Chrome's built-in PDF viewer</strong> — Uses <code>content-visibility: auto</code> on pages not currently visible, dramatically reducing memory and render cost for 1000+ page documents.</li>
+                <li><strong>Wikipedia</strong> — Tested <code>content-visibility: auto</code> on article sections, achieving 7x rendering speed improvement on long articles.</li>
+                <li><strong>YouTube</strong> — Comment sections and recommendation lists use containment to prevent layout recalculation when new items load.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Using <code>contain: size</code> without explicit dimensions</strong> — The element collapses to 0×0 because the browser ignores children for sizing. Always set width/height with size containment.</li>
+                <li><strong>Expecting <code>contain: strict</code> to work like <code>overflow: hidden</code></strong> — It does clip overflow, but it also affects layout calculations. Test thoroughly.</li>
+                <li><strong>Applying containment to inline elements</strong> — Containment requires a formatting context. It only works on block-level, flex, grid, or absolutely positioned elements.</li>
+                <li><strong>Forgetting <code>contain-intrinsic-size</code> with <code>content-visibility: auto</code></strong> — Without it, the scrollbar height is wrong (elements are 0 height when off-screen).</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand CSS Containment When...</h3>
+                <p>You can explain why adding <code>contain: content</code> to 500 list items makes inserting a new item at position #250 go from 50ms to 1ms (hint: layout recalculation stops at the containment boundary).</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Create a page with 1000 paragraphs. Measure initial render time with and without <code>content-visibility: auto</code>. Then add <code>contain-intrinsic-size</code> and verify the scrollbar is correct. Target: 5x+ improvement in Largest Contentful Paint.</p>
+                <h3>🔗 Connect It</h3>
+                <p>CSS Containment connects to: <strong>Browser Compositing Layers</strong> (containment helps the browser create independent layers), <strong>Paint vs Composite vs Layout</strong> (containment limits which stages propagate), and <strong>ResizeObserver</strong> (containment boundaries affect observation scope).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="34-gpu-acceleration-css.html" class="nav-btn nav-btn-prev">← GPU Acceleration in CSS</a>
+                <a href="36-subpixel-rendering.html" class="nav-btn nav-btn-next">Subpixel Rendering →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 10: Deployment — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> Deployment</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 10: Deployment</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">From trained adapter to production API: LoRA merging, quantization (GGUF/AWQ/GPTQ), serving with vLLM and Text Generation Inference, and building a REST API.</p>
+
+            <h2 id="merge">🔗 Step 1: Merge LoRA Adapters</h2>
+            
+            <pre><code>"""
+Merge all LoRA adapters into the base model to create a standalone model.
+This eliminates the need to load adapters at inference time.
+
+Pipeline: Base Model + CPT LoRA + SFT LoRA + DPO LoRA → Merged Model
+"""
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
+
+BASE_MODEL = "google/gemma-3-27b-it"
+ADAPTERS = [
+    "./checkpoints/cpt_lora/final",   # Stage 1: CPT
+    "./checkpoints/sft_lora/final",   # Stage 2: SFT
+    "./checkpoints/dpo_lora/final",   # Stage 3: DPO
+]
+OUTPUT_DIR = "./model_merged"
+
+print("📦 Loading base model in full precision...")
+model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL,
+    torch_dtype=torch.bfloat16,
+    device_map="cpu",  # Load on CPU for merging (needs ~60GB RAM for 27B)
+)
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+
+# Merge each adapter sequentially
+for adapter_path in ADAPTERS:
+    print(f"  📎 Merging adapter: {adapter_path}")
+    model = PeftModel.from_pretrained(model, adapter_path)
+    model = model.merge_and_unload()
+
+# Save merged model
+print(f"💾 Saving merged model to {OUTPUT_DIR}...")
+model.save_pretrained(OUTPUT_DIR, safe_serialization=True)
+tokenizer.save_pretrained(OUTPUT_DIR)
+
+print(f"✅ Merged model saved! Size: {sum(p.numel() for p in model.parameters()) / 1e9:.1f}B params")</code></pre>
+
+            <h2 id="quantize">📦 Step 2: Quantization for Deployment</h2>
+            
+            <h3>Option A: GGUF (for llama.cpp / Ollama)</h3>
+            <pre><code># Convert to GGUF format for CPU/consumer GPU inference
+# Requires: llama.cpp (clone from GitHub)
+
+# 1. Install llama.cpp
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp && make -j
+
+# 2. Convert HuggingFace model to GGUF
+python convert_hf_to_gguf.py ../model_merged \
+    --outfile ../model_merged/gemma-scripture-f16.gguf \
+    --outtype f16
+
+# 3. Quantize to different sizes
+# Q4_K_M: Best quality/size balance (recommended)
+./llama-quantize ../model_merged/gemma-scripture-f16.gguf \
+    ../model_merged/gemma-scripture-Q4_K_M.gguf Q4_K_M
+
+# Q5_K_M: Higher quality, larger size
+./llama-quantize ../model_merged/gemma-scripture-f16.gguf \
+    ../model_merged/gemma-scripture-Q5_K_M.gguf Q5_K_M
+
+# Q8_0: Near full precision
+./llama-quantize ../model_merged/gemma-scripture-f16.gguf \
+    ../model_merged/gemma-scripture-Q8_0.gguf Q8_0</code></pre>
+            
+            <div class="callout callout-info">
+                <div class="callout-title">📊 GGUF Quantization Comparison (27B model)</div>
+                <table>
+                    <thead><tr><th>Quant</th><th>Size</th><th>RAM Needed</th><th>Quality Loss</th><th>Speed</th></tr></thead>
+                    <tbody>
+                        <tr><td>F16</td><td>54 GB</td><td>56 GB</td><td>None</td><td>Baseline</td></tr>
+                        <tr><td>Q8_0</td><td>28 GB</td><td>30 GB</td><td>Negligible</td><td>1.2× faster</td></tr>
+                        <tr><td>Q5_K_M</td><td>19 GB</td><td>21 GB</td><td>Very small</td><td>1.5× faster</td></tr>
+                        <tr><td><strong>Q4_K_M</strong></td><td><strong>16 GB</strong></td><td><strong>18 GB</strong></td><td><strong>Small</strong></td><td><strong>1.8× faster</strong></td></tr>
+                        <tr><td>Q3_K_M</td><td>13 GB</td><td>15 GB</td><td>Noticeable</td><td>2× faster</td></tr>
+                        <tr><td>Q2_K</td><td>10 GB</td><td>12 GB</td><td>Significant</td><td>2.5× faster</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Option B: AWQ (for vLLM — fastest inference)</h3>
+            <pre><code>"""
+AWQ (Activation-Aware Weight Quantization)
+Best for GPU inference with vLLM. 4-bit with minimal quality loss.
+"""
+from awq import AutoAWQForCausalLM
+from transformers import AutoTokenizer
+
+MODEL_PATH = "./model_merged"
+QUANT_PATH = "./model_awq"
+
+print("📦 Loading model for AWQ quantization...")
+model = AutoAWQForCausalLM.from_pretrained(MODEL_PATH, device_map="auto")
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+
+# Calibration data — use a sample of your training data
+calibration_data = [
+    "Explain the concept of Dharma in the Bhagavad Gita.",
+    "कर्मयोग क्या है और इसका महत्व क्या है?",
+    "What are the four paths of Yoga according to Hindu philosophy?",
+    "Describe the Vishvarupa (universal form) shown by Krishna.",
+    # Add 100-500 diverse samples for best calibration
+]
+
+# Quantize
+quant_config = {
+    "zero_point": True,
+    "q_group_size": 128,
+    "w_bit": 4,
+    "version": "GEMM"
+}
+
+print("⚡ Quantizing with AWQ...")
+model.quantize(tokenizer, quant_config=quant_config, calib_data=calibration_data)
+
+# Save
+model.save_quantized(QUANT_PATH)
+tokenizer.save_pretrained(QUANT_PATH)
+print(f"✅ AWQ model saved to {QUANT_PATH}")</code></pre>
+
+            <h2 id="vllm">🚀 Step 3: Serving with vLLM</h2>
+            
+            <pre><code># ============================================
+# Option A: vLLM OpenAI-compatible API server
+# ============================================
+# This creates an API that's drop-in compatible with OpenAI's API
+
+pip install vllm
+
+# Serve the AWQ quantized model
+vllm serve ./model_awq \
+    --model ./model_awq \
+    --tokenizer ./model_awq \
+    --dtype auto \
+    --quantization awq \
+    --max-model-len 4096 \
+    --gpu-memory-utilization 0.9 \
+    --port 8000 \
+    --host 0.0.0.0
+
+# Or serve the full BF16 merged model (needs more VRAM)
+vllm serve ./model_merged \
+    --dtype bfloat16 \
+    --max-model-len 8192 \
+    --tensor-parallel-size 2 \  # Split across 2 GPUs
+    --port 8000</code></pre>
+
+            <pre><code>"""
+Python client for the vLLM server (OpenAI-compatible).
+"""
+import openai
+
+# Point to your vLLM server
+client = openai.OpenAI(
+    base_url="http://localhost:8000/v1",
+    api_key="not-needed",  # vLLM doesn't require auth by default
+)
+
+def ask_scripture_model(question: str, language: str = "en") -> str:
+    """Query the deployed scripture model."""
+    
+    system_prompt = (
+        "You are a Hindu scripture scholar. Cite specific references."
+        if language == "en" else
+        "आप हिंदू शास्त्रों के विद्वान हैं। विशिष्ट संदर्भ दें।"
+    )
+    
+    response = client.chat.completions.create(
+        model="./model_awq",  # Model name as registered in vLLM
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": question}
+        ],
+        temperature=0.7,
+        max_tokens=1024,
+        stream=True,  # Streaming for real-time responses
+    )
+    
+    full_response = ""
+    for chunk in response:
+        if chunk.choices[0].delta.content:
+            content = chunk.choices[0].delta.content
+            full_response += content
+            print(content, end="", flush=True)
+    
+    print()
+    return full_response
+
+# Usage
+answer = ask_scripture_model("What is the meaning of Bhagavad Gita 2.47?")
+answer_hi = ask_scripture_model("गीता में कर्मयोग का क्या अर्थ है?", language="hi")</code></pre>
+
+            <h2 id="tgi">🐳 Alternative: Text Generation Inference (TGI)</h2>
+            
+            <pre><code># Docker-based deployment with HuggingFace TGI
+# Best for: Production deployments with Docker/Kubernetes
+
+# Pull TGI image
+docker pull ghcr.io/huggingface/text-generation-inference:latest
+
+# Run with quantized model
+docker run --gpus all -p 8080:80 \
+    -v ./model_merged:/model \
+    ghcr.io/huggingface/text-generation-inference:latest \
+    --model-id /model \
+    --quantize bitsandbytes-nf4 \
+    --max-input-length 4096 \
+    --max-total-tokens 8192 \
+    --max-batch-prefill-tokens 4096
+
+# TGI API call
+curl http://localhost:8080/generate \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{
+        "inputs": "<start_of_turn>user\nWhat is Karma?\n<end_of_turn>\n<start_of_turn>model\n",
+        "parameters": {
+            "max_new_tokens": 512,
+            "temperature": 0.7,
+            "top_p": 0.9
+        }
+    }'</code></pre>
+
+            <h2 id="ollama">🦙 Local Deployment with Ollama</h2>
+            
+            <pre><code># For local/desktop deployment — simplest option
+# Uses GGUF quantized model
+
+# 1. Create Modelfile
+cat > Modelfile << 'EOF'
+FROM ./gemma-scripture-Q4_K_M.gguf
+
+TEMPLATE """{{ if .System }}<start_of_turn>system
+{{ .System }}<end_of_turn>
+{{ end }}<start_of_turn>user
+{{ .Prompt }}<end_of_turn>
+<start_of_turn>model
+{{ .Response }}<end_of_turn>"""
+
+SYSTEM """You are a deeply knowledgeable scholar of Hindu scriptures.
+Always cite specific verse references. Provide original Sanskrit when relevant.
+Respond in the language the user asks in."""
+
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9
+PARAMETER num_ctx 4096
+PARAMETER stop "<end_of_turn>"
+EOF
+
+# 2. Create the model in Ollama
+ollama create gemma-scripture -f Modelfile
+
+# 3. Run it!
+ollama run gemma-scripture "What is the essence of the Upanishads?"
+
+# 4. API access
+curl http://localhost:11434/api/chat -d '{
+    "model": "gemma-scripture",
+    "messages": [
+        {"role": "user", "content": "Explain karma yoga from the Gita"}
+    ],
+    "stream": true
+}'</code></pre>
+
+            <h2 id="fastapi">🌐 Production REST API</h2>
+            
+            <pre><code>"""
+Production-ready FastAPI wrapper for the scripture model.
+Features: rate limiting, request validation, health checks, metrics.
+"""
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+import openai
+import time
+import uvicorn
+
+app = FastAPI(
+    title="Hindu Scripture AI API",
+    description="AI-powered Hindu scripture knowledge assistant",
+    version="1.0.0",
+)
+
+# Connect to vLLM backend
+vllm_client = openai.OpenAI(
+    base_url="http://localhost:8000/v1",
+    api_key="not-needed",
+)
+
+# ============================================
+# Request/Response Models
+# ============================================
+class QuestionRequest(BaseModel):
+    question: str = Field(..., min_length=5, max_length=2000)
+    language: str = Field(default="en", pattern="^(en|hi|sa)$")
+    max_tokens: int = Field(default=1024, ge=50, le=4096)
+    temperature: float = Field(default=0.7, ge=0.0, le=1.5)
+    include_references: bool = Field(default=True)
+
+class QuestionResponse(BaseModel):
+    answer: str
+    language: str
+    tokens_used: int
+    latency_ms: float
+
+
+# ============================================
+# Endpoints
+# ============================================
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "model": "gemma-scripture-27b"}
+
+
+@app.post("/ask", response_model=QuestionResponse)
+async def ask_question(request: QuestionRequest):
+    """Ask a question about Hindu scriptures."""
+    
+    start_time = time.time()
+    
+    system_prompts = {
+        "en": "You are a Hindu scripture scholar. Cite specific verse references.",
+        "hi": "आप हिंदू शास्त्रों के विद्वान हैं। विशिष्ट श्लोक संदर्भ दें।",
+        "sa": "त्वं हिन्दूशास्त्राणां विद्वान् असि। विशिष्टान् श्लोकसन्दर्भान् प्रयच्छ।",
+    }
+    
+    try:
+        response = vllm_client.chat.completions.create(
+            model="gemma-scripture",
+            messages=[
+                {"role": "system", "content": system_prompts[request.language]},
+                {"role": "user", "content": request.question}
+            ],
+            temperature=request.temperature,
+            max_tokens=request.max_tokens,
+        )
+        
+        answer = response.choices[0].message.content
+        tokens = response.usage.total_tokens
+        
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Model unavailable: {str(e)}")
+    
+    latency = (time.time() - start_time) * 1000
+    
+    return QuestionResponse(
+        answer=answer,
+        language=request.language,
+        tokens_used=tokens,
+        latency_ms=round(latency, 1),
+    )
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)</code></pre>
+
+            <h2 id="upload-hub">📤 Upload to HuggingFace Hub</h2>
+            <pre><code>"""
+Share your model with the community on HuggingFace Hub.
+"""
+from huggingface_hub import HfApi, create_repo
+
+api = HfApi()
+REPO_ID = "your-username/gemma-hindu-scripture-27b"
+
+# Create repository
+create_repo(REPO_ID, private=False, repo_type="model")
+
+# Upload merged model
+api.upload_folder(
+    folder_path="./model_merged",
+    repo_id=REPO_ID,
+    commit_message="Upload fine-tuned Gemma 27B for Hindu scriptures",
+)
+
+# Upload quantized versions
+api.upload_file(
+    path_or_fileobj="./model_merged/gemma-scripture-Q4_K_M.gguf",
+    path_in_repo="gemma-scripture-Q4_K_M.gguf",
+    repo_id=REPO_ID,
+)
+
+print(f"✅ Model uploaded to: https://huggingface.co/{REPO_ID}")</code></pre>
+
+            <nav class="page-nav">
+                <a href="09-evaluation.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Evaluation</span>
+                </a>
+                <a href="11-troubleshooting.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Troubleshooting</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script
+  src="../widget/dist/chatbot-widget.js"
+  data-site-key="YOUR_SITE_KEY"
+  data-api-url="http://localhost:8000"
+  data-position="bottom-right"
+  data-color="#6366f1"
+  data-title="Ask AI"
+  data-welcome-message="Hi! Ask me anything about this website's docs."
+></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full AI/LLM Engineering Course — Beginner to Advanced</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span>Complete Course</span>
+            <h2>🧠 AI/LLM Engineering</h2>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+
+                <li><span class="module-label">Module 1: Foundations</span></li>
+                <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+                <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+                <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+                <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+                <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+                <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+
+                <li><span class="module-label">Module 2: Datasets</span></li>
+                <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+                <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+                <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+                <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+                <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+
+                <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+                <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+                <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+                <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+                <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+
+                <li><span class="module-label">Module 4: Inference</span></li>
+                <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+                <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+                <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+
+                <li><span class="module-label">Module 5: Local AI</span></li>
+                <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+                <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+                <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+
+                <li><span class="module-label">Module 6: RAG & Memory</span></li>
+                <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+                <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+                <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+
+                <li><span class="module-label">Module 7: Agents</span></li>
+                <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+                <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+                <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+                <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+
+                <li><span class="module-label">Module 8: Model Types</span></li>
+                <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+
+                <li><span class="module-label">Module 9: Deployment</span></li>
+                <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+
+                <li><span class="module-label">Module 10: Evaluation</span></li>
+                <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+
+                <li><span class="module-label">Module 11: Real World</span></li>
+                <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+                <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+                <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+                <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Top Bar -->
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb">
+            <a href="index.html">Course</a>
+            <span>›</span> Home
+        </div>
+        <div class="topbar-actions">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h1>Full AI/LLM Engineering Course</h1>
+                <p>Master modern AI engineering from absolute basics to production-grade systems. Learn with simple language, real-world analogies, and industry-standard code.</p>
+            </section>
+
+            <!-- Learning Path -->
+            <h2>🗺️ Your Learning Path</h2>
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🧠</div>
+                    <span class="pipeline-label">Foundations</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">📚</div>
+                    <span class="pipeline-label">Datasets</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🎯</div>
+                    <span class="pipeline-label">Fine-Tuning</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">⚡</div>
+                    <span class="pipeline-label">Inference</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">💻</div>
+                    <span class="pipeline-label">Local AI</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🔍</div>
+                    <span class="pipeline-label">RAG</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🤖</div>
+                    <span class="pipeline-label">Agents</span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🚀</div>
+                    <span class="pipeline-label">Production</span>
+                </div>
+            </div>
+
+            <!-- Progress Tracker -->
+            <h2>📊 Your Progress</h2>
+            <div class="summary-box">
+                <div class="progress-container">
+                    <div class="progress-fill"></div>
+                </div>
+                <p class="progress-label" style="text-align: center; font-size: 0.9rem; color: var(--text-secondary); margin: 0.5rem 0 1rem;">0/35 completed (0%)</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0.25rem;">
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="01"> 1. LLM Basics</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="02"> 2. Tokens & Tokenization</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="03"> 3. Embeddings</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="04"> 4. Transformers & Attention</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="05"> 5. Parameters & Training</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="06"> 6. Open vs Closed Models</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="07"> 7. Dataset Types</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="08"> 8. Synthetic Data</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="09"> 9. Cleaning & Formatting</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="10"> 10. Fine-Tuning Basics</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="11"> 11. Hallucination Reduction</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="12"> 12. LoRA & QLoRA</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="13"> 13. DPO & RLHF</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="14"> 14. Quantization & GGUF</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="15"> 15. Checkpoints & Merging</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="16"> 16. KV Cache & Flash Attention</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="17"> 17. Inference Optimization</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="18"> 18. GPU & VRAM</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="19"> 19. llama.cpp & Ollama</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="20"> 20. vLLM & MLX</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="21"> 21. HuggingFace Ecosystem</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="22"> 22. RAG Fundamentals</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="23"> 23. Vector Databases</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="24"> 24. AI Memory Systems</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="25"> 25. Prompt Engineering</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="26"> 26. Tool & Function Calling</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="27"> 27. AI Agents</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="28"> 28. Browser Agents</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="29"> 29. Model Types</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="30"> 30. Deployment & Serving</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="31"> 31. Benchmarks & Evals</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="32"> 32. Chatbots & Copilots</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="33"> 33. AI Automation & SaaS</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="34"> 34. AI Orchestration</label>
+                    <label style="display: block; padding: 0.3rem 0; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" class="progress-check" data-id="35"> 35. Capstone Project</label>
+                </div>
+            </div>
+
+            <!-- Module Cards -->
+            <h2>📖 Modules</h2>
+
+            <!-- Module 1 -->
+            <h3><span class="module-badge module-badge-foundations">Module 1</span> Foundations</h3>
+            <div class="card-grid">
+                <div class="card"><a href="01-llm-basics.html">
+                    <span class="card-number">1</span>
+                    <h3>LLM Basics & How AI Works</h3>
+                    <p>What are Large Language Models, neural networks, and how AI actually "thinks".</p>
+                    <span class="tag tag-beginner">Beginner</span> <span class="tag tag-concept">Concept</span>
+                </a></div>
+                <div class="card"><a href="02-tokens-tokenization.html">
+                    <span class="card-number">2</span>
+                    <h3>Tokens, Tokenization & Context</h3>
+                    <p>How text becomes numbers, BPE algorithm, and why context windows matter.</p>
+                    <span class="tag tag-beginner">Beginner</span> <span class="tag tag-code">Code</span>
+                </a></div>
+                <div class="card"><a href="03-embeddings.html">
+                    <span class="card-number">3</span>
+                    <h3>Embeddings</h3>
+                    <p>Converting meaning into numbers, vector spaces, and semantic similarity.</p>
+                    <span class="tag tag-beginner">Beginner</span> <span class="tag tag-code">Code</span>
+                </a></div>
+                <div class="card"><a href="04-transformers-attention.html">
+                    <span class="card-number">4</span>
+                    <h3>Transformers & Attention</h3>
+                    <p>The architecture powering all modern AI — self-attention explained simply.</p>
+                    <span class="tag tag-beginner">Beginner</span> <span class="tag tag-concept">Concept</span>
+                </a></div>
+                <div class="card"><a href="05-parameters-training.html">
+                    <span class="card-number">5</span>
+                    <h3>Parameters & Training vs Inference</h3>
+                    <p>What "7B parameters" means, how models learn, and how they generate text.</p>
+                    <span class="tag tag-beginner">Beginner</span> <span class="tag tag-concept">Concept</span>
+                </a></div>
+                <div class="card"><a href="06-open-vs-closed-models.html">
+                    <span class="card-number">6</span>
+                    <h3>Open-Source vs Closed-Source</h3>
+                    <p>Llama vs GPT-4, licensing, cost comparison, and when to use which.</p>
+                    <span class="tag tag-beginner">Beginner</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+            </div>
+
+            <!-- Module 2 -->
+            <h3><span class="module-badge module-badge-datasets">Module 2</span> Datasets & Training</h3>
+            <div class="card-grid">
+                <div class="card"><a href="07-datasets-overview.html">
+                    <span class="card-number">7</span>
+                    <h3>SFT, Instruction & Preference Datasets</h3>
+                    <p>All dataset types for training — formats, sources, and when to use each.</p>
+                    <span class="tag tag-beginner">Beginner</span> <span class="tag tag-code">Code</span>
+                </a></div>
+                <div class="card"><a href="08-synthetic-data.html">
+                    <span class="card-number">8</span>
+                    <h3>Synthetic Data & Curation</h3>
+                    <p>Using AI to generate training data, quality filtering, and diversity scoring.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+                <div class="card"><a href="09-data-cleaning-formatting.html">
+                    <span class="card-number">9</span>
+                    <h3>Dataset Cleaning & Formatting</h3>
+                    <p>Deduplication, quality filtering, ChatML/Alpaca formats, chat templates.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-code">Code</span>
+                </a></div>
+                <div class="card"><a href="10-finetuning-basics.html">
+                    <span class="card-number">10</span>
+                    <h3>Fine-Tuning & Continued Pretraining</h3>
+                    <p>When to fine-tune vs RAG vs prompt, CPT for domain knowledge injection.</p>
+                    <span class="tag tag-concept">Concept</span> <span class="tag tag-python">Python</span>
+                </a></div>
+                <div class="card"><a href="11-hallucination-reduction.html">
+                    <span class="card-number">11</span>
+                    <h3>Hallucination Reduction</h3>
+                    <p>Why models make things up and proven techniques to reduce it.</p>
+                    <span class="tag tag-concept">Concept</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+            </div>
+
+            <!-- Module 3 -->
+            <h3><span class="module-badge module-badge-finetuning">Module 3</span> Fine-Tuning Techniques</h3>
+            <div class="card-grid">
+                <div class="card"><a href="12-lora-qlora.html">
+                    <span class="card-number">12</span>
+                    <h3>LoRA, QLoRA & Adapter Tuning</h3>
+                    <p>Parameter-efficient fine-tuning with production Unsloth/PEFT code.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+                <div class="card"><a href="13-dpo-rlhf.html">
+                    <span class="card-number">13</span>
+                    <h3>DPO & RLHF Alignment</h3>
+                    <p>Teaching models human preferences — reward models, PPO, DPO, ORPO.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+                <div class="card"><a href="14-quantization.html">
+                    <span class="card-number">14</span>
+                    <h3>Quantization & GGUF Models</h3>
+                    <p>Model compression — INT4/INT8, GGUF, AWQ, GPTQ methods compared.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-code">Code</span>
+                </a></div>
+                <div class="card"><a href="15-checkpoints-merging.html">
+                    <span class="card-number">15</span>
+                    <h3>Checkpoints & Model Merging</h3>
+                    <p>Saving training progress, merging adapters, SLERP/TIES/DARE merging.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+            </div>
+
+            <!-- Module 4 -->
+            <h3><span class="module-badge module-badge-inference">Module 4</span> Inference & Optimization</h3>
+            <div class="card-grid">
+                <div class="card"><a href="16-kv-cache-flash-attention.html">
+                    <span class="card-number">16</span>
+                    <h3>KV Cache, Flash Attention & Speculative Decoding</h3>
+                    <p>Speed tricks — caching, memory-efficient attention, draft-verify approach.</p>
+                    <span class="tag tag-concept">Concept</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+                <div class="card"><a href="17-inference-optimization.html">
+                    <span class="card-number">17</span>
+                    <h3>Model Serving & Batch Inference</h3>
+                    <p>Production endpoints, continuous batching, tensor parallelism.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+                <div class="card"><a href="18-gpu-vram-basics.html">
+                    <span class="card-number">18</span>
+                    <h3>GPU, VRAM & Latency Tradeoffs</h3>
+                    <p>Hardware fundamentals, memory math, speed vs quality decisions.</p>
+                    <span class="tag tag-concept">Concept</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+            </div>
+
+            <!-- Module 5 -->
+            <h3><span class="module-badge module-badge-ecosystem">Module 5</span> Local AI Ecosystem</h3>
+            <div class="card-grid">
+                <div class="card"><a href="19-llamacpp-ollama.html">
+                    <span class="card-number">19</span>
+                    <h3>llama.cpp & Ollama</h3>
+                    <p>Run AI models on your laptop — local inference made easy.</p>
+                    <span class="tag tag-code">Code</span> <span class="tag tag-beginner">Beginner</span>
+                </a></div>
+                <div class="card"><a href="20-vllm-mlx.html">
+                    <span class="card-number">20</span>
+                    <h3>vLLM & MLX</h3>
+                    <p>High-throughput serving with vLLM, Apple Silicon optimization with MLX.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+                <div class="card"><a href="21-huggingface-ecosystem.html">
+                    <span class="card-number">21</span>
+                    <h3>HuggingFace, Unsloth, Axolotl, PEFT & TRL</h3>
+                    <p>The complete open-source training ecosystem — every tool explained.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-code">Code</span>
+                </a></div>
+            </div>
+
+            <!-- Module 6 -->
+            <h3><span class="module-badge module-badge-rag">Module 6</span> RAG & Memory</h3>
+            <div class="card-grid">
+                <div class="card"><a href="22-rag-fundamentals.html">
+                    <span class="card-number">22</span>
+                    <h3>RAG & Retrieval Pipelines</h3>
+                    <p>Give AI access to your data — the open-book exam approach.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+                <div class="card"><a href="23-vector-databases.html">
+                    <span class="card-number">23</span>
+                    <h3>Vector Databases, Chunking & Semantic Search</h3>
+                    <p>ChromaDB, Pinecone, chunking strategies, and finding by meaning.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-code">Code</span>
+                </a></div>
+                <div class="card"><a href="24-ai-memory-systems.html">
+                    <span class="card-number">24</span>
+                    <h3>AI Memory Systems</h3>
+                    <p>Short-term, long-term, and episodic memory for AI applications.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+            </div>
+
+            <!-- Module 7 -->
+            <h3><span class="module-badge module-badge-agents">Module 7</span> Agents & Workflows</h3>
+            <div class="card-grid">
+                <div class="card"><a href="25-prompt-engineering.html">
+                    <span class="card-number">25</span>
+                    <h3>Prompt Engineering & System Prompts</h3>
+                    <p>Zero-shot, few-shot, CoT, structured output, and role design.</p>
+                    <span class="tag tag-beginner">Beginner</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+                <div class="card"><a href="26-tool-function-calling.html">
+                    <span class="card-number">26</span>
+                    <h3>Tool Calling & Function Calling</h3>
+                    <p>Giving LLMs tools — APIs, calculators, databases, and more.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-code">Code</span>
+                </a></div>
+                <div class="card"><a href="27-ai-agents.html">
+                    <span class="card-number">27</span>
+                    <h3>AI Agents & Multi-Agent Systems</h3>
+                    <p>Autonomous AI that plans, acts, and collaborates with other agents.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+                <div class="card"><a href="28-browser-agents.html">
+                    <span class="card-number">28</span>
+                    <h3>Browser Agents</h3>
+                    <p>AI that can browse the web, fill forms, and extract information.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+            </div>
+
+            <!-- Module 8 -->
+            <h3><span class="module-badge module-badge-models">Module 8</span> Model Types</h3>
+            <div class="card-grid">
+                <div class="card"><a href="29-model-types.html">
+                    <span class="card-number">29</span>
+                    <h3>VLMs, SLMs, Dense, MoE, Coding & Reasoning Models</h3>
+                    <p>Every model architecture — when to use which, with practical examples.</p>
+                    <span class="tag tag-concept">Concept</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+            </div>
+
+            <!-- Module 9 -->
+            <h3><span class="module-badge module-badge-deploy">Module 9</span> Deployment</h3>
+            <div class="card-grid">
+                <div class="card"><a href="30-deployment.html">
+                    <span class="card-number">30</span>
+                    <h3>Local, Cloud, Edge & API Deployment</h3>
+                    <p>Ship your models — from laptop to production with Docker, vLLM, FastAPI.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+            </div>
+
+            <!-- Module 10 -->
+            <h3><span class="module-badge module-badge-eval">Module 10</span> Evaluation</h3>
+            <div class="card-grid">
+                <div class="card"><a href="31-evaluation-benchmarks.html">
+                    <span class="card-number">31</span>
+                    <h3>Benchmarks, Human Evals & Cost Analysis</h3>
+                    <p>Measuring AI quality, speed, and cost — the complete evaluation toolkit.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+            </div>
+
+            <!-- Module 11 -->
+            <h3><span class="module-badge module-badge-realworld">Module 11</span> Real-World Skills</h3>
+            <div class="card-grid">
+                <div class="card"><a href="32-building-chatbots.html">
+                    <span class="card-number">32</span>
+                    <h3>Building Chatbots & AI Copilots</h3>
+                    <p>Production chatbot architecture, streaming, copilot patterns.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+                <div class="card"><a href="33-ai-automation-saas.html">
+                    <span class="card-number">33</span>
+                    <h3>AI Automation, SaaS & Coding Workflows</h3>
+                    <p>Building AI-powered products, automation pipelines, and monetization.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+                <div class="card"><a href="34-ai-orchestration.html">
+                    <span class="card-number">34</span>
+                    <h3>AI Orchestration & Product Thinking</h3>
+                    <p>Coordinating AI systems, observability, and designing AI-first products.</p>
+                    <span class="tag tag-advanced">Advanced</span> <span class="tag tag-industry">Industry</span>
+                </a></div>
+                <div class="card"><a href="35-capstone-project.html">
+                    <span class="card-number">35</span>
+                    <h3>Capstone: End-to-End AI System</h3>
+                    <p>Build a complete AI product combining RAG, agents, fine-tuning & deployment.</p>
+                    <span class="tag tag-python">Python</span> <span class="tag tag-advanced">Advanced</span>
+                </a></div>
+            </div>
+
+            <!-- Getting Started -->
+            <div class="callout callout-info" style="margin-top: 3rem;">
+                <div class="callout-title">🚀 Getting Started</div>
+                <p>New to AI? Start with <a href="01-llm-basics.html">Chapter 1: LLM Basics</a> — it explains everything from scratch using everyday language. Each chapter builds on the previous one, so follow the order for best results.</p>
+                <p>Already know the basics? Jump to <a href="12-lora-qlora.html">Module 3: Fine-Tuning</a> or <a href="22-rag-fundamentals.html">Module 6: RAG</a> for hands-on production code.</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

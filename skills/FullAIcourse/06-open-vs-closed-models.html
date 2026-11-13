@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open-Source vs Closed-Source Models — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 1</a> <span>›</span> Open vs Closed Models</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Open-Source vs Closed-Source Models</h1>
+                <p>Should you use GPT-4 (closed API) or Llama (open weights you can run yourself)? This chapter breaks down the ecosystem, licensing, costs, and helps you decide for your project.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Open-source = owning a car.</strong> You own it, you can modify the engine, paint it, drive anywhere, no per-mile fee. But you handle maintenance, fuel, and repairs.</p>
+                <p><strong>Closed-source = using Uber/taxi.</strong> Very convenient, no maintenance worries, pay per ride. But you can't modify the car, the company controls pricing, and they know where you go.</p>
+            </div>
+
+            <h2 id="landscape">The AI Model Landscape (2024-2026)</h2>
+
+            <h3>Closed-Source (API-only) Models:</h3>
+            <table>
+                <thead><tr><th>Model</th><th>Company</th><th>Pricing (per 1M tokens)</th><th>Strengths</th></tr></thead>
+                <tbody>
+                    <tr><td>GPT-4o</td><td>OpenAI</td><td>$2.50 in / $10 out</td><td>General intelligence, multimodal</td></tr>
+                    <tr><td>GPT-4o-mini</td><td>OpenAI</td><td>$0.15 in / $0.60 out</td><td>Cost-efficient, fast</td></tr>
+                    <tr><td>Claude 3.5 Sonnet</td><td>Anthropic</td><td>$3 in / $15 out</td><td>Coding, safety, long context</td></tr>
+                    <tr><td>Claude 4 Opus</td><td>Anthropic</td><td>$15 in / $75 out</td><td>Most capable, complex reasoning</td></tr>
+                    <tr><td>Gemini 1.5 Pro</td><td>Google</td><td>$1.25 in / $5 out</td><td>2M context window, multimodal</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Open-Source (Downloadable) Models:</h3>
+            <table>
+                <thead><tr><th>Model</th><th>Company</th><th>Sizes</th><th>License</th><th>Strengths</th></tr></thead>
+                <tbody>
+                    <tr><td>Llama 3.1</td><td>Meta</td><td>8B, 70B, 405B</td><td>Llama License</td><td>Best open general model</td></tr>
+                    <tr><td>Mistral / Mixtral</td><td>Mistral AI</td><td>7B, 8x7B, 8x22B</td><td>Apache 2.0</td><td>MoE efficiency, coding</td></tr>
+                    <tr><td>Qwen 2.5</td><td>Alibaba</td><td>0.5B to 72B</td><td>Apache 2.0</td><td>Multilingual, coding</td></tr>
+                    <tr><td>Gemma 2</td><td>Google</td><td>2B, 9B, 27B</td><td>Gemma License</td><td>Small, efficient, Google quality</td></tr>
+                    <tr><td>DeepSeek-V3</td><td>DeepSeek</td><td>671B (MoE)</td><td>DeepSeek License</td><td>Reasoning, math, coding</td></tr>
+                    <tr><td>Phi-3</td><td>Microsoft</td><td>3.8B, 7B, 14B</td><td>MIT</td><td>Small but powerful, mobile-ready</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="comparison">Head-to-Head Comparison</h2>
+
+            <div class="comparison-table">
+                <table>
+                    <thead><tr><th>Factor</th><th>Open-Source</th><th>Closed-Source</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Cost model</strong></td><td>Pay for compute (GPU/cloud)</td><td>Pay per token (API calls)</td></tr>
+                        <tr><td><strong>Privacy</strong></td><td>Data stays local — full control</td><td>Data sent to provider's servers</td></tr>
+                        <tr><td><strong>Customization</strong></td><td>Can fine-tune, modify, quantize</td><td>Limited to prompting + their fine-tuning API</td></tr>
+                        <tr><td><strong>Latency</strong></td><td>Depends on your hardware</td><td>~200-2000ms (network + compute)</td></tr>
+                        <tr><td><strong>Setup effort</strong></td><td>Need to handle deployment, scaling</td><td>One API call — they handle everything</td></tr>
+                        <tr><td><strong>Quality ceiling</strong></td><td>Top open models ≈ 90-95% of best closed</td><td>Highest quality (GPT-4, Claude)</td></tr>
+                        <tr><td><strong>Reliability</strong></td><td>Your responsibility</td><td>99.9% uptime SLA (usually)</td></tr>
+                        <tr><td><strong>Vendor lock-in</strong></td><td>None — switch anytime</td><td>High — each API is different</td></tr>
+                        <tr><td><strong>Compliance</strong></td><td>Easier (data stays in your control)</td><td>May violate GDPR/HIPAA</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 id="licensing">Understanding Licenses</h2>
+
+            <table>
+                <thead><tr><th>License</th><th>Commercial Use?</th><th>Fine-tuning?</th><th>Restrictions</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Apache 2.0</strong></td><td>Yes, unlimited</td><td>Yes</td><td>Almost none — most permissive</td></tr>
+                    <tr><td><strong>MIT</strong></td><td>Yes, unlimited</td><td>Yes</td><td>None — most permissive</td></tr>
+                    <tr><td><strong>Llama License</strong></td><td>Yes (if &lt;700M monthly users)</td><td>Yes</td><td>Can't use to train competing models</td></tr>
+                    <tr><td><strong>Gemma License</strong></td><td>Yes</td><td>Yes</td><td>Can't use for certain harmful purposes</td></tr>
+                    <tr><td><strong>CC-BY-NC</strong></td><td>No commercial use</td><td>Research only</td><td>Non-commercial only</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Always Check the License</div>
+                <p>Before using any open model commercially, verify its license. "Open weights" ≠ "open source". Some models let you download weights but restrict commercial use (e.g., some research models on HuggingFace).</p>
+            </div>
+
+            <h2 id="when-to-use">When to Use Which?</h2>
+
+            <h3>Use Closed-Source APIs When:</h3>
+            <ul>
+                <li>You're prototyping or building an MVP quickly</li>
+                <li>You need the absolute best quality and cost isn't a constraint</li>
+                <li>You don't have ML engineering expertise</li>
+                <li>Your volume is low (&lt;100K requests/day)</li>
+                <li>You need multimodal capabilities (vision, audio)</li>
+            </ul>
+
+            <h3>Use Open-Source Models When:</h3>
+            <ul>
+                <li>Data privacy is critical (healthcare, finance, legal)</li>
+                <li>You need to fine-tune for a specific domain</li>
+                <li>Your volume is high (millions of requests/day — cheaper at scale)</li>
+                <li>You need full control over model behavior</li>
+                <li>You're operating in regulated industries (GDPR, HIPAA)</li>
+                <li>You want to avoid vendor lock-in</li>
+            </ul>
+
+            <h2 id="code">Production Code: Using Both</h2>
+
+            <h3>Multi-Provider Setup (Industry Pattern)</h3>
+            <pre><code><span class="token-comment"># Production pattern: Abstract the provider so you can switch easily</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> os
+
+<span class="token-keyword">class</span> <span class="token-class">LLMClient</span>:
+    <span class="token-string">"""Unified interface for multiple LLM providers."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, provider=<span class="token-string">"openai"</span>):
+        self.provider = provider
+
+        <span class="token-keyword">if</span> provider == <span class="token-string">"openai"</span>:
+            self.client = OpenAI()
+            self.model = <span class="token-string">"gpt-4o-mini"</span>
+        <span class="token-keyword">elif</span> provider == <span class="token-string">"anthropic"</span>:
+            <span class="token-keyword">import</span> anthropic
+            self.client = anthropic.Anthropic()
+            self.model = <span class="token-string">"claude-3-5-sonnet-20241022"</span>
+        <span class="token-keyword">elif</span> provider == <span class="token-string">"ollama"</span>:
+            <span class="token-comment"># Ollama exposes an OpenAI-compatible API!</span>
+            self.client = OpenAI(
+                base_url=<span class="token-string">"http://localhost:11434/v1"</span>,
+                api_key=<span class="token-string">"ollama"</span>  <span class="token-comment"># dummy key, Ollama doesn't need auth</span>
+            )
+            self.model = <span class="token-string">"llama3.1:8b"</span>
+        <span class="token-keyword">elif</span> provider == <span class="token-string">"vllm"</span>:
+            <span class="token-comment"># vLLM also exposes OpenAI-compatible API</span>
+            self.client = OpenAI(
+                base_url=<span class="token-string">"http://localhost:8000/v1"</span>,
+                api_key=<span class="token-string">"token"</span>
+            )
+            self.model = <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">chat</span>(self, message: str, system: str = <span class="token-string">"You are a helpful assistant."</span>) -> str:
+        <span class="token-string">"""Send a message and get a response."""</span>
+        <span class="token-keyword">if</span> self.provider == <span class="token-string">"anthropic"</span>:
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=<span class="token-number">1024</span>,
+                system=system,
+                messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: message}]
+            )
+            <span class="token-keyword">return</span> response.content[<span class="token-number">0</span>].text
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># OpenAI, Ollama, vLLM all use same API format</span>
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system},
+                    {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: message}
+                ],
+                temperature=<span class="token-number">0.7</span>,
+                max_tokens=<span class="token-number">1024</span>
+            )
+            <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.content
+
+<span class="token-comment"># Usage — switch providers with one line!</span>
+llm = LLMClient(provider=<span class="token-string">"ollama"</span>)  <span class="token-comment"># Free, private, local</span>
+<span class="token-comment"># llm = LLMClient(provider="openai")  # Best quality, costs money</span>
+<span class="token-comment"># llm = LLMClient(provider="vllm")    # Self-hosted, production-grade</span>
+
+answer = llm.chat(<span class="token-string">"What is the capital of France?"</span>)
+<span class="token-builtin">print</span>(answer)</code></pre>
+
+            <h3>Cost Comparison Calculator</h3>
+            <pre><code><span class="token-comment"># Calculate when open-source becomes cheaper than APIs</span>
+
+<span class="token-keyword">def</span> <span class="token-function">calculate_monthly_cost</span>(
+    requests_per_day: int,
+    avg_input_tokens: int = <span class="token-number">500</span>,
+    avg_output_tokens: int = <span class="token-number">200</span>
+):
+    <span class="token-string">"""Compare monthly costs: API vs self-hosted."""</span>
+    monthly_requests = requests_per_day * <span class="token-number">30</span>
+    total_input_tokens = monthly_requests * avg_input_tokens
+    total_output_tokens = monthly_requests * avg_output_tokens
+
+    <span class="token-comment"># API costs (per million tokens)</span>
+    api_costs = {
+        <span class="token-string">"GPT-4o"</span>: {<span class="token-string">"input"</span>: <span class="token-number">2.50</span>, <span class="token-string">"output"</span>: <span class="token-number">10.00</span>},
+        <span class="token-string">"GPT-4o-mini"</span>: {<span class="token-string">"input"</span>: <span class="token-number">0.15</span>, <span class="token-string">"output"</span>: <span class="token-number">0.60</span>},
+        <span class="token-string">"Claude 3.5 Sonnet"</span>: {<span class="token-string">"input"</span>: <span class="token-number">3.00</span>, <span class="token-string">"output"</span>: <span class="token-number">15.00</span>},
+    }
+
+    <span class="token-comment"># Self-hosted costs (monthly GPU rental)</span>
+    self_hosted = {
+        <span class="token-string">"Ollama on laptop"</span>: <span class="token-number">0</span>,        <span class="token-comment"># Free (your hardware)</span>
+        <span class="token-string">"RunPod A100 80GB"</span>: <span class="token-number">2200</span>,   <span class="token-comment"># ~$3/hr × 24 × 30</span>
+        <span class="token-string">"Lambda 8xA100"</span>: <span class="token-number">12000</span>,     <span class="token-comment"># For 70B model</span>
+    }
+
+    <span class="token-builtin">print</span>(<span class="token-string">f"\n📊 Monthly cost comparison ({requests_per_day:,} requests/day):\n"</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">"API Providers:"</span>)
+    <span class="token-keyword">for</span> name, prices <span class="token-keyword">in</span> api_costs.items():
+        cost = (total_input_tokens * prices[<span class="token-string">"input"</span>] + total_output_tokens * prices[<span class="token-string">"output"</span>]) / <span class="token-number">1_000_000</span>
+        <span class="token-builtin">print</span>(<span class="token-string">f"  {name:25s}: ${cost:,.0f}/month"</span>)
+
+    <span class="token-builtin">print</span>(<span class="token-string">"\nSelf-Hosted (unlimited requests):"</span>)
+    <span class="token-keyword">for</span> name, cost <span class="token-keyword">in</span> self_hosted.items():
+        <span class="token-builtin">print</span>(<span class="token-string">f"  {name:25s}: ${cost:,.0f}/month"</span>)
+
+<span class="token-comment"># Try different scales</span>
+calculate_monthly_cost(requests_per_day=<span class="token-number">100</span>)    <span class="token-comment"># Small startup</span>
+calculate_monthly_cost(requests_per_day=<span class="token-number">10000</span>)  <span class="token-comment"># Growing product</span>
+calculate_monthly_cost(requests_per_day=<span class="token-number">100000</span>) <span class="token-comment"># Scale — self-hosted wins!</span></code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Startups (MVP phase)</strong> — Almost always start with OpenAI/Anthropic API. Speed to market > cost.</li>
+                    <li><strong>Startups (growth phase)</strong> — Switch critical paths to open models, keep API for edge cases.</li>
+                    <li><strong>Enterprise</strong> — Open models for privacy-sensitive data. API for non-sensitive tasks.</li>
+                    <li><strong>Hybrid approach dominates</strong> — Most production systems use BOTH: fast/cheap API for simple tasks + custom model for core product.</li>
+                    <li><strong>OpenAI-compatible API</strong> — vLLM, Ollama, TGI all expose the same API format. Write once, deploy anywhere.</li>
+                    <li><strong>Model router pattern</strong> — Route easy queries to small/cheap models, hard queries to powerful/expensive ones.</li>
+                </ul>
+            </div>
+
+            <h2 id="decision-framework">Decision Framework</h2>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ Quick Decision Guide</div>
+                <ul>
+                    <li><strong>Need it working in 1 hour?</strong> → API (OpenAI/Anthropic)</li>
+                    <li><strong>Sensitive data (medical/legal)?</strong> → Open model, self-hosted</li>
+                    <li><strong>Custom behavior needed?</strong> → Open model + fine-tuning</li>
+                    <li><strong>&gt;50K requests/day?</strong> → Probably cheaper to self-host</li>
+                    <li><strong>Need absolute best quality?</strong> → GPT-4o / Claude Opus (for now)</li>
+                    <li><strong>Building a product, not just a demo?</strong> → Plan for open model migration</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Closed-source</strong> (GPT-4, Claude) = Convenient, best quality, pay-per-use, data leaves your control</li>
+                    <li><strong>Open-source</strong> (Llama, Mistral, Qwen) = Full control, privacy, can fine-tune, requires infrastructure</li>
+                    <li>Open models are rapidly catching up to closed ones in quality</li>
+                    <li>Most production apps use a <strong>hybrid approach</strong></li>
+                    <li>The <strong>OpenAI-compatible API standard</strong> lets you switch between providers easily</li>
+                    <li>Always check the <strong>license</strong> before commercial use</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    Low volume + No privacy concerns → API (pay per token)<br>
+                    High volume OR Privacy needed → Self-host open model (pay for GPU)<br><br>
+                    Crossover point: ~$2,000-5,000/month in API costs = time to self-host
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Starting with self-hosting when you should use an API</strong> — Don't over-engineer early. Validate your idea first with an API.</li>
+                    <li><strong>Ignoring the total cost of self-hosting</strong> — It's not just GPU cost. Add: engineering time, monitoring, scaling, failure handling.</li>
+                    <li><strong>Thinking open = free</strong> — Open models are free to download, but running them costs compute.</li>
+                    <li><strong>Tight coupling to one provider</strong> — Always abstract your LLM calls behind a common interface.</li>
+                    <li><strong>Not reading the license</strong> — "Open weights" ≠ free commercial use. Llama has a 700M user threshold.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build a Provider-Agnostic System</h4>
+                <ol>
+                    <li>Install Ollama and pull <code>llama3.1:8b</code></li>
+                    <li>Get an OpenAI API key (free tier available)</li>
+                    <li>Implement the <code>LLMClient</code> class above</li>
+                    <li>Send the SAME prompt to both providers and compare:
+                        <ul>
+                            <li>Response quality</li>
+                            <li>Response time (use <code>time.time()</code>)</li>
+                            <li>Cost (calculate from token counts)</li>
+                        </ul>
+                    </li>
+                    <li>Run the cost calculator with your expected usage — at what point does self-hosting win?</li>
+                    <li><strong>Bonus:</strong> Add a simple router that sends "easy" questions to Ollama and "hard" questions to GPT-4o</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="05-parameters-training.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Parameters & Training</span>
+                </a>
+                <a href="07-datasets-overview.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Dataset Types</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html" class="active"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Design Patterns &rarr; Command</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Pattern</span>
+                <span class="tag">Design Pattern</span>
+            </div>
+            <h1>Command</h1>
+            <p class="hero-subtitle">Encapsulating a <strong>request as an object</strong> &mdash; letting you parameterize clients with different requests, queue or log requests, and support undoable operations.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>restaurant order ticket</strong>. The waiter writes down your order (the command object), passes it to the kitchen. The kitchen doesn&rsquo;t need to know <em>who</em> ordered or <em>when</em> &mdash; it just executes the ticket. Orders can be queued (busy night), logged (receipt), prioritized (VIP table), or even cancelled before cooking starts. The ticket <em>decouples</em> the customer from the chef &mdash; that&rsquo;s the Command pattern: encapsulate an action so it can be stored, forwarded, and undone.</p>
+        </div>
+
+        <h2>What Is the Command Pattern?</h2>
+        <ul>
+            <li><strong>Intent:</strong> Encapsulate a request as an object, thereby letting you parameterize clients, queue requests, log them, and support undo</li>
+            <li><strong>Classification:</strong> Behavioral pattern (GoF) &mdash; turns a <em>method call</em> into a first-class object</li>
+            <li><strong>Also known as:</strong> Action, Transaction</li>
+            <li><strong>Key insight:</strong> By reifying (making into an object) a request, you gain the ability to store, serialize, replay, and reverse it</li>
+            <li><strong>Participants:</strong> Command (interface), ConcreteCommand, Receiver (does the work), Invoker (triggers the command), Client (creates commands)</li>
+        </ul>
+
+        <h2>Undo/Redo Support</h2>
+        <ul>
+            <li><strong>Each command stores enough state</strong> to reverse its effect &mdash; the <code>undo()</code> method restores previous state</li>
+            <li><strong>Command history:</strong> Maintain a stack of executed commands &mdash; pop and undo to reverse, push to a redo stack</li>
+            <li><strong>Memento integration:</strong> For complex state, commands can store a snapshot (memento) before executing</li>
+            <li><strong>Granularity:</strong> Each command should represent one atomic, undoable action &mdash; not a batch of unrelated changes</li>
+            <li><strong>Limitation:</strong> Not all operations are reversible (sending an email, deleting a database) &mdash; use compensating commands instead</li>
+        </ul>
+
+        <h2>Command Queuing &amp; Scheduling</h2>
+        <ul>
+            <li><strong>Deferred execution:</strong> Commands are objects &mdash; you can store them in a queue and execute later (task schedulers, job queues)</li>
+            <li><strong>Priority queues:</strong> Commands can carry metadata (priority, timestamp) for ordering</li>
+            <li><strong>Retry logic:</strong> Failed commands can be re-queued with backoff &mdash; the command object persists across attempts</li>
+            <li><strong>Distributed systems:</strong> Serialize commands to JSON/Protobuf and send across network boundaries</li>
+        </ul>
+
+        <h3>Macro Commands (Composite)</h3>
+        <ul>
+            <li>A macro command is a command that contains a list of sub-commands &mdash; executing it runs all sub-commands in sequence</li>
+            <li>Undoing a macro undoes all sub-commands in reverse order</li>
+            <li>Combines Command pattern with Composite pattern &mdash; treat a group of commands as a single command</li>
+            <li>Use case: &ldquo;Format Document&rdquo; = remove trailing spaces + fix indentation + sort imports</li>
+        </ul>
+
+        <h3>Command Logging for Replay</h3>
+        <ul>
+            <li>Persist every command to a log (event store) &mdash; replay the log to reconstruct state from scratch</li>
+            <li>Foundation of <strong>event sourcing</strong> &mdash; the log IS the source of truth, not the current state</li>
+            <li>Enables time-travel debugging, audit trails, and crash recovery</li>
+            <li>Database write-ahead logs (WAL) are command logs &mdash; replay to recover after crash</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Command</th>
+                        <th>Strategy</th>
+                        <th>Observer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Encapsulates</strong></td>
+                        <td>An action/request</td>
+                        <td>An algorithm</td>
+                        <td>A notification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Purpose</strong></td>
+                        <td>Defer, queue, undo</td>
+                        <td>Swap behavior</td>
+                        <td>Broadcast changes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stores state</strong></td>
+                        <td>Yes (for undo)</td>
+                        <td>Rarely</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Direction</strong></td>
+                        <td>Invoker &rarr; Receiver</td>
+                        <td>Context &rarr; Strategy</td>
+                        <td>Subject &rarr; Observers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Example</strong></td>
+                        <td>Ctrl+Z undo</td>
+                        <td>Sort comparator</td>
+                        <td>Event listener</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Text Editor with Undo/Redo</h2>
+        <pre><code><span class="token-keyword">from</span> abc <span class="token-keyword">import</span> ABC, abstractmethod
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Command interface</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Command</span>(ABC):
+    <span class="token-keyword">@abstractmethod</span>
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self) -> <span class="token-keyword">None</span>:
+        ...
+
+    <span class="token-keyword">@abstractmethod</span>
+    <span class="token-keyword">def</span> <span class="token-function">undo</span>(self) -> <span class="token-keyword">None</span>:
+        ...
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Receiver — the actual text buffer</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">TextBuffer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._content: str = <span class="token-string">""</span>
+
+    <span class="token-keyword">@property</span>
+    <span class="token-keyword">def</span> <span class="token-function">content</span>(self) -> str:
+        <span class="token-keyword">return</span> self._content
+
+    <span class="token-keyword">def</span> <span class="token-function">insert</span>(self, position: <span class="token-keyword">int</span>, text: str) -> <span class="token-keyword">None</span>:
+        self._content = self._content[:position] + text + self._content[position:]
+
+    <span class="token-keyword">def</span> <span class="token-function">delete</span>(self, position: <span class="token-keyword">int</span>, length: <span class="token-keyword">int</span>) -> str:
+        deleted = self._content[position:position + length]
+        self._content = self._content[:position] + self._content[position + length:]
+        <span class="token-keyword">return</span> deleted
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Concrete commands</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">InsertCommand</span>(Command):
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, buffer: TextBuffer, position: <span class="token-keyword">int</span>, text: str):
+        self._buffer = buffer
+        self._position = position
+        self._text = text
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self) -> <span class="token-keyword">None</span>:
+        self._buffer.insert(self._position, self._text)
+
+    <span class="token-keyword">def</span> <span class="token-function">undo</span>(self) -> <span class="token-keyword">None</span>:
+        self._buffer.delete(self._position, len(self._text))
+
+
+<span class="token-keyword">class</span> <span class="token-class">DeleteCommand</span>(Command):
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, buffer: TextBuffer, position: <span class="token-keyword">int</span>, length: <span class="token-keyword">int</span>):
+        self._buffer = buffer
+        self._position = position
+        self._length = length
+        self._deleted_text: str = <span class="token-string">""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self) -> <span class="token-keyword">None</span>:
+        self._deleted_text = self._buffer.delete(self._position, self._length)
+
+    <span class="token-keyword">def</span> <span class="token-function">undo</span>(self) -> <span class="token-keyword">None</span>:
+        self._buffer.insert(self._position, self._deleted_text)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Invoker — manages command history for undo/redo</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Editor</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.buffer = TextBuffer()
+        self._history: List[Command] = []
+        self._redo_stack: List[Command] = []
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self, command: Command) -> <span class="token-keyword">None</span>:
+        command.execute()
+        self._history.append(command)
+        self._redo_stack.clear()  <span class="token-comment"># new action invalidates redo</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">undo</span>(self) -> <span class="token-keyword">None</span>:
+        <span class="token-keyword">if</span> self._history:
+            cmd = self._history.pop()
+            cmd.undo()
+            self._redo_stack.append(cmd)
+
+    <span class="token-keyword">def</span> <span class="token-function">redo</span>(self) -> <span class="token-keyword">None</span>:
+        <span class="token-keyword">if</span> self._redo_stack:
+            cmd = self._redo_stack.pop()
+            cmd.execute()
+            self._history.append(cmd)
+
+
+<span class="token-comment"># Usage</span>
+editor = Editor()
+editor.execute(InsertCommand(editor.buffer, <span class="token-number">0</span>, <span class="token-string">"Hello "</span>))
+editor.execute(InsertCommand(editor.buffer, <span class="token-number">6</span>, <span class="token-string">"World"</span>))
+<span class="token-keyword">print</span>(editor.buffer.content)  <span class="token-comment"># "Hello World"</span>
+
+editor.undo()
+<span class="token-keyword">print</span>(editor.buffer.content)  <span class="token-comment"># "Hello "</span>
+
+editor.redo()
+<span class="token-keyword">print</span>(editor.buffer.content)  <span class="token-comment"># "Hello World"</span></code></pre>
+
+        <h2>Task Queue with Command Objects</h2>
+        <pre><code><span class="token-keyword">from</span> collections <span class="token-keyword">import</span> deque
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Protocol
+<span class="token-keyword">import</span> time
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Command protocol — any object with execute()</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Task</span>(Protocol):
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self) -> str:
+        ...
+
+
+<span class="token-keyword">class</span> <span class="token-class">SendEmailTask</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, to: str, subject: str):
+        self.to = to
+        self.subject = subject
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self) -> str:
+        <span class="token-keyword">return</span> <span class="token-string">f"Email sent to {self.to}: '{self.subject}'"</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">GenerateReportTask</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, report_type: str):
+        self.report_type = report_type
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self) -> str:
+        <span class="token-keyword">return</span> <span class="token-string">f"Generated {self.report_type} report"</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">CleanupTask</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, directory: str):
+        self.directory = directory
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self) -> str:
+        <span class="token-keyword">return</span> <span class="token-string">f"Cleaned up {self.directory}"</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Invoker — processes queued commands sequentially</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">TaskQueue</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._queue: deque[Task] = deque()
+        self._log: list[str] = []
+
+    <span class="token-keyword">def</span> <span class="token-function">enqueue</span>(self, task: Task) -> <span class="token-keyword">None</span>:
+        self._queue.append(task)
+
+    <span class="token-keyword">def</span> <span class="token-function">process_all</span>(self) -> list[str]:
+        results = []
+        <span class="token-keyword">while</span> self._queue:
+            task = self._queue.popleft()
+            result = task.execute()
+            self._log.append(result)
+            results.append(result)
+        <span class="token-keyword">return</span> results
+
+    <span class="token-keyword">@property</span>
+    <span class="token-keyword">def</span> <span class="token-function">log</span>(self) -> list[str]:
+        <span class="token-keyword">return</span> self._log[:]
+
+
+<span class="token-comment"># Queue commands and process later</span>
+queue = TaskQueue()
+queue.enqueue(SendEmailTask(<span class="token-string">"dev@example.com"</span>, <span class="token-string">"Deploy complete"</span>))
+queue.enqueue(GenerateReportTask(<span class="token-string">"weekly-metrics"</span>))
+queue.enqueue(CleanupTask(<span class="token-string">"/tmp/builds"</span>))
+
+<span class="token-keyword">for</span> result <span class="token-keyword">in</span> queue.process_all():
+    <span class="token-keyword">print</span>(result)
+<span class="token-comment"># → Email sent to dev@example.com: 'Deploy complete'</span>
+<span class="token-comment"># → Generated weekly-metrics report</span>
+<span class="token-comment"># → Cleaned up /tmp/builds</span></code></pre>
+
+        <h2>Macro Command (Composite)</h2>
+        <pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Macro command — groups multiple commands as one</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">MacroCommand</span>(Command):
+    <span class="token-string">"""Execute multiple commands as a single undoable unit."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, commands: List[Command]):
+        self._commands = commands
+
+    <span class="token-keyword">def</span> <span class="token-function">execute</span>(self) -> <span class="token-keyword">None</span>:
+        <span class="token-keyword">for</span> cmd <span class="token-keyword">in</span> self._commands:
+            cmd.execute()
+
+    <span class="token-keyword">def</span> <span class="token-function">undo</span>(self) -> <span class="token-keyword">None</span>:
+        <span class="token-comment"># Undo in reverse order</span>
+        <span class="token-keyword">for</span> cmd <span class="token-keyword">in</span> reversed(self._commands):
+            cmd.undo()
+
+
+<span class="token-comment"># Usage — "Format Document" macro</span>
+editor = Editor()
+editor.execute(InsertCommand(editor.buffer, <span class="token-number">0</span>, <span class="token-string">"  hello  world  "</span>))
+
+<span class="token-comment"># Create a macro that does multiple operations</span>
+macro = MacroCommand([
+    DeleteCommand(editor.buffer, <span class="token-number">0</span>, <span class="token-number">2</span>),   <span class="token-comment"># remove leading spaces</span>
+    DeleteCommand(editor.buffer, <span class="token-number">12</span>, <span class="token-number">2</span>),  <span class="token-comment"># remove trailing spaces</span>
+])
+
+editor.execute(macro)
+<span class="token-keyword">print</span>(editor.buffer.content)  <span class="token-comment"># "hello  world"</span>
+
+<span class="token-comment"># Single undo reverses the entire macro</span>
+editor.undo()
+<span class="token-keyword">print</span>(editor.buffer.content)  <span class="token-comment"># "  hello  world  "</span></code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Applications</h3>
+            <ul>
+                <li><strong>Redux actions:</strong> Every action is a command object &mdash; <code>{ type: 'ADD_TODO', payload: {...} }</code> &mdash; stored, replayed, and time-traveled via Redux DevTools</li>
+                <li><strong>Git commands:</strong> Each commit is a command with enough information to be replayed (cherry-pick) or reversed (revert) &mdash; the reflog is a command history</li>
+                <li><strong>Database WAL:</strong> Write-ahead logs record every write command &mdash; replay the log to recover state after a crash</li>
+                <li><strong>GUI undo systems:</strong> Photoshop, VS Code, and every text editor use command stacks &mdash; Ctrl+Z pops and undoes the last command</li>
+                <li><strong>CQRS:</strong> Command Query Responsibility Segregation &mdash; separate the write model (commands) from the read model (queries) for scalability</li>
+            </ul>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Summary</h3>
+            <ul>
+                <li>Command turns a request into an object &mdash; decoupling the sender from the receiver</li>
+                <li>Enables undo/redo by storing executed commands and reversing them</li>
+                <li>Commands can be queued, logged, serialized, and replayed &mdash; foundation of event sourcing</li>
+                <li>Macro commands group sub-commands into a single undoable unit</li>
+                <li>The pattern trades simplicity for flexibility &mdash; use it when you need history, queuing, or decoupling</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <div class="model-visual">
+                <pre>
+┌──────────┐     ┌─────────────┐     ┌──────────┐
+│  CLIENT  │────▶│   COMMAND   │────▶│ RECEIVER │
+│ (waiter) │     │(order ticket)│     │ (kitchen)│
+└──────────┘     └──────┬──────┘     └──────────┘
+                        │
+                        ▼
+              ┌─────────────────┐
+              │    INVOKER      │
+              │  (queue/history) │
+              │                 │
+              │ [cmd1, cmd2, …] │
+              │                 │
+              │  undo() → pop   │
+              │  redo() → push  │
+              └─────────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Forgetting undo state:</strong> A command that doesn&rsquo;t store enough information to reverse itself &mdash; always capture the &ldquo;before&rdquo; state at execute time</li>
+                <li><strong>Unbounded history:</strong> Storing every command forever leads to memory leaks &mdash; cap the history size or periodically checkpoint and discard old commands</li>
+                <li><strong>Non-atomic macros:</strong> If a macro partially executes and one sub-command fails, the system is in an inconsistent state &mdash; implement rollback for the already-executed sub-commands</li>
+                <li><strong>Overusing the pattern:</strong> Simple direct method calls don&rsquo;t need command objects &mdash; only use when you need undo, queuing, logging, or decoupling</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Drawing app:</strong> Create commands for DrawCircle, DrawRect, ChangeColor. Implement undo/redo that removes/restores shapes from a canvas list.</li>
+                <li><strong>File system commands:</strong> Build CreateFile, DeleteFile, RenameFile commands with full undo support. Test that undo(delete) restores content.</li>
+                <li><strong>Transaction system:</strong> Implement Transfer(from, to, amount) as a command. Support undo (reverse transfer) and logging for audit trail.</li>
+                <li><strong>Command serialization:</strong> Serialize commands to JSON, store them, then deserialize and replay to reconstruct state from an empty starting point.</li>
+            </ol>
+        </div>
+
+        <nav class="page-nav">
+            <a href="57-strategy.html" class="prev">&larr; Strategy</a>
+            <a href="59-api-gateway.html" class="next">API Gateway &rarr;</a>
+        </nav>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

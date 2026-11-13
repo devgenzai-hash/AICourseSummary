@@ -1,0 +1,2639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classification - Complete ML Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --sidebar-bg: #1e1b4b;
+            --sidebar-text: #e2e8f0;
+            --sidebar-active: #8b5cf6;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --code-bg: #0d1117;
+            --code-text: #e6edf3;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+        
+        /* Header */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 16px;
+            margin-bottom: 3rem;
+        }
+        .hero h1 { font-size: 2.5rem; margin: 0 0 1rem; font-weight: 800; }
+        .hero p { font-size: 1.2rem; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+        
+        /* Navigation */
+        .toc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+        .toc h2 { margin-top: 0; color: var(--primary); }
+        .toc ol { padding-left: 1.5rem; }
+        .toc li { margin: 0.5rem 0; }
+        .toc a { color: var(--primary); text-decoration: none; font-weight: 500; }
+        .toc a:hover { text-decoration: underline; }
+        
+        /* Sections */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .section h2 {
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary-light);
+            display: inline-block;
+        }
+        .section h3 {
+            font-size: 1.3rem;
+            color: var(--text);
+            margin-top: 2rem;
+        }
+        .section h4 {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            position: relative;
+        }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #c586c0; }
+        pre .string { color: #ce9178; }
+        pre .function { color: #dcdcaa; }
+        pre .number { color: #b5cea8; }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        pre code { background: none; padding: 0; }
+        
+        /* Cards & Callouts */
+        .concept-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .concept-card h4 { margin-top: 0; color: var(--primary); }
+        
+        .callout {
+            padding: 1.2rem 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+        .callout-info { background: #eff6ff; border-color: var(--info); }
+        .callout-warning { background: #fffbeb; border-color: var(--warning); }
+        .callout-success { background: #ecfdf5; border-color: var(--success); }
+        .callout-danger { background: #fef2f2; border-color: var(--danger); }
+        [data-theme="dark"] .callout-info { background: #1e3a5f; }
+        [data-theme="dark"] .callout-warning { background: #3d2e0a; }
+        [data-theme="dark"] .callout-success { background: #0d3320; }
+        [data-theme="dark"] .callout-danger { background: #3b1010; }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) { background: var(--bg-secondary); }
+        
+        /* Diagram */
+        .diagram {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.4;
+        }
+        
+        /* Method comparison */
+        .method-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        /* Pipeline step */
+        .pipeline-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .pipeline-step .step-num {
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .pipeline-step .step-content { flex: 1; }
+        .pipeline-step .step-content h5 { margin: 0 0 0.3rem; }
+        .pipeline-step .step-content p { margin: 0; color: var(--text-secondary); font-size: 0.9rem; }
+
+        .accuracy-bar {
+            height: 24px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.3rem 0;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+    
+    <div class="container">
+        <div class="hero">
+            <h1>🖼️ Image Classification</h1>
+            <p>Complete Guide: From Raw Images to Production ML Model — Every Concept, Every Method, All the Code</p>
+        </div>
+
+        <!-- TABLE OF CONTENTS -->
+        <div class="toc">
+            <h2>📋 Table of Contents</h2>
+            <ol>
+                <li><a href="#overview">What is Image Classification?</a></li>
+                <li><a href="#pipeline">The Complete ML Pipeline</a></li>
+                <li><a href="#data-collection">Data Collection & Organization</a></li>
+                <li><a href="#preprocessing">Image Preprocessing & Augmentation</a></li>
+                <li><a href="#feature-extraction">Feature Extraction (Traditional ML)</a></li>
+                <li><a href="#method1">Method 1: Traditional ML (SVM, KNN, Random Forest)</a></li>
+                <li><a href="#method2">Method 2: CNN from Scratch</a></li>
+                <li><a href="#method3">Method 3: Transfer Learning (Pre-trained Models)</a></li>
+                <li><a href="#method4">Method 4: Fine-Tuning Pre-trained Models</a></li>
+                <li><a href="#method5">Method 5: Vision Transformers (ViT)</a></li>
+                <li><a href="#evaluation">Evaluation Metrics & Comparison</a></li>
+                <li><a href="#concepts">Key Concepts Deep Dive</a></li>
+                <li><a href="#production">Making it Production-Ready</a></li>
+                <li><a href="#complete-code">Complete Runnable Code</a></li>
+            </ol>
+        </div>
+
+        <!-- SECTION 1: OVERVIEW -->
+        <div class="section" id="overview">
+            <h2>1. What is Image Classification?</h2>
+            <p>Image classification is the task of assigning a <strong>label (class)</strong> to an input image from a fixed set of categories. For example, given images of cats and dogs, the model learns to predict whether a new image is a "cat" or a "dog".</p>
+            
+            <div class="concept-card">
+                <h4>The Core Idea</h4>
+                <p>You show the model many labeled examples → It learns patterns → It predicts labels for new unseen images.</p>
+                <p><strong>Input:</strong> Raw pixel values (e.g., 224×224×3 = 150,528 numbers for a color image)</p>
+                <p><strong>Output:</strong> Probability distribution over classes (e.g., [0.95 cat, 0.05 dog])</p>
+            </div>
+
+            <div class="diagram">
+┌──────────────┐     ┌──────────────────┐     ┌──────────────┐
+│  Raw Image   │────▶│   ML/DL Model    │────▶│  Prediction  │
+│  (pixels)    │     │  (learned rules) │     │  "Cat" 95%   │
+└──────────────┘     └──────────────────┘     └──────────────┘
+                              ▲
+                              │ Training
+                    ┌──────────────────┐
+                    │  Labeled Dataset │
+                    │  cat.jpg → "cat" │
+                    │  dog.jpg → "dog" │
+                    └──────────────────┘
+            </div>
+
+            <h3>Types of Image Classification</h3>
+            <table>
+                <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+                <tr><td>Binary</td><td>2 classes</td><td>Cat vs Dog</td></tr>
+                <tr><td>Multi-class</td><td>Many classes, one label per image</td><td>Cat vs Dog vs Bird vs Fish</td></tr>
+                <tr><td>Multi-label</td><td>Multiple labels per image</td><td>Beach + Sunset + People</td></tr>
+            </table>
+        </div>
+
+        <!-- SECTION 2: ML PIPELINE -->
+        <div class="section" id="pipeline">
+            <h2>2. The Complete ML Pipeline</h2>
+            <p>Every image classification project follows these steps:</p>
+
+            <div class="pipeline-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h5>Data Collection</h5>
+                    <p>Gather images for each class. More data = better model. Minimum ~100 images per class for deep learning.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h5>Data Organization</h5>
+                    <p>Organize into folders: train/, val/, test/ with subfolders for each class.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h5>Preprocessing</h5>
+                    <p>Resize, normalize, augment images. Convert to tensors the model can process.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <h5>Model Selection</h5>
+                    <p>Choose architecture: Traditional ML, CNN, Transfer Learning, or Transformers.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                    <h5>Training</h5>
+                    <p>Feed data through model, compute loss, backpropagate gradients, update weights.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">6</div>
+                <div class="step-content">
+                    <h5>Evaluation</h5>
+                    <p>Test on unseen data. Check accuracy, precision, recall, confusion matrix.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">7</div>
+                <div class="step-content">
+                    <h5>Optimization</h5>
+                    <p>Tune hyperparameters, add regularization, try different architectures.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">8</div>
+                <div class="step-content">
+                    <h5>Deployment</h5>
+                    <p>Save model, create inference API, deploy to production.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: DATA COLLECTION -->
+        <div class="section" id="data-collection">
+            <h2>3. Data Collection & Organization</h2>
+            
+            <h3>Folder Structure (Required)</h3>
+            <p>All methods expect this standard folder structure:</p>
+<pre><code>dataset/
+├── train/           # 70-80% of data
+│   ├── cat/
+│   │   ├── cat_001.jpg
+│   │   ├── cat_002.jpg
+│   │   └── ...
+│   ├── dog/
+│   │   ├── dog_001.jpg
+│   │   └── ...
+│   └── bird/
+│       └── ...
+├── val/             # 10-15% of data
+│   ├── cat/
+│   ├── dog/
+│   └── bird/
+└── test/            # 10-15% of data
+    ├── cat/
+    ├── dog/
+    └── bird/</code></pre>
+
+            <h3>Code: Organizing Your Images Automatically</h3>
+<pre><code>import os
+import shutil
+import random
+from pathlib import Path
+
+def organize_dataset(source_dir, output_dir, train_ratio=0.7, val_ratio=0.15):
+    """
+    Organize images into train/val/test splits.
+    
+    Args:
+        source_dir: Folder with subfolders for each class
+                    e.g., source_dir/cats/*.jpg, source_dir/dogs/*.jpg
+        output_dir: Where to create train/val/test structure
+        train_ratio: Fraction for training (default 70%)
+        val_ratio: Fraction for validation (default 15%)
+    """
+    random.seed(42)  # Reproducibility
+    
+    classes = [d for d in os.listdir(source_dir) 
+               if os.path.isdir(os.path.join(source_dir, d))]
+    
+    for split in ['train', 'val', 'test']:
+        for cls in classes:
+            os.makedirs(os.path.join(output_dir, split, cls), exist_ok=True)
+    
+    for cls in classes:
+        cls_path = os.path.join(source_dir, cls)
+        images = [f for f in os.listdir(cls_path) 
+                  if f.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp', '.webp'))]
+        
+        random.shuffle(images)
+        
+        n_train = int(len(images) * train_ratio)
+        n_val = int(len(images) * val_ratio)
+        
+        splits = {
+            'train': images[:n_train],
+            'val': images[n_train:n_train + n_val],
+            'test': images[n_train + n_val:]
+        }
+        
+        for split_name, split_images in splits.items():
+            for img in split_images:
+                src = os.path.join(cls_path, img)
+                dst = os.path.join(output_dir, split_name, cls, img)
+                shutil.copy2(src, dst)
+        
+        print(f"  {cls}: {len(splits['train'])} train, "
+              f"{len(splits['val'])} val, {len(splits['test'])} test")
+
+# Usage:
+# organize_dataset("my_raw_images/", "dataset/")</code></pre>
+
+            <div class="callout callout-info">
+                <strong>💡 How many images do you need?</strong><br>
+                • Traditional ML (SVM, KNN): 50-200 per class<br>
+                • CNN from scratch: 1,000+ per class<br>
+                • Transfer Learning: 50-500 per class (leverages pre-trained knowledge)<br>
+                • The more diverse your images, the better the model generalizes
+            </div>
+        </div>
+
+        <!-- SECTION 4: PREPROCESSING -->
+        <div class="section" id="preprocessing">
+            <h2>4. Image Preprocessing & Augmentation</h2>
+            
+            <h3>Why Preprocess?</h3>
+            <ul>
+                <li><strong>Resize:</strong> Models need fixed input dimensions (e.g., 224×224)</li>
+                <li><strong>Normalize:</strong> Scale pixel values from [0, 255] to [0, 1] or [-1, 1] for faster convergence</li>
+                <li><strong>Augment:</strong> Artificially increase dataset size by applying transformations</li>
+            </ul>
+
+            <div class="concept-card">
+                <h4>🔑 Key Concept: Data Augmentation</h4>
+                <p>Data augmentation creates modified copies of your images during training. This helps the model:</p>
+                <ul>
+                    <li>Become invariant to position, rotation, lighting</li>
+                    <li>Reduce overfitting (model memorizing training data)</li>
+                    <li>Effectively increase dataset size 5-10x</li>
+                </ul>
+            </div>
+
+            <h3>Common Augmentation Techniques</h3>
+            <table>
+                <tr><th>Technique</th><th>What it does</th><th>When to use</th></tr>
+                <tr><td>Horizontal Flip</td><td>Mirror image left-right</td><td>Always (unless text in image)</td></tr>
+                <tr><td>Random Rotation</td><td>Rotate ±15-30°</td><td>Objects can appear rotated</td></tr>
+                <tr><td>Random Crop</td><td>Cut a portion of image</td><td>Object not always centered</td></tr>
+                <tr><td>Color Jitter</td><td>Change brightness/contrast/saturation</td><td>Variable lighting conditions</td></tr>
+                <tr><td>Random Zoom</td><td>Zoom in/out slightly</td><td>Object at various distances</td></tr>
+                <tr><td>Gaussian Noise</td><td>Add random noise</td><td>Low-quality images expected</td></tr>
+                <tr><td>Cutout/Erasing</td><td>Block out random patches</td><td>Occlusion robustness</td></tr>
+            </table>
+
+            <h3>Code: Preprocessing Pipeline</h3>
+<pre><code>import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import numpy as np
+from PIL import Image
+
+# ============================================
+# METHOD A: Using Keras ImageDataGenerator
+# ============================================
+
+# Training data: WITH augmentation
+train_datagen = ImageDataGenerator(
+    rescale=1./255,              # Normalize pixels to [0, 1]
+    rotation_range=20,           # Random rotation ±20°
+    width_shift_range=0.2,       # Random horizontal shift
+    height_shift_range=0.2,      # Random vertical shift
+    shear_range=0.2,             # Shear transformation
+    zoom_range=0.2,              # Random zoom
+    horizontal_flip=True,        # Random horizontal flip
+    fill_mode='nearest'          # How to fill new pixels
+)
+
+# Validation/Test data: NO augmentation (only rescale)
+val_datagen = ImageDataGenerator(rescale=1./255)
+
+# Load images from directory
+IMG_SIZE = 224
+BATCH_SIZE = 32
+
+train_generator = train_datagen.flow_from_directory(
+    'dataset/train',
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode='categorical'     # One-hot encoded labels
+)
+
+val_generator = val_datagen.flow_from_directory(
+    'dataset/val',
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode='categorical'
+)
+
+# Print class mapping
+print("Classes:", train_generator.class_indices)
+# Output: {'bird': 0, 'cat': 1, 'dog': 2}
+
+
+# ============================================
+# METHOD B: Using tf.data (More Efficient)
+# ============================================
+
+def load_and_preprocess(path, label):
+    """Load image file and preprocess."""
+    img = tf.io.read_file(path)
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.image.resize(img, [IMG_SIZE, IMG_SIZE])
+    img = img / 255.0  # Normalize
+    return img, label
+
+def augment(image, label):
+    """Apply random augmentations."""
+    image = tf.image.random_flip_left_right(image)
+    image = tf.image.random_brightness(image, 0.2)
+    image = tf.image.random_contrast(image, 0.8, 1.2)
+    image = tf.image.random_saturation(image, 0.8, 1.2)
+    # Random rotation
+    angle = tf.random.uniform([], -0.2, 0.2)
+    image = tf.keras.layers.RandomRotation(0.1)(tf.expand_dims(image, 0))[0]
+    return image, label
+
+# Create tf.data pipeline
+train_ds = tf.keras.utils.image_dataset_from_directory(
+    'dataset/train',
+    image_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE
+)
+
+# Apply augmentation and prefetch
+train_ds = train_ds.map(lambda x, y: (x/255.0, y))  # Normalize
+AUTOTUNE = tf.data.AUTOTUNE
+train_ds = train_ds.cache().shuffle(1000).prefetch(AUTOTUNE)
+
+
+# ============================================
+# METHOD C: Using PyTorch transforms
+# ============================================
+import torchvision.transforms as transforms
+from torchvision.datasets import ImageFolder
+from torch.utils.data import DataLoader
+
+# PyTorch preprocessing pipeline
+train_transform = transforms.Compose([
+    transforms.Resize((IMG_SIZE, IMG_SIZE)),
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.RandomRotation(15),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+    transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
+    transforms.ToTensor(),          # Converts to [0,1] and C×H×W format
+    transforms.Normalize(           # ImageNet mean/std
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
+])
+
+val_transform = transforms.Compose([
+    transforms.Resize((IMG_SIZE, IMG_SIZE)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+# Load datasets
+train_dataset = ImageFolder('dataset/train', transform=train_transform)
+val_dataset = ImageFolder('dataset/val', transform=val_transform)
+
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=4)
+
+print(f"Classes: {train_dataset.classes}")
+print(f"Class to idx: {train_dataset.class_to_idx}")</code></pre>
+
+            <div class="callout callout-warning">
+                <strong>⚠️ Critical Rule:</strong> NEVER apply augmentation to validation or test data! Augmentation is only for training to prevent overfitting. Validation/test data must be clean to give honest performance estimates.
+            </div>
+        </div>
+
+        <!-- SECTION 5: FEATURE EXTRACTION -->
+        <div class="section" id="feature-extraction">
+            <h2>5. Feature Extraction (Traditional ML)</h2>
+            
+            <p>Traditional ML algorithms (SVM, KNN, Random Forest) cannot directly process raw pixel arrays efficiently. We need to extract <strong>meaningful features</strong> first.</p>
+
+            <div class="concept-card">
+                <h4>🧠 What are Features?</h4>
+                <p>Features are numerical representations that capture meaningful information from images:</p>
+                <ul>
+                    <li><strong>Color Histograms:</strong> Distribution of colors in the image</li>
+                    <li><strong>HOG (Histogram of Oriented Gradients):</strong> Captures edge/shape information</li>
+                    <li><strong>LBP (Local Binary Patterns):</strong> Captures texture patterns</li>
+                    <li><strong>SIFT/SURF:</strong> Detects distinctive keypoints</li>
+                    <li><strong>Flattened Pixels:</strong> Simply reshape image into 1D array (least effective)</li>
+                </ul>
+            </div>
+
+            <h3>Code: Feature Extraction Methods</h3>
+<pre><code>import cv2
+import numpy as np
+from skimage.feature import hog, local_binary_pattern
+from sklearn.preprocessing import StandardScaler
+import os
+
+def extract_color_histogram(image, bins=32):
+    """
+    Extract color histogram features.
+    Captures the distribution of colors - good for scenes/objects with distinct colors.
+    """
+    features = []
+    for channel in range(3):  # B, G, R channels
+        hist = cv2.calcHist([image], [channel], None, [bins], [0, 256])
+        hist = hist.flatten()
+        features.extend(hist)
+    return np.array(features)  # Shape: (96,) for bins=32
+
+def extract_hog_features(image, orientations=9, pixels_per_cell=(8,8), cells_per_block=(2,2)):
+    """
+    Extract HOG (Histogram of Oriented Gradients) features.
+    Captures shape/edge information - excellent for object recognition.
+    
+    How it works:
+    1. Compute gradients (edge directions) in small cells
+    2. Build histogram of gradient orientations per cell
+    3. Normalize across blocks for illumination invariance
+    """
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.resize(gray, (128, 128))
+    
+    features = hog(
+        gray,
+        orientations=orientations,
+        pixels_per_cell=pixels_per_cell,
+        cells_per_block=cells_per_block,
+        block_norm='L2-Hys',
+        visualize=False,
+        feature_vector=True
+    )
+    return features  # Shape: (8100,) for default params with 128x128
+
+def extract_lbp_features(image, radius=3, n_points=24, bins=256):
+    """
+    Extract LBP (Local Binary Pattern) features.
+    Captures texture information - good for materials, textures.
+    
+    How it works:
+    1. For each pixel, compare with surrounding neighbors
+    2. Create binary pattern based on greater/less than center
+    3. Build histogram of these patterns
+    """
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.resize(gray, (128, 128))
+    
+    lbp = local_binary_pattern(gray, n_points, radius, method='uniform')
+    hist, _ = np.histogram(lbp.ravel(), bins=bins, range=(0, bins))
+    hist = hist.astype(np.float64)
+    hist /= (hist.sum() + 1e-7)  # Normalize
+    return hist
+
+def extract_combined_features(image):
+    """Combine multiple feature types for better representation."""
+    color_feat = extract_color_histogram(image)
+    hog_feat = extract_hog_features(image)
+    lbp_feat = extract_lbp_features(image)
+    
+    # Concatenate all features
+    combined = np.concatenate([color_feat, hog_feat, lbp_feat])
+    return combined
+
+def load_dataset_with_features(data_dir, feature_fn=extract_combined_features, img_size=(128, 128)):
+    """
+    Load all images and extract features.
+    Returns feature matrix X and label vector y.
+    """
+    X = []
+    y = []
+    class_names = sorted(os.listdir(data_dir))
+    
+    for label_idx, class_name in enumerate(class_names):
+        class_dir = os.path.join(data_dir, class_name)
+        if not os.path.isdir(class_dir):
+            continue
+            
+        for img_file in os.listdir(class_dir):
+            img_path = os.path.join(class_dir, img_file)
+            image = cv2.imread(img_path)
+            if image is None:
+                continue
+            
+            image = cv2.resize(image, img_size)
+            features = feature_fn(image)
+            X.append(features)
+            y.append(label_idx)
+    
+    X = np.array(X)
+    y = np.array(y)
+    
+    # Standardize features (zero mean, unit variance)
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+    
+    print(f"Dataset: {X.shape[0]} images, {X.shape[1]} features, {len(class_names)} classes")
+    print(f"Classes: {class_names}")
+    return X, y, class_names, scaler</code></pre>
+        </div>
+
+        <!-- SECTION 6: METHOD 1 - TRADITIONAL ML -->
+        <div class="section" id="method1">
+            <div class="method-header">📊 Method 1: Traditional ML (SVM, KNN, Random Forest)</div>
+            
+            <h3>When to Use</h3>
+            <ul>
+                <li>Small dataset (50-500 images per class)</li>
+                <li>Limited computing resources (no GPU needed)</li>
+                <li>Need fast training and interpretable results</li>
+                <li>Images have distinctive color/texture/shape patterns</li>
+            </ul>
+
+            <div class="concept-card">
+                <h4>How These Algorithms Work</h4>
+                <p><strong>SVM (Support Vector Machine):</strong> Finds the optimal hyperplane that separates classes with maximum margin. Uses kernel tricks to handle non-linear boundaries. Best overall for traditional image classification.</p>
+                <p><strong>KNN (K-Nearest Neighbors):</strong> For a new image, finds K most similar images in training set and votes. Simple but slow at prediction time with large datasets.</p>
+                <p><strong>Random Forest:</strong> Ensemble of decision trees, each trained on random subsets. Robust to noise, handles high-dimensional features well.</p>
+            </div>
+
+            <h3>Complete Code: Traditional ML Pipeline</h3>
+<pre><code>from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.model_selection import GridSearchCV, cross_val_score
+from sklearn.metrics import (classification_report, confusion_matrix, 
+                             accuracy_score)
+from sklearn.pipeline import Pipeline
+import numpy as np
+import time
+
+# ============================================
+# Step 1: Load data and extract features
+# ============================================
+print("Loading and extracting features...")
+X_train, y_train, class_names, scaler = load_dataset_with_features('dataset/train')
+X_val, y_val, _, _ = load_dataset_with_features('dataset/val')
+X_test, y_test, _, _ = load_dataset_with_features('dataset/test')
+
+# Apply same scaling to val/test
+X_val = scaler.transform(X_val)
+X_test = scaler.transform(X_test)
+
+# ============================================
+# Step 2: Train Multiple Models
+# ============================================
+
+models = {
+    'SVM (Linear)': SVC(kernel='linear', C=1.0, probability=True),
+    'SVM (RBF)': SVC(kernel='rbf', C=10.0, gamma='scale', probability=True),
+    'KNN (k=5)': KNeighborsClassifier(n_neighbors=5, metric='euclidean'),
+    'KNN (k=3)': KNeighborsClassifier(n_neighbors=3, metric='cosine'),
+    'Random Forest': RandomForestClassifier(n_estimators=200, max_depth=None, random_state=42),
+    'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42)
+}
+
+results = {}
+
+for name, model in models.items():
+    print(f"\n{'='*50}")
+    print(f"Training: {name}")
+    print(f"{'='*50}")
+    
+    start_time = time.time()
+    model.fit(X_train, y_train)
+    train_time = time.time() - start_time
+    
+    # Predict
+    start_time = time.time()
+    y_pred = model.predict(X_test)
+    predict_time = time.time() - start_time
+    
+    # Evaluate
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    results[name] = {
+        'accuracy': accuracy,
+        'train_time': train_time,
+        'predict_time': predict_time,
+        'predictions': y_pred
+    }
+    
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Train time: {train_time:.2f}s")
+    print(f"Predict time: {predict_time:.4f}s")
+    print(f"\nClassification Report:")
+    print(classification_report(y_test, y_pred, target_names=class_names))
+
+# ============================================
+# Step 3: Hyperparameter Tuning (SVM Example)
+# ============================================
+
+print("\n\nHyperparameter Tuning with Grid Search...")
+param_grid = {
+    'C': [0.1, 1, 10, 100],
+    'gamma': ['scale', 'auto', 0.001, 0.01],
+    'kernel': ['rbf', 'linear']
+}
+
+grid_search = GridSearchCV(
+    SVC(probability=True),
+    param_grid,
+    cv=5,                  # 5-fold cross validation
+    scoring='accuracy',
+    n_jobs=-1,             # Use all CPU cores
+    verbose=1
+)
+
+grid_search.fit(X_train, y_train)
+print(f"\nBest params: {grid_search.best_params_}")
+print(f"Best CV accuracy: {grid_search.best_score_:.4f}")
+print(f"Test accuracy: {grid_search.score(X_test, y_test):.4f}")
+
+# ============================================
+# Step 4: Print Comparison Table
+# ============================================
+
+print("\n\n" + "="*70)
+print(f"{'Model':<25} {'Accuracy':<12} {'Train Time':<15} {'Predict Time'}")
+print("="*70)
+for name, r in sorted(results.items(), key=lambda x: x[1]['accuracy'], reverse=True):
+    print(f"{name:<25} {r['accuracy']:<12.4f} {r['train_time']:<15.2f}s {r['predict_time']:.4f}s")
+print("="*70)</code></pre>
+
+            <div class="callout callout-success">
+                <strong>✅ Expected Accuracy:</strong> 60-80% depending on dataset complexity. Traditional ML works surprisingly well for simple classification tasks (e.g., 2-3 visually distinct classes).
+            </div>
+        </div>
+
+        <!-- SECTION 7: METHOD 2 - CNN -->
+        <div class="section" id="method2">
+            <div class="method-header">🧠 Method 2: CNN from Scratch (Convolutional Neural Network)</div>
+            
+            <h3>How CNNs Work</h3>
+            <div class="concept-card">
+                <h4>CNN Architecture Explained</h4>
+                <p>A CNN automatically learns hierarchical features from images:</p>
+                <ul>
+                    <li><strong>Convolutional Layers:</strong> Slide small filters over the image to detect patterns (edges → textures → parts → objects)</li>
+                    <li><strong>Activation (ReLU):</strong> Introduces non-linearity: f(x) = max(0, x)</li>
+                    <li><strong>Pooling Layers:</strong> Downsample feature maps (reduce size, keep important info)</li>
+                    <li><strong>Flatten:</strong> Convert 2D feature maps to 1D vector</li>
+                    <li><strong>Dense Layers:</strong> Fully connected layers for final classification</li>
+                    <li><strong>Softmax:</strong> Convert final output to probability distribution</li>
+                </ul>
+            </div>
+
+            <div class="diagram">
+Input Image (224×224×3)
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  CONV Layer 1 (32 filters, 3×3)  →  ReLU  →  MaxPool (2×2)    │
+│  Output: 112×112×32                                             │
+├─────────────────────────────────────────────────────────────────┤
+│  CONV Layer 2 (64 filters, 3×3)  →  ReLU  →  MaxPool (2×2)    │
+│  Output: 56×56×64                                               │
+├─────────────────────────────────────────────────────────────────┤
+│  CONV Layer 3 (128 filters, 3×3) →  ReLU  →  MaxPool (2×2)    │
+│  Output: 28×28×128                                              │
+├─────────────────────────────────────────────────────────────────┤
+│  CONV Layer 4 (256 filters, 3×3) →  ReLU  →  MaxPool (2×2)    │
+│  Output: 14×14×256                                              │
+├─────────────────────────────────────────────────────────────────┤
+│  Flatten → 14×14×256 = 50,176 neurons                          │
+├─────────────────────────────────────────────────────────────────┤
+│  Dense (512) → ReLU → Dropout(0.5) → Dense(num_classes)        │
+│  → Softmax                                                      │
+└─────────────────────────────────────────────────────────────────┘
+    │
+    ▼
+Output: [0.02, 0.95, 0.03]  →  "Cat" (95% confidence)
+            </div>
+
+            <h3>Key Concepts</h3>
+            
+            <div class="concept-card">
+                <h4>🔍 Convolution Operation</h4>
+                <p>A small matrix (kernel/filter) slides over the input image. At each position, element-wise multiplication + sum produces one output value. Different filters detect different patterns:</p>
+                <ul>
+                    <li>Early layers: edges, corners, colors</li>
+                    <li>Middle layers: textures, patterns, parts</li>
+                    <li>Deep layers: full objects, scenes</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <h4>📉 Loss Function & Backpropagation</h4>
+                <p><strong>Categorical Cross-Entropy Loss:</strong> Measures how far predictions are from true labels.</p>
+                <p><code>Loss = -Σ y_true × log(y_predicted)</code></p>
+                <p><strong>Backpropagation:</strong> Computes gradients (how much each weight contributed to the error) using chain rule, then updates weights to reduce loss.</p>
+                <p><strong>Optimizer (Adam):</strong> Adaptive learning rate optimizer. Adjusts step size per parameter based on past gradients.</p>
+            </div>
+
+            <h3>Complete Code: CNN from Scratch (TensorFlow/Keras)</h3>
+<pre><code>import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers, models, callbacks
+import matplotlib.pyplot as plt
+
+# ============================================
+# Configuration
+# ============================================
+IMG_SIZE = 224
+BATCH_SIZE = 32
+EPOCHS = 50
+NUM_CLASSES = 3  # Change based on your dataset
+
+# ============================================
+# Data Loading
+# ============================================
+train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+    rescale=1./255,
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.15,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest'
+)
+val_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
+
+train_gen = train_datagen.flow_from_directory(
+    'dataset/train', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical'
+)
+val_gen = val_datagen.flow_from_directory(
+    'dataset/val', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical'
+)
+
+# ============================================
+# Model Architecture: CNN from Scratch
+# ============================================
+def build_cnn(input_shape=(224, 224, 3), num_classes=3):
+    model = models.Sequential([
+        # Block 1
+        layers.Conv2D(32, (3, 3), padding='same', input_shape=input_shape),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.Conv2D(32, (3, 3), padding='same'),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.MaxPooling2D((2, 2)),
+        layers.Dropout(0.25),
+        
+        # Block 2
+        layers.Conv2D(64, (3, 3), padding='same'),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.Conv2D(64, (3, 3), padding='same'),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.MaxPooling2D((2, 2)),
+        layers.Dropout(0.25),
+        
+        # Block 3
+        layers.Conv2D(128, (3, 3), padding='same'),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.Conv2D(128, (3, 3), padding='same'),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.MaxPooling2D((2, 2)),
+        layers.Dropout(0.25),
+        
+        # Block 4
+        layers.Conv2D(256, (3, 3), padding='same'),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.MaxPooling2D((2, 2)),
+        layers.Dropout(0.25),
+        
+        # Classification Head
+        layers.GlobalAveragePooling2D(),  # Better than Flatten
+        layers.Dense(512),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.Dropout(0.5),
+        layers.Dense(num_classes, activation='softmax')
+    ])
+    return model
+
+model = build_cnn(num_classes=NUM_CLASSES)
+model.summary()
+
+# ============================================
+# Compile
+# ============================================
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# ============================================
+# Callbacks (Training Utilities)
+# ============================================
+my_callbacks = [
+    # Stop training when val_loss stops improving
+    callbacks.EarlyStopping(
+        monitor='val_loss',
+        patience=10,
+        restore_best_weights=True
+    ),
+    # Reduce learning rate when plateauing
+    callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,
+        patience=5,
+        min_lr=1e-7
+    ),
+    # Save best model
+    callbacks.ModelCheckpoint(
+        'best_cnn_model.keras',
+        monitor='val_accuracy',
+        save_best_only=True
+    )
+]
+
+# ============================================
+# Train
+# ============================================
+history = model.fit(
+    train_gen,
+    epochs=EPOCHS,
+    validation_data=val_gen,
+    callbacks=my_callbacks
+)
+
+# ============================================
+# Plot Training History
+# ============================================
+def plot_training_history(history):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    
+    # Accuracy
+    ax1.plot(history.history['accuracy'], label='Train Accuracy')
+    ax1.plot(history.history['val_accuracy'], label='Val Accuracy')
+    ax1.set_title('Model Accuracy')
+    ax1.set_xlabel('Epoch')
+    ax1.set_ylabel('Accuracy')
+    ax1.legend()
+    ax1.grid(True)
+    
+    # Loss
+    ax2.plot(history.history['loss'], label='Train Loss')
+    ax2.plot(history.history['val_loss'], label='Val Loss')
+    ax2.set_title('Model Loss')
+    ax2.set_xlabel('Epoch')
+    ax2.set_ylabel('Loss')
+    ax2.legend()
+    ax2.grid(True)
+    
+    plt.tight_layout()
+    plt.savefig('training_history.png', dpi=150)
+    plt.show()
+
+plot_training_history(history)
+
+# ============================================
+# Evaluate on Test Set
+# ============================================
+test_gen = val_datagen.flow_from_directory(
+    'dataset/test', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical', shuffle=False
+)
+
+test_loss, test_accuracy = model.evaluate(test_gen)
+print(f"\nTest Accuracy: {test_accuracy:.4f}")
+print(f"Test Loss: {test_loss:.4f}")</code></pre>
+
+            <h3>Same CNN in PyTorch</h3>
+<pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+import time
+
+# ============================================
+# PyTorch CNN Model
+# ============================================
+class ImageClassifierCNN(nn.Module):
+    def __init__(self, num_classes=3):
+        super().__init__()
+        
+        self.features = nn.Sequential(
+            # Block 1
+            nn.Conv2d(3, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
+            nn.Dropout2d(0.25),
+            
+            # Block 2
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
+            nn.Dropout2d(0.25),
+            
+            # Block 3
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
+            nn.Dropout2d(0.25),
+            
+            # Block 4
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(inplace=True),
+            nn.AdaptiveAvgPool2d((1, 1))  # Global Average Pooling
+        )
+        
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(256, 512),
+            nn.BatchNorm1d(512),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),
+            nn.Linear(512, num_classes)
+        )
+    
+    def forward(self, x):
+        x = self.features(x)
+        x = self.classifier(x)
+        return x
+
+# ============================================
+# Training Loop
+# ============================================
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
+
+model = ImageClassifierCNN(num_classes=3).to(device)
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, factor=0.5)
+
+def train_one_epoch(model, loader, criterion, optimizer, device):
+    model.train()
+    running_loss = 0.0
+    correct = 0
+    total = 0
+    
+    for images, labels in loader:
+        images, labels = images.to(device), labels.to(device)
+        
+        optimizer.zero_grad()
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+        
+        running_loss += loss.item()
+        _, predicted = outputs.max(1)
+        total += labels.size(0)
+        correct += predicted.eq(labels).sum().item()
+    
+    return running_loss / len(loader), correct / total
+
+def evaluate(model, loader, criterion, device):
+    model.eval()
+    running_loss = 0.0
+    correct = 0
+    total = 0
+    
+    with torch.no_grad():
+        for images, labels in loader:
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+            
+            running_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += labels.size(0)
+            correct += predicted.eq(labels).sum().item()
+    
+    return running_loss / len(loader), correct / total
+
+# Training
+EPOCHS = 50
+best_val_acc = 0
+patience_counter = 0
+patience = 10
+
+for epoch in range(EPOCHS):
+    train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, device)
+    val_loss, val_acc = evaluate(model, val_loader, criterion, device)
+    scheduler.step(val_loss)
+    
+    print(f"Epoch {epoch+1}/{EPOCHS} | "
+          f"Train Loss: {train_loss:.4f}, Acc: {train_acc:.4f} | "
+          f"Val Loss: {val_loss:.4f}, Acc: {val_acc:.4f}")
+    
+    # Save best model
+    if val_acc > best_val_acc:
+        best_val_acc = val_acc
+        torch.save(model.state_dict(), 'best_cnn_pytorch.pth')
+        patience_counter = 0
+    else:
+        patience_counter += 1
+        if patience_counter >= patience:
+            print(f"Early stopping at epoch {epoch+1}")
+            break
+
+print(f"\nBest Validation Accuracy: {best_val_acc:.4f}")</code></pre>
+
+            <div class="callout callout-info">
+                <strong>💡 CNN from Scratch - Pros & Cons:</strong><br>
+                ✅ Full control over architecture<br>
+                ✅ Good learning exercise<br>
+                ❌ Needs large dataset (1000+ per class)<br>
+                ❌ Slow to train, prone to overfitting<br>
+                ❌ Usually worse than transfer learning
+            </div>
+        </div>
+
+        <!-- SECTION 8: METHOD 3 - TRANSFER LEARNING -->
+        <div class="section" id="method3">
+            <div class="method-header">🚀 Method 3: Transfer Learning (Pre-trained Models)</div>
+            
+            <div class="concept-card">
+                <h4>🧠 What is Transfer Learning?</h4>
+                <p>Instead of training from scratch, use a model already trained on millions of images (ImageNet: 1.2M images, 1000 classes). The pre-trained model has already learned universal features (edges, textures, shapes). We just add our own classification head on top.</p>
+                <p><strong>Analogy:</strong> Like hiring an experienced artist and just teaching them what labels to write — they already know how to see.</p>
+            </div>
+
+            <div class="diagram">
+Pre-trained Model (e.g., ResNet50 trained on ImageNet)
+┌───────────────────────────────────────────────────────┐
+│  Feature Extractor (FROZEN - don't train)             │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐              │
+│  │ Conv    │→ │ Conv    │→ │ Conv    │→ ...          │
+│  │ Blocks  │  │ Blocks  │  │ Blocks  │              │
+│  │(edges)  │  │(texture)│  │(objects)│              │
+│  └─────────┘  └─────────┘  └─────────┘              │
+└──────────────────────────────────┬────────────────────┘
+                                   │ Features (2048-dim vector)
+                                   ▼
+┌───────────────────────────────────────────────────────┐
+│  New Classification Head (TRAINABLE)                   │
+│  Dense(256) → ReLU → Dropout → Dense(num_classes)     │
+│  → Softmax                                            │
+└───────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+                        Prediction: "Cat" 97%
+            </div>
+
+            <h3>Available Pre-trained Models Comparison</h3>
+            <table>
+                <tr><th>Model</th><th>Parameters</th><th>ImageNet Accuracy</th><th>Speed</th><th>Best For</th></tr>
+                <tr><td>MobileNetV2</td><td>3.4M</td><td>71.8%</td><td>⚡ Very Fast</td><td>Mobile/Edge deployment</td></tr>
+                <tr><td>EfficientNetB0</td><td>5.3M</td><td>77.1%</td><td>⚡ Fast</td><td>Best accuracy/speed tradeoff</td></tr>
+                <tr><td>ResNet50</td><td>25.6M</td><td>76.1%</td><td>🔵 Medium</td><td>General purpose, well-studied</td></tr>
+                <tr><td>VGG16</td><td>138M</td><td>71.3%</td><td>🔴 Slow</td><td>Simple architecture, teaching</td></tr>
+                <tr><td>InceptionV3</td><td>23.8M</td><td>77.9%</td><td>🔵 Medium</td><td>Multi-scale features</td></tr>
+                <tr><td>EfficientNetB4</td><td>19M</td><td>82.9%</td><td>🔵 Medium</td><td>High accuracy needed</td></tr>
+                <tr><td>ConvNeXt</td><td>28.6M</td><td>82.1%</td><td>🔵 Medium</td><td>Modern CNN architecture</td></tr>
+            </table>
+
+            <h3>Complete Code: Transfer Learning (TensorFlow)</h3>
+<pre><code>import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers, models, callbacks
+from tensorflow.keras.applications import (
+    ResNet50, VGG16, MobileNetV2, EfficientNetB0, InceptionV3
+)
+
+IMG_SIZE = 224
+BATCH_SIZE = 32
+NUM_CLASSES = 3
+
+# Data loading (same as before)
+train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+    rescale=1./255, rotation_range=20, width_shift_range=0.2,
+    height_shift_range=0.2, horizontal_flip=True, zoom_range=0.2
+)
+val_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
+
+train_gen = train_datagen.flow_from_directory(
+    'dataset/train', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical'
+)
+val_gen = val_datagen.flow_from_directory(
+    'dataset/val', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical'
+)
+
+# ============================================
+# Transfer Learning: Feature Extraction Mode
+# ============================================
+
+def build_transfer_model(base_model_class, input_shape=(224,224,3), num_classes=3):
+    """
+    Build a transfer learning model.
+    The base model is FROZEN (not trained) - we only train the classification head.
+    """
+    # Load pre-trained base (without top classification layer)
+    base_model = base_model_class(
+        weights='imagenet',         # Pre-trained on ImageNet
+        include_top=False,          # Remove original classification head
+        input_shape=input_shape
+    )
+    
+    # Freeze all base model layers
+    base_model.trainable = False
+    
+    # Build new model
+    model = models.Sequential([
+        base_model,
+        layers.GlobalAveragePooling2D(),
+        layers.BatchNormalization(),
+        layers.Dense(256, activation='relu'),
+        layers.Dropout(0.5),
+        layers.Dense(128, activation='relu'),
+        layers.Dropout(0.3),
+        layers.Dense(num_classes, activation='softmax')
+    ])
+    
+    return model
+
+# ============================================
+# Train Multiple Pre-trained Models
+# ============================================
+
+pretrained_models = {
+    'ResNet50': ResNet50,
+    'VGG16': VGG16,
+    'MobileNetV2': MobileNetV2,
+    'EfficientNetB0': EfficientNetB0,
+}
+
+transfer_results = {}
+
+for name, model_class in pretrained_models.items():
+    print(f"\n{'='*60}")
+    print(f"Training Transfer Learning: {name}")
+    print(f"{'='*60}")
+    
+    model = build_transfer_model(model_class, num_classes=NUM_CLASSES)
+    
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=0.001),
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    
+    history = model.fit(
+        train_gen,
+        epochs=20,
+        validation_data=val_gen,
+        callbacks=[
+            callbacks.EarlyStopping(patience=5, restore_best_weights=True),
+            callbacks.ReduceLROnPlateau(patience=3, factor=0.5)
+        ],
+        verbose=1
+    )
+    
+    # Evaluate
+    test_gen = val_datagen.flow_from_directory(
+        'dataset/test', target_size=(IMG_SIZE, IMG_SIZE),
+        batch_size=BATCH_SIZE, class_mode='categorical', shuffle=False
+    )
+    test_loss, test_acc = model.evaluate(test_gen)
+    
+    transfer_results[name] = {
+        'accuracy': test_acc,
+        'history': history.history,
+        'model': model
+    }
+    
+    print(f"{name} Test Accuracy: {test_acc:.4f}")
+    model.save(f'transfer_{name.lower()}.keras')
+
+# Print comparison
+print("\n\nTransfer Learning Results:")
+print("="*50)
+for name, r in sorted(transfer_results.items(), key=lambda x: x[1]['accuracy'], reverse=True):
+    print(f"  {name:<20} Accuracy: {r['accuracy']:.4f}")</code></pre>
+
+            <h3>Transfer Learning in PyTorch</h3>
+<pre><code>import torch
+import torch.nn as nn
+import torchvision.models as models
+
+def build_transfer_model_pytorch(model_name='resnet50', num_classes=3):
+    """Build transfer learning model in PyTorch."""
+    
+    if model_name == 'resnet50':
+        model = models.resnet50(weights='IMAGENET1K_V2')
+        # Freeze all layers
+        for param in model.parameters():
+            param.requires_grad = False
+        # Replace final FC layer
+        model.fc = nn.Sequential(
+            nn.Linear(model.fc.in_features, 256),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(256, num_classes)
+        )
+        
+    elif model_name == 'mobilenet_v2':
+        model = models.mobilenet_v2(weights='IMAGENET1K_V2')
+        for param in model.parameters():
+            param.requires_grad = False
+        model.classifier = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(model.classifier[1].in_features, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, num_classes)
+        )
+    
+    elif model_name == 'efficientnet_b0':
+        model = models.efficientnet_b0(weights='IMAGENET1K_V1')
+        for param in model.parameters():
+            param.requires_grad = False
+        model.classifier = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(model.classifier[1].in_features, 256),
+            nn.ReLU(),
+            nn.Linear(256, num_classes)
+        )
+    
+    return model
+
+# Usage
+model = build_transfer_model_pytorch('resnet50', num_classes=3)
+model = model.to(device)
+
+# Only optimize the unfrozen parameters
+optimizer = optim.Adam(
+    filter(lambda p: p.requires_grad, model.parameters()),
+    lr=0.001
+)
+
+# Training loop is same as Method 2</code></pre>
+
+            <div class="callout callout-success">
+                <strong>✅ Expected Accuracy:</strong> 85-95%+ even with small datasets (100-500 images per class). This is usually the best approach for most real-world problems.
+            </div>
+        </div>
+
+        <!-- SECTION 9: METHOD 4 - FINE TUNING -->
+        <div class="section" id="method4">
+            <div class="method-header">🎯 Method 4: Fine-Tuning Pre-trained Models</div>
+            
+            <div class="concept-card">
+                <h4>Fine-Tuning vs Feature Extraction</h4>
+                <p><strong>Feature Extraction (Method 3):</strong> Freeze entire base model, only train new head. Fast but limited.</p>
+                <p><strong>Fine-Tuning (Method 4):</strong> After initial training, UNFREEZE some top layers of base model and train them with a very low learning rate. This adapts the pre-trained features to your specific task.</p>
+            </div>
+
+            <div class="diagram">
+Fine-Tuning Strategy (2-Phase Training):
+
+Phase 1: Feature Extraction (5-10 epochs)
+┌─────────────────────────────────────┐
+│  Base Model Layers: ❄️ FROZEN       │
+│  New Head Layers:   🔥 TRAINING     │
+│  Learning Rate:     0.001           │
+└─────────────────────────────────────┘
+
+Phase 2: Fine-Tuning (10-20 epochs)
+┌─────────────────────────────────────┐
+│  Early Layers:      ❄️ FROZEN       │  ← Generic features (keep)
+│  Top ~30% Layers:   🔥 TRAINING     │  ← Task-specific features (adapt)
+│  New Head Layers:   🔥 TRAINING     │
+│  Learning Rate:     0.0001 (10x lower) │
+└─────────────────────────────────────┘
+            </div>
+
+            <h3>Complete Code: Fine-Tuning</h3>
+<pre><code>import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers, models, callbacks
+from tensorflow.keras.applications import EfficientNetB0
+
+IMG_SIZE = 224
+BATCH_SIZE = 32
+NUM_CLASSES = 3
+
+# ============================================
+# Phase 1: Feature Extraction
+# ============================================
+
+# Load base model
+base_model = EfficientNetB0(weights='imagenet', include_top=False, input_shape=(IMG_SIZE, IMG_SIZE, 3))
+base_model.trainable = False  # Freeze everything
+
+# Build model
+inputs = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
+x = base_model(inputs, training=False)  # training=False keeps BatchNorm in inference mode
+x = layers.GlobalAveragePooling2D()(x)
+x = layers.BatchNormalization()(x)
+x = layers.Dense(256, activation='relu')(x)
+x = layers.Dropout(0.5)(x)
+outputs = layers.Dense(NUM_CLASSES, activation='softmax')(x)
+model = keras.Model(inputs, outputs)
+
+# Compile for Phase 1
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+print("Phase 1: Feature Extraction Training")
+print(f"Trainable params: {sum(p.numpy().size for p in model.trainable_weights):,}")
+
+history_phase1 = model.fit(
+    train_gen,
+    epochs=10,
+    validation_data=val_gen,
+    callbacks=[callbacks.EarlyStopping(patience=5, restore_best_weights=True)]
+)
+
+# ============================================
+# Phase 2: Fine-Tuning
+# ============================================
+
+# Unfreeze top layers of base model
+base_model.trainable = True
+
+# Freeze early layers, unfreeze top ~30%
+total_layers = len(base_model.layers)
+fine_tune_from = int(total_layers * 0.7)  # Unfreeze top 30%
+
+for layer in base_model.layers[:fine_tune_from]:
+    layer.trainable = False
+
+print(f"\nPhase 2: Fine-Tuning")
+print(f"Total base layers: {total_layers}")
+print(f"Frozen layers: {fine_tune_from}")
+print(f"Trainable layers: {total_layers - fine_tune_from}")
+print(f"Trainable params: {sum(p.numpy().size for p in model.trainable_weights):,}")
+
+# Re-compile with MUCH lower learning rate
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-4),  # 10x lower!
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+history_phase2 = model.fit(
+    train_gen,
+    epochs=20,
+    validation_data=val_gen,
+    callbacks=[
+        callbacks.EarlyStopping(patience=7, restore_best_weights=True),
+        callbacks.ReduceLROnPlateau(patience=3, factor=0.5, min_lr=1e-7),
+        callbacks.ModelCheckpoint('best_finetuned.keras', save_best_only=True, monitor='val_accuracy')
+    ]
+)
+
+# Final Evaluation
+test_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255).flow_from_directory(
+    'dataset/test', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical', shuffle=False
+)
+test_loss, test_acc = model.evaluate(test_gen)
+print(f"\nFine-tuned Model Test Accuracy: {test_acc:.4f}")</code></pre>
+
+            <h3>PyTorch Fine-Tuning</h3>
+<pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+import torchvision.models as models
+
+def fine_tune_resnet(num_classes=3, device='cuda'):
+    # Load pre-trained ResNet50
+    model = models.resnet50(weights='IMAGENET1K_V2')
+    
+    # ===== Phase 1: Feature Extraction =====
+    for param in model.parameters():
+        param.requires_grad = False
+    
+    # Replace classifier
+    model.fc = nn.Sequential(
+        nn.Linear(2048, 256),
+        nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(256, num_classes)
+    )
+    model = model.to(device)
+    
+    # Train only the classifier
+    optimizer = optim.Adam(model.fc.parameters(), lr=1e-3)
+    criterion = nn.CrossEntropyLoss()
+    
+    print("Phase 1: Training classifier head...")
+    for epoch in range(10):
+        train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, device)
+        val_loss, val_acc = evaluate(model, val_loader, criterion, device)
+        print(f"  Epoch {epoch+1}: Train Acc={train_acc:.4f}, Val Acc={val_acc:.4f}")
+    
+    # ===== Phase 2: Fine-Tuning =====
+    # Unfreeze layer4 (last residual block) + fc
+    for param in model.layer4.parameters():
+        param.requires_grad = True
+    
+    # Use different learning rates for different parts
+    optimizer = optim.Adam([
+        {'params': model.layer4.parameters(), 'lr': 1e-5},   # Lower LR for pre-trained
+        {'params': model.fc.parameters(), 'lr': 1e-4}         # Higher LR for new layers
+    ], weight_decay=1e-4)
+    
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=20)
+    
+    print("\nPhase 2: Fine-tuning top layers...")
+    best_acc = 0
+    for epoch in range(20):
+        train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, device)
+        val_loss, val_acc = evaluate(model, val_loader, criterion, device)
+        scheduler.step()
+        
+        if val_acc > best_acc:
+            best_acc = val_acc
+            torch.save(model.state_dict(), 'best_finetuned_resnet.pth')
+        
+        print(f"  Epoch {epoch+1}: Train Acc={train_acc:.4f}, Val Acc={val_acc:.4f}")
+    
+    print(f"\nBest Fine-tuned Accuracy: {best_acc:.4f}")
+    return model
+
+model = fine_tune_resnet(num_classes=3, device=device)</code></pre>
+
+            <div class="callout callout-success">
+                <strong>✅ Expected Accuracy:</strong> 90-98%+. Fine-tuning typically gives the best results for custom datasets. The 2-phase approach prevents catastrophic forgetting.
+            </div>
+        </div>
+
+        <!-- SECTION 10: METHOD 5 - VISION TRANSFORMERS -->
+        <div class="section" id="method5">
+            <div class="method-header">🔮 Method 5: Vision Transformers (ViT)</div>
+            
+            <div class="concept-card">
+                <h4>Vision Transformers - The New Era</h4>
+                <p>ViT applies the Transformer architecture (originally for NLP) to images. Instead of processing pixels through convolutions, it:</p>
+                <ol>
+                    <li>Splits image into fixed-size patches (e.g., 16×16 pixels)</li>
+                    <li>Flattens each patch into a vector</li>
+                    <li>Adds position embeddings (so model knows where patches are)</li>
+                    <li>Processes through Transformer encoder (self-attention)</li>
+                    <li>Uses [CLS] token output for classification</li>
+                </ol>
+            </div>
+
+            <div class="diagram">
+Input Image (224×224)
+    │
+    ▼ Split into 14×14 = 196 patches (each 16×16 pixels)
+┌──────────────────────────────────────────────────────────┐
+│ [CLS] [P1] [P2] [P3] ... [P196]  ← Patch Embeddings    │
+│   +     +    +    +         +                            │
+│ [E0]  [E1] [E2] [E3] ... [E196]  ← Position Embeddings │
+├──────────────────────────────────────────────────────────┤
+│         Transformer Encoder × 12 layers                   │
+│  ┌─────────────────────────────────────┐                 │
+│  │  Multi-Head Self-Attention          │                 │
+│  │  Feed-Forward Network               │                 │
+│  │  Layer Normalization                │                 │
+│  └─────────────────────────────────────┘                 │
+├──────────────────────────────────────────────────────────┤
+│  [CLS] output → MLP Head → num_classes                   │
+└──────────────────────────────────────────────────────────┘
+    │
+    ▼
+Prediction: "Dog" 96%
+            </div>
+
+            <h3>Code: Using Pre-trained ViT (Hugging Face)</h3>
+<pre><code>from transformers import ViTForImageClassification, ViTFeatureExtractor
+from transformers import TrainingArguments, Trainer
+from datasets import load_dataset, Features, ClassLabel, Image
+import torch
+from torchvision import transforms
+import numpy as np
+
+# ============================================
+# Method A: Using Hugging Face Transformers
+# ============================================
+
+# Load pre-trained ViT
+model_name = "google/vit-base-patch16-224-in21k"
+feature_extractor = ViTFeatureExtractor.from_pretrained(model_name)
+
+# Prepare dataset
+from datasets import load_dataset
+
+# Load from local folder
+dataset = load_dataset("imagefolder", data_dir="dataset/")
+# This auto-detects train/val/test splits from folder structure
+
+# Preprocessing function
+def preprocess(examples):
+    """Process images for ViT."""
+    images = [img.convert("RGB") for img in examples["image"]]
+    inputs = feature_extractor(images=images, return_tensors="pt")
+    inputs["labels"] = examples["label"]
+    return inputs
+
+# Apply preprocessing
+dataset = dataset.with_transform(preprocess)
+
+# Load model for fine-tuning
+num_classes = len(dataset["train"].features["label"].names)
+model = ViTForImageClassification.from_pretrained(
+    model_name,
+    num_labels=num_classes,
+    ignore_mismatched_sizes=True
+)
+
+# Freeze base, train classifier
+for param in model.vit.parameters():
+    param.requires_grad = False
+
+# Training arguments
+training_args = TrainingArguments(
+    output_dir="./vit_output",
+    num_train_epochs=10,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
+    warmup_steps=100,
+    weight_decay=0.01,
+    logging_dir="./logs",
+    logging_steps=10,
+    evaluation_strategy="epoch",
+    save_strategy="epoch",
+    load_best_model_at_end=True,
+    metric_for_best_model="accuracy",
+    learning_rate=2e-4,
+)
+
+# Metrics
+from sklearn.metrics import accuracy_score
+def compute_metrics(pred):
+    labels = pred.label_ids
+    preds = pred.predictions.argmax(-1)
+    acc = accuracy_score(labels, preds)
+    return {"accuracy": acc}
+
+# Trainer
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset["train"],
+    eval_dataset=dataset["validation"],
+    compute_metrics=compute_metrics,
+)
+
+# Train
+trainer.train()
+
+# Evaluate
+results = trainer.evaluate(dataset["test"])
+print(f"ViT Test Accuracy: {results['eval_accuracy']:.4f}")
+
+# ============================================
+# Method B: Using timm library (simpler)
+# ============================================
+import timm
+import torch.nn as nn
+
+# Load pre-trained ViT from timm
+model = timm.create_model('vit_base_patch16_224', pretrained=True, num_classes=NUM_CLASSES)
+
+# Freeze all except head
+for param in model.parameters():
+    param.requires_grad = False
+for param in model.head.parameters():
+    param.requires_grad = True
+
+model = model.to(device)
+optimizer = optim.Adam(model.head.parameters(), lr=1e-3)
+
+# Training loop same as PyTorch CNN method...</code></pre>
+
+            <div class="callout callout-info">
+                <strong>💡 When to use ViT:</strong><br>
+                • Large datasets (5000+ images) - ViTs are data hungry<br>
+                • Complex classification tasks where CNNs plateau<br>
+                • When you need attention maps for explainability<br>
+                • State-of-the-art accuracy is required<br>
+                For small datasets, Transfer Learning with CNNs (Method 3/4) usually works better.
+            </div>
+        </div>
+
+        <!-- SECTION 11: EVALUATION -->
+        <div class="section" id="evaluation">
+            <h2>11. Evaluation Metrics & Accuracy Comparison</h2>
+            
+            <h3>Understanding Metrics</h3>
+            <div class="concept-card">
+                <h4>📊 Key Metrics Explained</h4>
+                <ul>
+                    <li><strong>Accuracy:</strong> % of correct predictions. Can be misleading with imbalanced classes.</li>
+                    <li><strong>Precision:</strong> Of all predicted "cat", how many were actually cat? (Low false positives)</li>
+                    <li><strong>Recall:</strong> Of all actual cats, how many did we find? (Low false negatives)</li>
+                    <li><strong>F1-Score:</strong> Harmonic mean of precision & recall. Best single metric.</li>
+                    <li><strong>Confusion Matrix:</strong> Shows exact breakdown of predictions vs truth</li>
+                    <li><strong>AUC-ROC:</strong> Area under ROC curve. Measures classification ability across thresholds.</li>
+                </ul>
+            </div>
+
+            <h3>Code: Comprehensive Evaluation</h3>
+<pre><code>import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import (
+    classification_report, confusion_matrix, accuracy_score,
+    precision_recall_fscore_support, roc_curve, auc
+)
+
+def comprehensive_evaluation(model, test_generator, class_names):
+    """
+    Complete model evaluation with all metrics and visualizations.
+    Works with Keras models and generators.
+    """
+    # Get predictions
+    predictions = model.predict(test_generator)
+    y_pred_classes = np.argmax(predictions, axis=1)
+    y_true = test_generator.classes
+    
+    # Overall accuracy
+    accuracy = accuracy_score(y_true, y_pred_classes)
+    print(f"Overall Accuracy: {accuracy:.4f} ({accuracy*100:.1f}%)")
+    
+    # Classification report
+    print("\nDetailed Classification Report:")
+    print("="*60)
+    report = classification_report(y_true, y_pred_classes, 
+                                   target_names=class_names, digits=4)
+    print(report)
+    
+    # Per-class metrics
+    precision, recall, f1, support = precision_recall_fscore_support(
+        y_true, y_pred_classes, average=None
+    )
+    
+    print("\nPer-Class Breakdown:")
+    print(f"{'Class':<15} {'Precision':<12} {'Recall':<12} {'F1':<12} {'Support'}")
+    print("-"*60)
+    for i, name in enumerate(class_names):
+        print(f"{name:<15} {precision[i]:<12.4f} {recall[i]:<12.4f} {f1[i]:<12.4f} {support[i]}")
+    
+    # Confusion Matrix
+    cm = confusion_matrix(y_true, y_pred_classes)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=class_names, yticklabels=class_names)
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.tight_layout()
+    plt.savefig('confusion_matrix.png', dpi=150)
+    plt.show()
+    
+    # Confidence distribution
+    max_confidences = np.max(predictions, axis=1)
+    correct_mask = (y_pred_classes == y_true)
+    
+    plt.figure(figsize=(10, 5))
+    plt.hist(max_confidences[correct_mask], bins=50, alpha=0.7, label='Correct', color='green')
+    plt.hist(max_confidences[~correct_mask], bins=50, alpha=0.7, label='Incorrect', color='red')
+    plt.xlabel('Confidence')
+    plt.ylabel('Count')
+    plt.title('Prediction Confidence Distribution')
+    plt.legend()
+    plt.savefig('confidence_distribution.png', dpi=150)
+    plt.show()
+    
+    return {
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1,
+        'confusion_matrix': cm,
+        'predictions': predictions
+    }
+
+# Usage with each model
+# results = comprehensive_evaluation(model, test_gen, class_names)</code></pre>
+
+            <h3>Expected Accuracy Comparison</h3>
+            <table>
+                <tr>
+                    <th>Method</th>
+                    <th>Small Dataset<br>(100 imgs/class)</th>
+                    <th>Medium Dataset<br>(1000 imgs/class)</th>
+                    <th>Large Dataset<br>(10000 imgs/class)</th>
+                    <th>Training Time</th>
+                    <th>GPU Required?</th>
+                </tr>
+                <tr>
+                    <td><strong>SVM + HOG</strong></td>
+                    <td>55-70%</td>
+                    <td>65-75%</td>
+                    <td>70-80%</td>
+                    <td>Minutes</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><strong>Random Forest</strong></td>
+                    <td>50-65%</td>
+                    <td>60-72%</td>
+                    <td>65-75%</td>
+                    <td>Minutes</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><strong>CNN from Scratch</strong></td>
+                    <td>40-60%</td>
+                    <td>70-82%</td>
+                    <td>80-90%</td>
+                    <td>Hours</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Transfer Learning<br>(Frozen)</strong></td>
+                    <td>80-90%</td>
+                    <td>88-94%</td>
+                    <td>92-96%</td>
+                    <td>10-30 min</td>
+                    <td>Recommended</td>
+                </tr>
+                <tr>
+                    <td><strong>Fine-Tuning</strong></td>
+                    <td>85-93%</td>
+                    <td>92-97%</td>
+                    <td>95-99%</td>
+                    <td>30-60 min</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Vision Transformer</strong></td>
+                    <td>75-85%</td>
+                    <td>90-96%</td>
+                    <td>96-99%</td>
+                    <td>1-2 hours</td>
+                    <td>Yes</td>
+                </tr>
+            </table>
+
+            <div class="callout callout-warning">
+                <strong>⚠️ Key Insight:</strong> For most real-world tasks with limited data (<1000 images per class), <strong>Transfer Learning with Fine-Tuning</strong> (Method 4) gives the best accuracy-to-effort ratio. Only move to ViT if you have abundant data and compute.
+            </div>
+
+            <h3>Visual Accuracy Comparison</h3>
+            <div style="max-width:600px; margin: 1rem 0;">
+                <p style="margin:0.3rem 0;"><strong>SVM + HOG Features</strong></p>
+                <div class="accuracy-bar" style="width: 70%">~70%</div>
+                <p style="margin:0.3rem 0;"><strong>Random Forest</strong></p>
+                <div class="accuracy-bar" style="width: 65%">~65%</div>
+                <p style="margin:0.3rem 0;"><strong>CNN from Scratch</strong></p>
+                <div class="accuracy-bar" style="width: 78%">~78%</div>
+                <p style="margin:0.3rem 0;"><strong>Transfer Learning (Frozen)</strong></p>
+                <div class="accuracy-bar" style="width: 90%">~90%</div>
+                <p style="margin:0.3rem 0;"><strong>Fine-Tuning (EfficientNet)</strong></p>
+                <div class="accuracy-bar" style="width: 95%; background: linear-gradient(90deg, #10b981, #059669);">~95%</div>
+                <p style="margin:0.3rem 0;"><strong>Vision Transformer (ViT)</strong></p>
+                <div class="accuracy-bar" style="width: 93%; background: linear-gradient(90deg, #f59e0b, #d97706);">~93%</div>
+            </div>
+            <p style="font-size:0.8rem; color: var(--text-muted);">*Approximate accuracy for medium dataset (~1000 images/class, 3 classes)</p>
+        </div>
+
+        <!-- SECTION 12: CONCEPTS DEEP DIVE -->
+        <div class="section" id="concepts">
+            <h2>12. Key Concepts Deep Dive</h2>
+
+            <div class="concept-card">
+                <h4>🔄 Overfitting vs Underfitting</h4>
+                <p><strong>Overfitting:</strong> Model memorizes training data but fails on new data. Signs: high train accuracy, low val accuracy.</p>
+                <p><strong>Underfitting:</strong> Model too simple to learn patterns. Signs: low accuracy on both train and val.</p>
+                <p><strong>Solutions for Overfitting:</strong></p>
+                <ul>
+                    <li>More training data / data augmentation</li>
+                    <li>Dropout (randomly zero out neurons during training)</li>
+                    <li>L2 Regularization (penalize large weights)</li>
+                    <li>Early Stopping (stop when val loss increases)</li>
+                    <li>Simpler model architecture</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <h4>📐 Batch Size & Learning Rate</h4>
+                <p><strong>Batch Size:</strong> Number of images processed before updating weights.</p>
+                <ul>
+                    <li>Small batch (8-16): More noise in updates, better generalization, slower training</li>
+                    <li>Large batch (64-128): Smoother updates, faster training, may generalize worse</li>
+                    <li>Sweet spot: 32 for most cases</li>
+                </ul>
+                <p><strong>Learning Rate:</strong> How big a step to take when updating weights.</p>
+                <ul>
+                    <li>Too high: Training diverges (loss goes up)</li>
+                    <li>Too low: Training takes forever, may get stuck</li>
+                    <li>Start at 0.001, use ReduceLROnPlateau to decrease automatically</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <h4>🏗️ Batch Normalization</h4>
+                <p>Normalizes the output of each layer to have zero mean and unit variance. Benefits:</p>
+                <ul>
+                    <li>Faster training (allows higher learning rates)</li>
+                    <li>Acts as regularization</li>
+                    <li>Reduces internal covariate shift</li>
+                    <li>Place AFTER Conv/Dense, BEFORE activation</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <h4>🎲 Dropout</h4>
+                <p>During training, randomly sets a fraction of neurons to 0. This prevents co-adaptation (neurons relying too much on each other).</p>
+                <ul>
+                    <li>Typical rates: 0.25 after conv blocks, 0.5 after dense layers</li>
+                    <li>Only active during training (not inference)</li>
+                    <li>Acts like training many smaller networks and averaging</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <h4>🎯 Global Average Pooling vs Flatten</h4>
+                <p><strong>Flatten:</strong> Converts 7×7×512 → 25,088 neurons. Many parameters, prone to overfitting.</p>
+                <p><strong>Global Average Pooling:</strong> Averages each feature map to single value. 7×7×512 → 512 neurons. Far fewer parameters, better generalization. <strong>Always prefer GAP.</strong></p>
+            </div>
+
+            <div class="concept-card">
+                <h4>📊 Cross-Entropy Loss</h4>
+                <p>The standard loss function for classification:</p>
+                <ul>
+                    <li><strong>Binary Cross-Entropy:</strong> For 2 classes: <code>-[y·log(p) + (1-y)·log(1-p)]</code></li>
+                    <li><strong>Categorical Cross-Entropy:</strong> For N classes: <code>-Σ y_i · log(p_i)</code></li>
+                    <li>Heavily penalizes confident wrong predictions</li>
+                    <li>Use <code>sparse_categorical_crossentropy</code> if labels are integers (not one-hot)</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <h4>⚡ Learning Rate Schedules</h4>
+                <p>Changing learning rate during training improves results:</p>
+                <ul>
+                    <li><strong>Step Decay:</strong> Reduce LR by factor every N epochs</li>
+                    <li><strong>Cosine Annealing:</strong> Smoothly decreases LR following cosine curve</li>
+                    <li><strong>ReduceLROnPlateau:</strong> Reduce when validation loss stops improving (most practical)</li>
+                    <li><strong>Warmup:</strong> Start with very low LR, gradually increase, then decay</li>
+                    <li><strong>One Cycle:</strong> LR goes up then down in one cycle (fast convergence)</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <h4>🧊 Catastrophic Forgetting</h4>
+                <p>When fine-tuning, if learning rate is too high, the model "forgets" what it learned from ImageNet. Solutions:</p>
+                <ul>
+                    <li>Use very low learning rate for pre-trained layers (1e-5)</li>
+                    <li>Differential learning rates (lower for early layers)</li>
+                    <li>Gradual unfreezing (unfreeze layers one at a time)</li>
+                    <li>Freeze BatchNorm layers during fine-tuning</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECTION 13: PRODUCTION -->
+        <div class="section" id="production">
+            <h2>13. Making it Production-Ready</h2>
+            
+            <h3>Saving & Loading Models</h3>
+<pre><code># ============================================
+# TensorFlow/Keras
+# ============================================
+
+# Save entire model (architecture + weights + optimizer state)
+model.save('my_classifier.keras')
+
+# Load model
+loaded_model = keras.models.load_model('my_classifier.keras')
+
+# Save only weights (lighter, need architecture code to reload)
+model.save_weights('model_weights.h5')
+
+# Export for deployment (TensorFlow Lite - mobile)
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+with open('model.tflite', 'wb') as f:
+    f.write(tflite_model)
+
+# Export to ONNX (universal format)
+# pip install tf2onnx
+import tf2onnx
+spec = (tf.TensorSpec((None, 224, 224, 3), tf.float32),)
+model_proto, _ = tf2onnx.convert.from_keras(model, input_signature=spec)
+
+# ============================================
+# PyTorch
+# ============================================
+
+# Save model state dict (recommended)
+torch.save(model.state_dict(), 'model.pth')
+
+# Load
+model = ImageClassifierCNN(num_classes=3)
+model.load_state_dict(torch.load('model.pth'))
+model.eval()
+
+# Export to ONNX
+dummy_input = torch.randn(1, 3, 224, 224)
+torch.onnx.export(model, dummy_input, 'model.onnx')</code></pre>
+
+            <h3>Inference: Predicting New Images</h3>
+<pre><code>import numpy as np
+from PIL import Image
+import tensorflow as tf
+
+# ============================================
+# Single Image Prediction (TensorFlow)
+# ============================================
+
+def predict_image(model, image_path, class_names, img_size=224):
+    """
+    Predict class of a single image.
+    
+    Args:
+        model: Trained Keras model
+        image_path: Path to image file
+        class_names: List of class names
+        img_size: Expected input size
+    
+    Returns:
+        predicted_class, confidence, all_probabilities
+    """
+    # Load and preprocess
+    img = Image.open(image_path).convert('RGB')
+    img = img.resize((img_size, img_size))
+    img_array = np.array(img) / 255.0  # Normalize
+    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension: (1, 224, 224, 3)
+    
+    # Predict
+    predictions = model.predict(img_array, verbose=0)
+    predicted_class_idx = np.argmax(predictions[0])
+    confidence = predictions[0][predicted_class_idx]
+    
+    print(f"Predicted: {class_names[predicted_class_idx]} ({confidence*100:.1f}% confidence)")
+    print(f"All probabilities:")
+    for i, (name, prob) in enumerate(zip(class_names, predictions[0])):
+        bar = "█" * int(prob * 30)
+        print(f"  {name:<12} {prob:.4f} {bar}")
+    
+    return class_names[predicted_class_idx], confidence, predictions[0]
+
+# Usage:
+class_names = ['bird', 'cat', 'dog']
+model = keras.models.load_model('best_finetuned.keras')
+predict_image(model, 'test_photo.jpg', class_names)
+
+
+# ============================================
+# Single Image Prediction (PyTorch)
+# ============================================
+
+def predict_image_pytorch(model, image_path, class_names, device='cuda'):
+    """Predict single image with PyTorch model."""
+    from torchvision import transforms
+    
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+    
+    img = Image.open(image_path).convert('RGB')
+    img_tensor = transform(img).unsqueeze(0).to(device)  # (1, 3, 224, 224)
+    
+    model.eval()
+    with torch.no_grad():
+        outputs = model(img_tensor)
+        probabilities = torch.softmax(outputs, dim=1)[0]
+        predicted_idx = probabilities.argmax().item()
+        confidence = probabilities[predicted_idx].item()
+    
+    print(f"Predicted: {class_names[predicted_idx]} ({confidence*100:.1f}%)")
+    return class_names[predicted_idx], confidence
+
+# Usage:
+predict_image_pytorch(model, 'test_photo.jpg', class_names)</code></pre>
+
+            <h3>Simple Flask API for Deployment</h3>
+<pre><code>from flask import Flask, request, jsonify
+from PIL import Image
+import numpy as np
+import tensorflow as tf
+import io
+
+app = Flask(__name__)
+
+# Load model once at startup
+model = tf.keras.models.load_model('best_finetuned.keras')
+CLASS_NAMES = ['bird', 'cat', 'dog']
+IMG_SIZE = 224
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image provided'}), 400
+    
+    file = request.files['image']
+    img = Image.open(io.BytesIO(file.read())).convert('RGB')
+    img = img.resize((IMG_SIZE, IMG_SIZE))
+    img_array = np.array(img) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+    
+    predictions = model.predict(img_array, verbose=0)
+    predicted_idx = int(np.argmax(predictions[0]))
+    
+    return jsonify({
+        'predicted_class': CLASS_NAMES[predicted_idx],
+        'confidence': float(predictions[0][predicted_idx]),
+        'all_probabilities': {
+            name: float(prob) for name, prob in zip(CLASS_NAMES, predictions[0])
+        }
+    })
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+# Test with curl:
+# curl -X POST -F "image=@test_photo.jpg" http://localhost:5000/predict</code></pre>
+        </div>
+
+        <!-- SECTION 14: COMPLETE RUNNABLE CODE -->
+        <div class="section" id="complete-code">
+            <h2>14. Complete Runnable Code (All Methods)</h2>
+            
+            <h3>requirements.txt</h3>
+<pre><code># Core
+numpy>=1.21.0
+Pillow>=9.0.0
+matplotlib>=3.5.0
+seaborn>=0.12.0
+scikit-learn>=1.1.0
+
+# Image processing
+opencv-python>=4.6.0
+scikit-image>=0.19.0
+
+# Deep Learning (choose one framework)
+# TensorFlow
+tensorflow>=2.12.0
+
+# PyTorch (alternative)
+# torch>=2.0.0
+# torchvision>=0.15.0
+
+# Vision Transformers
+# transformers>=4.30.0
+# timm>=0.9.0
+# datasets>=2.12.0
+
+# Deployment
+# flask>=2.3.0
+# onnxruntime>=1.15.0</code></pre>
+
+            <h3>Complete Training Script</h3>
+<pre><code>"""
+========================================================
+COMPLETE IMAGE CLASSIFICATION - ALL METHODS IN ONE SCRIPT
+========================================================
+
+Usage:
+    1. Organize your images in dataset/ folder structure
+    2. Run: python train_all_methods.py
+    3. Results comparison printed at the end
+
+Requirements: pip install -r requirements.txt
+"""
+
+import os
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+# ============================================
+# CONFIGURATION
+# ============================================
+DATASET_DIR = "dataset"        # Your dataset folder
+IMG_SIZE = 224                  # Input image size
+BATCH_SIZE = 32                # Batch size for training
+EPOCHS_CNN = 50                # Max epochs for CNN
+EPOCHS_TRANSFER = 20           # Max epochs for transfer learning
+NUM_CLASSES = None             # Auto-detected from folders
+
+# Detect number of classes
+NUM_CLASSES = len([d for d in os.listdir(f"{DATASET_DIR}/train") 
+                   if os.path.isdir(f"{DATASET_DIR}/train/{d}")])
+CLASS_NAMES = sorted([d for d in os.listdir(f"{DATASET_DIR}/train") 
+                      if os.path.isdir(f"{DATASET_DIR}/train/{d}")])
+print(f"Detected {NUM_CLASSES} classes: {CLASS_NAMES}")
+
+all_results = {}
+
+# ============================================
+# METHOD 1: TRADITIONAL ML
+# ============================================
+print("\n" + "="*70)
+print("METHOD 1: Traditional ML (SVM, Random Forest)")
+print("="*70)
+
+import cv2
+from skimage.feature import hog
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report
+
+def extract_features(image_path):
+    """Extract HOG + Color Histogram features from image."""
+    img = cv2.imread(image_path)
+    if img is None:
+        return None
+    img = cv2.resize(img, (128, 128))
+    
+    # HOG features
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    hog_feat = hog(gray, orientations=9, pixels_per_cell=(8,8),
+                   cells_per_block=(2,2), feature_vector=True)
+    
+    # Color histogram
+    color_feat = []
+    for ch in range(3):
+        hist = cv2.calcHist([img], [ch], None, [32], [0, 256]).flatten()
+        color_feat.extend(hist)
+    
+    return np.concatenate([hog_feat, np.array(color_feat)])
+
+def load_features(split_dir):
+    """Load all images from a split and extract features."""
+    X, y = [], []
+    for label_idx, class_name in enumerate(CLASS_NAMES):
+        class_dir = os.path.join(split_dir, class_name)
+        if not os.path.isdir(class_dir):
+            continue
+        for img_file in os.listdir(class_dir):
+            feat = extract_features(os.path.join(class_dir, img_file))
+            if feat is not None:
+                X.append(feat)
+                y.append(label_idx)
+    return np.array(X), np.array(y)
+
+print("Extracting features...")
+start = time.time()
+X_train, y_train = load_features(f"{DATASET_DIR}/train")
+X_test, y_test = load_features(f"{DATASET_DIR}/test")
+feat_time = time.time() - start
+print(f"Feature extraction: {feat_time:.1f}s | Train: {X_train.shape}, Test: {X_test.shape}")
+
+# Scale features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train models
+traditional_models = {
+    'SVM (RBF)': SVC(kernel='rbf', C=10, gamma='scale'),
+    'SVM (Linear)': SVC(kernel='linear', C=1),
+    'Random Forest': RandomForestClassifier(n_estimators=200, random_state=42),
+    'KNN (k=5)': KNeighborsClassifier(n_neighbors=5),
+}
+
+for name, model in traditional_models.items():
+    start = time.time()
+    model.fit(X_train_scaled, y_train)
+    train_time = time.time() - start
+    
+    y_pred = model.predict(X_test_scaled)
+    acc = accuracy_score(y_test, y_pred)
+    
+    all_results[name] = {'accuracy': acc, 'train_time': train_time + feat_time}
+    print(f"  {name:<20} Accuracy: {acc:.4f} | Time: {train_time:.1f}s")
+
+# ============================================
+# METHOD 2 & 3 & 4: DEEP LEARNING
+# ============================================
+print("\n" + "="*70)
+print("METHOD 2-4: Deep Learning (CNN, Transfer, Fine-Tune)")
+print("="*70)
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers, models, callbacks
+from tensorflow.keras.applications import EfficientNetB0, ResNet50, MobileNetV2
+
+# Data generators
+train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+    rescale=1./255, rotation_range=20, width_shift_range=0.2,
+    height_shift_range=0.2, horizontal_flip=True, zoom_range=0.2
+)
+val_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
+
+train_gen = train_datagen.flow_from_directory(
+    f'{DATASET_DIR}/train', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical'
+)
+val_gen = val_datagen.flow_from_directory(
+    f'{DATASET_DIR}/val', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical'
+)
+test_gen = val_datagen.flow_from_directory(
+    f'{DATASET_DIR}/test', target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode='categorical', shuffle=False
+)
+
+# --- Method 2: CNN from Scratch ---
+print("\nTraining CNN from Scratch...")
+start = time.time()
+
+cnn_model = models.Sequential([
+    layers.Conv2D(32, 3, padding='same', activation='relu', input_shape=(IMG_SIZE, IMG_SIZE, 3)),
+    layers.BatchNormalization(),
+    layers.MaxPooling2D(),
+    layers.Dropout(0.25),
+    
+    layers.Conv2D(64, 3, padding='same', activation='relu'),
+    layers.BatchNormalization(),
+    layers.MaxPooling2D(),
+    layers.Dropout(0.25),
+    
+    layers.Conv2D(128, 3, padding='same', activation='relu'),
+    layers.BatchNormalization(),
+    layers.MaxPooling2D(),
+    layers.Dropout(0.25),
+    
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(256, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(NUM_CLASSES, activation='softmax')
+])
+
+cnn_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+cnn_model.fit(train_gen, epochs=EPOCHS_CNN, validation_data=val_gen, verbose=0,
+              callbacks=[callbacks.EarlyStopping(patience=10, restore_best_weights=True)])
+
+cnn_acc = cnn_model.evaluate(test_gen, verbose=0)[1]
+cnn_time = time.time() - start
+all_results['CNN from Scratch'] = {'accuracy': cnn_acc, 'train_time': cnn_time}
+print(f"  CNN from Scratch:    Accuracy: {cnn_acc:.4f} | Time: {cnn_time:.1f}s")
+
+# --- Method 3: Transfer Learning (Frozen) ---
+print("\nTraining Transfer Learning (EfficientNetB0 Frozen)...")
+start = time.time()
+
+base = EfficientNetB0(weights='imagenet', include_top=False, input_shape=(IMG_SIZE, IMG_SIZE, 3))
+base.trainable = False
+
+transfer_model = models.Sequential([
+    base,
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(256, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(NUM_CLASSES, activation='softmax')
+])
+
+transfer_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+transfer_model.fit(train_gen, epochs=EPOCHS_TRANSFER, validation_data=val_gen, verbose=0,
+                   callbacks=[callbacks.EarlyStopping(patience=5, restore_best_weights=True)])
+
+transfer_acc = transfer_model.evaluate(test_gen, verbose=0)[1]
+transfer_time = time.time() - start
+all_results['Transfer Learning (Frozen)'] = {'accuracy': transfer_acc, 'train_time': transfer_time}
+print(f"  Transfer (Frozen):   Accuracy: {transfer_acc:.4f} | Time: {transfer_time:.1f}s")
+
+# --- Method 4: Fine-Tuning ---
+print("\nFine-tuning EfficientNetB0...")
+start = time.time()
+
+# Start from the transfer model, unfreeze top layers
+base.trainable = True
+for layer in base.layers[:int(len(base.layers) * 0.7)]:
+    layer.trainable = False
+
+transfer_model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-4),
+    loss='categorical_crossentropy', metrics=['accuracy']
+)
+transfer_model.fit(train_gen, epochs=EPOCHS_TRANSFER, validation_data=val_gen, verbose=0,
+                   callbacks=[callbacks.EarlyStopping(patience=7, restore_best_weights=True),
+                              callbacks.ReduceLROnPlateau(patience=3, factor=0.5)])
+
+finetune_acc = transfer_model.evaluate(test_gen, verbose=0)[1]
+finetune_time = time.time() - start
+all_results['Fine-Tuned EfficientNet'] = {'accuracy': finetune_acc, 'train_time': finetune_time}
+print(f"  Fine-Tuned:          Accuracy: {finetune_acc:.4f} | Time: {finetune_time:.1f}s")
+
+# Save best model
+transfer_model.save('best_model.keras')
+
+# ============================================
+# FINAL COMPARISON
+# ============================================
+print("\n\n" + "="*70)
+print("FINAL RESULTS COMPARISON")
+print("="*70)
+print(f"\n{'Method':<30} {'Accuracy':<12} {'Training Time'}")
+print("-"*60)
+for name, r in sorted(all_results.items(), key=lambda x: x[1]['accuracy'], reverse=True):
+    acc_pct = r['accuracy'] * 100
+    print(f"{name:<30} {acc_pct:<12.1f}% {r['train_time']:.1f}s")
+
+# Find winner
+winner = max(all_results.items(), key=lambda x: x[1]['accuracy'])
+print(f"\n🏆 BEST MODEL: {winner[0]} with {winner[1]['accuracy']*100:.1f}% accuracy")
+print(f"\n✅ Best model saved to: best_model.keras")
+print(f"   Use predict_image() function to classify new images.")</code></pre>
+
+            <div class="callout callout-success">
+                <strong>🎉 You're Done!</strong> Run the script above, and it will:
+                <ol>
+                    <li>Train all methods on your dataset</li>
+                    <li>Compare accuracy side by side</li>
+                    <li>Save the best model for you to use</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- QUICK REFERENCE -->
+        <div class="section">
+            <h2>Quick Reference: Which Method to Choose?</h2>
+            
+            <div class="concept-card">
+                <h4>Decision Tree</h4>
+                <pre style="background: transparent; color: var(--text); font-size: 0.9rem;">
+Do you have a GPU?
+├── NO → Use Traditional ML (Method 1)
+│        Best: SVM with HOG features
+│
+└── YES → How many images per class?
+          ├── < 100 → Transfer Learning Frozen (Method 3)
+          ├── 100-1000 → Fine-Tuning (Method 4) ← BEST FOR MOST CASES
+          └── > 1000 → Fine-Tuning (Method 4) or ViT (Method 5)
+                </pre>
+            </div>
+
+            <table>
+                <tr><th>Scenario</th><th>Recommended Method</th><th>Why</th></tr>
+                <tr><td>Quick prototype, no GPU</td><td>SVM + HOG</td><td>Fast, no GPU needed, decent results</td></tr>
+                <tr><td>Small dataset, need high accuracy</td><td>Fine-tuned EfficientNet</td><td>Pre-trained knowledge compensates for small data</td></tr>
+                <tr><td>Mobile/edge deployment</td><td>MobileNetV2 transfer</td><td>Small model, fast inference</td></tr>
+                <tr><td>Maximum accuracy, large dataset</td><td>ViT or EfficientNetB4 fine-tuned</td><td>State-of-the-art architectures</td></tr>
+                <tr><td>Learning/educational</td><td>CNN from scratch</td><td>Understand how neural networks work</td></tr>
+            </table>
+        </div>
+
+    </div><!-- /container -->
+
+    <script>
+        function toggleTheme() {
+            const body = document.documentElement;
+            const btn = document.querySelector('.theme-toggle');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                btn.textContent = '🌙 Dark';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                btn.textContent = '☀️ Light';
+            }
+        }
+    </script>
+</body>
+</html>

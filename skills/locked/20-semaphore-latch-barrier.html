@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semaphore, Latch &amp; Barrier - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Semaphore, Latch &amp; Barrier</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Semaphore, Latch &amp; Barrier</h1>
+                <p class="subtitle">Coordination primitives that control how many threads can access a resource (semaphore), wait for one-time events (latch), or synchronize at a meeting point (barrier).</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-pattern">Pattern</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">Three Real-World Analogies</div>
+                <p><strong>Semaphore (Parking Lot)</strong>: A parking lot with 5 spots. Cars enter if spots available, wait if full. Each car leaving frees one spot.</p>
+<p><strong>Latch (Starting Gate)</strong>: A race starting gate. All runners wait behind it. When the announcer fires the gun (count reaches zero), everyone runs. Gate never closes again.</p>
+<p><strong>Barrier (Meeting Point)</strong>: A hiking group agrees to wait at the summit for everyone. Nobody continues until ALL members arrive. Then everyone descends together.</p>
+            </div>
+
+
+            <h2>Semaphore: Limited Access</h2>
+<pre><code><span class="token-keyword">import</span> threading, time
+
+<span class="token-comment"># Semaphore(n) = allow up to n threads simultaneously</span>
+<span class="token-comment"># Mutex is just Semaphore(1)</span>
+connection_pool = threading.Semaphore(<span class="token-number">3</span>)  <span class="token-comment"># Max 3 DB connections</span>
+
+<span class="token-keyword">def</span> <span class="token-function">query_database</span>(thread_id):
+    <span class="token-keyword">with</span> connection_pool:  <span class="token-comment"># Only 3 threads here at once</span>
+        print(<span class="token-string">f"Thread {thread_id}: connected"</span>)
+        time.sleep(<span class="token-number">1</span>)  <span class="token-comment"># Simulate query</span>
+        print(<span class="token-string">f"Thread {thread_id}: done"</span>)
+
+<span class="token-comment"># 10 threads, but only 3 run concurrently</span>
+threads = [threading.Thread(target=query_database, args=(i,)) <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">10</span>)]
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.start()
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.join()</code></pre>
+
+            <h2>CountDownLatch: Wait for N Events</h2>
+<pre><code><span class="token-keyword">import</span> threading
+
+<span class="token-keyword">class</span> <span class="token-class">CountDownLatch</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, count):
+        self._count = count
+        self._lock = threading.Lock()
+        self._event = threading.Event()
+
+    <span class="token-keyword">def</span> <span class="token-function">count_down</span>(self):
+        <span class="token-keyword">with</span> self._lock:
+            self._count -= <span class="token-number">1</span>
+            <span class="token-keyword">if</span> self._count <= <span class="token-number">0</span>:
+                self._event.set()
+
+    <span class="token-keyword">def</span> <span class="token-function">wait</span>(self):
+        self._event.wait()
+
+<span class="token-comment"># Example: main thread waits for all workers to initialize</span>
+latch = CountDownLatch(<span class="token-number">3</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">service</span>(name):
+    time.sleep(<span class="token-number">1</span>)  <span class="token-comment"># Initialize</span>
+    print(<span class="token-string">f"{name} ready!"</span>)
+    latch.count_down()  <span class="token-comment"># Signal "I'm ready"</span>
+
+<span class="token-keyword">for</span> name <span class="token-keyword">in</span> [<span class="token-string">"DB"</span>, <span class="token-string">"Cache"</span>, <span class="token-string">"Queue"</span>]:
+    threading.Thread(target=service, args=(name,)).start()
+
+latch.wait()  <span class="token-comment"># Block until all 3 services ready</span>
+print(<span class="token-string">"All services initialized! Starting server..."</span>)</code></pre>
+
+            <h2>Barrier: Everyone Waits for Everyone</h2>
+<pre><code><span class="token-keyword">import</span> threading
+
+<span class="token-comment"># Built-in Python barrier</span>
+barrier = threading.Barrier(<span class="token-number">4</span>)  <span class="token-comment"># Wait for 4 threads</span>
+
+<span class="token-keyword">def</span> <span class="token-function">parallel_phase</span>(thread_id):
+    <span class="token-comment"># Phase 1: each thread does independent work</span>
+    print(<span class="token-string">f"T{thread_id}: Phase 1 (computing...)"</span>)
+    time.sleep(thread_id * <span class="token-number">0.5</span>)
+
+    <span class="token-comment"># BARRIER: wait for ALL threads to finish Phase 1</span>
+    barrier.wait()  <span class="token-comment"># Blocks until all 4 arrive</span>
+
+    <span class="token-comment"># Phase 2: everyone proceeds together</span>
+    print(<span class="token-string">f"T{thread_id}: Phase 2 (all synchronized!)"</span>)
+
+threads = [threading.Thread(target=parallel_phase, args=(i,)) <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">4</span>)]
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.start()
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.join()</code></pre>
+
+            <h2>Comparison</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Primitive</th><th>Purpose</th><th>Reusable?</th><th>Who waits?</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Semaphore</strong></td><td>Limit concurrent access to N</td><td>Yes</td><td>Thread trying to acquire when count=0</td></tr>
+                    <tr><td><strong>Latch</strong></td><td>Wait for N events to happen</td><td>No (one-shot)</td><td>Threads calling wait()</td></tr>
+                    <tr><td><strong>Barrier</strong></td><td>Synchronize N threads at a point</td><td>Yes (resets)</td><td>All threads until last arrives</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>Industry Usage</h4>
+                <ul>
+                    <li><strong>Connection pooling</strong> — Semaphore limits concurrent DB/HTTP connections</li>
+                    <li><strong>Rate limiting</strong> — Semaphore controls requests per second</li>
+                    <li><strong>MapReduce</strong> — Barrier at end of map phase; all mappers finish before reduce starts</li>
+                    <li><strong>Microservice startup</strong> — Latch: wait for all dependencies before accepting traffic</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>Semaphore(N): allow up to N threads concurrently (generalized mutex)</li>
+<li>CountDownLatch: block until N events occur (one-shot, not reusable)</li>
+<li>Barrier: all N threads wait until the last one arrives, then all proceed</li>
+<li>Semaphore for resource limiting, latch for startup coordination, barrier for phase sync</li>
+<li>Python has built-in Semaphore and Barrier; CountDownLatch needs custom implementation</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">SEMAPHORE(3):
+    [T1 in] [T2 in] [T3 in] | T4 waits | T5 waits
+    T1 exits → T4 enters
+    Always max 3 inside.
+
+LATCH(3):
+    Count: 3 → 2 → 1 → 0 → [OPEN!]
+    All waiters released. Cannot close again.
+
+BARRIER(4):
+    T1 arrives → wait
+    T2 arrives → wait
+    T3 arrives → wait
+    T4 arrives → ALL GO! (last one triggers release)</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Semaphore release without acquire</strong> — Increases count beyond max! Always pair acquire/release.</li>
+<li><strong>Barrier with wrong count</strong> — If count is 5 but only 4 threads call wait(), hangs forever.</li>
+<li><strong>Using latch when barrier needed</strong> — Latch is one-shot. For repeated synchronization, use barrier.</li>
+<li><strong>Not handling BrokenBarrierError</strong> — If one thread crashes at barrier, others get this exception.</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Use Semaphore(3) to limit concurrent file downloads to 3 at a time out of 20.</li>
+<li>Implement CountDownLatch: main waits for 5 worker threads to finish initialization.</li>
+<li>Use Barrier for parallel matrix computation: each thread computes its portion, barrier syncs, then next phase.</li>
+<li>Combine: Semaphore for resource limits + Barrier for phase synchronization in a pipeline.</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="19-read-write-locks.html" class="prev">Read-Write Locks</a>
+                <a href="21-cap-theorem.html" class="next">CAP Theorem</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

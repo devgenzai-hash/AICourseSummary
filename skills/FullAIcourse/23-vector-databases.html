@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector Databases — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 6</a> <span>›</span> Vector Databases</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Vector Databases</h1>
+                <p>Where do you store millions of embeddings so you can search them in milliseconds? Vector databases. The backbone of every RAG system and semantic search application.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Regular database = a library card catalog.</strong> Search by title, author, ISBN — exact matches only. Ask for "books about feeling lost in life" and it returns nothing.</p>
+                <p><strong>Vector database = a librarian who understands meaning.</strong> Ask for "books about feeling lost in life" and they hand you "The Alchemist", "Into the Wild", and "Siddhartha" — because they understand the MEANING, not just keywords.</p>
+            </div>
+
+            <h2 id="options">Popular Vector Databases</h2>
+
+            <table>
+                <thead><tr><th>Database</th><th>Type</th><th>Best For</th><th>Max Scale</th><th>Price</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>ChromaDB</strong></td><td>Embedded</td><td>Prototyping, small apps</td><td>~1M vectors</td><td>Free (open source)</td></tr>
+                    <tr><td><strong>Qdrant</strong></td><td>Self-hosted/Cloud</td><td>Production, filtering</td><td>Billions</td><td>Free self-hosted / Cloud pricing</td></tr>
+                    <tr><td><strong>Pinecone</strong></td><td>Cloud only</td><td>Managed, zero-ops</td><td>Billions</td><td>Free tier / $70+/mo</td></tr>
+                    <tr><td><strong>Weaviate</strong></td><td>Self-hosted/Cloud</td><td>Multi-modal, hybrid search</td><td>Billions</td><td>Free self-hosted / Cloud</td></tr>
+                    <tr><td><strong>Milvus</strong></td><td>Self-hosted/Cloud</td><td>Enterprise scale</td><td>Trillions</td><td>Free (open source)</td></tr>
+                    <tr><td><strong>pgvector</strong></td><td>PostgreSQL extension</td><td>Already using Postgres</td><td>~10M vectors</td><td>Free</td></tr>
+                    <tr><td><strong>FAISS</strong></td><td>Library (in-memory)</td><td>Research, benchmarks</td><td>~100M vectors</td><td>Free (Meta)</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="chromadb">ChromaDB (Best for Starting)</h2>
+
+            <pre><code><span class="token-comment"># pip install chromadb</span>
+<span class="token-keyword">import</span> chromadb
+<span class="token-keyword">from</span> chromadb.utils <span class="token-keyword">import</span> embedding_functions
+
+<span class="token-comment"># Create persistent database</span>
+client = chromadb.PersistentClient(path=<span class="token-string">"./my_vector_db"</span>)
+
+<span class="token-comment"># Use a sentence-transformer for embeddings</span>
+embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name=<span class="token-string">"all-MiniLM-L6-v2"</span>
+)
+
+<span class="token-comment"># Create a collection</span>
+collection = client.get_or_create_collection(
+    name=<span class="token-string">"knowledge_base"</span>,
+    embedding_function=embedding_fn,
+    metadata={<span class="token-string">"hnsw:space"</span>: <span class="token-string">"cosine"</span>}  <span class="token-comment"># cosine similarity</span>
+)
+
+<span class="token-comment"># Add documents (embeddings generated automatically)</span>
+collection.add(
+    ids=[<span class="token-string">"doc1"</span>, <span class="token-string">"doc2"</span>, <span class="token-string">"doc3"</span>, <span class="token-string">"doc4"</span>],
+    documents=[
+        <span class="token-string">"Python is a programming language known for readability"</span>,
+        <span class="token-string">"JavaScript runs in web browsers and Node.js"</span>,
+        <span class="token-string">"Rust provides memory safety without garbage collection"</span>,
+        <span class="token-string">"Go was created by Google for concurrent programming"</span>,
+    ],
+    metadatas=[
+        {<span class="token-string">"category"</span>: <span class="token-string">"python"</span>, <span class="token-string">"year"</span>: <span class="token-number">1991</span>},
+        {<span class="token-string">"category"</span>: <span class="token-string">"javascript"</span>, <span class="token-string">"year"</span>: <span class="token-number">1995</span>},
+        {<span class="token-string">"category"</span>: <span class="token-string">"rust"</span>, <span class="token-string">"year"</span>: <span class="token-number">2015</span>},
+        {<span class="token-string">"category"</span>: <span class="token-string">"go"</span>, <span class="token-string">"year"</span>: <span class="token-number">2009</span>},
+    ]
+)
+
+<span class="token-comment"># Semantic search</span>
+results = collection.query(
+    query_texts=[<span class="token-string">"What language is best for beginners?"</span>],
+    n_results=<span class="token-number">2</span>,
+)
+<span class="token-builtin">print</span>(results[<span class="token-string">"documents"</span>])  <span class="token-comment"># Returns Python and Go (readable/simple)</span>
+
+<span class="token-comment"># Filter by metadata</span>
+results = collection.query(
+    query_texts=[<span class="token-string">"fast systems programming"</span>],
+    n_results=<span class="token-number">2</span>,
+    where={<span class="token-string">"year"</span>: {<span class="token-string">"$gte"</span>: <span class="token-number">2010</span>}},  <span class="token-comment"># Only modern languages</span>
+)
+<span class="token-builtin">print</span>(results[<span class="token-string">"documents"</span>])  <span class="token-comment"># Returns Rust</span></code></pre>
+
+            <h2 id="qdrant">Qdrant (Best for Production)</h2>
+
+            <pre><code><span class="token-comment"># pip install qdrant-client</span>
+<span class="token-comment"># Docker: docker run -p 6333:6333 qdrant/qdrant</span>
+<span class="token-keyword">from</span> qdrant_client <span class="token-keyword">import</span> QdrantClient
+<span class="token-keyword">from</span> qdrant_client.models <span class="token-keyword">import</span> Distance, VectorParams, PointStruct
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> SentenceTransformer
+
+<span class="token-comment"># Connect</span>
+client = QdrantClient(url=<span class="token-string">"http://localhost:6333"</span>)
+embedder = SentenceTransformer(<span class="token-string">"all-MiniLM-L6-v2"</span>)
+
+<span class="token-comment"># Create collection</span>
+client.create_collection(
+    collection_name=<span class="token-string">"docs"</span>,
+    vectors_config=VectorParams(
+        size=<span class="token-number">384</span>,  <span class="token-comment"># Embedding dimension (depends on model)</span>
+        distance=Distance.COSINE,
+    ),
+)
+
+<span class="token-comment"># Add documents</span>
+documents = [
+    <span class="token-string">"Our API rate limit is 100 requests per minute"</span>,
+    <span class="token-string">"Authentication uses JWT tokens with 24-hour expiry"</span>,
+    <span class="token-string">"Database backups run every 6 hours"</span>,
+]
+embeddings = embedder.encode(documents)
+
+client.upsert(
+    collection_name=<span class="token-string">"docs"</span>,
+    points=[
+        PointStruct(id=i, vector=emb.tolist(), payload={<span class="token-string">"text"</span>: doc, <span class="token-string">"source"</span>: <span class="token-string">"api_docs"</span>})
+        <span class="token-keyword">for</span> i, (doc, emb) <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(<span class="token-builtin">zip</span>(documents, embeddings))
+    ]
+)
+
+<span class="token-comment"># Search</span>
+query = <span class="token-string">"How often can I call the API?"</span>
+query_vector = embedder.encode(query).tolist()
+
+results = client.search(
+    collection_name=<span class="token-string">"docs"</span>,
+    query_vector=query_vector,
+    limit=<span class="token-number">3</span>,
+)
+<span class="token-keyword">for</span> result <span class="token-keyword">in</span> results:
+    <span class="token-builtin">print</span>(<span class="token-string">f"Score: {result.score:.3f} | {result.payload['text']}"</span>)</code></pre>
+
+            <h2 id="pgvector">pgvector (PostgreSQL Extension)</h2>
+
+            <pre><code><span class="token-comment"># If you're already using PostgreSQL, pgvector is the simplest addition</span>
+<span class="token-comment"># pip install psycopg2-binary pgvector</span>
+<span class="token-keyword">import</span> psycopg2
+<span class="token-keyword">from</span> pgvector.psycopg2 <span class="token-keyword">import</span> register_vector
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+
+<span class="token-comment"># Connect to PostgreSQL</span>
+conn = psycopg2.connect(<span class="token-string">"postgresql://localhost/mydb"</span>)
+register_vector(conn)
+
+<span class="token-comment"># Create table with vector column</span>
+cur = conn.cursor()
+cur.execute(<span class="token-string">"""
+    CREATE EXTENSION IF NOT EXISTS vector;
+    CREATE TABLE IF NOT EXISTS documents (
+        id SERIAL PRIMARY KEY,
+        content TEXT,
+        embedding vector(384),  -- 384-dim embeddings
+        metadata JSONB
+    );
+    CREATE INDEX ON documents USING ivfflat (embedding vector_cosine_ops);
+"""</span>)
+
+<span class="token-comment"># Insert with embedding</span>
+embedding = embedder.encode(<span class="token-string">"Your document text here"</span>)
+cur.execute(
+    <span class="token-string">"INSERT INTO documents (content, embedding, metadata) VALUES (%s, %s, %s)"</span>,
+    (<span class="token-string">"Your document text here"</span>, embedding.tolist(), <span class="token-string">'{"source": "manual"}'</span>)
+)
+
+<span class="token-comment"># Semantic search with SQL!</span>
+query_embedding = embedder.encode(<span class="token-string">"how to authenticate"</span>)
+cur.execute(<span class="token-string">"""
+    SELECT content, 1 - (embedding <=> %s::vector) AS similarity
+    FROM documents
+    ORDER BY embedding <=> %s::vector
+    LIMIT 5
+"""</span>, (query_embedding.tolist(), query_embedding.tolist()))
+
+<span class="token-keyword">for</span> row <span class="token-keyword">in</span> cur.fetchall():
+    <span class="token-builtin">print</span>(<span class="token-string">f"Similarity: {row[1]:.3f} | {row[0][:80]}"</span>)
+
+conn.commit()</code></pre>
+
+            <div class="comparison-table">
+                <h3>Choosing the Right Vector DB:</h3>
+                <table>
+                    <thead><tr><th>Scenario</th><th>Recommendation</th><th>Why</th></tr></thead>
+                    <tbody>
+                        <tr><td>Learning/prototyping</td><td><strong>ChromaDB</strong></td><td>Zero setup, embedded, great docs</td></tr>
+                        <tr><td>Small production app</td><td><strong>pgvector</strong></td><td>Already have Postgres, no new infra</td></tr>
+                        <tr><td>Serious production</td><td><strong>Qdrant</strong></td><td>Fast, great filtering, easy to scale</td></tr>
+                        <tr><td>Managed, zero-ops</td><td><strong>Pinecone</strong></td><td>No infrastructure to manage, just works</td></tr>
+                        <tr><td>Enterprise scale (billions)</td><td><strong>Milvus / Weaviate</strong></td><td>Proven at massive scale</td></tr>
+                        <tr><td>In-memory, research</td><td><strong>FAISS</strong></td><td>Fastest search, no network overhead</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>ChromaDB for prototypes, Qdrant/Pinecone for production</strong> — Start simple, scale when needed.</li>
+                    <li><strong>pgvector if you're already on Postgres</strong> — Avoids adding new infrastructure.</li>
+                    <li><strong>Always store metadata with vectors</strong> — Source, timestamp, category — enables filtering.</li>
+                    <li><strong>Cosine similarity is the default</strong> — Works well for normalized embeddings (most embedding models).</li>
+                    <li><strong>HNSW index for fast search</strong> — All modern vector DBs use HNSW (Hierarchical Navigable Small World).</li>
+                    <li><strong>Embedding model matters more than DB choice</strong> — A better embedding model improves results more than switching databases.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Vector databases</strong> store embeddings and enable fast semantic search</li>
+                    <li><strong>ChromaDB</strong> = easiest to start, embedded, great for learning</li>
+                    <li><strong>Qdrant</strong> = best open-source for production (fast, filtering, scalable)</li>
+                    <li><strong>pgvector</strong> = add vector search to existing PostgreSQL</li>
+                    <li><strong>Pinecone</strong> = fully managed, zero infrastructure</li>
+                    <li>All support: add vectors, semantic search, metadata filtering</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Different embedding models for indexing vs search</strong> — You MUST use the same model for both!</li>
+                    <li><strong>Not persisting the database</strong> — Use PersistentClient (ChromaDB) or a proper server (Qdrant).</li>
+                    <li><strong>Over-engineering for small data</strong> — Under 10K documents? ChromaDB or even FAISS in-memory is fine.</li>
+                    <li><strong>Ignoring metadata filters</strong> — "Find docs about auth from last 30 days" is much more useful than just semantic search.</li>
+                    <li><strong>Not benchmarking retrieval quality</strong> — Create a test set of queries + expected results. Measure precision/recall.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build a Vector Search</h4>
+                <ol>
+                    <li>Create a ChromaDB collection and add 20+ document chunks</li>
+                    <li>Test semantic search with 5 different queries</li>
+                    <li>Add metadata and use filters in your search</li>
+                    <li>Try Qdrant with Docker: <code>docker run -p 6333:6333 qdrant/qdrant</code></li>
+                    <li>Compare search results between ChromaDB and Qdrant (should be similar)</li>
+                    <li><strong>Bonus:</strong> Set up pgvector and do semantic search with SQL</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="22-rag-fundamentals.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">RAG Fundamentals</span>
+                </a>
+                <a href="24-ai-memory-systems.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">AI Memory Systems</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

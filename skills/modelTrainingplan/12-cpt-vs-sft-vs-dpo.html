@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPT vs SFT vs DPO — Complete Comparison — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+            <li><a href="12-cpt-vs-sft-vs-dpo.html"><span class="nav-number">★</span> CPT vs SFT vs DPO</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> CPT vs SFT vs DPO</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>CPT vs SFT vs DPO — Complete Deep Dive Comparison</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Understanding the fundamental differences between all three training stages — what each does, why it exists, what data it needs, what happens when you skip it, and how they perform individually vs together.</p>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: THE ANALOGY -->
+            <!-- ============================================ -->
+            <h2 id="analogy">🎓 The University Analogy (Non-Technical)</h2>
+            
+            <p>Think of training an AI model like educating a student:</p>
+            
+            <table>
+                <thead>
+                    <tr><th>Stage</th><th>University Analogy</th><th>What Happens</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Base Model (Pre-trained)</strong></td>
+                        <td>A brilliant student who has read millions of books in many languages</td>
+                        <td>Knows general knowledge, grammar, facts — but hasn't specialized</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPT (Continued Pre-Training)</strong></td>
+                        <td>Sending the student to study Sanskrit texts in a library for 6 months</td>
+                        <td>Absorbs domain knowledge — can now complete sentences about scriptures</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SFT (Supervised Fine-Tuning)</strong></td>
+                        <td>Having a tutor teach them how to answer questions and explain concepts</td>
+                        <td>Learns the FORMAT of helpful responses — question→answer pattern</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DPO (Preference Alignment)</strong></td>
+                        <td>A panel of experts grading their answers: "This answer is better than that one"</td>
+                        <td>Learns WHICH responses are better — accuracy, depth, tone refinement</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔑 Key Insight</div>
+                <p><strong>CPT = Knowledge</strong> (what does the model know?)<br>
+                <strong>SFT = Behavior</strong> (how does it respond?)<br>
+                <strong>DPO = Quality</strong> (how good are its responses?)</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: FUNDAMENTAL DIFFERENCES -->
+            <!-- ============================================ -->
+            <h2 id="fundamental">🔬 Fundamental Technical Differences</h2>
+
+            <h3>What Each Stage Optimizes</h3>
+            <table>
+                <thead>
+                    <tr><th>Aspect</th><th>CPT</th><th>SFT</th><th>DPO</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Objective Function</strong></td>
+                        <td>Next token prediction on raw text</td>
+                        <td>Next token prediction on assistant responses only</td>
+                        <td>Preference optimization (chosen vs rejected)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>What It Learns</strong></td>
+                        <td>Domain vocabulary, concepts, patterns, facts</td>
+                        <td>How to format responses, follow instructions</td>
+                        <td>Which responses are better quality</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Loss Function</strong></td>
+                        <td>Cross-entropy on ALL tokens</td>
+                        <td>Cross-entropy on ASSISTANT tokens only</td>
+                        <td>DPO loss: log-probability ratio of chosen vs rejected</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Analogy</strong></td>
+                        <td>Reading a textbook cover-to-cover</td>
+                        <td>Practicing answering exam questions</td>
+                        <td>Getting feedback on which answers scored higher</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Changes to Model</strong></td>
+                        <td>Internal representations, embeddings, knowledge</td>
+                        <td>Output distribution — how it structures responses</td>
+                        <td>Fine-grained preference between response styles</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>The Mathematical Difference</h3>
+            <pre><code># ============================================
+# CPT Loss: Predict every next token
+# ============================================
+# Input:  "The Bhagavad Gita teaches that karma yoga..."
+# Loss on: [The] [Bhagavad] [Gita] [teaches] [that] [karma] [yoga] ...
+#           ↑      ↑          ↑       ↑         ↑       ↑       ↑
+#      ALL tokens contribute to the loss
+
+L_CPT = -1/N × Σ log P(token_i | token_1, ..., token_{i-1})
+
+
+# ============================================
+# SFT Loss: Only predict assistant's response
+# ============================================
+# Input:  [System: You are a scholar] [User: What is karma?] [Assistant: Karma means...]
+# Loss on: [ignored]                   [ignored]              [Karma] [means] [...]
+#                                                               ↑       ↑       ↑
+#                                                         ONLY assistant tokens
+
+L_SFT = -1/M × Σ log P(assistant_token_j | all_previous_tokens)
+# Where M = number of assistant tokens only
+
+
+# ============================================
+# DPO Loss: Compare chosen vs rejected
+# ============================================
+# Input: Prompt + Chosen response + Rejected response
+# The model learns: P(chosen) should be HIGHER than P(rejected)
+
+L_DPO = -log σ(β × [log π_θ(y_chosen|x)/π_ref(y_chosen|x) 
+                    - log π_θ(y_rejected|x)/π_ref(y_rejected|x)])
+
+# Where:
+#   π_θ = our model being trained
+#   π_ref = frozen reference model (model before DPO)
+#   β = controls how much deviation is allowed
+#   σ = sigmoid function</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: DATASET FORMATS -->
+            <!-- ============================================ -->
+            <h2 id="datasets">📊 Dataset Format Comparison</h2>
+
+            <h3>CPT Dataset Format</h3>
+            <pre><code># CPT format: Just raw text. No structure. No questions or answers.
+# The model reads it like reading a book.
+
+# Example 1: Plain scripture text
+{"text": "अथातो धर्मजिज्ञासा। The Bhagavad Gita, composed as part of the Mahabharata, presents a dialogue between Prince Arjuna and Lord Krishna on the battlefield of Kurukshetra. The text addresses fundamental questions about duty (dharma), action (karma), knowledge (jnana), and devotion (bhakti). In Chapter 2, Verse 47, Krishna instructs: कर्मण्येवाधिकारस्ते मा फलेषु कदाचन। मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥ This verse establishes the foundation of Karma Yoga..."}
+
+# Example 2: Commentary text
+{"text": "Shankaracharya's commentary on the Mandukya Upanishad explains the four states of consciousness: Vaishvanara (waking), Taijasa (dreaming), Prajna (deep sleep), and Turiya (the fourth, transcendent state). The Mandukya Karika by Gaudapada further elaborates..."}
+
+# Example 3: Philosophical discourse
+{"text": "सांख्यदर्शन के अनुसार प्रकृति और पुरुष दो मूल तत्व हैं। प्रकृति जड़ है किन्तु सक्रिय है, जबकि पुरुष चेतन है किन्तु निष्क्रिय है। इन दोनों के संयोग से सृष्टि होती है..."}</code></pre>
+
+            <h3>SFT Dataset Format</h3>
+            <pre><code># SFT format: Structured conversations with clear roles.
+# System prompt + User question + Assistant answer.
+
+# Example 1: Simple Q&A
+{
+    "messages": [
+        {"role": "system", "content": "You are a Hindu scripture scholar."},
+        {"role": "user", "content": "What is the meaning of Bhagavad Gita 2.47?"},
+        {"role": "assistant", "content": "Bhagavad Gita 2.47 (कर्मण्येवाधिकारस्ते मा फलेषु कदाचन) means: 'You have the right to perform your duty, but you are not entitled to the fruits of your actions.' This is the foundational verse of Karma Yoga. Krishna teaches Arjuna that one should focus on righteous action without attachment to outcomes..."}
+    ]
+}
+
+# Example 2: Multi-turn conversation
+{
+    "messages": [
+        {"role": "system", "content": "You are a Hindu scripture scholar."},
+        {"role": "user", "content": "What are the Upanishads?"},
+        {"role": "assistant", "content": "The Upanishads are philosophical texts that form the concluding part of the Vedas (hence called Vedanta). There are traditionally 108 Upanishads, with 10-13 considered principal (Mukhya)..."},
+        {"role": "user", "content": "Which are the most important ones?"},
+        {"role": "assistant", "content": "The principal Upanishads commented upon by Shankaracharya are: 1. Isha, 2. Kena, 3. Katha, 4. Prashna, 5. Mundaka, 6. Mandukya, 7. Taittiriya, 8. Aitareya, 9. Chandogya, 10. Brihadaranyaka..."}
+    ]
+}
+
+# Example 3: Hindi instruction
+{
+    "messages": [
+        {"role": "system", "content": "आप हिंदू शास्त्रों के विद्वान हैं।"},
+        {"role": "user", "content": "योग के आठ अंग क्या हैं?"},
+        {"role": "assistant", "content": "पतंजलि के योगसूत्र (2.29) में अष्टांग योग का वर्णन है:\n1. यम - सामाजिक अनुशासन\n2. नियम - व्यक्तिगत अनुशासन\n3. आसन - शारीरिक मुद्राएँ\n4. प्राणायाम - श्वास नियंत्रण\n5. प्रत्याहार - इन्द्रिय निग्रह\n6. धारणा - एकाग्रता\n7. ध्यान - ध्यान\n8. समाधि - परम चेतना"}
+    ]
+}</code></pre>
+
+            <h3>DPO Dataset Format</h3>
+            <pre><code># DPO format: Same prompt with TWO responses — one better (chosen), one worse (rejected).
+# The model learns to prefer the chosen style over the rejected style.
+
+# Example 1: Accuracy preference
+{
+    "prompt": [
+        {"role": "system", "content": "You are a Hindu scripture scholar."},
+        {"role": "user", "content": "Who spoke the Bhagavad Gita?"}
+    ],
+    "chosen": [
+        {"role": "assistant", "content": "The Bhagavad Gita is primarily spoken by Lord Krishna (श्रीकृष्ण) to Arjuna on the battlefield of Kurukshetra. However, the text has multiple narrators:\n\n1. **Sanjaya** narrates the dialogue to King Dhritarashtra (frame narrative)\n2. **Krishna** speaks most of the verses (574 out of 700)\n3. **Arjuna** asks questions and speaks some verses\n4. **Dhritarashtra** speaks the opening verse\n\nThe Gita is found in the Bhishma Parva (Book 6) of the Mahabharata, chapters 25-42."}
+    ],
+    "rejected": [
+        {"role": "assistant", "content": "The Bhagavad Gita was spoken by Krishna to Arjuna before a big battle. It's a holy book of Hinduism."}
+    ]
+}
+
+# Example 2: Depth preference
+{
+    "prompt": [
+        {"role": "system", "content": "You are a Hindu scripture scholar."},
+        {"role": "user", "content": "What is Maya?"}
+    ],
+    "chosen": [
+        {"role": "assistant", "content": "Maya (माया) is one of the most complex concepts in Hindu philosophy, understood differently across schools:\n\n**Advaita Vedanta (Shankara):**\nMaya is the cosmic illusion that makes the one Brahman appear as the manifold world. It is neither real (sat) nor unreal (asat) — it is 'mithya' (apparently real). Shankara uses the rope-snake analogy: just as a rope is mistaken for a snake in darkness, Brahman is mistaken for the world due to Maya.\n\nमूल श्लोक (Vivekachudamani 108):\n*ब्रह्म सत्यं जगन्मिथ्या जीवो ब्रह्मैव नापरः*\n\n**Vishishtadvaita (Ramanuja):**\nMaya is not illusion but the REAL creative power (shakti) of God. The world is real — it is the body of Brahman.\n\n**Dvaita (Madhva):**\nMaya is the Lord's power of creation, not illusion. The world is genuinely real and distinct from God.\n\n**In the Gita (7.14):**\n*दैवी ह्येषा गुणमयी मम माया दुरत्यया*\n'This divine Maya of Mine, consisting of the three gunas, is difficult to overcome.'"}
+    ],
+    "rejected": [
+        {"role": "assistant", "content": "Maya means illusion in Hinduism. It refers to the idea that the world is not real. Hindus believe that everything we see is Maya and only Brahman is real. This concept is central to Hindu philosophy and is discussed in many texts."}
+    ]
+}
+
+# Example 3: Respectfulness preference
+{
+    "prompt": [
+        {"role": "system", "content": "You are a Hindu scripture scholar."},
+        {"role": "user", "content": "Are Hindu gods just myths?"}
+    ],
+    "chosen": [
+        {"role": "assistant", "content": "This is a question that involves different perspectives and frameworks of understanding:\n\n**Within the tradition:** Hindu deities are understood as real manifestations of the divine. The Puranas describe them as actual beings, while Vedantic philosophy sees them as aspects of the one Brahman. For millions of practitioners, these are living presences in their spiritual lives.\n\n**Scholarly perspective:** Historians of religion study these narratives as sacred literature that encodes deep philosophical truths, cultural values, and psychological insights. The stories function as teaching vehicles (upadesha).\n\n**The Hindu philosophical view itself is nuanced:**\n- Nirguna Brahman (formless absolute) is beyond all names and forms\n- Saguna Brahman (with attributes) manifests as various deities for the benefit of devotees\n- This is not 'myth vs reality' but different levels of truth (paramarthika vs vyavaharika)\n\nThe Rig Veda itself says (1.164.46): *एकं सद्विप्रा बहुधा वदन्ति* — 'Truth is one; the wise call it by many names.'"}
+    ],
+    "rejected": [
+        {"role": "assistant", "content": "Hindu gods are mythological figures from ancient stories. Like Greek or Norse mythology, they are fictional characters created by ancient people to explain natural phenomena before science existed. Modern scholars consider them myths, though some Hindus still believe in them."}
+    ]
+}</code></pre>
+
+            <h3>Format Comparison Summary</h3>
+            <table>
+                <thead>
+                    <tr><th>Aspect</th><th>CPT</th><th>SFT</th><th>DPO</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Structure</strong></td>
+                        <td>Flat text only</td>
+                        <td>Messages array (system/user/assistant)</td>
+                        <td>Prompt + chosen + rejected messages</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Minimum fields</strong></td>
+                        <td><code>{"text": "..."}</code></td>
+                        <td><code>{"messages": [...]}</code></td>
+                        <td><code>{"prompt": [...], "chosen": [...], "rejected": [...]}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Roles used</strong></td>
+                        <td>None (no roles)</td>
+                        <td>system, user, assistant</td>
+                        <td>system, user, assistant (in all three fields)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Typical example length</strong></td>
+                        <td>512-4096 tokens</td>
+                        <td>200-2000 tokens</td>
+                        <td>400-3000 tokens (prompt + both responses)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quality requirement</strong></td>
+                        <td>Medium (can be raw scraped text)</td>
+                        <td>High (correct answers needed)</td>
+                        <td>Very High (clear quality difference between pairs)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Creation difficulty</strong></td>
+                        <td>Easy (just collect text)</td>
+                        <td>Medium (need Q&A pairs)</td>
+                        <td>Hard (need comparative judgments)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: DATA REQUIREMENTS -->
+            <!-- ============================================ -->
+            <h2 id="data-requirements">📈 Data Requirements</h2>
+
+            <table>
+                <thead>
+                    <tr><th>Metric</th><th>CPT</th><th>SFT</th><th>DPO</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Minimum viable</strong></td>
+                        <td>100 MB raw text</td>
+                        <td>1,000 conversations</td>
+                        <td>1,000 preference pairs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recommended</strong></td>
+                        <td>1-5 GB raw text</td>
+                        <td>10,000-50,000 conversations</td>
+                        <td>5,000-20,000 preference pairs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ideal</strong></td>
+                        <td>10+ GB raw text</td>
+                        <td>100,000+ conversations</td>
+                        <td>50,000+ preference pairs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cost to create</strong></td>
+                        <td>$0-50 (scraping + OCR)</td>
+                        <td>$50-500 (API generation)</td>
+                        <td>$200-2000 (expert annotation)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Source</strong></td>
+                        <td>Books, PDFs, websites, scraped text</td>
+                        <td>Generated by GPT-4, human-written, or Self-Instruct</td>
+                        <td>Human annotators, model-as-judge, contrastive generation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Languages needed</strong></td>
+                        <td>Sanskrit, Hindi, English (whatever the model will specialize in)</td>
+                        <td>Same languages as target usage</td>
+                        <td>Same languages as target usage</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: WHAT EACH STAGE DOES TO THE MODEL -->
+            <!-- ============================================ -->
+            <h2 id="what-changes">🧠 What Each Stage Changes Inside the Model</h2>
+
+            <h3>CPT: Changes the Model's Knowledge</h3>
+            <pre><code># BEFORE CPT: Ask the model about a specific verse
+# Model: "I'm not sure about the exact Sanskrit text..." (vague, generic)
+
+# AFTER CPT: Same question
+# Model: "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन..." (knows the actual content)
+
+# What changed internally:
+# - Token embeddings for Sanskrit/Hindi words are now more meaningful
+# - Attention patterns recognize scripture-specific patterns
+# - MLP layers encode factual relationships (which verse is in which chapter)
+# - The model's "world model" now includes scripture domain knowledge</code></pre>
+
+            <h3>SFT: Changes the Model's Behavior</h3>
+            <pre><code># BEFORE SFT (after CPT): Give it a question
+# Input: "What is dharma?"
+# Model: "dharma is a concept in hinduism and buddhism that refers to the cosmic order
+#          and individual duty the word comes from the root dhr meaning to hold..." 
+#          (rambling, no structure, doesn't stop, no formatting)
+
+# AFTER SFT: Same question
+# Model: "Dharma (धर्म) has multiple interconnected meanings in Hindu philosophy:
+#          
+#          1. **Cosmic Order (Rta)** — The underlying principle that maintains...
+#          2. **Individual Duty (Svadharma)** — One's personal obligations based on...
+#          3. **Righteousness** — Moral and ethical conduct...
+#          
+#          The Bhagavad Gita (18.66) emphasizes..."
+#          (structured, helpful, proper formatting, knows when to stop)
+
+# What changed internally:
+# - Output distribution shifted toward structured response patterns
+# - Model learned to START responses helpfully (not with filler)
+# - Model learned to STOP at appropriate points
+# - Attention now prioritizes the user's question when generating</code></pre>
+
+            <h3>DPO: Changes the Model's Quality Judgment</h3>
+            <pre><code># BEFORE DPO (after SFT): Ask a nuanced question
+# Model: "Advaita Vedanta says the world is an illusion (maya). Brahman is the 
+#          only reality." (correct but oversimplified, only one perspective)
+
+# AFTER DPO: Same question  
+# Model: "The concept of Maya differs across philosophical schools:
+#          
+#          **Advaita (Shankara):** Maya is 'mithya' — neither real nor unreal...
+#          **Vishishtadvaita (Ramanuja):** The world is real, as it is the body of Brahman...
+#          **Dvaita (Madhva):** Maya is God's genuine creative power...
+#          
+#          Original Sanskrit (Vivekachudamani 108):
+#          ब्रह्म सत्यं जगन्मिथ्या जीवो ब्रह्मैव नापरः"
+#          (nuanced, multi-perspective, includes Sanskrit, scholarly)
+
+# What changed internally:
+# - Model now prefers generating nuanced over simplistic responses
+# - Probability of citing sources increased
+# - Probability of dismissive/shallow content decreased
+# - Response "quality distribution" shifted toward preferred style</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: WHAT HAPPENS WHEN YOU SKIP -->
+            <!-- ============================================ -->
+            <h2 id="skip-stages">⚠️ What Happens When You Skip a Stage?</h2>
+
+            <h3>❌ Skip CPT (do only SFT + DPO)</h3>
+            <div class="callout callout-warning">
+                <div class="callout-title">Impact of Skipping CPT</div>
+                <table>
+                    <thead><tr><th>Aspect</th><th>Effect</th><th>Severity</th></tr></thead>
+                    <tbody>
+                        <tr><td>Domain knowledge</td><td>Model relies only on pre-training knowledge (may not know specific verses)</td><td>🟡 Medium-High</td></tr>
+                        <tr><td>Sanskrit/Hindi fluency</td><td>If base model already handles these languages (Gemma does), impact is lower</td><td>🟡 Medium</td></tr>
+                        <tr><td>Verse accuracy</td><td>More hallucination of verses — model doesn't "know" the actual texts deeply</td><td>🔴 High</td></tr>
+                        <tr><td>Response quality</td><td>SFT+DPO still teaches format and preferences — responses look good but may be factually weaker</td><td>🟡 Medium</td></tr>
+                        <tr><td>When acceptable</td><td>If the base model already has decent coverage of your domain (e.g., Gemma already knows common Gita verses)</td><td>—</td></tr>
+                    </tbody>
+                </table>
+                <p><strong>Verdict:</strong> Skip CPT if your domain is well-represented in the base model's training data. For niche topics (specific commentaries, rare Upanishads, Sanskrit philosophical texts), CPT is critical.</p>
+            </div>
+
+            <h3>❌ Skip SFT (do only CPT + DPO)</h3>
+            <div class="callout callout-danger">
+                <div class="callout-title">Impact of Skipping SFT — MOST DAMAGING</div>
+                <table>
+                    <thead><tr><th>Aspect</th><th>Effect</th><th>Severity</th></tr></thead>
+                    <tbody>
+                        <tr><td>Response format</td><td>Model cannot format responses properly — rambles, doesn't answer the question</td><td>🔴 Critical</td></tr>
+                        <tr><td>Instruction following</td><td>Model ignores user intent — just generates text continuation</td><td>🔴 Critical</td></tr>
+                        <tr><td>DPO effectiveness</td><td>DPO CANNOT work well without SFT — the model needs to produce coherent responses BEFORE you can compare them</td><td>🔴 Critical</td></tr>
+                        <tr><td>Conversation ability</td><td>No multi-turn capability — model doesn't understand the chat format</td><td>🔴 Critical</td></tr>
+                        <tr><td>When acceptable</td><td>Almost NEVER — unless the base model is already instruction-tuned (like gemma-it)</td><td>—</td></tr>
+                    </tbody>
+                </table>
+                <p><strong>Verdict:</strong> NEVER skip SFT unless you're starting from an instruct-tuned model. If using <code>gemma-3-27b-it</code> (already instruction-tuned), you can skip SFT and go directly to DPO — but only because someone already did SFT for you.</p>
+            </div>
+
+            <h3>❌ Skip DPO (do only CPT + SFT)</h3>
+            <div class="callout callout-info">
+                <div class="callout-title">Impact of Skipping DPO — Least Damaging</div>
+                <table>
+                    <thead><tr><th>Aspect</th><th>Effect</th><th>Severity</th></tr></thead>
+                    <tbody>
+                        <tr><td>Response quality</td><td>Responses are helpful but may lack nuance, depth, or preferred style</td><td>🟢 Low-Medium</td></tr>
+                        <tr><td>Hallucination</td><td>Model may still hallucinate verse references (SFT alone doesn't fix this)</td><td>🟡 Medium</td></tr>
+                        <tr><td>Tone/style</td><td>Less polished — may sometimes be too verbose, too brief, or slightly off-tone</td><td>🟢 Low</td></tr>
+                        <tr><td>Safety</td><td>No alignment against disrespectful or incorrect responses</td><td>🟡 Medium</td></tr>
+                        <tr><td>When acceptable</td><td>For prototypes, internal tools, or when preference data is unavailable</td><td>—</td></tr>
+                    </tbody>
+                </table>
+                <p><strong>Verdict:</strong> CPT + SFT alone gives you a functional, knowledgeable model. DPO is the "polish" — important for production but not strictly necessary for a working prototype.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: INDIVIDUAL STAGE PERFORMANCE -->
+            <!-- ============================================ -->
+            <h2 id="individual">🔬 What If You Only Do ONE Stage?</h2>
+
+            <h3>Only CPT (No SFT, No DPO)</h3>
+            <pre><code># Result: A model that KNOWS scriptures but can't CONVERSE about them
+
+# Input: "What is the meaning of dharma?"
+# Output: "What is the meaning of dharma? This question has been explored by numerous
+#          scholars across centuries. The Mahabharata states that dharma is subtle
+#          (dharmasya tattvam nihitam guhayam). In the context of Manusmriti Chapter 1..."
+#          [continues indefinitely, never directly answers, just generates related text]
+
+# Why this happens:
+# - CPT teaches the model to CONTINUE text, not to ANSWER questions
+# - It's like a student who has read all the books but never practiced writing essays
+# - The model becomes a "scripture text generator" not a "scripture assistant"
+
+# When this is useful:
+# ✅ Text completion/generation
+# ✅ Creating synthetic training data
+# ✅ As foundation for subsequent SFT
+# ❌ NOT useful as a chatbot or Q&A system</code></pre>
+
+            <h3>Only SFT (No CPT, No DPO)</h3>
+            <pre><code># Result: A model that can CONVERSE but may lack deep domain knowledge
+
+# Input: "Explain the Pancha Kosha theory from Taittiriya Upanishad"
+# Output: "The Pancha Kosha (Five Sheaths) theory describes five layers of human 
+#          existence: Annamaya (physical), Pranamaya (vital), Manomaya (mental), 
+#          Vijnanamaya (intellectual), and Anandamaya (bliss).
+#          
+#          [Might get basic facts right from pre-training knowledge]
+#          [But may not know the specific verses from Taittiriya Upanishad]
+#          [May hallucinate verse numbers it doesn't actually know]"
+
+# Why this happens:
+# - The base model has SOME knowledge from pre-training
+# - SFT taught it HOW to respond but didn't add NEW knowledge
+# - It's like teaching someone answer formats without giving them the textbook
+
+# When this is useful:
+# ✅ General knowledge Q&A (topics well-covered in pre-training)
+# ✅ Quick prototype/demo
+# ✅ When base model already has good domain coverage
+# ❌ Deep domain expertise requires CPT first</code></pre>
+
+            <h3>Only DPO (No CPT, No SFT)</h3>
+            <pre><code># Result: Almost completely broken — DPO REQUIRES a model that can already generate responses
+
+# Input: "What is karma?"
+# Output: [Likely gibberish, repetition, or text completion — NOT a response]
+
+# Why this happens:
+# - DPO compares two responses and teaches the model to prefer one
+# - But if the model can't generate coherent responses in the first place,
+#   there's nothing meaningful to "prefer"
+# - It's like asking a student to grade exam papers when they haven't 
+#   learned to write yet
+
+# When this is useful:
+# ❌ NEVER useful alone on a base (non-instruct) model
+# ✅ ONLY works on an already instruction-tuned model (like gemma-it)
+# 
+# Exception: If you start from gemma-3-27b-it (already SFT'd by Google):
+#   DPO alone on top of this = valid approach for alignment</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: COMBINATION ANALYSIS -->
+            <!-- ============================================ -->
+            <h2 id="combinations">📊 All Possible Combinations Ranked</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Combination</th>
+                        <th>Starting Point</th>
+                        <th>Quality (1-10)</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: var(--bg-secondary);">
+                        <td><strong>CPT → SFT → DPO</strong></td>
+                        <td>Base model</td>
+                        <td><strong>10/10</strong> ⭐</td>
+                        <td>Production deployment — maximum quality</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SFT → DPO</strong></td>
+                        <td>Base model</td>
+                        <td><strong>7/10</strong></td>
+                        <td>When domain is already in pre-training data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPT → SFT</strong></td>
+                        <td>Base model</td>
+                        <td><strong>8/10</strong></td>
+                        <td>Good prototype — functional and knowledgeable</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DPO only</strong></td>
+                        <td>Instruct model (gemma-it)</td>
+                        <td><strong>6/10</strong></td>
+                        <td>Quick alignment of existing instruct model</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SFT only</strong></td>
+                        <td>Base model</td>
+                        <td><strong>6/10</strong></td>
+                        <td>Quick chatbot with general knowledge</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPT → DPO</strong></td>
+                        <td>Instruct model (gemma-it)</td>
+                        <td><strong>8/10</strong></td>
+                        <td>Add domain knowledge + align — skipping SFT since base is already instruct-tuned</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPT only</strong></td>
+                        <td>Base model</td>
+                        <td><strong>4/10</strong></td>
+                        <td>Only for text generation, not conversation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DPO only</strong></td>
+                        <td>Base model (non-instruct)</td>
+                        <td><strong>1/10</strong> ❌</td>
+                        <td>BROKEN — Don't do this</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 9: COMPUTE & TIME COMPARISON -->
+            <!-- ============================================ -->
+            <h2 id="compute">⚡ Compute, Time & Cost Comparison</h2>
+
+            <table>
+                <thead>
+                    <tr><th>Metric</th><th>CPT</th><th>SFT</th><th>DPO</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Training time (27B, QLoRA)</strong></td>
+                        <td>12-48 hours</td>
+                        <td>6-12 hours</td>
+                        <td>4-8 hours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPU memory needed</strong></td>
+                        <td>24-40 GB</td>
+                        <td>24-40 GB</td>
+                        <td>40-80 GB (2 models)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cloud cost (RunPod A100)</strong></td>
+                        <td>$15-60</td>
+                        <td>$8-15</td>
+                        <td>$5-10</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data preparation time</strong></td>
+                        <td>Days (scraping, cleaning)</td>
+                        <td>Days-Weeks (creating Q&A)</td>
+                        <td>Weeks (annotation/curation)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Learning rate</strong></td>
+                        <td>2e-4 (aggressive)</td>
+                        <td>1e-4 (moderate)</td>
+                        <td>5e-7 (very conservative)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Epochs</strong></td>
+                        <td>1-2</td>
+                        <td>2-3</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA Rank (typical)</strong></td>
+                        <td>64 (high — learning new knowledge)</td>
+                        <td>32 (medium — learning patterns)</td>
+                        <td>16 (low — fine adjustments)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Risk of catastrophic forgetting</strong></td>
+                        <td>High (if LR too high)</td>
+                        <td>Medium</td>
+                        <td>Low (very conservative)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Risk of overfitting</strong></td>
+                        <td>Low (large dataset)</td>
+                        <td>Medium (watch eval loss)</td>
+                        <td>High (small dataset, 1 epoch only)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 10: DECISION FLOWCHART -->
+            <!-- ============================================ -->
+            <h2 id="decision">🗺️ Decision Flowchart: Which Stages Do YOU Need?</h2>
+
+            <pre><code>START
+  │
+  ├─ Is your domain well-covered by the base model?
+  │    │
+  │    ├─ YES (e.g., common Gita knowledge, general Hinduism)
+  │    │    │
+  │    │    └─ Skip CPT → Go to SFT
+  │    │
+  │    └─ NO (e.g., specific commentaries, rare texts, deep Sanskrit)
+  │         │
+  │         └─ DO CPT → Then SFT
+  │
+  ├─ Are you starting from a base or instruct model?
+  │    │
+  │    ├─ BASE model (e.g., gemma-3-27b)
+  │    │    │
+  │    │    └─ SFT is MANDATORY — model can't chat without it
+  │    │
+  │    └─ INSTRUCT model (e.g., gemma-3-27b-it)
+  │         │
+  │         └─ SFT is OPTIONAL — can go directly to DPO
+  │
+  ├─ Do you need production-quality responses?
+  │    │
+  │    ├─ YES (public-facing, accuracy critical)
+  │    │    │
+  │    │    └─ DO DPO — alignment significantly improves output quality
+  │    │
+  │    └─ NO (internal tool, prototype, research)
+  │         │
+  │         └─ Skip DPO — CPT + SFT is sufficient
+  │
+  └─ RECOMMENDED PATHS:
+       │
+       ├─ 🏆 BEST: CPT → SFT → DPO (full pipeline)
+       ├─ 💰 BUDGET: SFT → DPO (skip CPT, use instruct model)
+       ├─ ⚡ FASTEST: DPO only (on instruct model)
+       └─ 🔬 RESEARCH: CPT → SFT (skip DPO for quick experiments)</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 11: REAL-WORLD EXAMPLES -->
+            <!-- ============================================ -->
+            <h2 id="examples">🌍 Real-World Scenarios</h2>
+
+            <div class="collapsible open">
+                <div class="collapsible-header">Scenario 1: "I want a chatbot that accurately answers Gita questions"</div>
+                <div class="collapsible-content">
+                    <p><strong>Recommended: CPT → SFT → DPO</strong></p>
+                    <ul>
+                        <li><strong>CPT</strong>: Feed it all 700 verses + commentaries (Shankara, Ramanuja, Madhva) + modern interpretations. This ensures it KNOWS the exact verses.</li>
+                        <li><strong>SFT</strong>: Create 20,000 Q&A pairs about the Gita (verse meanings, philosophy, context).</li>
+                        <li><strong>DPO</strong>: Create 5,000 preference pairs where "chosen" has correct verse numbers and "rejected" has wrong/hallucinated ones.</li>
+                    </ul>
+                    <p><strong>Expected result</strong>: Model cites correct verses 90%+ of the time, provides multiple commentarial perspectives, responds in user's language.</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">Scenario 2: "Quick prototype for a hackathon"</div>
+                <div class="collapsible-content">
+                    <p><strong>Recommended: SFT only (on instruct model)</strong></p>
+                    <ul>
+                        <li>Start from <code>gemma-3-12b-it</code> (already instruction-tuned)</li>
+                        <li>Create 1,000-2,000 high-quality scripture Q&A pairs</li>
+                        <li>Train QLoRA SFT for 3 hours</li>
+                    </ul>
+                    <p><strong>Expected result</strong>: Decent responses about well-known topics. Will struggle with obscure references but handles common questions well.</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">Scenario 3: "Model must handle rare Sanskrit texts"</div>
+                <div class="collapsible-content">
+                    <p><strong>Recommended: Heavy CPT → SFT → DPO</strong></p>
+                    <ul>
+                        <li><strong>CPT</strong>: CRITICAL — feed it 5+ GB of Sanskrit texts, commentaries, rare Upanishads, Darshana Shastras. Multiple epochs.</li>
+                        <li><strong>SFT</strong>: Create examples in Sanskrit itself, not just about Sanskrit.</li>
+                        <li><strong>DPO</strong>: Prefer responses that use correct Sanskrit grammar and proper sandhi.</li>
+                    </ul>
+                    <p><strong>Expected result</strong>: Model understands and generates grammatically correct Sanskrit, knows rare texts that aren't in standard training data.</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">Scenario 4: "Existing instruct model gives shallow answers, need better quality"</div>
+                <div class="collapsible-content">
+                    <p><strong>Recommended: DPO only (on instruct model)</strong></p>
+                    <ul>
+                        <li>Start from <code>gemma-3-27b-it</code></li>
+                        <li>Create 5,000-10,000 preference pairs: chosen = deep scholarly response, rejected = shallow response</li>
+                        <li>Train DPO for 4-6 hours</li>
+                    </ul>
+                    <p><strong>Expected result</strong>: Same knowledge but better response quality — more nuanced, better structured, includes Sanskrit, cites sources.</p>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 12: COMMON MISCONCEPTIONS -->
+            <!-- ============================================ -->
+            <h2 id="misconceptions">❌ Common Misconceptions</h2>
+
+            <table>
+                <thead>
+                    <tr><th>Misconception</th><th>Reality</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>"SFT teaches the model new knowledge"</td>
+                        <td>SFT primarily teaches <strong>format and behavior</strong>, not facts. New knowledge comes from CPT. SFT examples do add <em>some</em> knowledge but it's not the primary mechanism.</td>
+                    </tr>
+                    <tr>
+                        <td>"DPO makes the model smarter"</td>
+                        <td>DPO doesn't add intelligence or knowledge. It teaches the model to <strong>select better responses from what it already knows</strong>. Think of it as improving judgment, not knowledge.</td>
+                    </tr>
+                    <tr>
+                        <td>"More CPT data is always better"</td>
+                        <td>Low-quality CPT data (badly OCR'd, corrupted, duplicate) can HURT the model. Quality > quantity. A clean 1GB dataset beats a noisy 10GB dataset.</td>
+                    </tr>
+                    <tr>
+                        <td>"I need all three stages"</td>
+                        <td>Many production models use only 1-2 stages. If starting from an instruct model (<code>-it</code>), you might only need DPO. If your domain is well-known, skip CPT.</td>
+                    </tr>
+                    <tr>
+                        <td>"DPO and SFT do the same thing"</td>
+                        <td>They're fundamentally different. SFT shows the model "here's what a good response looks like." DPO shows it "this response is BETTER than that response." SFT is absolute, DPO is comparative.</td>
+                    </tr>
+                    <tr>
+                        <td>"CPT requires a non-instruct model"</td>
+                        <td>You CAN do CPT on instruct models. But it may slightly degrade instruction-following ability, which you'd recover during SFT.</td>
+                    </tr>
+                    <tr>
+                        <td>"Higher LoRA rank = better results"</td>
+                        <td>Higher rank means more trainable parameters, which can overfit on small datasets. Match rank to your data size: r=16 for DPO (small data), r=64 for CPT (large data).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 13: SUMMARY VISUAL -->
+            <!-- ============================================ -->
+            <h2 id="summary">📋 Final Summary</h2>
+
+            <div class="callout callout-success">
+                <div class="callout-title">🎯 The One-Paragraph Summary</div>
+                <p><strong>CPT</strong> injects new domain knowledge into the model (teaches it WHAT scriptures say). <strong>SFT</strong> teaches the model how to behave as a helpful assistant (teaches it HOW to respond). <strong>DPO</strong> refines quality by teaching preferences (teaches it WHICH responses are better). Each stage builds on the previous one. CPT without SFT gives you a text generator, not an assistant. SFT without CPT gives you a helpful assistant with potentially shallow domain knowledge. DPO without SFT gives you nothing useful. The full pipeline (CPT→SFT→DPO) gives you a knowledgeable, helpful, and high-quality domain expert.</p>
+            </div>
+
+            <div class="pipeline" style="margin: 2rem 0;">
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">📚</div>
+                    <span class="pipeline-label"><strong>CPT</strong><br>Knowledge<br><small>What to know</small></span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🎯</div>
+                    <span class="pipeline-label"><strong>SFT</strong><br>Behavior<br><small>How to respond</small></span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">⚖️</div>
+                    <span class="pipeline-label"><strong>DPO</strong><br>Quality<br><small>Which is better</small></span>
+                </div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🏆</div>
+                    <span class="pipeline-label"><strong>Result</strong><br>Expert Model<br><small>Knowledgeable + Helpful + Polished</small></span>
+                </div>
+            </div>
+
+            <nav class="page-nav">
+                <a href="11-troubleshooting.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Troubleshooting</span>
+                </a>
+                <a href="index.html" style="text-align: right;">
+                    <span class="nav-label">Back to →</span>
+                    <span class="nav-title">Home</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

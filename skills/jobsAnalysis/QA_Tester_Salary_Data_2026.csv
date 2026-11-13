@@ -1,0 +1,8 @@
+market,role,avg_salary,min_salary,max_salary,unit,source,source_url,notes,as_of
+India,Software Tester,399742,192000,783000,INR/year,PayScale,https://www.payscale.com/research/IN/Job=Software_Tester/Salary,Avg base salary,2026-04-02
+India,Software Tester (Glassdoor base),400000,300000,600000,INR/year,Glassdoor India,https://www.glassdoor.co.in/Salaries/india-software-tester-salary-SRCH_IL.0,5_IN115_KO6,21.htm,₹4L avg base with ₹3L-₹6L range,2026-04-02
+India,Software Tester (Glassdoor additional),28000,8000,50000,INR/year,Glassdoor India,https://www.glassdoor.co.in/Salaries/india-software-tester-salary-SRCH_IL.0,5_IN115_KO6,21.htm,Additional pay range,2026-04-02
+US,QA Automation Engineer,77679,56000,102000,USD/year,PayScale,https://www.payscale.com/research/US/Job=QA_Automation_Engineer/Salary,Avg base salary,2026-04-02
+US,QA Automation Engineer (total pay),77679,54000,110000,USD/year,PayScale,https://www.payscale.com/research/US/Job=QA_Automation_Engineer/Salary,Total pay range shown by PayScale,2026-04-02
+India,QA Automation Tester (sample posting),900000,600000,1200000,INR/year,Glassdoor India,https://www.glassdoor.co.in/job-listing/qa-automation-tester-selenium-with-java-cucumber-forar-tech-india-private-limited-JV_KO0,48_KE49,81.htm,Converted from ₹50k-₹1L per month,2026-04-02
+US,QA Tester (sample posting),104000,83200,124800,USD/year,Glassdoor,https://www.glassdoor.com/job-listing/qa-tester-cedent-JV_KO0,9_KE10,16.htm?jl=1009348596593,Converted from $40-$60 per hour (40h*52w),2026-04-02

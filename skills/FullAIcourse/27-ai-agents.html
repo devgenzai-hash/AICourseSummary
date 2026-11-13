@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agents — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 7</a> <span>›</span> AI Agents</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>AI Agents</h1>
+                <p>An AI agent is an LLM that can think, plan, use tools, and take actions autonomously. It's not just answering questions — it's completing multi-step tasks on its own, like a digital employee.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Regular chatbot = a librarian.</strong> You ask a question, they give an answer. That's it.</p>
+                <p><strong>AI Agent = a personal assistant.</strong> You say "Book me a flight to Paris next Friday under $500." They research flights, compare prices, check your calendar, book the cheapest option, and confirm with you. Multiple steps, decisions, and actions — autonomously.</p>
+            </div>
+
+            <h2 id="agent-vs-chatbot">Agent vs Chatbot</h2>
+
+            <table>
+                <thead><tr><th>Feature</th><th>Chatbot</th><th>AI Agent</th></tr></thead>
+                <tbody>
+                    <tr><td>Interaction</td><td>Single Q&A</td><td>Multi-step task completion</td></tr>
+                    <tr><td>Tool use</td><td>None or basic</td><td>Multiple tools, chosen dynamically</td></tr>
+                    <tr><td>Planning</td><td>No planning</td><td>Breaks tasks into steps</td></tr>
+                    <tr><td>Memory</td><td>Conversation only</td><td>Short + long-term memory</td></tr>
+                    <tr><td>Autonomy</td><td>Waits for each message</td><td>Acts independently between messages</td></tr>
+                    <tr><td>Error recovery</td><td>None</td><td>Retries, alternative approaches</td></tr>
+                    <tr><td>Example</td><td>"What's 2+2?" → "4"</td><td>"Analyze this CSV, make a chart, email it to my boss"</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="react">The ReAct Pattern (Reason + Act)</h2>
+
+            <div class="mental-model">
+                <h4>🧠 ReAct Loop</h4>
+                <pre><code>while task_not_complete:
+    THINK  → "I need to find the user's order status"
+    ACT    → call search_orders(user_id="123")
+    OBSERVE → result: {"order": "shipped", "eta": "March 5"}
+    THINK  → "Got the info, now I can respond"
+    RESPOND → "Your order is shipped! Expected arrival: March 5"</code></pre>
+            </div>
+
+            <h2 id="full-agent">Production AI Agent</h2>
+
+            <pre><code><span class="token-comment"># Complete AI Agent with ReAct pattern, tools, and planning</span>
+<span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Callable
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+
+<span class="token-keyword">class</span> <span class="token-function">AIAgent</span>:
+    <span class="token-string">"""Production AI Agent with ReAct pattern."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, name: str, system_prompt: str, model: str = <span class="token-string">"llama3.1:8b"</span>):
+        self.name = name
+        self.model = model
+        self.client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+        self.system_prompt = system_prompt
+        self.tools = {}
+        self.tool_schemas = []
+        self.conversation = []
+        self.max_iterations = <span class="token-number">10</span>
+        self.verbose = <span class="token-keyword">True</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">add_tool</span>(self, name: str, func: Callable, description: str, parameters: dict):
+        <span class="token-string">"""Register a tool the agent can use."""</span>
+        self.tools[name] = func
+        self.tool_schemas.append({
+            <span class="token-string">"type"</span>: <span class="token-string">"function"</span>,
+            <span class="token-string">"function"</span>: {
+                <span class="token-string">"name"</span>: name,
+                <span class="token-string">"description"</span>: description,
+                <span class="token-string">"parameters"</span>: parameters,
+            }
+        })
+    
+    <span class="token-keyword">def</span> <span class="token-function">_execute_tool</span>(self, name: str, arguments: dict) -> str:
+        <span class="token-string">"""Execute a tool safely."""</span>
+        <span class="token-keyword">if</span> name <span class="token-keyword">not in</span> self.tools:
+            <span class="token-keyword">return</span> json.dumps({<span class="token-string">"error"</span>: <span class="token-string">f"Tool '{name}' not found"</span>})
+        <span class="token-keyword">try</span>:
+            result = self.tools[name](**arguments)
+            <span class="token-keyword">return</span> json.dumps(result, default=str)
+        <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+            <span class="token-keyword">return</span> json.dumps({<span class="token-string">"error"</span>: str(e)})
+    
+    <span class="token-keyword">def</span> <span class="token-function">run</span>(self, task: str) -> str:
+        <span class="token-string">"""Execute a task using the ReAct loop."""</span>
+        self.conversation = [
+            {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: self.system_prompt},
+            {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: task},
+        ]
+        
+        <span class="token-keyword">for</span> iteration <span class="token-keyword">in</span> <span class="token-builtin">range</span>(self.max_iterations):
+            <span class="token-keyword">if</span> self.verbose:
+                <span class="token-builtin">print</span>(<span class="token-string">f"\n--- Iteration {iteration + 1} ---"</span>)
+            
+            <span class="token-comment"># Ask the model what to do next</span>
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=self.conversation,
+                tools=self.tool_schemas <span class="token-keyword">if</span> self.tool_schemas <span class="token-keyword">else</span> <span class="token-keyword">None</span>,
+                tool_choice=<span class="token-string">"auto"</span> <span class="token-keyword">if</span> self.tool_schemas <span class="token-keyword">else</span> <span class="token-keyword">None</span>,
+            )
+            
+            msg = response.choices[<span class="token-number">0</span>].message
+            self.conversation.append(msg)
+            
+            <span class="token-comment"># If no tool calls, the agent is done</span>
+            <span class="token-keyword">if not</span> msg.tool_calls:
+                <span class="token-keyword">if</span> self.verbose:
+                    <span class="token-builtin">print</span>(<span class="token-string">f"✅ Agent finished: {msg.content[:100]}..."</span>)
+                <span class="token-keyword">return</span> msg.content
+            
+            <span class="token-comment"># Execute each tool call</span>
+            <span class="token-keyword">for</span> tool_call <span class="token-keyword">in</span> msg.tool_calls:
+                func_name = tool_call.function.name
+                func_args = json.loads(tool_call.function.arguments)
+                
+                <span class="token-keyword">if</span> self.verbose:
+                    <span class="token-builtin">print</span>(<span class="token-string">f"🔧 {func_name}({func_args})"</span>)
+                
+                result = self._execute_tool(func_name, func_args)
+                
+                <span class="token-keyword">if</span> self.verbose:
+                    <span class="token-builtin">print</span>(<span class="token-string">f"📋 Result: {result[:200]}"</span>)
+                
+                self.conversation.append({
+                    <span class="token-string">"role"</span>: <span class="token-string">"tool"</span>,
+                    <span class="token-string">"tool_call_id"</span>: tool_call.id,
+                    <span class="token-string">"content"</span>: result,
+                })
+        
+        <span class="token-keyword">return</span> <span class="token-string">"Agent reached maximum iterations without completing the task."</span>
+
+<span class="token-comment"># ====== CREATE A RESEARCH AGENT ======</span>
+
+<span class="token-keyword">def</span> <span class="token-function">web_search</span>(query: str) -> dict:
+    <span class="token-string">"""Simulated web search."""</span>
+    <span class="token-keyword">return</span> {<span class="token-string">"results"</span>: [
+        {<span class="token-string">"title"</span>: <span class="token-string">f"Result about {query}"</span>, <span class="token-string">"snippet"</span>: <span class="token-string">f"Information about {query}..."</span>},
+    ]}
+
+<span class="token-keyword">def</span> <span class="token-function">read_file</span>(path: str) -> dict:
+    <span class="token-string">"""Read a file from disk."""</span>
+    <span class="token-keyword">try</span>:
+        <span class="token-keyword">with</span> <span class="token-builtin">open</span>(path, <span class="token-string">"r"</span>) <span class="token-keyword">as</span> f:
+            <span class="token-keyword">return</span> {<span class="token-string">"content"</span>: f.read()[:<span class="token-number">2000</span>]}
+    <span class="token-keyword">except</span> FileNotFoundError:
+        <span class="token-keyword">return</span> {<span class="token-string">"error"</span>: <span class="token-string">f"File not found: {path}"</span>}
+
+<span class="token-keyword">def</span> <span class="token-function">write_file</span>(path: str, content: str) -> dict:
+    <span class="token-string">"""Write content to a file."""</span>
+    <span class="token-keyword">with</span> <span class="token-builtin">open</span>(path, <span class="token-string">"w"</span>) <span class="token-keyword">as</span> f:
+        f.write(content)
+    <span class="token-keyword">return</span> {<span class="token-string">"status"</span>: <span class="token-string">"written"</span>, <span class="token-string">"path"</span>: path, <span class="token-string">"bytes"</span>: <span class="token-builtin">len</span>(content)}
+
+<span class="token-keyword">def</span> <span class="token-function">run_python</span>(code: str) -> dict:
+    <span class="token-string">"""Execute Python code and return output."""</span>
+    <span class="token-keyword">import</span> subprocess
+    result = subprocess.run(
+        [<span class="token-string">"python"</span>, <span class="token-string">"-c"</span>, code],
+        capture_output=<span class="token-keyword">True</span>, text=<span class="token-keyword">True</span>, timeout=<span class="token-number">30</span>
+    )
+    <span class="token-keyword">return</span> {<span class="token-string">"stdout"</span>: result.stdout, <span class="token-string">"stderr"</span>: result.stderr, <span class="token-string">"returncode"</span>: result.returncode}
+
+<span class="token-comment"># Build the agent</span>
+agent = AIAgent(
+    name=<span class="token-string">"ResearchBot"</span>,
+    system_prompt=<span class="token-string">"""You are a research assistant agent. You can:
+1. Search the web for information
+2. Read and write files
+3. Run Python code for analysis
+
+When given a task:
+- Break it down into steps
+- Use tools to gather information
+- Synthesize findings into a clear answer
+- If a tool fails, try an alternative approach"""</span>
+)
+
+<span class="token-comment"># Register tools</span>
+agent.add_tool(<span class="token-string">"web_search"</span>, web_search, <span class="token-string">"Search the web"</span>, {
+    <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+    <span class="token-string">"properties"</span>: {<span class="token-string">"query"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>, <span class="token-string">"description"</span>: <span class="token-string">"Search query"</span>}},
+    <span class="token-string">"required"</span>: [<span class="token-string">"query"</span>]
+})
+agent.add_tool(<span class="token-string">"read_file"</span>, read_file, <span class="token-string">"Read a file"</span>, {
+    <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+    <span class="token-string">"properties"</span>: {<span class="token-string">"path"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>, <span class="token-string">"description"</span>: <span class="token-string">"File path"</span>}},
+    <span class="token-string">"required"</span>: [<span class="token-string">"path"</span>]
+})
+agent.add_tool(<span class="token-string">"write_file"</span>, write_file, <span class="token-string">"Write to a file"</span>, {
+    <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+    <span class="token-string">"properties"</span>: {
+        <span class="token-string">"path"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>},
+        <span class="token-string">"content"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>}
+    },
+    <span class="token-string">"required"</span>: [<span class="token-string">"path"</span>, <span class="token-string">"content"</span>]
+})
+agent.add_tool(<span class="token-string">"run_python"</span>, run_python, <span class="token-string">"Execute Python code"</span>, {
+    <span class="token-string">"type"</span>: <span class="token-string">"object"</span>,
+    <span class="token-string">"properties"</span>: {<span class="token-string">"code"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"string"</span>, <span class="token-string">"description"</span>: <span class="token-string">"Python code to run"</span>}},
+    <span class="token-string">"required"</span>: [<span class="token-string">"code"</span>]
+})
+
+<span class="token-comment"># Run the agent!</span>
+result = agent.run(<span class="token-string">"Research the top 3 Python web frameworks, compare their performance, and save a summary to frameworks.md"</span>)
+<span class="token-builtin">print</span>(result)</code></pre>
+
+            <h2 id="multi-agent">Multi-Agent Systems</h2>
+
+            <pre><code><span class="token-comment"># Multiple specialized agents working together</span>
+
+<span class="token-keyword">class</span> <span class="token-function">MultiAgentSystem</span>:
+    <span class="token-string">"""Orchestrate multiple specialized agents."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.agents = {}
+        self.client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">add_agent</span>(self, name: str, agent: AIAgent):
+        self.agents[name] = agent
+    
+    <span class="token-keyword">def</span> <span class="token-function">route_task</span>(self, task: str) -> str:
+        <span class="token-string">"""Route a task to the most appropriate agent."""</span>
+        routing_prompt = <span class="token-string">f"""Given this task, which agent should handle it?
+Available agents:
+{chr(10).join([f'- {name}: {a.system_prompt[:100]}' for name, a in self.agents.items()])}
+
+Task: {task}
+
+Respond with ONLY the agent name."""</span>
+        
+        response = self.client.chat.completions.create(
+            model=<span class="token-string">"llama3.1:8b"</span>,
+            messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: routing_prompt}],
+            temperature=<span class="token-number">0</span>,
+        )
+        
+        agent_name = response.choices[<span class="token-number">0</span>].message.content.strip()
+        
+        <span class="token-keyword">if</span> agent_name <span class="token-keyword">in</span> self.agents:
+            <span class="token-builtin">print</span>(<span class="token-string">f"📨 Routing to: {agent_name}"</span>)
+            <span class="token-keyword">return</span> self.agents[agent_name].run(task)
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># Fallback to first agent</span>
+            first_agent = <span class="token-builtin">list</span>(self.agents.values())[<span class="token-number">0</span>]
+            <span class="token-keyword">return</span> first_agent.run(task)
+
+<span class="token-comment"># Example: Specialized agents</span>
+coder = AIAgent(name=<span class="token-string">"Coder"</span>, system_prompt=<span class="token-string">"You write Python code. Focus on clean, working code."</span>)
+researcher = AIAgent(name=<span class="token-string">"Researcher"</span>, system_prompt=<span class="token-string">"You research topics and provide detailed summaries."</span>)
+reviewer = AIAgent(name=<span class="token-string">"Reviewer"</span>, system_prompt=<span class="token-string">"You review code for bugs, security issues, and improvements."</span>)
+
+system = MultiAgentSystem()
+system.add_agent(<span class="token-string">"coder"</span>, coder)
+system.add_agent(<span class="token-string">"researcher"</span>, researcher)
+system.add_agent(<span class="token-string">"reviewer"</span>, reviewer)
+
+<span class="token-comment"># Tasks get automatically routed</span>
+system.route_task(<span class="token-string">"Write a function to parse CSV files"</span>)  <span class="token-comment"># → Coder</span>
+system.route_task(<span class="token-string">"What are the latest trends in AI?"</span>)    <span class="token-comment"># → Researcher</span>
+system.route_task(<span class="token-string">"Check this code for SQL injection"</span>)    <span class="token-comment"># → Reviewer</span></code></pre>
+
+            <h2 id="planning">Agent Planning Strategies</h2>
+
+            <table>
+                <thead><tr><th>Strategy</th><th>How It Works</th><th>Best For</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>ReAct</strong></td><td>Think → Act → Observe → Repeat</td><td>General tasks, simple workflows</td></tr>
+                    <tr><td><strong>Plan-then-Execute</strong></td><td>Create full plan first, then execute steps</td><td>Complex multi-step tasks</td></tr>
+                    <tr><td><strong>Tree of Thought</strong></td><td>Explore multiple paths, pick best</td><td>Problems with multiple solutions</td></tr>
+                    <tr><td><strong>Reflection</strong></td><td>After acting, check if result is correct</td><td>Tasks requiring accuracy</td></tr>
+                    <tr><td><strong>Human-in-the-Loop</strong></td><td>Ask human for approval at key steps</td><td>High-stakes actions</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>LangChain/LangGraph</strong> — Most popular frameworks for building agents with complex workflows.</li>
+                    <li><strong>CrewAI</strong> — Multi-agent framework where agents have roles and collaborate.</li>
+                    <li><strong>AutoGen (Microsoft)</strong> — Multi-agent conversation framework for enterprise.</li>
+                    <li><strong>Always set max_iterations</strong> — Runaway agents can burn API credits fast. Typical limit: 5-15 steps.</li>
+                    <li><strong>Structured outputs for planning</strong> — Use JSON for plans so they're parseable and trackable.</li>
+                    <li><strong>Observability is critical</strong> — Log every thought, action, and result. Use LangSmith or custom logging.</li>
+                    <li><strong>Fallback strategies</strong> — If an agent gets stuck, have escape hatches (ask human, try different approach).</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>AI Agent</strong> = LLM + Tools + Planning + Memory (autonomous task completion)</li>
+                    <li><strong>ReAct pattern</strong>: Think → Act → Observe → Repeat until done</li>
+                    <li>Agents need: tool registry, iteration limits, error handling, logging</li>
+                    <li><strong>Multi-agent systems</strong> route tasks to specialized agents</li>
+                    <li>Planning strategies: ReAct, Plan-then-Execute, Tree of Thought, Reflection</li>
+                    <li>Production requires: observability, safety limits, human-in-the-loop for critical actions</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>No iteration limit</strong> — Agent loops forever, burns all your API credits. ALWAYS cap iterations.</li>
+                    <li><strong>Too many tools</strong> — More than 10-15 tools confuses the model. Group related tools or use routing.</li>
+                    <li><strong>No error recovery</strong> — When a tool fails, agent should try alternatives, not crash.</li>
+                    <li><strong>Autonomous dangerous actions</strong> — Agents that can delete data or send money without confirmation = disaster.</li>
+                    <li><strong>Not logging agent steps</strong> — When things go wrong, you can't debug without a trace of what happened.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build Your Own Agent</h4>
+                <ol>
+                    <li>Build the AIAgent class from scratch</li>
+                    <li>Add 4 tools: web_search, read_file, write_file, run_python</li>
+                    <li>Give it a task: "Find the current Python version, write a script that prints system info, run it, and save results"</li>
+                    <li>Add verbose logging (print each Think/Act/Observe step)</li>
+                    <li>Implement a "Plan-then-Execute" strategy (agent creates a plan first)</li>
+                    <li><strong>Bonus:</strong> Build a 2-agent system where one writes code and another reviews it</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="26-tool-function-calling.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Tool & Function Calling</span>
+                </a>
+                <a href="28-browser-agents.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Browser Agents</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

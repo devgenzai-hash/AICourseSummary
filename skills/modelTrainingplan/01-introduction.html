@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Introduction & Overview — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span>Fine-Tuning Guide</span>
+            <h2>🙏 Gemma × Hindu Scriptures</h2>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+                <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+                <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+                <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+                <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+                <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+                <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+                <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+                <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+                <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+                <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+                <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb">
+            <a href="index.html">Guide</a><span>›</span> Introduction & Overview
+        </div>
+        <div class="topbar-actions">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 1: Introduction & Overview</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Understanding what fine-tuning is, why we chose Google's Gemma model, and the complete roadmap from raw PDFs to a deployed scripture-expert AI.</p>
+
+            <!-- SECTION: What is Fine-Tuning -->
+            <h2 id="what-is-finetuning">🤔 What is Fine-Tuning?</h2>
+            
+            <h3>The Non-Technical Explanation</h3>
+            <p>Imagine you hire a brilliant university graduate who has read millions of books on every subject. They're intelligent and articulate, but they've never specifically studied Hindu scriptures in depth. <strong>Fine-tuning is like giving this person intensive specialized training</strong> — months of focused study on the Vedas, Upanishads, Bhagavad Gita, and other sacred texts until they become an expert in that specific domain.</p>
+            
+            <p>The "university graduate" is the <strong>pre-trained model</strong> (Gemma). It already knows language, reasoning, and general knowledge. Fine-tuning adds <strong>domain expertise</strong> — deep knowledge of Hindu philosophy, Sanskrit terminology, specific verses, commentaries, and the ability to answer questions about these texts accurately.</p>
+
+            <h3>The Technical Explanation</h3>
+            <p>Fine-tuning is the process of taking a pre-trained Large Language Model (LLM) and continuing its training on a smaller, domain-specific dataset. The model's weights are adjusted (either all of them or a subset) to optimize for your specific task.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Key Insight</div>
+                <p>Pre-training costs millions of dollars and uses trillions of tokens. Fine-tuning leverages that investment and costs a fraction — typically $100-$10,000 depending on scale — while making the model an expert in your domain.</p>
+            </div>
+
+            <h3>The Three Stages of Fine-Tuning</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>What It Does</th>
+                        <th>Analogy</th>
+                        <th>Data Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1. CPT</strong><br>(Continued Pre-Training)</td>
+                        <td>Injects domain knowledge into the model's "memory"</td>
+                        <td>Reading all the textbooks</td>
+                        <td>Raw text (books, scriptures)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2. SFT</strong><br>(Supervised Fine-Tuning)</td>
+                        <td>Teaches the model to follow instructions and answer questions</td>
+                        <td>Practice Q&A with a tutor</td>
+                        <td>Question-Answer pairs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3. DPO/RLHF</strong><br>(Preference Alignment)</td>
+                        <td>Aligns responses with human quality standards</td>
+                        <td>Learning from feedback on essay drafts</td>
+                        <td>Preferred vs rejected responses</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- SECTION: Why Gemma -->
+            <h2 id="why-gemma">🌟 Why Google's Gemma Model?</h2>
+
+            <h3>Model Architecture Overview</h3>
+            <p>Gemma is Google's family of open-weight models built from the same research behind Gemini. Here's why it's ideal for this project:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Specification</th>
+                        <th>Why It Matters</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Context Length</strong></td>
+                        <td>128K tokens</td>
+                        <td>Can process entire chapters of Mahabharata in one go</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multilingual</strong></td>
+                        <td>140+ languages including Hindi</td>
+                        <td>Native understanding of Devanagari script (Hindi/Sanskrit)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Model Sizes</strong></td>
+                        <td>1B, 4B, 12B, 27B parameters</td>
+                        <td>Choose based on your hardware budget</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Precision</strong></td>
+                        <td>BFloat16</td>
+                        <td>Efficient training with good numerical stability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Open Weights</strong></td>
+                        <td>Apache-like license</td>
+                        <td>Free to fine-tune and deploy commercially</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multimodal</strong></td>
+                        <td>Text + Image input</td>
+                        <td>Could process scanned manuscript pages directly</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Architecture</strong></td>
+                        <td>Transformer (decoder-only)</td>
+                        <td>Industry standard, well-supported by all tools</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ Hindi/Sanskrit Support</div>
+                <p>Gemma was trained on data in 140+ languages. Its tokenizer handles Devanagari script (used for both Hindi and Sanskrit) natively. This means the model already has foundational understanding of these languages — fine-tuning builds upon this existing capability.</p>
+            </div>
+
+            <h3>Gemma Architecture Deep Dive</h3>
+            <div class="collapsible">
+                <div class="collapsible-header">🔍 Technical Details: Transformer Architecture</div>
+                <div class="collapsible-content">
+                    <p>Gemma uses a <strong>decoder-only transformer</strong> architecture with these key components:</p>
+                    <ul>
+                        <li><strong>Multi-Head Attention (MHA)</strong>: Allows the model to focus on different parts of the input simultaneously. For the 27B model, there are multiple attention heads per layer.</li>
+                        <li><strong>Grouped Query Attention (GQA)</strong>: An optimization where key-value heads are shared across multiple query heads, reducing memory usage during inference.</li>
+                        <li><strong>RMSNorm</strong>: A normalization technique (instead of LayerNorm) that's more computationally efficient.</li>
+                        <li><strong>Rotary Position Embeddings (RoPE)</strong>: Enables the 128K context length by encoding position information into the attention mechanism.</li>
+                        <li><strong>SwiGLU Activation</strong>: The feed-forward network uses SwiGLU instead of ReLU for better performance.</li>
+                    </ul>
+                    <pre><code># Gemma model architecture (simplified)
+# Each transformer layer:
+class GemmaDecoderLayer:
+    def forward(self, x):
+        # 1. Self-attention with RoPE
+        residual = x
+        x = rms_norm(x)
+        x = grouped_query_attention(x, rope_embeddings)
+        x = residual + x
+        
+        # 2. Feed-forward with SwiGLU
+        residual = x
+        x = rms_norm(x)
+        x = swiglu_ffn(x)  # gate_proj, up_proj, down_proj
+        x = residual + x
+        
+        return x</code></pre>
+                    <p><strong>Key modules for LoRA fine-tuning:</strong></p>
+                    <ul>
+                        <li><code>q_proj</code>, <code>k_proj</code>, <code>v_proj</code>, <code>o_proj</code> — Attention projections</li>
+                        <li><code>gate_proj</code>, <code>up_proj</code>, <code>down_proj</code> — Feed-forward network</li>
+                    </ul>
+                    <p>When fine-tuning with LoRA, we inject small trainable matrices into these layers while keeping the original weights frozen.</p>
+                </div>
+            </div>
+
+            <!-- SECTION: What We're Building -->
+            <h2 id="what-were-building">🎯 What We're Building</h2>
+            <p>By the end of this guide, you'll have a model that can:</p>
+            <ul>
+                <li>✅ Answer questions about Hindu scriptures accurately in Hindi, Sanskrit, or English</li>
+                <li>✅ Explain complex philosophical concepts from the Upanishads and Vedanta</li>
+                <li>✅ Provide verse references with translations and commentaries</li>
+                <li>✅ Discuss the Bhagavad Gita's teachings in context</li>
+                <li>✅ Summarize stories from the Ramayana and Mahabharata</li>
+                <li>✅ Respond respectfully and accurately without hallucinating content</li>
+                <li>✅ Handle multilingual queries (Hindi question → English answer, or vice versa)</li>
+            </ul>
+
+            <!-- SECTION: Prerequisites -->
+            <h2 id="prerequisites">📋 Prerequisites</h2>
+            
+            <h3>Knowledge Requirements</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Topic</th>
+                        <th>Level Needed</th>
+                        <th>Where to Learn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Python Programming</td>
+                        <td>Intermediate</td>
+                        <td>Should know classes, decorators, async</td>
+                    </tr>
+                    <tr>
+                        <td>PyTorch Basics</td>
+                        <td>Basic</td>
+                        <td>Tensors, .to(device), basic training loop</td>
+                    </tr>
+                    <tr>
+                        <td>LLM Concepts</td>
+                        <td>Basic</td>
+                        <td>Tokens, attention, transformer architecture</td>
+                    </tr>
+                    <tr>
+                        <td>Command Line</td>
+                        <td>Basic</td>
+                        <td>pip install, running scripts, SSH</td>
+                    </tr>
+                    <tr>
+                        <td>Hindu Scriptures</td>
+                        <td>Domain knowledge</td>
+                        <td>Helps with data quality assessment</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Hardware Requirements (Minimum)</h3>
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ GPU Memory is Critical</div>
+                <p>Fine-tuning LLMs requires significant GPU memory. The minimum for QLoRA fine-tuning of a 27B model is <strong>1× NVIDIA A100 40GB</strong>. For full fine-tuning, you need <strong>4-8× A100 80GB</strong>. Cloud GPUs (RunPod, Lambda Labs, AWS) are the most practical option for most people.</p>
+            </div>
+
+            <h3>Software Stack</h3>
+            <pre><code># requirements.txt for the entire pipeline
+# Core
+torch>=2.2.0
+transformers>=4.50.0
+accelerate>=0.30.0
+datasets>=2.19.0
+
+# Fine-tuning
+trl>=0.9.0
+peft>=0.11.0
+bitsandbytes>=0.43.0
+
+# Data processing
+pymupdf>=1.24.0       # PDF text extraction
+pdfplumber>=0.11.0    # PDF table extraction
+pytesseract>=0.3.10   # OCR
+Pillow>=10.0.0        # Image processing
+langdetect>=1.0.9     # Language detection
+datasketch>=1.6.0     # Deduplication (MinHash)
+indic-nlp-library     # Indian language processing
+
+# Distributed training
+deepspeed>=0.14.0
+
+# Evaluation
+evaluate>=0.4.0
+rouge-score>=0.1.2
+bert-score>=0.3.13
+nltk>=3.8.0
+
+# Monitoring
+wandb>=0.17.0
+tensorboard>=2.16.0
+
+# Deployment
+vllm>=0.4.0
+auto-gptq>=0.7.0
+autoawq>=0.2.0</code></pre>
+
+            <!-- SECTION: Roadmap -->
+            <h2 id="roadmap">🗺️ Complete Roadmap</h2>
+            
+            <div class="flowchart">
+                <div class="flow-node">📚 Phase 1: Collect Scripture PDFs (Hindi/Sanskrit/English)</div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-node">🔧 Phase 2: Extract Text & Clean Data</div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-node">📝 Phase 3: Create Training Datasets (3 types)</div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-node">🧠 Phase 4: Continued Pre-Training (inject domain knowledge)</div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-node">🎯 Phase 5: Supervised Fine-Tuning (teach Q&A)</div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-node">⚖️ Phase 6: DPO Alignment (improve quality)</div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-node">🔬 Phase 7: Evaluate & Iterate</div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-node">🚀 Phase 8: Quantize & Deploy</div>
+            </div>
+
+            <!-- SECTION: Key Concepts -->
+            <h2 id="key-concepts">📚 Key Concepts Explained</h2>
+
+            <div class="collapsible open">
+                <div class="collapsible-header">🔤 Tokens & Tokenization</div>
+                <div class="collapsible-content">
+                    <p>LLMs don't read text character-by-character. They split text into <strong>tokens</strong> — chunks that can be whole words, parts of words, or individual characters. For Devanagari script (Hindi/Sanskrit), tokens often represent syllables or common word fragments.</p>
+                    <pre><code># Example: How Gemma tokenizes Hindi text
+from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("google/gemma-3-27b-it")
+
+# English
+text_en = "The Bhagavad Gita teaches the path of righteousness"
+tokens_en = tokenizer.tokenize(text_en)
+print(f"English: {len(tokens_en)} tokens")
+# Output: ~10 tokens
+
+# Hindi
+text_hi = "भगवद्गीता धर्म का मार्ग सिखाती है"
+tokens_hi = tokenizer.tokenize(text_hi)
+print(f"Hindi: {len(tokens_hi)} tokens")
+# Output: ~15-20 tokens (Devanagari uses more tokens per word)
+
+# Sanskrit
+text_sa = "धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः"
+tokens_sa = tokenizer.tokenize(text_sa)
+print(f"Sanskrit: {len(tokens_sa)} tokens")
+# Output: ~20-25 tokens</code></pre>
+                    <div class="callout callout-warning">
+                        <div class="callout-title">⚠️ Token Efficiency</div>
+                        <p>Hindi/Sanskrit text typically uses 1.5-2× more tokens than equivalent English text. This means you need proportionally more compute for the same amount of content. Budget accordingly.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">🧮 Parameters & Model Size</div>
+                <div class="collapsible-content">
+                    <p>A model's "size" is measured in <strong>parameters</strong> — the numbers (weights) that the model has learned during training. More parameters = more knowledge capacity, but also more memory and compute needed.</p>
+                    <table>
+                        <thead>
+                            <tr><th>Model</th><th>Parameters</th><th>Memory (BF16)</th><th>Memory (4-bit)</th><th>Quality</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Gemma 1B</td><td>1 billion</td><td>~2 GB</td><td>~0.7 GB</td><td>Basic</td></tr>
+                            <tr><td>Gemma 4B</td><td>4 billion</td><td>~8 GB</td><td>~2.5 GB</td><td>Good</td></tr>
+                            <tr><td>Gemma 12B</td><td>12 billion</td><td>~24 GB</td><td>~7 GB</td><td>Very Good</td></tr>
+                            <tr><td>Gemma 27B</td><td>27 billion</td><td>~54 GB</td><td>~16 GB</td><td>Excellent</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Recommendation:</strong> Start with the 12B or 27B model for best quality on multilingual scripture content. Use QLoRA (4-bit) to fit it in a single A100 GPU.</p>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">🎛️ LoRA & QLoRA (Parameter-Efficient Fine-Tuning)</div>
+                <div class="collapsible-content">
+                    <p>Instead of updating ALL 27 billion parameters (which requires massive GPU memory), <strong>LoRA</strong> (Low-Rank Adaptation) only trains a tiny fraction — typically 0.1-1% of parameters — while keeping the rest frozen.</p>
+                    <p><strong>How it works:</strong></p>
+                    <ul>
+                        <li>Original weight matrix W (huge, e.g., 4096×4096)</li>
+                        <li>LoRA adds two small matrices: A (4096×64) and B (64×4096)</li>
+                        <li>Output = W×x + A×B×x (original + learned adjustment)</li>
+                        <li>Only A and B are trained — <strong>99% memory savings</strong></li>
+                    </ul>
+                    <p><strong>QLoRA</strong> goes further: it loads the frozen base model in 4-bit precision (quantized), reducing memory by another 4×.</p>
+                    <pre><code># Memory comparison for Gemma 27B:
+# Full fine-tuning:  ~200 GB GPU memory (need 4-8 GPUs)
+# LoRA (BF16):       ~60 GB GPU memory (need 1-2 GPUs)
+# QLoRA (4-bit):     ~20 GB GPU memory (fits on 1 GPU!)</code></pre>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">⚖️ DPO vs RLHF (Preference Alignment)</div>
+                <div class="collapsible-content">
+                    <p><strong>The Problem:</strong> After SFT, the model can follow instructions, but it might generate responses that are technically correct but poorly formatted, overly verbose, culturally insensitive, or not aligned with what humans actually prefer.</p>
+                    
+                    <p><strong>RLHF (Reinforcement Learning from Human Feedback):</strong></p>
+                    <ol>
+                        <li>Train a separate "reward model" that scores responses</li>
+                        <li>Use PPO (a reinforcement learning algorithm) to optimize the main model</li>
+                        <li>Complex, unstable, requires careful hyperparameter tuning</li>
+                    </ol>
+                    
+                    <p><strong>DPO (Direct Preference Optimization):</strong></p>
+                    <ol>
+                        <li>Skip the reward model entirely</li>
+                        <li>Directly train on pairs of (preferred response, rejected response)</li>
+                        <li>Simple, stable, computationally lightweight</li>
+                        <li>Achieves similar or better results than RLHF</li>
+                    </ol>
+                    
+                    <div class="callout callout-success">
+                        <div class="callout-title">✅ Recommendation</div>
+                        <p>Use <strong>DPO</strong> as your primary alignment method. It's simpler, cheaper, and equally effective for most use cases. Reserve RLHF/GRPO only if DPO doesn't achieve your quality goals.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Navigation -->
+            <nav class="page-nav">
+                <a href="index.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Home</span>
+                </a>
+                <a href="02-data-collection.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Data Collection & Preparation</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone: Ingestion Pipeline - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/16 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Capstone: Ingestion Pipeline
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>P3: Ingestion Pipeline</h1>
+                <p class="subtitle">Deduplicate, normalize, chunk smartly per document type, embed with BGE-M3, and dual-index into Qdrant (vectors) + Elasticsearch (BM25). Built for 10 million documents.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-code">Full Code</span>
+                    <span class="tag tag-scale">10M Scale</span>
+                </div>
+            </div>
+
+            <!-- ===== DEDUPLICATION ===== -->
+            <h2>1. Deduplication Engine</h2>
+            <p>At 10M documents, you <strong>will</strong> have duplicates. Same document shared via email, Slack, and saved in two folders. We need both exact and near-duplicate detection.</p>
+
+<pre><code><span class="token-comment"># src/ingestion/deduplicator.py</span>
+
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">from</span> datasketch <span class="token-keyword">import</span> MinHash, MinHashLSH
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Set, Tuple
+<span class="token-keyword">from</span> src.parsers.base <span class="token-keyword">import</span> ParsedDocument
+
+<span class="token-keyword">class</span> <span class="token-class">Deduplicator</span>:
+    <span class="token-string">"""
+    Two-layer deduplication:
+    1. Exact: SHA256 hash of content (catches identical copies)
+    2. Near-duplicate: MinHash LSH (catches slightly modified copies)
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, similarity_threshold: <span class="token-builtin">float</span> = <span class="token-number">0.85</span>):
+        self.seen_hashes: Set[<span class="token-builtin">str</span>] = <span class="token-builtin">set</span>()
+        self.lsh = MinHashLSH(threshold=similarity_threshold, num_perm=<span class="token-number">128</span>)
+        self.minhash_store = {}  <span class="token-comment"># doc_id → MinHash</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">is_duplicate</span>(self, doc: ParsedDocument) -> Tuple[<span class="token-builtin">bool</span>, <span class="token-builtin">str</span>]:
+        <span class="token-string">"""
+        Check if document is a duplicate.
+        Returns (is_dup, reason) — reason is 'exact', 'near', or ''.
+        """</span>
+        <span class="token-comment"># Layer 1: Exact hash match</span>
+        content_hash = hashlib.sha256(doc.content.encode()).hexdigest()
+        <span class="token-keyword">if</span> content_hash <span class="token-keyword">in</span> self.seen_hashes:
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>, <span class="token-string">"exact"</span>
+        
+        <span class="token-comment"># Layer 2: Near-duplicate via MinHash LSH</span>
+        minhash = self._compute_minhash(doc.content)
+        
+        <span class="token-keyword">try</span>:
+            similar_docs = self.lsh.query(minhash)
+            <span class="token-keyword">if</span> similar_docs:
+                <span class="token-keyword">return</span> <span class="token-keyword">True</span>, <span class="token-string">"near"</span>
+        <span class="token-keyword">except</span> ValueError:
+            <span class="token-keyword">pass</span>
+        
+        <span class="token-comment"># Not a duplicate — register it</span>
+        self.seen_hashes.add(content_hash)
+        self.lsh.insert(doc.id, minhash)
+        self.minhash_store[doc.id] = minhash
+        
+        <span class="token-keyword">return</span> <span class="token-keyword">False</span>, <span class="token-string">""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">deduplicate_batch</span>(self, docs: List[ParsedDocument]) -> List[ParsedDocument]:
+        <span class="token-string">"""Remove duplicates from a batch of documents."""</span>
+        unique = []
+        stats = {<span class="token-string">"exact"</span>: <span class="token-number">0</span>, <span class="token-string">"near"</span>: <span class="token-number">0</span>, <span class="token-string">"unique"</span>: <span class="token-number">0</span>}
+        
+        <span class="token-keyword">for</span> doc <span class="token-keyword">in</span> docs:
+            is_dup, reason = self.is_duplicate(doc)
+            <span class="token-keyword">if</span> <span class="token-keyword">not</span> is_dup:
+                unique.append(doc)
+                stats[<span class="token-string">"unique"</span>] += <span class="token-number">1</span>
+            <span class="token-keyword">else</span>:
+                stats[reason] += <span class="token-number">1</span>
+        
+        print(<span class="token-string">f"📊 Dedup: {stats['unique']} unique, {stats['exact']} exact dups, {stats['near']} near dups"</span>)
+        <span class="token-keyword">return</span> unique
+    
+    <span class="token-keyword">def</span> <span class="token-function">_compute_minhash</span>(self, text: <span class="token-builtin">str</span>) -> MinHash:
+        <span class="token-string">"""Compute MinHash signature from text shingles."""</span>
+        m = MinHash(num_perm=<span class="token-number">128</span>)
+        <span class="token-comment"># Use 3-word shingles</span>
+        words = text.lower().split()
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-builtin">len</span>(words) - <span class="token-number">2</span>):
+            shingle = <span class="token-string">" "</span>.join(words[i:i+<span class="token-number">3</span>])
+            m.update(shingle.encode(<span class="token-string">"utf-8"</span>))
+        <span class="token-keyword">return</span> m</code></pre>
+
+            <!-- ===== NORMALIZER ===== -->
+            <h2>2. Text Normalization</h2>
+
+<pre><code><span class="token-comment"># src/ingestion/normalizer.py</span>
+
+<span class="token-keyword">import</span> re
+<span class="token-keyword">import</span> unicodedata
+
+<span class="token-keyword">class</span> <span class="token-class">TextNormalizer</span>:
+    <span class="token-string">"""
+    Clean and normalize text before chunking.
+    Handles encoding issues, whitespace, special characters.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">normalize</span>(self, text: <span class="token-builtin">str</span>) -> <span class="token-builtin">str</span>:
+        <span class="token-comment"># 1. Unicode normalization (NFC form)</span>
+        text = unicodedata.normalize(<span class="token-string">"NFC"</span>, text)
+        
+        <span class="token-comment"># 2. Replace smart quotes with standard quotes</span>
+        text = text.replace(<span class="token-string">"\u2018"</span>, <span class="token-string">"'"</span>).replace(<span class="token-string">"\u2019"</span>, <span class="token-string">"'"</span>)
+        text = text.replace(<span class="token-string">"\u201c"</span>, <span class="token-string">'"'</span>).replace(<span class="token-string">"\u201d"</span>, <span class="token-string">'"'</span>)
+        
+        <span class="token-comment"># 3. Replace em/en dashes</span>
+        text = text.replace(<span class="token-string">"\u2013"</span>, <span class="token-string">"-"</span>).replace(<span class="token-string">"\u2014"</span>, <span class="token-string">" - "</span>)
+        
+        <span class="token-comment"># 4. Collapse multiple whitespace (preserve single newlines)</span>
+        text = re.sub(r<span class="token-string">"[ \t]+"</span>, <span class="token-string">" "</span>, text)
+        text = re.sub(r<span class="token-string">"\n{3,}"</span>, <span class="token-string">"\n\n"</span>, text)
+        
+        <span class="token-comment"># 5. Remove null bytes and control characters</span>
+        text = re.sub(r<span class="token-string">"[\x00-\x08\x0b\x0c\x0e-\x1f]"</span>, <span class="token-string">""</span>, text)
+        
+        <span class="token-comment"># 6. Strip leading/trailing whitespace per line</span>
+        lines = [line.strip() <span class="token-keyword">for</span> line <span class="token-keyword">in</span> text.split(<span class="token-string">"\n"</span>)]
+        text = <span class="token-string">"\n"</span>.join(lines)
+        
+        <span class="token-keyword">return</span> text.strip()</code></pre>
+
+            <!-- ===== CHUNKING ===== -->
+            <h2>3. Smart Chunking (Per Document Type)</h2>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Critical Insight</div>
+                <p>Chunking strategy should differ by document type. A PDF research paper needs section-aware chunking. An email thread needs per-message chunks. Code needs function-level chunks. One-size-fits-all chunking <strong>destroys context</strong>.</p>
+            </div>
+
+<pre><code><span class="token-comment"># src/ingestion/chunker.py</span>
+
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> src.parsers.base <span class="token-keyword">import</span> ParsedDocument, SourceType
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">Chunk</span>:
+    <span class="token-string">"""A chunk of text ready for embedding."""</span>
+    id: <span class="token-builtin">str</span>
+    content: <span class="token-builtin">str</span>
+    doc_id: <span class="token-builtin">str</span>            <span class="token-comment"># Parent document ID</span>
+    chunk_index: <span class="token-builtin">int</span>
+    source_type: SourceType
+    metadata: dict         <span class="token-comment"># Inherited from parent + chunk-specific</span>
+
+<span class="token-keyword">class</span> <span class="token-class">SmartChunker</span>:
+    <span class="token-string">"""
+    Chunk documents using type-specific strategies.
+    
+    - PDF/Papers: Section-aware (split at headings, 512-token chunks)
+    - Emails: Per-message (each email = one chunk)
+    - Slack: Per-thread (conversation context preserved)
+    - Code: Per-function/class
+    - Bills: Whole document (structured, usually short)
+    - Default: Sliding window with overlap
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, max_tokens: <span class="token-builtin">int</span> = <span class="token-number">512</span>, overlap_tokens: <span class="token-builtin">int</span> = <span class="token-number">50</span>):
+        self.max_tokens = max_tokens
+        self.overlap = overlap_tokens
+    
+    <span class="token-keyword">def</span> <span class="token-function">chunk</span>(self, doc: ParsedDocument) -> List[Chunk]:
+        <span class="token-string">"""Route to type-specific chunking strategy."""</span>
+        strategy_map = {
+            SourceType.PDF: self._chunk_by_sections,
+            SourceType.DOCX: self._chunk_by_sections,
+            SourceType.EMAIL: self._chunk_email,
+            SourceType.SLACK: self._chunk_conversation,
+            SourceType.CODE: self._chunk_code,
+            SourceType.BILL: self._chunk_whole,
+            SourceType.DATABASE: self._chunk_whole,
+            SourceType.WEB: self._chunk_by_sections,
+            SourceType.OCR: self._chunk_sliding_window,
+        }
+        
+        strategy = strategy_map.get(doc.source_type, self._chunk_sliding_window)
+        chunks = strategy(doc)
+        
+        <span class="token-comment"># Ensure no chunk exceeds max size</span>
+        final_chunks = []
+        <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> chunks:
+            <span class="token-keyword">if</span> self._token_count(chunk.content) > self.max_tokens * <span class="token-number">1.5</span>:
+                <span class="token-comment"># Split oversized chunks</span>
+                sub_chunks = self._split_large_chunk(chunk)
+                final_chunks.extend(sub_chunks)
+            <span class="token-keyword">else</span>:
+                final_chunks.append(chunk)
+        
+        <span class="token-keyword">return</span> final_chunks
+    
+    <span class="token-keyword">def</span> <span class="token-function">_chunk_by_sections</span>(self, doc: ParsedDocument) -> List[Chunk]:
+        <span class="token-string">"""Split by document sections (headings), then sliding window within."""</span>
+        chunks = []
+        
+        <span class="token-keyword">if</span> doc.sections:
+            <span class="token-keyword">for</span> i, section <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(doc.sections):
+                section_text = <span class="token-string">f"{section['heading']}\n\n{section['content']}"</span>
+                
+                <span class="token-keyword">if</span> self._token_count(section_text) <= self.max_tokens:
+                    chunks.append(Chunk(
+                        id=<span class="token-string">f"{doc.id}_s{i}"</span>,
+                        content=section_text,
+                        doc_id=doc.id,
+                        chunk_index=i,
+                        source_type=doc.source_type,
+                        metadata={
+                            <span class="token-string">"section"</span>: section[<span class="token-string">"heading"</span>],
+                            <span class="token-string">"title"</span>: doc.title,
+                            <span class="token-string">"source"</span>: doc.source_path
+                        }
+                    ))
+                <span class="token-keyword">else</span>:
+                    <span class="token-comment"># Section too large — apply sliding window</span>
+                    sub_chunks = self._sliding_window(
+                        section_text, doc, start_index=<span class="token-builtin">len</span>(chunks)
+                    )
+                    chunks.extend(sub_chunks)
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># No sections — fallback to sliding window</span>
+            chunks = self._sliding_window(doc.content, doc, start_index=<span class="token-number">0</span>)
+        
+        <span class="token-keyword">return</span> chunks
+    
+    <span class="token-keyword">def</span> <span class="token-function">_chunk_email</span>(self, doc: ParsedDocument) -> List[Chunk]:
+        <span class="token-string">"""Each email message is one chunk (preserves full context)."""</span>
+        <span class="token-keyword">return</span> [Chunk(
+            id=<span class="token-string">f"{doc.id}_e0"</span>,
+            content=doc.content,
+            doc_id=doc.id,
+            chunk_index=<span class="token-number">0</span>,
+            source_type=doc.source_type,
+            metadata={
+                <span class="token-string">"title"</span>: doc.title,
+                <span class="token-string">"author"</span>: doc.author,
+                <span class="token-string">"source"</span>: doc.source_path,
+                **doc.metadata
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_chunk_conversation</span>(self, doc: ParsedDocument) -> List[Chunk]:
+        <span class="token-string">"""Slack threads: use a sliding window of messages."""</span>
+        messages = doc.content.split(<span class="token-string">"\n"</span>)
+        chunks = []
+        window_size = <span class="token-number">10</span>  <span class="token-comment"># 10 messages per chunk</span>
+        step = <span class="token-number">7</span>           <span class="token-comment"># 3-message overlap</span>
+        
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-number">0</span>, <span class="token-builtin">len</span>(messages), step):
+            window = messages[i:i + window_size]
+            content = <span class="token-string">"\n"</span>.join(window)
+            
+            chunks.append(Chunk(
+                id=<span class="token-string">f"{doc.id}_c{len(chunks)}"</span>,
+                content=content,
+                doc_id=doc.id,
+                chunk_index=<span class="token-builtin">len</span>(chunks),
+                source_type=doc.source_type,
+                metadata={
+                    <span class="token-string">"title"</span>: doc.title,
+                    <span class="token-string">"source"</span>: doc.source_path,
+                    <span class="token-string">"message_range"</span>: <span class="token-string">f"{i}-{i+len(window)}"</span>
+                }
+            ))
+        
+        <span class="token-keyword">return</span> chunks
+    
+    <span class="token-keyword">def</span> <span class="token-function">_chunk_code</span>(self, doc: ParsedDocument) -> List[Chunk]:
+        <span class="token-string">"""Code files: already split by function in parsing. Keep as-is."""</span>
+        <span class="token-keyword">return</span> [Chunk(
+            id=<span class="token-string">f"{doc.id}_code0"</span>,
+            content=doc.content,
+            doc_id=doc.id,
+            chunk_index=<span class="token-number">0</span>,
+            source_type=doc.source_type,
+            metadata={<span class="token-string">"title"</span>: doc.title, <span class="token-string">"source"</span>: doc.source_path}
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_chunk_whole</span>(self, doc: ParsedDocument) -> List[Chunk]:
+        <span class="token-string">"""Bills/DB records: keep as single chunk (usually short)."""</span>
+        <span class="token-keyword">return</span> [Chunk(
+            id=<span class="token-string">f"{doc.id}_w0"</span>,
+            content=doc.content,
+            doc_id=doc.id,
+            chunk_index=<span class="token-number">0</span>,
+            source_type=doc.source_type,
+            metadata={<span class="token-string">"title"</span>: doc.title, <span class="token-string">"source"</span>: doc.source_path, **doc.metadata}
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_chunk_sliding_window</span>(self, doc: ParsedDocument) -> List[Chunk]:
+        <span class="token-string">"""Default: sliding window chunking."""</span>
+        <span class="token-keyword">return</span> self._sliding_window(doc.content, doc, <span class="token-number">0</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_sliding_window</span>(self, text: <span class="token-builtin">str</span>, doc: ParsedDocument, start_index: <span class="token-builtin">int</span>) -> List[Chunk]:
+        <span class="token-string">"""Apply sliding window with overlap."""</span>
+        words = text.split()
+        chunks = []
+        step = self.max_tokens - self.overlap
+        
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-number">0</span>, <span class="token-builtin">len</span>(words), step):
+            chunk_words = words[i:i + self.max_tokens]
+            content = <span class="token-string">" "</span>.join(chunk_words)
+            
+            chunks.append(Chunk(
+                id=<span class="token-string">f"{doc.id}_sw{start_index + len(chunks)}"</span>,
+                content=content,
+                doc_id=doc.id,
+                chunk_index=start_index + <span class="token-builtin">len</span>(chunks),
+                source_type=doc.source_type,
+                metadata={<span class="token-string">"title"</span>: doc.title, <span class="token-string">"source"</span>: doc.source_path}
+            ))
+        
+        <span class="token-keyword">return</span> chunks
+    
+    <span class="token-keyword">def</span> <span class="token-function">_token_count</span>(self, text: <span class="token-builtin">str</span>) -> <span class="token-builtin">int</span>:
+        <span class="token-string">"""Approximate token count (words ≈ 0.75 tokens)."""</span>
+        <span class="token-keyword">return</span> <span class="token-builtin">int</span>(<span class="token-builtin">len</span>(text.split()) * <span class="token-number">1.3</span>)</code></pre>
+
+            <!-- ===== EMBEDDER ===== -->
+            <h2>4. Embedding Generator (BGE-M3)</h2>
+
+<pre><code><span class="token-comment"># src/ingestion/embedder.py</span>
+
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> SentenceTransformer
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> src.config <span class="token-keyword">import</span> settings
+
+<span class="token-keyword">class</span> <span class="token-class">EmbeddingGenerator</span>:
+    <span class="token-string">"""
+    Generate embeddings using BAAI/bge-m3.
+    
+    Why BGE-M3:
+    - 1024 dimensions (good balance of quality vs storage)
+    - Multilingual (100+ languages)
+    - Open-source (no API cost for embeddings)
+    - SOTA on MTEB retrieval benchmarks
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.model = SentenceTransformer(
+            settings.embedding_model,
+            device=<span class="token-string">"cuda"</span>  <span class="token-comment"># Use GPU if available</span>
+        )
+        self.dimension = settings.embedding_dimension
+        self.batch_size = settings.embedding_batch_size
+    
+    <span class="token-keyword">def</span> <span class="token-function">embed_chunks</span>(self, chunks: List) -> List[np.ndarray]:
+        <span class="token-string">"""
+        Embed a list of chunks in batches.
+        
+        At 10M docs with ~5 chunks each = 50M embeddings.
+        At 1024 dims × 4 bytes = ~200GB of vectors.
+        Batch processing is essential.
+        """</span>
+        texts = [chunk.content <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> chunks]
+        
+        all_embeddings = []
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-number">0</span>, <span class="token-builtin">len</span>(texts), self.batch_size):
+            batch = texts[i:i + self.batch_size]
+            embeddings = self.model.encode(
+                batch,
+                normalize_embeddings=<span class="token-keyword">True</span>,  <span class="token-comment"># L2 normalize for cosine sim</span>
+                show_progress_bar=<span class="token-keyword">False</span>,
+                batch_size=self.batch_size
+            )
+            all_embeddings.extend(embeddings)
+            
+            <span class="token-keyword">if</span> i % (<span class="token-number">1000</span>) == <span class="token-number">0</span> <span class="token-keyword">and</span> i > <span class="token-number">0</span>:
+                print(<span class="token-string">f"  Embedded {i}/{len(texts)} chunks..."</span>)
+        
+        <span class="token-keyword">return</span> all_embeddings
+    
+    <span class="token-keyword">def</span> <span class="token-function">embed_query</span>(self, query: <span class="token-builtin">str</span>) -> np.ndarray:
+        <span class="token-string">"""Embed a single query (adds 'query: ' prefix for BGE models)."""</span>
+        <span class="token-keyword">return</span> self.model.encode(
+            <span class="token-string">f"query: {query}"</span>,
+            normalize_embeddings=<span class="token-keyword">True</span>
+        )</code></pre>
+
+            <!-- ===== DUAL INDEXER ===== -->
+            <h2>5. Dual Indexer (Qdrant + Elasticsearch)</h2>
+
+<pre><code><span class="token-comment"># src/ingestion/indexer.py</span>
+
+<span class="token-keyword">from</span> qdrant_client <span class="token-keyword">import</span> QdrantClient
+<span class="token-keyword">from</span> qdrant_client.models <span class="token-keyword">import</span> (
+    Distance, VectorParams, PointStruct,
+    OptimizersConfigDiff, HnswConfigDiff, 
+    ScalarQuantization, ScalarQuantizationConfig, ScalarType
+)
+<span class="token-keyword">from</span> elasticsearch <span class="token-keyword">import</span> Elasticsearch, helpers
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+<span class="token-keyword">from</span> src.config <span class="token-keyword">import</span> settings
+
+<span class="token-keyword">class</span> <span class="token-class">DualIndexer</span>:
+    <span class="token-string">"""
+    Index chunks into both:
+    - Qdrant (vector similarity search)
+    - Elasticsearch (BM25 keyword search)
+    
+    This enables hybrid retrieval (Stage 2).
+    """</span>
+    
+    COLLECTION_NAME = <span class="token-string">"enterprise_rag"</span>
+    ES_INDEX_NAME = <span class="token-string">"enterprise_rag"</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        <span class="token-comment"># Qdrant connection</span>
+        self.qdrant = QdrantClient(url=settings.qdrant_url)
+        
+        <span class="token-comment"># Elasticsearch connection</span>
+        self.es = Elasticsearch(settings.elasticsearch_url)
+        
+        <span class="token-comment"># Initialize collections/indexes</span>
+        self._init_qdrant()
+        self._init_elasticsearch()
+    
+    <span class="token-keyword">def</span> <span class="token-function">_init_qdrant</span>(self):
+        <span class="token-string">"""Create Qdrant collection optimized for 10M vectors."""</span>
+        collections = self.qdrant.get_collections().collections
+        exists = <span class="token-builtin">any</span>(c.name == self.COLLECTION_NAME <span class="token-keyword">for</span> c <span class="token-keyword">in</span> collections)
+        
+        <span class="token-keyword">if not</span> exists:
+            self.qdrant.create_collection(
+                collection_name=self.COLLECTION_NAME,
+                vectors_config=VectorParams(
+                    size=settings.embedding_dimension,  <span class="token-comment"># 1024 for BGE-M3</span>
+                    distance=Distance.COSINE,
+                ),
+                <span class="token-comment"># HNSW config optimized for 10M+ vectors</span>
+                hnsw_config=HnswConfigDiff(
+                    m=<span class="token-number">16</span>,                  <span class="token-comment"># Connections per node</span>
+                    ef_construct=<span class="token-number">200</span>,      <span class="token-comment"># Build-time accuracy</span>
+                    full_scan_threshold=<span class="token-number">20000</span>,
+                ),
+                <span class="token-comment"># Scalar quantization: reduces memory 4x</span>
+                quantization_config=ScalarQuantization(
+                    scalar=ScalarQuantizationConfig(
+                        type=ScalarType.INT8,
+                        quantile=<span class="token-number">0.99</span>,
+                        always_ram=<span class="token-keyword">True</span>
+                    )
+                ),
+                optimizers_config=OptimizersConfigDiff(
+                    indexing_threshold=<span class="token-number">50000</span>,  <span class="token-comment"># Index after 50K points</span>
+                )
+            )
+            print(<span class="token-string">f"✅ Created Qdrant collection: {self.COLLECTION_NAME}"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_init_elasticsearch</span>(self):
+        <span class="token-string">"""Create Elasticsearch index with BM25 mapping."""</span>
+        <span class="token-keyword">if not</span> self.es.indices.exists(index=self.ES_INDEX_NAME):
+            mapping = {
+                <span class="token-string">"settings"</span>: {
+                    <span class="token-string">"number_of_shards"</span>: <span class="token-number">3</span>,     <span class="token-comment"># For 10M docs</span>
+                    <span class="token-string">"number_of_replicas"</span>: <span class="token-number">1</span>,
+                    <span class="token-string">"analysis"</span>: {
+                        <span class="token-string">"analyzer"</span>: {
+                            <span class="token-string">"rag_analyzer"</span>: {
+                                <span class="token-string">"type"</span>: <span class="token-string">"custom"</span>,
+                                <span class="token-string">"tokenizer"</span>: <span class="token-string">"standard"</span>,
+                                <span class="token-string">"filter"</span>: [<span class="token-string">"lowercase"</span>, <span class="token-string">"stop"</span>, <span class="token-string">"snowball"</span>]
+                            }
+                        }
+                    }
+                },
+                <span class="token-string">"mappings"</span>: {
+                    <span class="token-string">"properties"</span>: {
+                        <span class="token-string">"chunk_id"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"keyword"</span>},
+                        <span class="token-string">"doc_id"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"keyword"</span>},
+                        <span class="token-string">"content"</span>: {
+                            <span class="token-string">"type"</span>: <span class="token-string">"text"</span>,
+                            <span class="token-string">"analyzer"</span>: <span class="token-string">"rag_analyzer"</span>
+                        },
+                        <span class="token-string">"source_type"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"keyword"</span>},
+                        <span class="token-string">"title"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"text"</span>},
+                        <span class="token-string">"source_path"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"keyword"</span>},
+                        <span class="token-string">"created_at"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"date"</span>},
+                        <span class="token-string">"metadata"</span>: {<span class="token-string">"type"</span>: <span class="token-string">"object"</span>, <span class="token-string">"enabled"</span>: <span class="token-keyword">False</span>}
+                    }
+                }
+            }
+            self.es.indices.create(index=self.ES_INDEX_NAME, body=mapping)
+            print(<span class="token-string">f"✅ Created Elasticsearch index: {self.ES_INDEX_NAME}"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">index_batch</span>(self, chunks: List, embeddings: List[np.ndarray]):
+        <span class="token-string">"""Index a batch of chunks into both stores."""</span>
+        <span class="token-comment"># === Qdrant: Vector indexing ===</span>
+        points = [
+            PointStruct(
+                id=<span class="token-builtin">hash</span>(chunk.id) % (<span class="token-number">2</span>**<span class="token-number">63</span>),  <span class="token-comment"># Qdrant needs int IDs</span>
+                vector=embedding.tolist(),
+                payload={
+                    <span class="token-string">"chunk_id"</span>: chunk.id,
+                    <span class="token-string">"doc_id"</span>: chunk.doc_id,
+                    <span class="token-string">"content"</span>: chunk.content,
+                    <span class="token-string">"source_type"</span>: chunk.source_type.value,
+                    <span class="token-string">"metadata"</span>: chunk.metadata
+                }
+            )
+            <span class="token-keyword">for</span> chunk, embedding <span class="token-keyword">in</span> <span class="token-builtin">zip</span>(chunks, embeddings)
+        ]
+        
+        <span class="token-comment"># Upload in batches of 100</span>
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-number">0</span>, <span class="token-builtin">len</span>(points), <span class="token-number">100</span>):
+            self.qdrant.upsert(
+                collection_name=self.COLLECTION_NAME,
+                points=points[i:i+<span class="token-number">100</span>]
+            )
+        
+        <span class="token-comment"># === Elasticsearch: Text indexing ===</span>
+        actions = [
+            {
+                <span class="token-string">"_index"</span>: self.ES_INDEX_NAME,
+                <span class="token-string">"_id"</span>: chunk.id,
+                <span class="token-string">"_source"</span>: {
+                    <span class="token-string">"chunk_id"</span>: chunk.id,
+                    <span class="token-string">"doc_id"</span>: chunk.doc_id,
+                    <span class="token-string">"content"</span>: chunk.content,
+                    <span class="token-string">"source_type"</span>: chunk.source_type.value,
+                    <span class="token-string">"title"</span>: chunk.metadata.get(<span class="token-string">"title"</span>, <span class="token-string">""</span>),
+                    <span class="token-string">"source_path"</span>: chunk.metadata.get(<span class="token-string">"source"</span>, <span class="token-string">""</span>),
+                    <span class="token-string">"metadata"</span>: chunk.metadata
+                }
+            }
+            <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> chunks
+        ]
+        
+        helpers.bulk(self.es, actions)
+        print(<span class="token-string">f"  Indexed {len(chunks)} chunks → Qdrant + Elasticsearch"</span>)</code></pre>
+
+            <!-- ===== FULL PIPELINE ===== -->
+            <h2>6. Full Ingestion Pipeline Orchestrator</h2>
+
+<pre><code><span class="token-comment"># src/ingestion/pipeline.py</span>
+
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> src.parsers.router <span class="token-keyword">import</span> DocumentRouter
+<span class="token-keyword">from</span> .deduplicator <span class="token-keyword">import</span> Deduplicator
+<span class="token-keyword">from</span> .normalizer <span class="token-keyword">import</span> TextNormalizer
+<span class="token-keyword">from</span> .chunker <span class="token-keyword">import</span> SmartChunker
+<span class="token-keyword">from</span> .embedder <span class="token-keyword">import</span> EmbeddingGenerator
+<span class="token-keyword">from</span> .indexer <span class="token-keyword">import</span> DualIndexer
+
+<span class="token-keyword">class</span> <span class="token-class">IngestionPipeline</span>:
+    <span class="token-string">"""
+    Full ingestion orchestrator.
+    
+    Flow: Parse → Dedup → Normalize → Chunk → Embed → Index
+    
+    Handles 10M documents via batch processing.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.router = DocumentRouter()
+        self.dedup = Deduplicator()
+        self.normalizer = TextNormalizer()
+        self.chunker = SmartChunker()
+        self.embedder = EmbeddingGenerator()
+        self.indexer = DualIndexer()
+    
+    <span class="token-keyword">def</span> <span class="token-function">ingest_directory</span>(self, directory: <span class="token-builtin">str</span>) -> dict:
+        <span class="token-string">"""Ingest all documents from a directory."""</span>
+        print(<span class="token-string">f"\n🚀 Starting ingestion from: {directory}"</span>)
+        
+        <span class="token-comment"># Step 1: Parse all documents</span>
+        print(<span class="token-string">"📄 Step 1: Parsing documents..."</span>)
+        docs = self.router.parse_directory(directory)
+        
+        <span class="token-comment"># Step 2: Deduplicate</span>
+        print(<span class="token-string">"🔍 Step 2: Deduplicating..."</span>)
+        unique_docs = self.dedup.deduplicate_batch(docs)
+        
+        <span class="token-comment"># Step 3: Normalize text</span>
+        print(<span class="token-string">"✨ Step 3: Normalizing..."</span>)
+        <span class="token-keyword">for</span> doc <span class="token-keyword">in</span> unique_docs:
+            doc.content = self.normalizer.normalize(doc.content)
+        
+        <span class="token-comment"># Step 4: Chunk documents</span>
+        print(<span class="token-string">"✂️ Step 4: Chunking..."</span>)
+        all_chunks = []
+        <span class="token-keyword">for</span> doc <span class="token-keyword">in</span> unique_docs:
+            chunks = self.chunker.chunk(doc)
+            all_chunks.extend(chunks)
+        print(<span class="token-string">f"   Created {len(all_chunks)} chunks from {len(unique_docs)} docs"</span>)
+        
+        <span class="token-comment"># Step 5: Generate embeddings (batch)</span>
+        print(<span class="token-string">"🧠 Step 5: Generating embeddings..."</span>)
+        embeddings = self.embedder.embed_chunks(all_chunks)
+        
+        <span class="token-comment"># Step 6: Index into Qdrant + Elasticsearch</span>
+        print(<span class="token-string">"💾 Step 6: Indexing..."</span>)
+        batch_size = <span class="token-number">500</span>
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-number">0</span>, <span class="token-builtin">len</span>(all_chunks), batch_size):
+            batch_chunks = all_chunks[i:i + batch_size]
+            batch_embeddings = embeddings[i:i + batch_size]
+            self.indexer.index_batch(batch_chunks, batch_embeddings)
+        
+        stats = {
+            <span class="token-string">"documents_parsed"</span>: <span class="token-builtin">len</span>(docs),
+            <span class="token-string">"documents_unique"</span>: <span class="token-builtin">len</span>(unique_docs),
+            <span class="token-string">"duplicates_removed"</span>: <span class="token-builtin">len</span>(docs) - <span class="token-builtin">len</span>(unique_docs),
+            <span class="token-string">"chunks_created"</span>: <span class="token-builtin">len</span>(all_chunks),
+            <span class="token-string">"embeddings_generated"</span>: <span class="token-builtin">len</span>(embeddings)
+        }
+        
+        print(<span class="token-string">f"\n✅ Ingestion complete! {stats}"</span>)
+        <span class="token-keyword">return</span> stats
+
+<span class="token-comment"># === CLI Entry Point ===</span>
+<span class="token-keyword">if</span> __name__ == <span class="token-string">"__main__"</span>:
+    <span class="token-keyword">import</span> sys
+    directory = sys.argv[<span class="token-number">1</span>] <span class="token-keyword">if</span> <span class="token-builtin">len</span>(sys.argv) > <span class="token-number">1</span> <span class="token-keyword">else</span> <span class="token-string">"./data/documents"</span>
+    pipeline = IngestionPipeline()
+    pipeline.ingest_directory(directory)</code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 10M Document Ingestion Math</div>
+                <ul>
+                    <li><strong>Documents:</strong> 10,000,000</li>
+                    <li><strong>Avg chunks per doc:</strong> 5 → 50,000,000 chunks</li>
+                    <li><strong>Embedding time:</strong> ~50M × 5ms = ~70 hours on single GPU (parallelize!)</li>
+                    <li><strong>Vector storage:</strong> 50M × 1024 dims × 4 bytes = ~200GB (with INT8 quant: ~50GB)</li>
+                    <li><strong>Elasticsearch:</strong> ~50M documents × ~500 bytes avg = ~25GB</li>
+                    <li><strong>Strategy:</strong> Process in parallel batches of 10K docs. Use multi-GPU for embeddings.</li>
+                </ul>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="project-parsing.html" class="prev">Document Parsing</a>
+                <a href="project-retrieval.html" class="next">Retrieval Engine</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

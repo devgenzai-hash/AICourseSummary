@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observer - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html" class="active"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Design Patterns &rarr; Observer</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Pattern</span>
+                <span class="tag">Design Pattern</span>
+            </div>
+            <h1>Observer</h1>
+            <p class="hero-subtitle">Defining a <strong>one-to-many dependency</strong> between objects &mdash; when one changes state, all dependents are notified and updated automatically.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>newsletter subscription</strong>. When the newspaper publishes a new edition, all subscribers receive it automatically &mdash; they don&rsquo;t need to check the newsstand every morning. New readers can subscribe at any time, and existing readers can unsubscribe whenever they want. The publisher doesn&rsquo;t need to know <em>who</em> the subscribers are or <em>what</em> they do with the paper &mdash; it just delivers to everyone on the list. That&rsquo;s the Observer pattern: publish once, notify many.</p>
+        </div>
+
+        <h2>What Is the Observer Pattern?</h2>
+        <ul>
+            <li><strong>Intent:</strong> Define a one-to-many dependency so that when one object (Subject) changes, all its dependents (Observers) are notified automatically</li>
+            <li><strong>Classification:</strong> Behavioral pattern (GoF) &mdash; controls how objects <em>communicate</em></li>
+            <li><strong>Also known as:</strong> Publish-Subscribe, Event-Listener, Signal-Slot</li>
+            <li><strong>Loose coupling:</strong> The subject knows nothing about observers except that they implement an interface &mdash; you can add/remove observers without touching the subject</li>
+            <li><strong>Foundation:</strong> Event-driven architecture, reactive programming, and GUI frameworks all build on this pattern</li>
+        </ul>
+
+        <h2>Push vs Pull Models</h2>
+        <ul>
+            <li><strong>Push model:</strong> Subject sends all relevant data to observers in the notification &mdash; observers get everything they need immediately</li>
+            <li><strong>Pull model:</strong> Subject sends minimal notification (&ldquo;I changed&rdquo;); observers query the subject for the data they need</li>
+            <li><strong>Push advantage:</strong> Observers don&rsquo;t need a reference back to the subject; simpler for observers</li>
+            <li><strong>Pull advantage:</strong> Subject doesn&rsquo;t need to know what data each observer wants; more flexible</li>
+            <li><strong>Hybrid:</strong> Most real systems push an event type + payload, letting observers filter by event type</li>
+        </ul>
+
+        <h2>Observer in GUI Frameworks</h2>
+        <ul>
+            <li><strong>DOM Events:</strong> <code>element.addEventListener('click', handler)</code> &mdash; the element is the subject, handlers are observers</li>
+            <li><strong>React:</strong> <code>useState</code> triggers re-renders of all components that read that state &mdash; components are observers of state</li>
+            <li><strong>Vue:</strong> Reactive data system automatically tracks dependencies and re-renders &mdash; built-in observer pattern</li>
+            <li><strong>Qt Signals/Slots:</strong> Objects emit signals; connected slots (observer methods) are called automatically</li>
+        </ul>
+
+        <h3>Memory Leaks from Unsubscribed Observers</h3>
+        <ul>
+            <li>If an observer subscribes but never unsubscribes, the subject holds a reference to it &rarr; garbage collector can&rsquo;t reclaim it</li>
+            <li>Classic source of memory leaks in long-lived applications (servers, SPAs, games)</li>
+            <li><strong>Solution:</strong> Always unsubscribe in cleanup/destructor methods; use weak references where possible</li>
+            <li>React&rsquo;s <code>useEffect</code> return function exists specifically to clean up subscriptions</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Observer (GoF)</th>
+                        <th>Pub/Sub (Messaging)</th>
+                        <th>Event Emitter</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Coupling</strong></td>
+                        <td>Subject knows observer interface</td>
+                        <td>Fully decoupled via broker</td>
+                        <td>Emitter knows listener signature</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Communication</strong></td>
+                        <td>Direct method call</td>
+                        <td>Message queue/topic</td>
+                        <td>Callback invocation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scale</strong></td>
+                        <td>In-process</td>
+                        <td>Cross-process/network</td>
+                        <td>In-process</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Filtering</strong></td>
+                        <td>All observers get all events</td>
+                        <td>Topic-based routing</td>
+                        <td>Event-name based</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Example</strong></td>
+                        <td>Java Observable</td>
+                        <td>Kafka, RabbitMQ, Redis Pub/Sub</td>
+                        <td>Node.js EventEmitter</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python EventEmitter &mdash; Generic Observer</h2>
+        <pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Callable, Dict, List, Any
+<span class="token-keyword">import</span> weakref
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Generic EventEmitter — subject that manages observers</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">EventEmitter</span>:
+    <span class="token-string">"""A generic observer/event system — subscribe, emit, unsubscribe."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._listeners: Dict[str, List[Callable]] = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">on</span>(self, event: str, callback: Callable) -> Callable:
+        <span class="token-string">"""Subscribe a callback to an event. Returns the callback for chaining."""</span>
+        <span class="token-keyword">if</span> event <span class="token-keyword">not in</span> self._listeners:
+            self._listeners[event] = []
+        self._listeners[event].append(callback)
+        <span class="token-keyword">return</span> callback
+
+    <span class="token-keyword">def</span> <span class="token-function">off</span>(self, event: str, callback: Callable) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Unsubscribe a callback from an event."""</span>
+        <span class="token-keyword">if</span> event <span class="token-keyword">in</span> self._listeners:
+            self._listeners[event] = [
+                cb <span class="token-keyword">for</span> cb <span class="token-keyword">in</span> self._listeners[event]
+                <span class="token-keyword">if</span> cb != callback
+            ]
+
+    <span class="token-keyword">def</span> <span class="token-function">emit</span>(self, event: str, *args, **kwargs) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Notify all observers subscribed to this event."""</span>
+        <span class="token-keyword">for</span> callback <span class="token-keyword">in</span> self._listeners.get(event, []):
+            callback(*args, **kwargs)
+
+    <span class="token-keyword">def</span> <span class="token-function">once</span>(self, event: str, callback: Callable) -> Callable:
+        <span class="token-string">"""Subscribe a callback that fires only once, then auto-unsubscribes."""</span>
+        <span class="token-keyword">def</span> <span class="token-function">wrapper</span>(*args, **kwargs):
+            callback(*args, **kwargs)
+            self.off(event, wrapper)
+        self.on(event, wrapper)
+        <span class="token-keyword">return</span> callback
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Using the EventEmitter</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+emitter = EventEmitter()
+
+<span class="token-comment"># Subscribe observers</span>
+emitter.on(<span class="token-string">"user:login"</span>, <span class="token-keyword">lambda</span> user: print(f<span class="token-string">"  [Analytics] {user} logged in"</span>))
+emitter.on(<span class="token-string">"user:login"</span>, <span class="token-keyword">lambda</span> user: print(f<span class="token-string">"  [Audit] Login event for {user}"</span>))
+emitter.on(<span class="token-string">"user:login"</span>, <span class="token-keyword">lambda</span> user: print(f<span class="token-string">"  [Welcome] Hello, {user}!"</span>))
+
+print(<span class="token-string">"=== User Login Event ==="</span>)
+emitter.emit(<span class="token-string">"user:login"</span>, <span class="token-string">"Alice"</span>)
+
+<span class="token-comment"># One-time observer</span>
+emitter.once(<span class="token-string">"first:purchase"</span>, <span class="token-keyword">lambda</span> item: print(f<span class="token-string">"  [Promo] First purchase: {item}! 10% off next!"</span>))
+
+print(<span class="token-string">"\n=== First Purchase ==="</span>)
+emitter.emit(<span class="token-string">"first:purchase"</span>, <span class="token-string">"Laptop"</span>)
+print(<span class="token-string">"=== Second Purchase (no promo) ==="</span>)
+emitter.emit(<span class="token-string">"first:purchase"</span>, <span class="token-string">"Mouse"</span>)  <span class="token-comment"># observer already removed</span></code></pre>
+
+        <h2>Stock Price Observer &mdash; Classic Example</h2>
+        <pre><code><span class="token-keyword">from</span> abc <span class="token-keyword">import</span> ABC, abstractmethod
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Observer interface</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">StockObserver</span>(ABC):
+    <span class="token-string">"""Interface that all observers must implement."""</span>
+
+    @abstractmethod
+    <span class="token-keyword">def</span> <span class="token-function">update</span>(self, symbol: str, price: float) -> <span class="token-keyword">None</span>:
+        ...
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Subject — the stock ticker</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">StockTicker</span>:
+    <span class="token-string">"""Subject that notifies observers when stock prices change."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._observers: List[StockObserver] = []
+        self._prices: dict = {}
+
+    <span class="token-keyword">def</span> <span class="token-function">subscribe</span>(self, observer: StockObserver) -> <span class="token-keyword">None</span>:
+        self._observers.append(observer)
+        print(f<span class="token-string">"  [Ticker] {observer.__class__.__name__} subscribed"</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">unsubscribe</span>(self, observer: StockObserver) -> <span class="token-keyword">None</span>:
+        self._observers.remove(observer)
+        print(f<span class="token-string">"  [Ticker] {observer.__class__.__name__} unsubscribed"</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">set_price</span>(self, symbol: str, price: float) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Update price and notify all observers."""</span>
+        old_price = self._prices.get(symbol, <span class="token-number">0</span>)
+        self._prices[symbol] = price
+        <span class="token-keyword">if</span> price != old_price:
+            self._notify(symbol, price)
+
+    <span class="token-keyword">def</span> <span class="token-function">_notify</span>(self, symbol: str, price: float) -> <span class="token-keyword">None</span>:
+        <span class="token-keyword">for</span> observer <span class="token-keyword">in</span> self._observers:
+            observer.update(symbol, price)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Concrete observers — each reacts differently</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">PriceDisplay</span>(StockObserver):
+    <span class="token-keyword">def</span> <span class="token-function">update</span>(self, symbol: str, price: float) -> <span class="token-keyword">None</span>:
+        print(f<span class="token-string">"  [Display] {symbol}: ${price:.2f}"</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">PriceAlert</span>(StockObserver):
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, threshold: float):
+        self._threshold = threshold
+
+    <span class="token-keyword">def</span> <span class="token-function">update</span>(self, symbol: str, price: float) -> <span class="token-keyword">None</span>:
+        <span class="token-keyword">if</span> price > self._threshold:
+            print(f<span class="token-string">"  [ALERT] {symbol} exceeded ${self._threshold}! Now ${price:.2f}"</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">TradeBot</span>(StockObserver):
+    <span class="token-keyword">def</span> <span class="token-function">update</span>(self, symbol: str, price: float) -> <span class="token-keyword">None</span>:
+        <span class="token-keyword">if</span> price < <span class="token-number">150</span>:
+            print(f<span class="token-string">"  [Bot] BUY {symbol} at ${price:.2f} (below $150)"</span>)
+        <span class="token-keyword">elif</span> price > <span class="token-number">200</span>:
+            print(f<span class="token-string">"  [Bot] SELL {symbol} at ${price:.2f} (above $200)"</span>)
+
+
+<span class="token-comment"># Demo</span>
+ticker = StockTicker()
+display = PriceDisplay()
+alert = PriceAlert(threshold=<span class="token-number">180.0</span>)
+bot = TradeBot()
+
+ticker.subscribe(display)
+ticker.subscribe(alert)
+ticker.subscribe(bot)
+
+print(<span class="token-string">"\n=== Price Updates ==="</span>)
+ticker.set_price(<span class="token-string">"AAPL"</span>, <span class="token-number">145.50</span>)
+print()
+ticker.set_price(<span class="token-string">"AAPL"</span>, <span class="token-number">185.00</span>)
+print()
+ticker.set_price(<span class="token-string">"AAPL"</span>, <span class="token-number">210.75</span>)</code></pre>
+
+        <h2>Chat Room with Observers</h2>
+        <pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Set
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Chat Room — Subject that broadcasts messages</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">ChatRoom</span>:
+    <span class="token-string">"""A chat room where users observe messages from others."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, name: str):
+        self.name = name
+        self._members: Set[<span class="token-string">'ChatUser'</span>] = set()
+
+    <span class="token-keyword">def</span> <span class="token-function">join</span>(self, user: <span class="token-string">'ChatUser'</span>) -> <span class="token-keyword">None</span>:
+        self._members.add(user)
+        self._broadcast(f<span class="token-string">"[{user.username} joined #{self.name}]"</span>, sender=<span class="token-keyword">None</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">leave</span>(self, user: <span class="token-string">'ChatUser'</span>) -> <span class="token-keyword">None</span>:
+        self._members.discard(user)
+        self._broadcast(f<span class="token-string">"[{user.username} left #{self.name}]"</span>, sender=<span class="token-keyword">None</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">send_message</span>(self, sender: <span class="token-string">'ChatUser'</span>, message: str) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Broadcast message to all members except sender."""</span>
+        formatted = f<span class="token-string">"[{sender.username}]: {message}"</span>
+        self._broadcast(formatted, sender=sender)
+
+    <span class="token-keyword">def</span> <span class="token-function">_broadcast</span>(self, message: str, sender) -> <span class="token-keyword">None</span>:
+        <span class="token-keyword">for</span> member <span class="token-keyword">in</span> self._members:
+            <span class="token-keyword">if</span> member != sender:
+                member.receive(self.name, message)
+
+
+<span class="token-keyword">class</span> <span class="token-class">ChatUser</span>:
+    <span class="token-string">"""Observer — receives messages from chat rooms."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, username: str):
+        self.username = username
+        self.inbox: List[str] = []
+
+    <span class="token-keyword">def</span> <span class="token-function">receive</span>(self, room: str, message: str) -> <span class="token-keyword">None</span>:
+        formatted = f<span class="token-string">"  [{self.username}] #{room}: {message}"</span>
+        self.inbox.append(formatted)
+        print(formatted)
+
+
+<span class="token-comment"># Demo</span>
+room = ChatRoom(<span class="token-string">"general"</span>)
+alice = ChatUser(<span class="token-string">"Alice"</span>)
+bob = ChatUser(<span class="token-string">"Bob"</span>)
+charlie = ChatUser(<span class="token-string">"Charlie"</span>)
+
+print(<span class="token-string">"=== Chat Room Observer ==="</span>)
+room.join(alice)
+room.join(bob)
+room.join(charlie)
+print()
+
+room.send_message(alice, <span class="token-string">"Hello everyone!"</span>)
+print()
+room.send_message(bob, <span class="token-string">"Hey Alice!"</span>)
+print()
+
+room.leave(charlie)
+room.send_message(alice, <span class="token-string">"Where did Charlie go?"</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>JavaScript addEventListener:</strong> The DOM event system is the Observer pattern in action. <code>button.addEventListener('click', handler)</code> subscribes an observer; <code>removeEventListener</code> unsubscribes. The browser&rsquo;s event loop is the notification mechanism. Multiple handlers can observe the same event independently.</p>
+            <p><strong>React useState/useEffect:</strong> When state changes via <code>setState</code>, React re-renders all components that read that state &mdash; they&rsquo;re observers. <code>useEffect</code>&rsquo;s cleanup function (<code>return () =&gt; unsubscribe()</code>) prevents memory leaks by removing observers when components unmount.</p>
+            <p><strong>Redux store.subscribe:</strong> Redux is a centralized subject. <code>store.subscribe(listener)</code> adds an observer that fires on every dispatch. React-Redux&rsquo;s <code>connect()</code> and <code>useSelector()</code> optimize this with shallow equality checks &mdash; only re-rendering when relevant state slices change.</p>
+            <p><strong>RxJS Observables:</strong> RxJS takes the Observer pattern to its extreme &mdash; everything is a stream of events. <code>observable.pipe(filter(), map()).subscribe(observer)</code> composes transformations on event streams. Used heavily in Angular for HTTP calls, form changes, and WebSocket data.</p>
+            <p><strong>Django Signals:</strong> Django&rsquo;s signal system (<code>post_save.connect(handler, sender=User)</code>) is a decoupled observer &mdash; models emit signals, handlers react without the model knowing about them. Used for audit logs, cache invalidation, and sending notifications on data changes.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Observer defines a one-to-many dependency &mdash; subject notifies all observers automatically on state change</li>
+                <li>Loose coupling &mdash; subject and observers can evolve independently as long as they share the notification interface</li>
+                <li>Push model sends data with the notification; pull model lets observers query the subject</li>
+                <li>Memory leaks occur when observers forget to unsubscribe &mdash; always clean up in destructors/unmount hooks</li>
+                <li>Foundation for event-driven architecture, reactive programming, and modern UI frameworks</li>
+                <li>Pub/Sub is the distributed version &mdash; same concept, but with a message broker decoupling publishers from subscribers</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of the Observer pattern as a <strong>radio broadcast</strong>. The radio station (Subject) transmits on a frequency. Anyone with a receiver tuned to that frequency (Observer) hears the broadcast. The station doesn&rsquo;t know how many listeners there are. Listeners can tune in or out at any time. The broadcast happens regardless of whether anyone is listening.</p>
+            <div class="model-visual">
+                <pre>
+  OBSERVER PATTERN STRUCTURE:
+  ══════════════════════════════════════════════════════
+
+  ┌──────────────────────────────────────────────────┐
+  │                  SUBJECT                          │
+  │  (StockTicker / EventEmitter / ChatRoom)         │
+  │                                                  │
+  │  state: current data                             │
+  │  observers: [obs1, obs2, obs3, ...]              │
+  │                                                  │
+  │  subscribe(observer)   ← add to list             │
+  │  unsubscribe(observer) ← remove from list        │
+  │  notify()              ← call update() on all    │
+  └──────────────────┬───────────────────────────────┘
+                     │ notify (push data or signal)
+         ┌───────────┼────────────┐
+         ▼           ▼            ▼
+  ┌────────────┐ ┌────────────┐ ┌────────────┐
+  │ Observer A │ │ Observer B │ │ Observer C │
+  │ (Display)  │ │ (Alert)    │ │ (Bot)      │
+  │            │ │            │ │            │
+  │ update()   │ │ update()   │ │ update()   │
+  │ → show UI  │ │ → send SMS │ │ → auto-buy │
+  └────────────┘ └────────────┘ └────────────┘
+  Each observer reacts differently to the same event
+
+
+  EVENT FLOW TIMELINE:
+  ══════════════════════════════════════════════════════
+
+  Subject:   ──[state change]──────[state change]────→
+                    │                     │
+  Observer A: ─────update()──────────update()────────→
+  Observer B: ─────update()──────────update()────────→
+  Observer C: ─────update()────[unsubscribe]─────────→
+                                          ↑
+                              C stops receiving after unsub
+
+
+  PUSH vs PULL:
+  ══════════════════════════════════════════════════════
+
+  Push: Subject → update(symbol="AAPL", price=185.00) → Observer
+        Observer has all data immediately
+
+  Pull: Subject → update() → Observer → subject.get_price("AAPL")
+        Observer queries subject for what it needs
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Memory leaks from forgotten unsubscriptions:</strong> The #1 Observer bug. If observers subscribe in a constructor but never unsubscribe, the subject holds references forever. In web apps, this means event listeners accumulating on every page navigation. Always pair <code>subscribe()</code> with <code>unsubscribe()</code> in cleanup logic.</li>
+                <li><strong>Notification order dependency:</strong> If Observer A must run before Observer B, you have a hidden coupling. The Observer pattern makes no ordering guarantees. If order matters, use a priority queue or chain the observers explicitly rather than relying on registration order.</li>
+                <li><strong>Cascading updates (notification storms):</strong> Observer A updates state in response to a notification, which triggers another notification to Observer B, which triggers another update&hellip; infinite loops or performance collapse. Guard against re-entrant notifications with a &ldquo;notifying&rdquo; flag or batch updates.</li>
+                <li><strong>Observing too broadly:</strong> If every observer gets every event type, they waste time checking if the event is relevant. Use event names/topics (<code>on("price:AAPL", ...)</code>) so observers only receive events they care about. This is why Pub/Sub uses topic-based routing.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Typed EventEmitter:</strong> Extend the EventEmitter to support typed events using Python&rsquo;s <code>TypeVar</code> and <code>Generic</code>. Define event schemas as dataclasses and ensure <code>emit("user:login", LoginEvent(...))</code> type-checks at development time. Add a <code>listeners(event)</code> method that returns the count of active observers.</li>
+                <li><strong>Weak reference observers:</strong> Modify the StockTicker to store observers as <code>weakref.ref</code> objects. When an observer is garbage collected, the ticker should automatically remove it from the list on the next notification. Demonstrate that deleting an observer variable causes automatic unsubscription.</li>
+                <li><strong>Async observer with batching:</strong> Create an <code>AsyncEventEmitter</code> that batches notifications. Instead of notifying immediately, it collects events for 100ms, then delivers all at once (like React&rsquo;s batched state updates). Use <code>asyncio</code> to implement the debouncing. Verify that 10 rapid <code>emit()</code> calls result in one batched delivery.</li>
+                <li><strong>Observable data store:</strong> Build a <code>Store</code> class (inspired by Redux) with <code>get_state()</code>, <code>dispatch(action)</code>, and <code>subscribe(selector, callback)</code>. The selector function picks a slice of state; the callback only fires when that slice changes (not on every dispatch). Implement shallow equality check for the selector output.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="55-facade.html" class="prev">&larr; Facade</a>
+            <a href="57-strategy.html" class="next">Strategy &rarr;</a>
+        </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntersectionObserver Internals - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> IntersectionObserver Internals
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>IntersectionObserver Internals</h1>
+                <p class="subtitle">How the browser efficiently detects element visibility without scroll listeners — the internal scheduling, threshold system, and why it's asynchronous (not real-time).</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Observer API</span>
+                    <span class="tag tag-browser">Browser API</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">👁️ Daily-Life Analogy: Security Camera Zones</div>
+                <p>Instead of having a guard constantly scanning the entire warehouse (scroll events checking <code>getBoundingClientRect()</code>), you install smart cameras with motion zones (IntersectionObserver). The cameras only alert you when something <strong>enters or exits</strong> a defined zone. They don't fire continuously — just at crossing points. Much cheaper than constant monitoring.</p>
+            </div>
+
+            <h2>The Problem: Scroll-Based Visibility Detection Is Expensive</h2>
+<pre><code><span class="token-comment">// ❌ THE OLD WAY: Forces layout on every scroll frame</span>
+window.addEventListener(<span class="token-string">'scroll'</span>, () => {
+    elements.forEach(el => {
+        <span class="token-comment">// getBoundingClientRect() forces synchronous layout recalculation</span>
+        <span class="token-keyword">const</span> rect = el.getBoundingClientRect(); <span class="token-comment">// EXPENSIVE per element</span>
+        <span class="token-keyword">if</span> (rect.top &lt; window.innerHeight && rect.bottom > 0) {
+            el.classList.add(<span class="token-string">'visible'</span>);
+        }
+    });
+});
+<span class="token-comment">// Problems: fires 60x/sec, forces layout per element, blocks scrolling</span>
+</code></pre>
+
+            <h2>How IntersectionObserver Works Internally</h2>
+            <ol>
+                <li><strong>Registration</strong> — You tell the browser "watch these elements against this root"</li>
+                <li><strong>Browser schedules checks</strong> — Checks happen during idle time or between frames, NOT synchronously on scroll</li>
+                <li><strong>Geometry calculation</strong> — Browser uses its internal layout tree (already computed) — no forced reflow</li>
+                <li><strong>Threshold crossing</strong> — Callback fires only when intersection ratio crosses a threshold you defined</li>
+                <li><strong>Asynchronous delivery</strong> — Entries are batched and delivered asynchronously (like requestIdleCallback timing)</li>
+            </ol>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ It's NOT Real-Time</div>
+                <p>IntersectionObserver callbacks are <strong>asynchronous and batched</strong>. There can be a delay of 1-2 frames between when an element actually enters the viewport and when your callback fires. For pixel-perfect scroll-linked animations, you need <code>scroll</code> events or the new Scroll Timeline API. IntersectionObserver is for lazy loading, analytics, infinite scroll — not pixel-sync animations.</p>
+            </div>
+
+            <h2>Code: Full-Featured IntersectionObserver</h2>
+<pre><code><span class="token-comment">// Create observer with options</span>
+<span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> IntersectionObserver(
+    (entries, observer) => {
+        entries.forEach(entry => {
+            <span class="token-comment">// entry.isIntersecting — boolean: is it visible?</span>
+            <span class="token-comment">// entry.intersectionRatio — 0.0 to 1.0: how much is visible?</span>
+            <span class="token-comment">// entry.boundingClientRect — element's rect (no forced layout!)</span>
+            <span class="token-comment">// entry.rootBounds — root's rect</span>
+            <span class="token-comment">// entry.intersectionRect — the overlapping area</span>
+            <span class="token-comment">// entry.time — high-resolution timestamp of the observation</span>
+            
+            <span class="token-keyword">if</span> (entry.isIntersecting) {
+                <span class="token-comment">// Element is visible — load it</span>
+                loadImage(entry.target);
+                observer.unobserve(entry.target); <span class="token-comment">// Stop watching (one-shot)</span>
+            }
+        });
+    },
+    {
+        <span class="token-comment">// root: null = viewport (default). Can be any scrollable ancestor.</span>
+        root: <span class="token-keyword">null</span>,
+        
+        <span class="token-comment">// rootMargin: expand/shrink the detection area</span>
+        <span class="token-comment">// "200px" = fire callback 200px BEFORE element enters viewport</span>
+        rootMargin: <span class="token-string">'200px 0px'</span>, <span class="token-comment">// top/bottom left/right — preload before visible</span>
+        
+        <span class="token-comment">// threshold: which intersection ratios trigger the callback</span>
+        <span class="token-comment">// [0] = fire when any pixel enters/exits (default)</span>
+        <span class="token-comment">// [0, 0.5, 1.0] = fire at 0%, 50%, and 100% visibility</span>
+        threshold: [0, 0.25, 0.5, 0.75, 1.0],
+    }
+);
+
+<span class="token-comment">// Observe elements (very cheap — just registers them)</span>
+document.querySelectorAll(<span class="token-string">'img[data-src]'</span>).forEach(img => {
+    observer.observe(img);
+});
+</code></pre>
+
+            <h3>Advanced: Infinite Scroll with Sentinel</h3>
+<pre><code><span class="token-comment">// Pattern: observe a "sentinel" element at the bottom of the list</span>
+<span class="token-keyword">const</span> sentinel = document.getElementById(<span class="token-string">'scroll-sentinel'</span>);
+
+<span class="token-keyword">const</span> infiniteScrollObserver = <span class="token-keyword">new</span> IntersectionObserver(
+    (entries) => {
+        <span class="token-keyword">if</span> (entries[0].isIntersecting) {
+            <span class="token-comment">// Sentinel is visible → user scrolled near the bottom → load more</span>
+            loadNextPage();
+        }
+    },
+    { rootMargin: <span class="token-string">'400px'</span> } <span class="token-comment">// Start loading 400px before sentinel is visible</span>
+);
+
+infiniteScrollObserver.observe(sentinel);
+<span class="token-comment">// The sentinel is a zero-height div at the end of your list</span>
+<span class="token-comment">// When new items load, the sentinel naturally moves down</span>
+</code></pre>
+
+            <h2>Internal Scheduling: When Does the Check Happen?</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Trigger</th><th>When Observer Checks</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Scroll</td><td>After compositing, before next paint</td><td>Batched — not per-scroll-pixel</td></tr>
+                    <tr><td>Resize</td><td>After layout, before next paint</td><td>Viewport size change triggers re-check</td></tr>
+                    <tr><td>DOM mutation</td><td>After style/layout recalc</td><td>Adding/removing elements triggers re-check</td></tr>
+                    <tr><td>Element property change</td><td>After layout</td><td>Changing <code>display: none → block</code> triggers</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Every lazy-loading library</strong> — <code>loading="lazy"</code> in browsers uses IntersectionObserver internally to determine when to start fetching images.</li>
+                <li><strong>Google Analytics / ad viewability</strong> — Tracking whether ads were actually "seen" (50%+ visible for 1+ second) uses threshold-based observation.</li>
+                <li><strong>React/Vue virtual lists</strong> — Libraries like <code>react-intersection-observer</code> trigger rendering of items as they approach the viewport.</li>
+                <li><strong>Scroll-driven animations (fallback)</strong> — Before Scroll Timeline API, IntersectionObserver with multiple thresholds was the performant way to trigger scroll animations.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Not unobserving after one-shot use</strong> — For lazy loading, call <code>observer.unobserve(entry.target)</code> after loading. Otherwise, the callback keeps firing on every scroll.</li>
+                <li><strong>Using it for scroll-linked animations</strong> — The async nature means 1-2 frame lag. Use Scroll Timeline or scroll events for pixel-perfect sync.</li>
+                <li><strong>Creating a new observer per element</strong> — One observer can watch many elements. Creating one per element wastes resources.</li>
+                <li><strong>Forgetting the initial callback</strong> — IntersectionObserver fires immediately on observe() with the current state. Handle the "already visible" case.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand IntersectionObserver When...</h3>
+                <p>You can explain why it's more performant than scroll events (hint: uses the browser's internal layout data, doesn't force reflow, batches callbacks asynchronously), and why it's NOT suitable for frame-perfect scroll-linked animations.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a "reading progress" indicator using IntersectionObserver with thresholds at every 10% (0.0, 0.1, 0.2, ..., 1.0). As sections become visible, update a progress bar. Then compare the smoothness with a scroll event implementation.</p>
+                <h3>🔗 Connect It</h3>
+                <p>IntersectionObserver connects to: <strong>ResizeObserver</strong> (similar observer pattern, different trigger), <strong>content-visibility: auto</strong> (uses IO internally to skip rendering), and <strong>Lazy Loading</strong> (the primary use case for IO).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="36-subpixel-rendering.html" class="nav-btn nav-btn-prev">← Subpixel Rendering</a>
+                <a href="38-resize-observer.html" class="nav-btn nav-btn-next">ResizeObserver Loop Limits →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

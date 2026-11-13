@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Throttling - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Resilience Patterns &rarr; Throttling</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Resilience</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Throttling</h1>
+            <p class="hero-subtitle">Controlling the rate at which work is processed by delaying or degrading responses &mdash; keeping systems alive under pressure rather than rejecting requests outright.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of <strong>speed bumps on a road</strong>. They don&rsquo;t stop you from driving &mdash; they slow you down. A rate limiter is like a roadblock that says &ldquo;road closed, turn around&rdquo; (hard reject). Throttling is the speed bump that says &ldquo;you can keep going, but you&rsquo;ll do it at 20 mph instead of 60.&rdquo; During a traffic jam, you might also get routed to a smaller road (degraded service) rather than being told to go home entirely.</p>
+        </div>
+
+        <h2>Throttling vs Rate Limiting</h2>
+        <p>These two concepts are often confused, but they serve different purposes and behave differently under load:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Rate Limiting</th>
+                        <th>Throttling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Response to excess</strong></td>
+                        <td>Hard reject (HTTP 429)</td>
+                        <td>Slow down, queue, or degrade</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Client experience</strong></td>
+                        <td>Error &mdash; must retry later</td>
+                        <td>Slower but still gets a response</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Goal</strong></td>
+                        <td>Enforce strict quotas</td>
+                        <td>Maintain system stability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scope</strong></td>
+                        <td>Per-client or per-API-key</td>
+                        <td>System-wide or per-priority-class</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trigger</strong></td>
+                        <td>Client exceeds their quota</td>
+                        <td>System load exceeds capacity</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data loss</strong></td>
+                        <td>Requests are dropped</td>
+                        <td>Requests are delayed or degraded</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Throttling Strategies</h2>
+
+        <h3>1. Queue-Based Throttling</h3>
+        <p>Excess requests are placed in a queue and processed at a controlled rate. Callers block until their request is served or a timeout expires.</p>
+
+        <h3>2. Priority-Based Throttling</h3>
+        <p>Assign priority classes to requests. Under load, low-priority requests are delayed or dropped while high-priority ones proceed normally.</p>
+
+        <h3>3. Graceful Degradation</h3>
+        <p>Instead of full responses, return cheaper approximations &mdash; cached data, lower resolution, fewer results &mdash; to reduce per-request cost.</p>
+
+        <h3>4. Adaptive Throttling</h3>
+        <p>Dynamically adjust the processing rate based on real-time system metrics (CPU, memory, queue depth, latency percentiles).</p>
+
+        <h2>Queue-Based Throttler</h2>
+        <p>A throttler that queues incoming requests and releases them at a controlled rate using an asyncio semaphore and delay:</p>
+
+        <pre><code><span class="token-keyword">import</span> asyncio
+<span class="token-keyword">import</span> time
+<span class="token-keyword">from</span> collections <span class="token-keyword">import</span> deque
+
+<span class="token-keyword">class</span> <span class="token-class">Throttler</span>:
+    <span class="token-string">"""Queue-based throttler that delays excess requests.
+
+    Instead of rejecting requests, queues them and
+    processes at a controlled rate (requests_per_second).
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, requests_per_second: float,
+                 max_queue_size: int = <span class="token-number">100</span>):
+        self._interval = <span class="token-number">1.0</span> / requests_per_second
+        self._max_queue = max_queue_size
+        self._semaphore = asyncio.Semaphore(<span class="token-number">1</span>)
+        self._last_release = <span class="token-number">0.0</span>
+        self._queue_depth = <span class="token-number">0</span>
+
+    <span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">acquire</span>(self, timeout: float = <span class="token-number">30.0</span>) -> bool:
+        <span class="token-string">"""Wait for permission to proceed.
+
+        Returns True if acquired within timeout,
+        False if queue is full or timeout expired.
+        """</span>
+        <span class="token-keyword">if</span> self._queue_depth >= self._max_queue:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>  <span class="token-comment"># Queue full &mdash; shed load</span>
+
+        self._queue_depth += <span class="token-number">1</span>
+        <span class="token-keyword">try</span>:
+            <span class="token-keyword">async</span> <span class="token-keyword">with</span> asyncio.timeout(timeout):
+                <span class="token-keyword">async</span> <span class="token-keyword">with</span> self._semaphore:
+                    now = time.monotonic()
+                    wait = self._last_release + self._interval - now
+                    <span class="token-keyword">if</span> wait > <span class="token-number">0</span>:
+                        <span class="token-keyword">await</span> asyncio.sleep(wait)
+                    self._last_release = time.monotonic()
+                    <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+        <span class="token-keyword">except</span> asyncio.TimeoutError:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        <span class="token-keyword">finally</span>:
+            self._queue_depth -= <span class="token-number">1</span>
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">queue_depth</span>(self) -> int:
+        <span class="token-keyword">return</span> self._queue_depth
+
+
+<span class="token-comment"># Usage: 10 requests per second with queue of 50</span>
+throttler = Throttler(requests_per_second=<span class="token-number">10</span>, max_queue_size=<span class="token-number">50</span>)
+
+<span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">handle_request</span>(request_id: int):
+    allowed = <span class="token-keyword">await</span> throttler.acquire(timeout=<span class="token-number">5.0</span>)
+    <span class="token-keyword">if</span> allowed:
+        print(<span class="token-string">f"Request </span>{request_id}<span class="token-string">: processed"</span>)
+    <span class="token-keyword">else</span>:
+        print(<span class="token-string">f"Request </span>{request_id}<span class="token-string">: timed out in queue"</span>)</code></pre>
+
+        <h2>Priority Queue Throttling</h2>
+        <p>Under load, not all requests are equal. Payment processing should take precedence over analytics. Priority throttling ensures critical work proceeds while less important work is delayed:</p>
+
+        <pre><code><span class="token-keyword">import</span> asyncio
+<span class="token-keyword">import</span> heapq
+<span class="token-keyword">import</span> time
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+<span class="token-keyword">from</span> enum <span class="token-keyword">import</span> IntEnum
+
+<span class="token-keyword">class</span> <span class="token-class">Priority</span>(IntEnum):
+    CRITICAL = <span class="token-number">0</span>   <span class="token-comment"># Payment, auth</span>
+    HIGH = <span class="token-number">1</span>       <span class="token-comment"># User-facing reads</span>
+    NORMAL = <span class="token-number">2</span>     <span class="token-comment"># Standard operations</span>
+    LOW = <span class="token-number">3</span>        <span class="token-comment"># Background jobs, analytics</span>
+
+@dataclass(order=<span class="token-keyword">True</span>)
+<span class="token-keyword">class</span> <span class="token-class">PrioritizedRequest</span>:
+    priority: int
+    timestamp: float = field(compare=<span class="token-keyword">True</span>)
+    future: asyncio.Future = field(compare=<span class="token-keyword">False</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">PriorityThrottler</span>:
+    <span class="token-string">"""Throttler that processes higher-priority requests first.
+
+    Under load, LOW priority requests may be delayed
+    significantly or dropped when queue is full.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, requests_per_second: float,
+                 max_queue: int = <span class="token-number">200</span>):
+        self._interval = <span class="token-number">1.0</span> / requests_per_second
+        self._max_queue = max_queue
+        self._heap: list = []
+        self._processing = <span class="token-keyword">False</span>
+        self._loop = <span class="token-keyword">None</span>
+
+    <span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">submit</span>(self, priority: Priority,
+                       timeout: float = <span class="token-number">30.0</span>) -> bool:
+        <span class="token-string">"""Submit a request with given priority.
+
+        Returns True when the request is allowed to proceed.
+        Returns False on timeout or queue overflow.
+        """</span>
+        <span class="token-keyword">if</span> len(self._heap) >= self._max_queue:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+
+        loop = asyncio.get_event_loop()
+        future = loop.create_future()
+        entry = PrioritizedRequest(
+            priority=priority,
+            timestamp=time.monotonic(),
+            future=future
+        )
+        heapq.heappush(self._heap, entry)
+
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> self._processing:
+            asyncio.create_task(self._process_queue())
+
+        <span class="token-keyword">try</span>:
+            <span class="token-keyword">async</span> <span class="token-keyword">with</span> asyncio.timeout(timeout):
+                <span class="token-keyword">return</span> <span class="token-keyword">await</span> future
+        <span class="token-keyword">except</span> asyncio.TimeoutError:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+
+    <span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">_process_queue</span>(self):
+        self._processing = <span class="token-keyword">True</span>
+        <span class="token-keyword">while</span> self._heap:
+            entry = heapq.heappop(self._heap)
+            <span class="token-keyword">if</span> <span class="token-keyword">not</span> entry.future.done():
+                entry.future.set_result(<span class="token-keyword">True</span>)
+            <span class="token-keyword">await</span> asyncio.sleep(self._interval)
+        self._processing = <span class="token-keyword">False</span>
+
+
+<span class="token-comment"># Critical requests processed first, LOW waits longest</span>
+pt = PriorityThrottler(requests_per_second=<span class="token-number">50</span>)
+
+<span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">payment_handler</span>():
+    <span class="token-keyword">await</span> pt.submit(Priority.CRITICAL)
+    <span class="token-comment"># Process payment...</span>
+
+<span class="token-keyword">async</span> <span class="token-keyword">def</span> <span class="token-function">analytics_handler</span>():
+    <span class="token-keyword">await</span> pt.submit(Priority.LOW)
+    <span class="token-comment"># Log analytics event...</span></code></pre>
+
+        <h2>Adaptive Throttling</h2>
+        <p>Static throttle rates are fragile &mdash; they&rsquo;re either too aggressive (waste capacity) or too lenient (don&rsquo;t protect under spikes). Adaptive throttling adjusts the rate based on real-time system health:</p>
+
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> threading
+
+<span class="token-keyword">class</span> <span class="token-class">AdaptiveThrottler</span>:
+    <span class="token-string">"""Adjusts throttle rate based on system load.
+
+    Monitors a load metric (0.0 to 1.0) and scales
+    the allowed request rate between min and max.
+    Above critical_load, only essential requests pass.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, min_rps: float = <span class="token-number">10</span>,
+                 max_rps: float = <span class="token-number">1000</span>,
+                 critical_load: float = <span class="token-number">0.9</span>):
+        self._min_rps = min_rps
+        self._max_rps = max_rps
+        self._critical_load = critical_load
+        self._current_load = <span class="token-number">0.0</span>
+        self._lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">update_load</span>(self, load: float):
+        <span class="token-string">"""Update current system load (0.0 to 1.0).
+
+        Call this periodically from a health monitor.
+        """</span>
+        <span class="token-keyword">with</span> self._lock:
+            self._current_load = max(<span class="token-number">0.0</span>, min(<span class="token-number">1.0</span>, load))
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">current_rate</span>(self) -> float:
+        <span class="token-string">"""Current allowed requests per second."""</span>
+        <span class="token-keyword">with</span> self._lock:
+            load = self._current_load
+        <span class="token-comment"># Linear interpolation: high load &rarr; low rate</span>
+        rate = self._max_rps - (
+            load * (self._max_rps - self._min_rps)
+        )
+        <span class="token-keyword">return</span> max(self._min_rps, rate)
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">is_critical</span>(self) -> bool:
+        <span class="token-keyword">with</span> self._lock:
+            <span class="token-keyword">return</span> self._current_load >= self._critical_load
+
+    <span class="token-keyword">def</span> <span class="token-function">should_allow</span>(self, is_essential: bool = <span class="token-keyword">False</span>) -> bool:
+        <span class="token-string">"""Decide whether to allow a request.
+
+        Essential requests pass even under critical load.
+        Non-essential requests are probabilistically shed.
+        """</span>
+        <span class="token-keyword">if</span> is_essential:
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+        <span class="token-keyword">if</span> self.is_critical:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>  <span class="token-comment"># Only essential traffic</span>
+
+        <span class="token-keyword">import</span> random
+        <span class="token-keyword">with</span> self._lock:
+            load = self._current_load
+        <span class="token-comment"># Probabilistic shedding: higher load &rarr; more drops</span>
+        accept_probability = <span class="token-number">1.0</span> - (load * <span class="token-number">0.8</span>)
+        <span class="token-keyword">return</span> random.random() &lt; accept_probability
+
+
+<span class="token-comment"># Example: monitor feeds load every second</span>
+throttler = AdaptiveThrottler(
+    min_rps=<span class="token-number">10</span>, max_rps=<span class="token-number">500</span>, critical_load=<span class="token-number">0.85</span>
+)
+
+<span class="token-comment"># Simulated load spike</span>
+throttler.update_load(<span class="token-number">0.3</span>)   <span class="token-comment"># Normal: ~350 rps allowed</span>
+throttler.update_load(<span class="token-number">0.7</span>)   <span class="token-comment"># High: ~157 rps allowed</span>
+throttler.update_load(<span class="token-number">0.9</span>)   <span class="token-comment"># Critical: essential only</span></code></pre>
+
+        <h2>Graceful Degradation Strategies</h2>
+        <p>When throttling, you can offer reduced functionality rather than just slowing down:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Load Level</th>
+                        <th>Strategy</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Normal (0-50%)</strong></td>
+                        <td>Full service</td>
+                        <td>All features, fresh data, full results</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Elevated (50-70%)</strong></td>
+                        <td>Reduced freshness</td>
+                        <td>Serve from cache even if slightly stale</td>
+                    </tr>
+                    <tr>
+                        <td><strong>High (70-85%)</strong></td>
+                        <td>Feature shedding</td>
+                        <td>Disable recommendations, autocomplete, previews</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Critical (85-95%)</strong></td>
+                        <td>Essential only</td>
+                        <td>Only auth, payments, core reads</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Emergency (&gt;95%)</strong></td>
+                        <td>Static fallback</td>
+                        <td>Serve static error page from CDN</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>AWS API Throttling:</strong> Returns HTTP 429 &ldquo;Too Many Requests&rdquo; with exponential backoff guidance. AWS services use token bucket internally &mdash; each API has a bucket rate (steady-state) and burst capacity. DynamoDB throttles per-partition when provisioned capacity is exceeded.</p>
+            <p><strong>YouTube Video Quality:</strong> Classic graceful degradation. Under bandwidth pressure, video resolution drops from 4K &rarr; 1080p &rarr; 720p &rarr; 480p. The service continues (you still watch the video) but at reduced quality. The client doesn&rsquo;t get an error &mdash; just a degraded experience.</p>
+            <p><strong>CDN Throttling (Cloudflare/Akamai):</strong> Edge servers throttle origin requests during traffic spikes. They serve stale cache entries and batch multiple client requests into a single origin fetch (request coalescing), protecting backend servers from collapse.</p>
+            <p><strong>Netflix:</strong> Uses priority-based throttling extensively. During peak hours, background operations (recommendations recomputation, A/B test logging) are throttled to preserve capacity for stream playback &mdash; the one thing users absolutely cannot tolerate failing.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Throttling slows or degrades; rate limiting hard-rejects &mdash; use both together for defense in depth</li>
+                <li>Queue-based throttling delays requests but preserves them; clients get responses, just slower</li>
+                <li>Priority throttling ensures critical operations (payments, auth) always proceed under load</li>
+                <li>Adaptive throttling adjusts dynamically based on CPU, memory, queue depth, or latency</li>
+                <li>Graceful degradation offers reduced functionality instead of complete failure</li>
+                <li>Always set queue size limits and timeouts &mdash; unbounded queues lead to memory exhaustion</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Rate limiting is a bouncer at the door (you&rsquo;re in or out). Throttling is the highway traffic management system &mdash; speed limits drop during congestion, HOV lanes prioritize carpools, and when it&rsquo;s really bad, on-ramp signals meter traffic one car at a time. Everyone eventually gets through, just slower.</p>
+            <div class="model-visual">
+                <pre>
+  LOAD LEVEL:   Low        Medium       High        Critical
+                 │           │            │            │
+  ─────────────────────────────────────────────────────────►
+                 │           │            │            │
+  RESPONSE:   Full        Cached      Features     Essential
+              service     responses    disabled      only
+                 │           │            │            │
+  LATENCY:    10ms        50ms         200ms        500ms+
+                 │           │            │            │
+  QUEUE:      Empty       Building     Near max     Shedding
+
+  PRIORITY PROCESSING:
+  ┌──────────────────────────────────────────┐
+  │  CRITICAL ████████████████  always runs  │
+  │  HIGH     ████████████      slight delay │
+  │  NORMAL   ████████          queued       │
+  │  LOW      ███               shed first   │
+  └──────────────────────────────────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Unbounded queues in throttlers:</strong> Without a max queue size, a sustained traffic spike fills memory until the process OOMs. Always set a queue limit and return 503 when the queue is full &mdash; a bounded delay is acceptable, infinite queueing is not.</li>
+                <li><strong>Throttling without priority differentiation:</strong> Treating all requests equally means a surge of analytics events can delay payment processing. Always classify requests by business impact and throttle low-priority work first.</li>
+                <li><strong>Static throttle rates that never adapt:</strong> A fixed &ldquo;100 rps&rdquo; throttle wastes capacity when the system is healthy and doesn&rsquo;t protect enough when hardware degrades. Monitor actual system metrics and adjust rates dynamically.</li>
+                <li><strong>Confusing throttling with backpressure:</strong> Throttling is proactive (you slow down before failure). Backpressure is reactive (downstream signals it&rsquo;s overwhelmed). Use throttling at entry points and backpressure between internal services for complete protection.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a queue-based throttler:</strong> Implement the async Throttler class. Send 100 concurrent requests to it configured at 10 rps. Verify requests are spaced ~100ms apart and measure total time to process all 100.</li>
+                <li><strong>Priority throttling under load:</strong> Create a PriorityThrottler with 4 priority levels. Simulate a traffic spike with 80% LOW requests and 20% CRITICAL. Verify CRITICAL requests complete within 100ms while LOW waits seconds.</li>
+                <li><strong>Adaptive throttler with health metrics:</strong> Build an AdaptiveThrottler that reads CPU usage (use <code>psutil</code>). Run a CPU-intensive workload and verify the throttler reduces allowed rate as CPU climbs above thresholds.</li>
+                <li><strong>Graceful degradation middleware:</strong> Build a FastAPI middleware that returns full responses when load is low, cached responses at medium load, and a minimal static response at critical load. Simulate load with concurrent requests.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="37-rate-limiting.html" class="prev">&larr; Rate Limiting</a>
+            <a href="39-retry-backoff.html" class="next">Retry with Backoff &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

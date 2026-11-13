@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Components Interoperability - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interop</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Web Components Interoperability
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Web Components Interoperability</h1>
+                <p class="subtitle">How custom elements interact with React, Vue, Angular, and Svelte — the friction points, data-passing patterns, and why frameworks still struggle with the platform's native component model.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-concept">Integration</span>
+                    <span class="tag tag-browser">Cross-Framework</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🌐 Daily-Life Analogy: International Diplomacy</div>
+                <p>Web Components speak the browser's native language (HTML/DOM). Frameworks like React, Vue, Angular are like countries with their own internal languages. <strong>Interoperability</strong> is the diplomacy — translating between "attributes" (HTML's way) and "props" (the framework's way), handling events that each side dispatches differently, and negotiating who controls what.</p>
+            </div>
+
+            <h2>The Problem: Why Interop Is Hard</h2>
+            <p>Custom elements speak the DOM API. Frameworks speak their own virtual/reactive API. The translation gaps:</p>
+            <ul>
+                <li><strong>Properties vs Attributes</strong> — Frameworks pass objects as props. HTML attributes are always strings. How do you pass <code>{items: [{id: 1}]}</code> to a custom element?</li>
+                <li><strong>Event systems differ</strong> — React uses synthetic events, Vue uses <code>v-on</code>, Angular uses <code>(output)</code>. Custom elements use native <code>CustomEvent</code>. These don't automatically bridge.</li>
+                <li><strong>Children/slots mismatch</strong> — React's <code>children</code> prop vs Web Components' <code>&lt;slot&gt;</code> mechanism have different mental models.</li>
+                <li><strong>Reactivity mismatch</strong> — Frameworks batch updates and diff. Custom elements respond to individual attribute/property changes synchronously.</li>
+            </ul>
+
+            <h2>Framework Compatibility Scorecard</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Feature</th><th>React</th><th>Vue 3</th><th>Angular</th><th>Svelte</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Set properties (not just attrs)</td><td>❌ (React 19 fixes)</td><td>✅ (auto-detection)</td><td>✅ (property binding)</td><td>✅ (auto)</td></tr>
+                    <tr><td>Listen to custom events</td><td>❌ (need ref)</td><td>✅ (<code>v-on</code>)</td><td>✅ (<code>(event)</code>)</td><td>✅ (<code>on:event</code>)</td></tr>
+                    <tr><td>Pass complex data</td><td>⚠️ (ref or wrapper)</td><td>✅ (<code>v-bind</code>)</td><td>✅ (<code>[prop]</code>)</td><td>✅</td></tr>
+                    <tr><td>SSR support</td><td>⚠️ (DSD in React 19)</td><td>✅ (3.3+)</td><td>⚠️</td><td>⚠️</td></tr>
+                    <tr><td>TypeScript support</td><td>⚠️ (manual types)</td><td>✅ (defineCustomElement)</td><td>✅ (CUSTOM_ELEMENTS_SCHEMA)</td><td>✅</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Code: Using Web Components in React</h2>
+<pre><code><span class="token-comment">// THE PROBLEM: React treats all custom element attributes as strings</span>
+<span class="token-comment">// React &lt;19 cannot set properties or listen to custom events natively</span>
+
+<span class="token-comment">// ❌ BAD: This only sets the attribute (string), not the property (object)</span>
+<span class="token-keyword">function</span> <span class="token-function">BadExample</span>() {
+    <span class="token-keyword">return</span> &lt;data-grid items={JSON.stringify(rows)} /&gt;; <span class="token-comment">// Serialization overhead!</span>
+}
+
+<span class="token-comment">// ✅ GOOD: Use a ref to set properties and add event listeners</span>
+<span class="token-keyword">import</span> { useRef, useEffect } <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+
+<span class="token-keyword">function</span> <span class="token-function">DataGridWrapper</span>({ items, onRowSelect }) {
+    <span class="token-keyword">const</span> ref = useRef(<span class="token-keyword">null</span>);
+    
+    useEffect(() => {
+        <span class="token-keyword">const</span> el = ref.current;
+        <span class="token-keyword">if</span> (!el) <span class="token-keyword">return</span>;
+        
+        <span class="token-comment">// Set complex data as a DOM property (bypasses attribute serialization)</span>
+        el.items = items;
+        
+        <span class="token-comment">// Listen to custom events (React's synthetic event system doesn't handle these)</span>
+        <span class="token-keyword">const</span> handler = (e) => onRowSelect(e.detail);
+        el.addEventListener(<span class="token-string">'row-select'</span>, handler);
+        
+        <span class="token-keyword">return</span> () => el.removeEventListener(<span class="token-string">'row-select'</span>, handler);
+    }, [items, onRowSelect]);
+    
+    <span class="token-keyword">return</span> &lt;data-grid ref={ref} /&gt;;
+}
+
+<span class="token-comment">// ✅ REACT 19+: Properties are set automatically when the prop exists on the element</span>
+<span class="token-comment">// React 19 checks: if (propName in element) set as property, else set as attribute</span>
+<span class="token-keyword">function</span> <span class="token-function">React19Example</span>() {
+    <span class="token-keyword">return</span> &lt;data-grid 
+        items={rows}                          <span class="token-comment">{/* Set as property (detected) */}</span>
+        onrow-select={(e) => handle(e.detail)} <span class="token-comment">{/* Custom event listeners */}</span>
+    /&gt;;
+}
+</code></pre>
+
+            <h2>Code: Using Web Components in Vue 3</h2>
+<pre><code><span class="token-comment">&lt;!-- Vue 3 has the best Web Component interop out of the box --&gt;</span>
+&lt;template&gt;
+    <span class="token-comment">&lt;!-- Vue auto-detects properties vs attributes --&gt;</span>
+    <span class="token-comment">&lt;!-- If 'items' exists as a property on the element, Vue sets it as property --&gt;</span>
+    &lt;data-grid 
+        :items="rows"
+        :columns="columnConfig"
+        @row-select="handleRowSelect"
+    /&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+<span class="token-comment">// Vue's compiler needs to know which tags are custom elements (not Vue components)</span>
+<span class="token-comment">// Configure in vite.config.js:</span>
+<span class="token-comment">// vue({ template: { compilerOptions: { isCustomElement: tag => tag.includes('-') } } })</span>
+
+<span class="token-keyword">import</span> { ref } <span class="token-keyword">from</span> <span class="token-string">'vue'</span>;
+
+<span class="token-keyword">const</span> rows = ref([{ id: 1, name: <span class="token-string">'Product A'</span> }]);
+<span class="token-keyword">const</span> columnConfig = ref([{ field: <span class="token-string">'name'</span>, header: <span class="token-string">'Product'</span> }]);
+
+<span class="token-keyword">function</span> <span class="token-function">handleRowSelect</span>(event) {
+    <span class="token-comment">// Vue automatically unwraps CustomEvent — event IS the CustomEvent</span>
+    console.log(event.detail); <span class="token-comment">// The row data from the custom element</span>
+}
+&lt;/script&gt;
+</code></pre>
+
+            <h2>Code: Building Framework-Agnostic Custom Elements</h2>
+<pre><code><span class="token-comment">// Design pattern: Support BOTH attributes (HTML) and properties (JS)</span>
+<span class="token-comment">// This makes your component work well with ALL frameworks</span>
+
+<span class="token-keyword">class</span> <span class="token-function">SmartGrid</span> <span class="token-keyword">extends</span> HTMLElement {
+    <span class="token-keyword">static</span> <span class="token-keyword">get</span> observedAttributes() { <span class="token-keyword">return</span> [<span class="token-string">'page-size'</span>]; }
+
+    <span class="token-comment">// Property getter/setter — frameworks that set properties will use this</span>
+    <span class="token-keyword">get</span> items() { <span class="token-keyword">return</span> <span class="token-keyword">this</span>._items || []; }
+    <span class="token-keyword">set</span> items(val) {
+        <span class="token-keyword">this</span>._items = val;
+        <span class="token-keyword">this</span>._render(); <span class="token-comment">// Re-render when property changes</span>
+    }
+    
+    <span class="token-comment">// Attribute → property reflection for simple values</span>
+    <span class="token-keyword">get</span> pageSize() { <span class="token-keyword">return</span> parseInt(<span class="token-keyword">this</span>.getAttribute(<span class="token-string">'page-size'</span>)) || 10; }
+    <span class="token-keyword">set</span> pageSize(val) { <span class="token-keyword">this</span>.setAttribute(<span class="token-string">'page-size'</span>, String(val)); }
+    
+    attributeChangedCallback(name, oldVal, newVal) {
+        <span class="token-keyword">if</span> (name === <span class="token-string">'page-size'</span> && <span class="token-keyword">this</span>.isConnected) <span class="token-keyword">this</span>._render();
+    }
+
+    <span class="token-comment">// Dispatch custom events with detail — all frameworks can listen</span>
+    _emitRowSelect(row) {
+        <span class="token-keyword">this</span>.dispatchEvent(<span class="token-keyword">new</span> CustomEvent(<span class="token-string">'row-select'</span>, {
+            detail: row,
+            bubbles: <span class="token-keyword">true</span>,     <span class="token-comment">// Let it bubble for event delegation</span>
+            composed: <span class="token-keyword">true</span>,    <span class="token-comment">// Cross shadow DOM boundary</span>
+        }));
+    }
+}
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Adobe Spectrum Web Components</strong> — Adobe's design system ships as custom elements, consumed by React, Vue, and vanilla HTML across all Adobe products (Photoshop Web, Acrobat).</li>
+                <li><strong>Ionic Framework</strong> — Ships UI components as Web Components (via Stencil), with thin React/Vue/Angular wrappers that handle the interop layer.</li>
+                <li><strong>SAP UI5 Web Components</strong> — Enterprise components that work across React, Vue, and Angular without framework lock-in.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Only supporting attributes</strong> — If your component only reads attributes, frameworks must serialize objects to strings. Always implement property setters for complex data.</li>
+                <li><strong>Not setting <code>composed: true</code> on events</strong> — Without it, events won't escape Shadow DOM boundaries, making them invisible to framework event listeners on the host.</li>
+                <li><strong>Ignoring SSR</strong> — Custom elements require JavaScript to render. For SSR, use Declarative Shadow DOM (<code>&lt;template shadowrootmode="open"&gt;</code>) or provide fallback content in slots.</li>
+                <li><strong>Breaking React's controlled component model</strong> — React expects to be the single source of truth for form values. Custom elements that internally mutate state confuse React's reconciliation.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Web Components Interop When...</h3>
+                <p>You can explain why passing an object as an attribute in React breaks (serialized to <code>[object Object]</code>), how Vue 3 auto-detects property vs attribute, and when you'd need <code>composed: true</code> on a custom event.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a <code>&lt;color-picker&gt;</code> Web Component that works in React, Vue, AND vanilla HTML. It should accept a <code>value</code> property (hex string), emit a <code>change</code> CustomEvent, and support two-way binding in Vue via <code>v-model</code>.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Web Components Interop connects to: <strong>Shadow DOM</strong> (encapsulation boundary that events must cross), <strong>Custom Elements Lifecycle</strong> (the hooks frameworks trigger), and <strong>Module Federation</strong> (both solve cross-team sharing, different layers).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="25-custom-elements-lifecycle.html" class="nav-btn nav-btn-prev">← Custom Elements Lifecycle</a>
+                <a href="27-web-workers-vs-service-workers.html" class="nav-btn nav-btn-next">Web Workers vs Service Workers →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

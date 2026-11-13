@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HealthBridge — Doctor Experience (File 3 of 4)</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#0F172A;color:#F8FAFC;line-height:1.5}
+
+    .page-header{background:linear-gradient(135deg,#7C3AED,#0D9488);padding:3rem 2rem;text-align:center}
+    .page-header .file-badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
+      border-radius:20px;padding:.25rem .9rem;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:.8rem}
+    .page-header h1{font-size:2.2rem;font-weight:800;margin-bottom:.4rem}
+    .page-header p{font-size:1rem;opacity:.85;max-width:580px;margin:0 auto}
+
+    .file-nav{background:#1E293B;padding:1rem 2rem;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;
+      border-bottom:1px solid #334155}
+    .file-nav a{color:#94A3B8;text-decoration:none;font-size:.8rem;padding:.3rem .7rem;border-radius:6px;
+      border:1px solid #334155;transition:.2s}
+    .file-nav a:hover,.file-nav a.active{background:#0D9488;color:white;border-color:#0D9488}
+
+    .section{padding:2.5rem 2rem;border-bottom:1px solid #1E293B}
+    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#64748B;margin-bottom:.4rem}
+    .section h2{font-size:1.5rem;font-weight:800;margin-bottom:.4rem}
+    .section .desc{font-size:.88rem;color:#94A3B8;max-width:900px;margin-bottom:2rem}
+
+    /* phone frames - dark mode for doctors */
+    .phone{flex-shrink:0;width:260px}
+    .phone-label{text-align:center;font-size:.72rem;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem}
+    .phone-device{background:#1a1a2e;border-radius:36px;padding:9px;
+      box-shadow:0 0 0 2px #2a2a4a,0 24px 60px rgba(0,0,0,.5);position:relative}
+    .phone-notch{width:80px;height:20px;background:#1a1a2e;border-radius:0 0 12px 12px;
+      position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:5}
+    .phone-screen{border-radius:28px;overflow:hidden;height:540px;display:flex;flex-direction:column;background:#0F172A}
+    .status-bar{display:flex;justify-content:space-between;align-items:center;
+      padding:24px 16px 5px;font-size:10px;font-weight:700;flex-shrink:0;color:#94A3B8}
+    .bottom-nav{display:flex;border-top:1px solid #334155;flex-shrink:0;background:#1E293B}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0 8px;gap:2px}
+    .nav-item .ni{font-size:16px}
+    .nav-item .nl{font-size:8px;font-weight:600;color:#475569}
+    .nav-item.a .nl,.nav-item.a .ni{color:#14B8A6}
+    .scr{overflow-y:auto;flex:1}
+    .scr::-webkit-scrollbar{display:none}
+
+    .arrow-row{display:flex;gap:2.5rem;flex-wrap:wrap;align-items:flex-start}
+    .flow-arrow{font-size:1.5rem;color:#334155;flex-shrink:0;align-self:center;margin-top:20px}
+
+    /* desktop frame */
+    .desktop-frame{background:#1E293B;border-radius:12px;border:1.5px solid #334155;overflow:hidden;
+      box-shadow:0 16px 48px rgba(0,0,0,.4)}
+    .desktop-topbar{background:#0F172A;height:30px;display:flex;align-items:center;padding:0 .8rem;gap:.4rem}
+    .desktop-dot{width:10px;height:10px;border-radius:50%}
+    .desktop-url{flex:1;background:#1E293B;border-radius:4px;height:16px;margin:0 .5rem;display:flex;align-items:center;
+      padding:0 .5rem;font-size:.62rem;color:#64748B}
+    .desktop-screen{display:flex;height:400px}
+    .desktop-sidebar{width:170px;background:#0F172A;border-right:1px solid #1E293B;padding:.5rem 0;flex-shrink:0}
+    .ds-logo{padding:.4rem .7rem .6rem;border-bottom:1px solid #1E293B;margin-bottom:.3rem}
+    .ds-logo div:first-child{font-size:.8rem;font-weight:800;color:white}
+    .ds-logo div:last-child{font-size:.62rem;color:#64748B}
+    .ds-item{padding:.4rem .7rem;display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:#64748B;cursor:pointer}
+    .ds-item.act{background:#0D948820;color:#14B8A6;border-left:3px solid #0D9488}
+    .di{font-size:13px}
+    .desktop-content{flex:1;overflow:hidden;padding:.65rem;background:#0F172A}
+
+    .annotation{background:#1E293B;border-left:3px solid #14B8A6;border-radius:0 8px 8px 0;
+      padding:.75rem 1rem;font-size:.82rem;color:#CBD5E1;margin-top:.75rem}
+    .annotation strong{color:#F8FAFC;display:block;margin-bottom:.2rem}
+
+    /* hero callout */
+    .hero-callout{background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:14px;padding:1.5rem;margin-bottom:2rem}
+    .hero-callout .hc-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-bottom:.4rem}
+    .hero-callout h3{font-size:1.2rem;font-weight:800;margin-bottom:.4rem}
+    .hero-callout p{font-size:.85rem;opacity:.88;max-width:600px}
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="file-badge">🩺 File 3 of 4 — Doctor Experience</div>
+  <h1>What the Doctor Sees</h1>
+  <p>The AI briefing card, appointment queue, patient history, and prescription flow. Dark mode used (Direction C). The hero feature of the product.</p>
+</div>
+<div class="file-nav">
+  <a href="mockup-01-design-systems.html">1 · Design Systems</a>
+  <a href="mockup-02-patient-screens.html">2 · Patient Journey</a>
+  <a href="mockup-03-doctor-screens.html" class="active">3 · Doctor Experience</a>
+  <a href="mockup-04-clinic-admin.html">4 · Clinic Admin</a>
+</div>
+
+<!-- ══════════════════════════════════
+     THE AI BRIEFING CARD — HERO FEATURE
+══════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Hero Feature</div>
+  <div class="hero-callout">
+    <div class="hc-label">🤖 The Single Most Important Screen in the Entire Product</div>
+    <h3>The AI Patient Briefing Card</h3>
+    <p>Before the doctor walks into the consultation room, they tap the patient's name and see this card. 3 seconds to know: what changed since last visit, trending metrics, active medications, and what to ask. This is the feature doctors will tell other doctors about.</p>
+  </div>
+  <h2>Doctor Queue + AI Briefing Flow</h2>
+  <div class="desc">The end-to-end flow from "doctor opens app" to "doctor walks into consultation fully informed."</div>
+
+  <div class="arrow-row">
+
+    <!-- Queue view -->
+    <div class="phone">
+      <div class="phone-label">Today's Queue</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <div style="padding:.6rem .8rem">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.65rem">
+                <div>
+                  <div style="color:#64748B;font-size:.65rem">Friday, 30 May 2026</div>
+                  <div style="color:white;font-size:.95rem;font-weight:700">Dr. Priya Mehta</div>
+                  <div style="color:#64748B;font-size:.65rem">General Medicine · Apollo Clinic</div>
+                </div>
+                <div style="width:36px;height:36px;background:#14B8A620;border:1px solid #14B8A640;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px">🔔</div>
+              </div>
+
+              <!-- stats row -->
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.7rem">
+                <div style="background:#1E293B;border-radius:8px;padding:.5rem .3rem;text-align:center">
+                  <div style="font-size:1.1rem;font-weight:800;color:#F8FAFC">12</div>
+                  <div style="font-size:.57rem;color:#64748B">Total</div>
+                </div>
+                <div style="background:#1E293B;border-radius:8px;padding:.5rem .3rem;text-align:center">
+                  <div style="font-size:1.1rem;font-weight:800;color:#22C55E">7</div>
+                  <div style="font-size:.57rem;color:#64748B">Done</div>
+                </div>
+                <div style="background:#1E293B;border-radius:8px;padding:.5rem .3rem;text-align:center">
+                  <div style="font-size:1.1rem;font-weight:800;color:#F59E0B">3</div>
+                  <div style="font-size:.57rem;color:#64748B">Waiting</div>
+                </div>
+                <div style="background:#1E293B;border-radius:8px;padding:.5rem .3rem;text-align:center">
+                  <div style="font-size:1.1rem;font-weight:800;color:#EF4444">2</div>
+                  <div style="font-size:.57rem;color:#64748B">No-show</div>
+                </div>
+              </div>
+
+              <!-- AI alert banner -->
+              <div style="background:#14B8A610;border:1px solid #14B8A630;border-radius:10px;padding:.6rem .7rem;margin-bottom:.7rem;display:flex;gap:.5rem;align-items:flex-start">
+                <span style="font-size:14px;flex-shrink:0">🤖</span>
+                <div style="font-size:.7rem;color:#CBD5E1">Rajesh Patil (11:00 AM) — <span style="color:#F59E0B;font-weight:700">HbA1c trending up 3 months</span>. Consider medication adjustment today.</div>
+              </div>
+
+              <!-- UP NEXT - featured card -->
+              <div style="background:#1E293B;border-radius:12px;border:1px solid #14B8A640;overflow:hidden;margin-bottom:.5rem">
+                <div style="background:linear-gradient(90deg,#14B8A620,transparent);padding:.6rem .75rem;display:flex;align-items:center;justify-content:space-between">
+                  <div style="display:flex;align-items:center;gap:.5rem">
+                    <span style="background:#14B8A6;color:#0F172A;border-radius:4px;padding:.1rem .4rem;font-size:.6rem;font-weight:800">UP NEXT</span>
+                    <span style="color:#64748B;font-size:.65rem">10:30 AM</span>
+                  </div>
+                  <span style="color:#64748B;font-size:.65rem">Slot 8</span>
+                </div>
+                <div style="padding:.6rem .75rem">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                    <div>
+                      <div style="color:white;font-size:.85rem;font-weight:700">Meena Sharma</div>
+                      <div style="color:#64748B;font-size:.67rem">F · 52 yrs · Diabetes follow-up</div>
+                    </div>
+                    <div style="background:#0D9488;border-radius:8px;padding:.3rem .6rem;font-size:.68rem;font-weight:700;color:white">Briefing →</div>
+                  </div>
+                  <!-- mini AI preview -->
+                  <div style="background:#0F172A;border-radius:8px;padding:.5rem;margin-top:.45rem">
+                    <div style="font-size:.62rem;color:#14B8A6;font-weight:700;margin-bottom:.2rem">🤖 AI PREVIEW</div>
+                    <div style="font-size:.68rem;color:#94A3B8">Stable HbA1c 6.8%. Borderline LDL. Ask about Atorvastatin compliance.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- regular patient cards -->
+              <div style="background:#1E293B;border-radius:10px;border:1px solid #334155;padding:.6rem .75rem;margin-bottom:.4rem">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="color:white;font-size:.8rem;font-weight:600">Rajesh Patil</div>
+                    <div style="color:#64748B;font-size:.65rem">11:00 AM · M 58y · HbA1c review</div>
+                  </div>
+                  <span style="background:#F59E0B20;color:#F59E0B;border-radius:4px;padding:.1rem .35rem;font-size:.6rem;font-weight:700">⚠️ Alert</span>
+                </div>
+              </div>
+              <div style="background:#1E293B;border-radius:10px;border:1px solid #334155;padding:.6rem .75rem;margin-bottom:.4rem;opacity:.7">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="color:white;font-size:.8rem;font-weight:600">Arjun Kumar</div>
+                    <div style="color:#64748B;font-size:.65rem">11:30 AM · M 45y · BP check</div>
+                  </div>
+                  <span style="color:#475569;font-size:.6rem">Waiting</span>
+                </div>
+              </div>
+              <div style="background:#1E293B;border-radius:10px;border:1px solid #334155;padding:.6rem .75rem;opacity:.5">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="color:#CBD5E1;font-size:.8rem;font-weight:600">Sunita Rao</div>
+                    <div style="color:#64748B;font-size:.65rem">12:00 PM · F 38y · Thyroid</div>
+                  </div>
+                  <span style="color:#475569;font-size:.6rem">Upcoming</span>
+                </div>
+              </div>
+              <div style="height:10px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#14B8A6">Queue</div></div>
+            <div class="nav-item"><div class="ni">👥</div><div class="nl">Patients</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">💬</div><div class="nl">Msgs</div></div>
+            <div class="nav-item"><div class="ni">👤</div><div class="nl">Profile</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">tap Briefing →</div>
+
+    <!-- THE AI BRIEFING CARD - the hero -->
+    <div class="phone">
+      <div class="phone-label">⭐ AI Briefing Card</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <!-- top bar -->
+            <div style="background:#1E293B;padding:.55rem .75rem;border-bottom:1px solid #334155;display:flex;align-items:center;gap:.5rem">
+              <span style="color:#14B8A6;font-size:14px">←</span>
+              <div style="flex:1">
+                <div style="color:white;font-size:.82rem;font-weight:700">Meena Sharma · F 52y</div>
+                <div style="color:#64748B;font-size:.62rem">AI Pre-consultation Briefing · 10:30 AM</div>
+              </div>
+              <span style="background:#14B8A6;color:#0F172A;border-radius:6px;padding:.15rem .45rem;font-size:.62rem;font-weight:800">🤖 AI</span>
+            </div>
+            <div style="padding:.6rem .75rem">
+
+              <!-- THE MAIN AI SUMMARY — Hero of the hero -->
+              <div style="background:linear-gradient(135deg,#0D948830,#14B8A620);border:1px solid #14B8A650;border-radius:12px;padding:.85rem;margin-bottom:.6rem">
+                <div style="font-size:.6rem;font-weight:800;color:#14B8A6;text-transform:uppercase;letter-spacing:1px;margin-bottom:.35rem">🤖 AI Pre-consultation Summary</div>
+                <div style="font-size:.77rem;color:#CBD5E1;line-height:1.55">
+                  Last seen <strong style="color:white">14 May</strong> for diabetes follow-up. <strong style="color:white">HbA1c stable at 6.8%</strong> — no regression. New concern: <span style="color:#F59E0B;font-weight:600">Lipid profile (20 May) shows borderline LDL at 142 mg/dL</span>. Patient on Metformin + Amlodipine. Atorvastatin prescribed last visit — <span style="color:#F59E0B;font-weight:600">compliance unconfirmed</span>.<br>
+                  <strong style="color:#14B8A6;margin-top:.35rem;display:block">Ask about: Atorvastatin compliance + dietary changes since lipid result.</strong>
+                </div>
+              </div>
+
+              <!-- Key metrics 2x2 -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.55rem">
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:1px solid #334155">
+                  <div style="font-size:.58rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">HbA1c (28 May)</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#22C55E">6.8%</div>
+                  <div style="font-size:.6rem;color:#22C55E;font-weight:600">↔ Stable — last 3 visits</div>
+                </div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:1px solid #334155">
+                  <div style="font-size:.58rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">LDL Cholesterol (20 May)</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#F59E0B">142 mg/dL</div>
+                  <div style="font-size:.6rem;color:#F59E0B;font-weight:600">↑ Borderline high</div>
+                </div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:1px solid #334155">
+                  <div style="font-size:.58rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">Last BP logged</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#22C55E">124/82</div>
+                  <div style="font-size:.6rem;color:#22C55E;font-weight:600">↔ Controlled</div>
+                </div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:1px solid #334155">
+                  <div style="font-size:.58rem;color:#64748B;text-transform:uppercase;margin-bottom:.2rem">Blood sugar (avg 30d)</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#F59E0B">148 mg/dL</div>
+                  <div style="font-size:.6rem;color:#F59E0B;font-weight:600">Fasting · Slightly elevated</div>
+                </div>
+              </div>
+
+              <!-- Medications -->
+              <div style="background:#1E293B;border-radius:10px;padding:.6rem .7rem;margin-bottom:.55rem">
+                <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Current Medications</div>
+                <div style="display:flex;flex-direction:column;gap:.3rem">
+                  <div style="display:flex;justify-content:space-between">
+                    <span style="font-size:.73rem;color:#CBD5E1">Metformin 500mg</span><span style="font-size:.68rem;color:#22C55E;font-weight:600">2x daily ✓ Compliant</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between">
+                    <span style="font-size:.73rem;color:#CBD5E1">Amlodipine 5mg</span><span style="font-size:.68rem;color:#22C55E;font-weight:600">1x evening ✓</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;background:#F59E0B10;border-radius:5px;padding:.2rem .3rem;margin:-.1rem -.1rem">
+                    <span style="font-size:.73rem;color:#FCD34D">Atorvastatin 10mg</span><span style="font-size:.68rem;color:#F59E0B;font-weight:600">⚠️ Compliance unclear</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- action buttons -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.35rem">
+                <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:10px;padding:.55rem;text-align:center;font-size:.72rem;font-weight:700;color:white">📋 Full History</div>
+                <div style="background:#1E293B;border:1px solid #334155;border-radius:10px;padding:.55rem;text-align:center;font-size:.72rem;font-weight:600;color:#CBD5E1">💊 Prescribe</div>
+              </div>
+              <div style="margin-top:.35rem;background:#22C55E20;border:1px solid #22C55E40;border-radius:10px;padding:.5rem;text-align:center;font-size:.72rem;font-weight:600;color:#4ADE80">✓ Mark Consultation Done</div>
+              <div style="height:10px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#14B8A6">Queue</div></div>
+            <div class="nav-item"><div class="ni">👥</div><div class="nl">Patients</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">💬</div><div class="nl">Msgs</div></div>
+            <div class="nav-item"><div class="ni">👤</div><div class="nl">Profile</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">tap Prescribe →</div>
+
+    <!-- E-Prescription -->
+    <div class="phone">
+      <div class="phone-label">Write Prescription</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <div style="background:#1E293B;padding:.55rem .75rem;border-bottom:1px solid #334155;display:flex;align-items:center;gap:.5rem">
+              <span style="color:#14B8A6;font-size:14px">←</span>
+              <div>
+                <div style="color:white;font-size:.82rem;font-weight:700">Prescription — Meena Sharma</div>
+                <div style="color:#64748B;font-size:.62rem">30 May 2026 · Dr. Priya Mehta</div>
+              </div>
+            </div>
+            <div style="padding:.6rem .75rem">
+              <!-- current meds shown -->
+              <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Current Medicines</div>
+              <div style="background:#1E293B;border-radius:10px;overflow:hidden;margin-bottom:.6rem">
+                <div style="padding:.5rem .65rem;border-bottom:1px solid #0F172A;display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-size:.75rem;color:white;font-weight:600">Metformin 500mg</div>
+                    <div style="font-size:.62rem;color:#64748B">2x daily · After meals</div>
+                  </div>
+                  <span style="color:#22C55E;font-size:.65rem">Continue ✓</span>
+                </div>
+                <div style="padding:.5rem .65rem;display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-size:.75rem;color:white;font-weight:600">Amlodipine 5mg</div>
+                    <div style="font-size:.62rem;color:#64748B">1x daily · Evening</div>
+                  </div>
+                  <span style="color:#22C55E;font-size:.65rem">Continue ✓</span>
+                </div>
+              </div>
+
+              <!-- add medicine -->
+              <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Add New Medicine</div>
+              <div style="background:#1E293B;border:1.5px solid #334155;border-radius:10px;padding:.5rem .65rem;font-size:.75rem;color:#475569;margin-bottom:.35rem;display:flex;align-items:center;gap:.35rem"><span>🔍</span> Search medicine name…</div>
+
+              <!-- AI suggestion box -->
+              <div style="background:#14B8A610;border:1px solid #14B8A630;border-radius:10px;padding:.6rem;margin-bottom:.5rem">
+                <div style="font-size:.6rem;font-weight:700;color:#14B8A6;margin-bottom:.25rem">🤖 AI SUGGESTION — Given LDL 142</div>
+                <div style="font-size:.72rem;color:#CBD5E1;margin-bottom:.4rem">Atorvastatin 10mg · 1x nightly</div>
+                <div style="display:flex;gap:.3rem">
+                  <div style="flex:1;background:#1E293B;border-radius:6px;padding:.35rem;text-align:center;font-size:.65rem;color:#CBD5E1">+ Add this</div>
+                  <div style="background:#14B8A6;border-radius:6px;padding:.35rem .5rem;font-size:.65rem;color:#0F172A;font-weight:700">Adjust dose</div>
+                </div>
+              </div>
+
+              <!-- Generic alternative -->
+              <div style="background:#22C55E10;border:1px solid #22C55E30;border-radius:10px;padding:.6rem;margin-bottom:.5rem">
+                <div style="font-size:.6rem;font-weight:700;color:#22C55E;margin-bottom:.2rem">💊 GENERIC ALTERNATIVE</div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-size:.72rem;color:#CBD5E1">Atorva 10mg (Cipla)</div>
+                    <div style="font-size:.62rem;color:#64748B">Same composition · ₹15/strip vs ₹80</div>
+                  </div>
+                  <div style="background:#22C55E;border-radius:6px;padding:.25rem .45rem;font-size:.62rem;color:white;font-weight:700">Suggest</div>
+                </div>
+              </div>
+
+              <!-- notes -->
+              <div style="background:#1E293B;border-radius:10px;padding:.5rem .65rem;font-size:.72rem;color:#475569;margin-bottom:.5rem">Add doctor's notes for patient…</div>
+
+              <!-- actions -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.35rem">
+                <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:10px;padding:.55rem;text-align:center;font-size:.72rem;font-weight:700;color:white">💾 Save + Send WhatsApp</div>
+                <div style="background:#1E293B;border:1px solid #334155;border-radius:10px;padding:.55rem;text-align:center;font-size:.72rem;font-weight:600;color:#CBD5E1">📄 Print PDF</div>
+              </div>
+              <div style="height:10px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#14B8A6">Queue</div></div>
+            <div class="nav-item"><div class="ni">👥</div><div class="nl">Patients</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">💬</div><div class="nl">Msgs</div></div>
+            <div class="nav-item"><div class="ni">👤</div><div class="nl">Profile</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- Patient full history -->
+    <div class="phone">
+      <div class="phone-label">Patient Full Timeline</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <div style="background:#1E293B;padding:.55rem .75rem;border-bottom:1px solid #334155">
+              <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem">
+                <span style="color:#14B8A6;font-size:14px">←</span>
+                <div style="flex:1">
+                  <div style="color:white;font-size:.82rem;font-weight:700">Meena Sharma</div>
+                  <div style="color:#64748B;font-size:.62rem">Patient ID: HB-2024-4421 · Active</div>
+                </div>
+                <div style="background:#0D9488;border-radius:6px;padding:.2rem .45rem;font-size:.62rem;color:white;font-weight:700">Message</div>
+              </div>
+              <!-- tab bar -->
+              <div style="display:flex;gap:.3rem">
+                <div style="background:#14B8A620;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#14B8A6;font-weight:700">Timeline</div>
+                <div style="border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#475569">Reports</div>
+                <div style="border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#475569">Medicines</div>
+                <div style="border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#475569">Metrics</div>
+              </div>
+            </div>
+            <div style="padding:.6rem .75rem">
+              <!-- timeline items -->
+              <div style="position:relative;padding-left:1.2rem;margin-bottom:.5rem">
+                <div style="position:absolute;left:0;top:.3rem;width:8px;height:8px;border-radius:50%;background:#14B8A6"></div>
+                <div style="position:absolute;left:3.5px;top:calc(.3rem + 8px);width:1px;height:calc(100% - .3rem - 8px);background:#334155"></div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;margin-bottom:.4rem">
+                  <div style="font-size:.62rem;color:#14B8A6;font-weight:700;margin-bottom:.15rem">28 MAY 2026 · LAB REPORT</div>
+                  <div style="font-size:.75rem;color:white;font-weight:600">Blood CBC Panel</div>
+                  <div style="font-size:.68rem;color:#64748B">Thyrocare · HbA1c: 6.8% · Hgb: 11.2</div>
+                  <span style="background:#F0FDF420;color:#22C55E;border-radius:4px;padding:.05rem .3rem;font-size:.58rem;font-weight:700;margin-top:.2rem;display:inline-block">Normal range</span>
+                </div>
+              </div>
+              <div style="position:relative;padding-left:1.2rem;margin-bottom:.5rem">
+                <div style="position:absolute;left:0;top:.3rem;width:8px;height:8px;border-radius:50%;background:#0D9488"></div>
+                <div style="position:absolute;left:3.5px;top:calc(.3rem + 8px);width:1px;height:calc(100% - .3rem - 8px);background:#334155"></div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;margin-bottom:.4rem">
+                  <div style="font-size:.62rem;color:#0D9488;font-weight:700;margin-bottom:.15rem">14 MAY 2026 · CONSULTATION</div>
+                  <div style="font-size:.75rem;color:white;font-weight:600">Follow-up: Diabetes management</div>
+                  <div style="font-size:.68rem;color:#64748B">Dr. Priya · Prescribed Atorvastatin 10mg</div>
+                  <div style="font-size:.68rem;color:#64748B">Notes: Advised low-fat diet</div>
+                </div>
+              </div>
+              <div style="position:relative;padding-left:1.2rem;margin-bottom:.5rem">
+                <div style="position:absolute;left:0;top:.3rem;width:8px;height:8px;border-radius:50%;background:#F59E0B"></div>
+                <div style="position:absolute;left:3.5px;top:calc(.3rem + 8px);width:1px;height:calc(100% - .3rem - 8px);background:#334155"></div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;margin-bottom:.4rem">
+                  <div style="font-size:.62rem;color:#F59E0B;font-weight:700;margin-bottom:.15rem">20 MAY 2026 · LAB REPORT</div>
+                  <div style="font-size:.75rem;color:white;font-weight:600">Lipid Profile</div>
+                  <div style="font-size:.68rem;color:#64748B">Dr. Lal PathLabs · LDL: 142 mg/dL</div>
+                  <span style="background:#F59E0B20;color:#F59E0B;border-radius:4px;padding:.05rem .3rem;font-size:.58rem;font-weight:700;margin-top:.2rem;display:inline-block">Borderline — review</span>
+                </div>
+              </div>
+              <div style="position:relative;padding-left:1.2rem">
+                <div style="position:absolute;left:0;top:.3rem;width:8px;height:8px;border-radius:50%;background:#334155;border:2px solid #475569"></div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;opacity:.6">
+                  <div style="font-size:.62rem;color:#475569;font-weight:700;margin-bottom:.15rem">2 APR 2026 · CONSULTATION</div>
+                  <div style="font-size:.75rem;color:#94A3B8;font-weight:600">Annual check-up</div>
+                  <div style="font-size:.68rem;color:#64748B">Dr. Priya · All normal</div>
+                </div>
+              </div>
+              <div style="height:10px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#14B8A6">Queue</div></div>
+            <div class="nav-item"><div class="ni">👥</div><div class="nl">Patients</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">💬</div><div class="nl">Msgs</div></div>
+            <div class="nav-item"><div class="ni">👤</div><div class="nl">Profile</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end arrow-row -->
+
+  <div class="annotation"><strong>AI Briefing Card — Key UX Decisions</strong>
+  The briefing card must load in &lt;1 second — doctor is standing outside the consultation room. RAG query over the patient's vector store runs in the background when the appointment is confirmed (not when the doctor taps). The "Ask about Atorvastatin compliance" is a AI-generated prompt that helps doctors who forget follow-up questions. This alone reduces missed care opportunities.</div>
+</div>
+
+<!-- DESKTOP DOCTOR VIEW -->
+<div class="section">
+  <div class="section-label">Desktop View</div>
+  <h2>Doctor Desktop Dashboard</h2>
+  <div class="desc">Doctors in larger clinics often use a laptop. The queue is the main view, with split-pane briefing on the right.</div>
+
+  <div class="desktop-frame">
+    <div class="desktop-topbar">
+      <div class="desktop-dot" style="background:#EF4444"></div>
+      <div class="desktop-dot" style="background:#F59E0B"></div>
+      <div class="desktop-dot" style="background:#22C55E"></div>
+      <div class="desktop-url">🔒 healthbridge.in/doctor/queue</div>
+    </div>
+    <div class="desktop-screen">
+      <div class="desktop-sidebar">
+        <div class="ds-logo">
+          <div>HealthBridge</div>
+          <div>Doctor Portal</div>
+        </div>
+        <div class="ds-item act"><span class="di">📋</span>Today's Queue</div>
+        <div class="ds-item"><span class="di">👥</span>All Patients</div>
+        <div class="ds-item"><span class="di">📅</span>Schedule</div>
+        <div class="ds-item"><span class="di">📁</span>Reports Inbox</div>
+        <div class="ds-item"><span class="di">💬</span>Messages</div>
+        <div class="ds-item"><span class="di">💊</span>Prescriptions</div>
+        <div style="border-top:1px solid #1E293B;margin-top:auto">
+          <div class="ds-item"><span class="di">⚙️</span>Settings</div>
+        </div>
+      </div>
+      <div class="desktop-content">
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:.6rem;height:100%">
+
+          <!-- left: queue list -->
+          <div style="display:flex;flex-direction:column;gap:.4rem">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:.72rem;font-weight:700;color:#F8FAFC">Fri 30 May · 12 Appointments</div>
+              <div style="display:flex;gap:.25rem">
+                <div style="background:#14B8A620;border-radius:4px;padding:.2rem .4rem;font-size:.6rem;color:#14B8A6">7 Done</div>
+                <div style="background:#F59E0B20;border-radius:4px;padding:.2rem .4rem;font-size:.6rem;color:#F59E0B">3 Waiting</div>
+                <div style="background:#EF444420;border-radius:4px;padding:.2rem .4rem;font-size:.6rem;color:#EF4444">2 No-show</div>
+              </div>
+            </div>
+            <!-- AI alert -->
+            <div style="background:#14B8A610;border:1px solid #14B8A630;border-radius:8px;padding:.5rem .6rem;font-size:.68rem;color:#CBD5E1">
+              🤖 <span style="color:#F59E0B;font-weight:600">Rajesh Patil</span> — HbA1c trending up 3Q. Consider medication adjustment.
+            </div>
+            <!-- queue items - active -->
+            <div style="background:#1E293B;border-radius:8px;border:1px solid #14B8A640;padding:.5rem .6rem;cursor:pointer">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:.4rem">
+                  <span style="background:#14B8A6;color:#0F172A;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:800">NEXT</span>
+                  <div>
+                    <div style="font-size:.73rem;font-weight:700;color:#14B8A6">Meena Sharma — F 52y</div>
+                    <div style="font-size:.6rem;color:#64748B">10:30 AM · Diabetes follow-up</div>
+                  </div>
+                </div>
+                <div style="background:#0D9488;border-radius:5px;padding:.2rem .4rem;font-size:.62rem;color:white;font-weight:600">View Briefing</div>
+              </div>
+              <div style="background:#0F172A;border-radius:6px;padding:.35rem .4rem;margin-top:.35rem;font-size:.62rem;color:#94A3B8">
+                🤖 Stable HbA1c · Borderline LDL · Ask about Atorvastatin
+              </div>
+            </div>
+            <div style="background:#1E293B;border-radius:8px;border:1px solid #334155;padding:.5rem .6rem;cursor:pointer">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <div style="font-size:.73rem;font-weight:600;color:#CBD5E1">Rajesh Patil — M 58y</div>
+                  <div style="font-size:.6rem;color:#64748B">11:00 AM · HbA1c review</div>
+                </div>
+                <span style="background:#F59E0B20;color:#F59E0B;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:700">⚠️ Alert</span>
+              </div>
+            </div>
+            <div style="background:#1E293B;border-radius:8px;border:1px solid #334155;padding:.5rem .6rem;cursor:pointer;opacity:.6">
+              <div style="font-size:.73rem;font-weight:600;color:#94A3B8">Arjun Kumar — M 45y</div>
+              <div style="font-size:.6rem;color:#64748B">11:30 AM · BP check</div>
+            </div>
+            <div style="background:#1E293B;border-radius:8px;border:1px solid #334155;padding:.5rem .6rem;cursor:pointer;opacity:.5">
+              <div style="font-size:.73rem;font-weight:600;color:#94A3B8">Sunita Rao — F 38y</div>
+              <div style="font-size:.6rem;color:#64748B">12:00 PM · Thyroid check</div>
+            </div>
+          </div>
+
+          <!-- right: expanded briefing -->
+          <div style="background:#1E293B;border-radius:8px;padding:.7rem;overflow:hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+              <div>
+                <div style="font-size:.78rem;font-weight:700;color:#14B8A6">Meena Sharma · F 52y</div>
+                <div style="font-size:.6rem;color:#64748B">ID: HB-2024-4421 · Next slot: 10:30 AM</div>
+              </div>
+              <div style="display:flex;gap:.3rem">
+                <div style="background:#14B8A620;border:1px solid #14B8A640;border-radius:5px;padding:.2rem .4rem;font-size:.6rem;color:#14B8A6">📋 History</div>
+                <div style="background:#0D9488;border-radius:5px;padding:.2rem .4rem;font-size:.6rem;color:white;font-weight:600">💊 Prescribe</div>
+              </div>
+            </div>
+            <!-- AI summary -->
+            <div style="background:linear-gradient(135deg,#0D948825,#14B8A615);border:1px solid #14B8A630;border-radius:8px;padding:.6rem;margin-bottom:.5rem">
+              <div style="font-size:.58rem;font-weight:700;color:#14B8A6;margin-bottom:.25rem">🤖 AI PRE-CONSULTATION SUMMARY</div>
+              <div style="font-size:.68rem;color:#CBD5E1;line-height:1.5">Last seen 14 May. HbA1c stable 6.8%. New concern: LDL 142 borderline. Atorvastatin prescribed but compliance unconfirmed. <span style="color:#14B8A6;font-weight:600">Ask about Atorvastatin + diet changes.</span></div>
+            </div>
+            <!-- mini metrics grid -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.3rem;margin-bottom:.5rem">
+              <div style="background:#0F172A;border-radius:6px;padding:.4rem;text-align:center">
+                <div style="font-size:.55rem;color:#64748B">HbA1c</div>
+                <div style="font-size:.85rem;font-weight:800;color:#22C55E">6.8%</div>
+              </div>
+              <div style="background:#0F172A;border-radius:6px;padding:.4rem;text-align:center">
+                <div style="font-size:.55rem;color:#64748B">LDL</div>
+                <div style="font-size:.85rem;font-weight:800;color:#F59E0B">142</div>
+              </div>
+              <div style="background:#0F172A;border-radius:6px;padding:.4rem;text-align:center">
+                <div style="font-size:.55rem;color:#64748B">BP</div>
+                <div style="font-size:.85rem;font-weight:800;color:#22C55E">124/82</div>
+              </div>
+              <div style="background:#0F172A;border-radius:6px;padding:.4rem;text-align:center">
+                <div style="font-size:.55rem;color:#64748B">Sugar avg</div>
+                <div style="font-size:.85rem;font-weight:800;color:#F59E0B">148</div>
+              </div>
+            </div>
+            <!-- medications mini -->
+            <div style="background:#0F172A;border-radius:6px;padding:.5rem;margin-bottom:.4rem">
+              <div style="font-size:.58rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.3rem">Medications</div>
+              <div style="display:flex;flex-direction:column;gap:.2rem;font-size:.68rem">
+                <div style="display:flex;justify-content:space-between"><span style="color:#94A3B8">Metformin 500mg</span><span style="color:#22C55E">2x daily ✓</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:#94A3B8">Amlodipine 5mg</span><span style="color:#22C55E">1x evening ✓</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:#FCD34D">Atorvastatin 10mg</span><span style="color:#F59E0B">⚠️ Unclear</span></div>
+              </div>
+            </div>
+            <div style="background:#22C55E20;border:1px solid #22C55E30;border-radius:6px;padding:.4rem;text-align:center;font-size:.65rem;font-weight:700;color:#4ADE80;cursor:pointer">✓ Mark Done · Schedule Follow-up</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation" style="margin-top:1rem"><strong>Desktop Doctor UX: The Split-Pane Pattern</strong>
+  Queue on the left — doctor clicks a patient row. The briefing card expands on the right without any page navigation. The whole workflow (see queue → read briefing → prescribe → mark done) happens without leaving this screen. On mobile, same three screens but with back-navigation. Design token: same data, responsive layout.</div>
+</div>
+
+<!-- ══════════════════════════════
+     DOCTOR: QUICK VITALS UPDATE
+     (low priority — prescription extraction covers this)
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Supporting Feature</div>
+  <h2>Quick Vitals Update</h2>
+  <div class="desc">Doctor can log patient vitals during the consultation. <strong style="color:#F59E0B">Low priority for MVP</strong> — in practice, doctors write vitals on paper and HealthBridge will auto-extract them from prescription photos. This screen exists as a fallback for digital-first clinics.</div>
+
+  <div style="display:flex;gap:2.5rem;flex-wrap:wrap;align-items:flex-start">
+
+    <!-- Vitals Update Phone -->
+    <div class="phone">
+      <div class="phone-label">Log Patient Vitals</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#0F172A">
+            <div style="background:#1E293B;padding:.55rem .75rem;border-bottom:1px solid #334155;display:flex;align-items:center;gap:.5rem">
+              <span style="color:#14B8A6;font-size:14px">←</span>
+              <div>
+                <div style="color:white;font-size:.82rem;font-weight:700">Meena Sharma · Vitals</div>
+                <div style="color:#64748B;font-size:.62rem">Log during consultation · 30 May 2026</div>
+              </div>
+            </div>
+            <div style="padding:.6rem .75rem">
+              <!-- vitals grid -->
+              <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.4rem">Vitals (tap to edit)</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.6rem">
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:2px solid #14B8A650">
+                  <div style="font-size:.58rem;color:#64748B;margin-bottom:.2rem">🫀 Blood Pressure</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#22C55E">124<span style="font-size:.65rem;color:#64748B">/</span>82</div>
+                  <div style="font-size:.58rem;color:#22C55E">mmHg · Normal</div>
+                </div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:1px solid #334155">
+                  <div style="font-size:.58rem;color:#64748B;margin-bottom:.2rem">❤️ Pulse</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#22C55E">78</div>
+                  <div style="font-size:.58rem;color:#64748B">bpm</div>
+                </div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:1px solid #334155">
+                  <div style="font-size:.58rem;color:#64748B;margin-bottom:.2rem">🌡️ Temperature</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#22C55E">98.4</div>
+                  <div style="font-size:.58rem;color:#64748B">°F · Normal</div>
+                </div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:1px solid #334155">
+                  <div style="font-size:.58rem;color:#64748B;margin-bottom:.2rem">⚖️ Weight</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#F59E0B">72</div>
+                  <div style="font-size:.58rem;color:#F59E0B">kg · +1.5 since last</div>
+                </div>
+                <div style="background:#1E293B;border-radius:10px;padding:.6rem;border:1px solid #334155">
+                  <div style="font-size:.58rem;color:#64748B;margin-bottom:.2rem">🩸 SpO2</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#22C55E">98%</div>
+                  <div style="font-size:.58rem;color:#64748B">Oxygen saturation</div>
+                </div>
+                <div style="background:#14B8A610;border-radius:10px;padding:.6rem;border:1px dashed #14B8A630;display:flex;align-items:center;justify-content:center">
+                  <div style="text-align:center"><div style="font-size:18px">➕</div><div style="font-size:.6rem;color:#64748B">Add vital</div></div>
+                </div>
+              </div>
+              <!-- quick notes -->
+              <div style="background:#1E293B;border-radius:10px;padding:.5rem .65rem;margin-bottom:.5rem;font-size:.72rem;color:#475569">Consultation notes… "Patient reports mild dizziness…"</div>
+              <!-- save -->
+              <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:10px;padding:.55rem;text-align:center;font-size:.75rem;font-weight:700;color:white">Save Vitals · Update Patient Record</div>
+              <!-- prescription extract note -->
+              <div style="background:#F59E0B10;border:1px solid #F59E0B30;border-radius:10px;padding:.5rem .65rem;margin-top:.4rem">
+                <div style="font-size:.6rem;font-weight:700;color:#F59E0B;margin-bottom:.2rem">💡 AUTO-EXTRACT TIP</div>
+                <div style="font-size:.67rem;color:#CBD5E1">Write vitals on prescription as usual. HealthBridge will OCR-extract BP, weight, temp from prescription photo automatically. No double entry needed.</div>
+              </div>
+              <div style="height:8px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#14B8A6">Queue</div></div>
+            <div class="nav-item"><div class="ni">👥</div><div class="nl">Patients</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">💬</div><div class="nl">Msgs</div></div>
+            <div class="nav-item"><div class="ni">👤</div><div class="nl">Profile</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prescription auto-extract explainer -->
+    <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:.75rem">
+      <div style="background:#1E293B;border-radius:12px;padding:1.1rem">
+        <div style="font-size:.7rem;font-weight:700;color:#F59E0B;text-transform:uppercase;margin-bottom:.65rem">💡 Preferred Path: Prescription Photo → Auto-Extract Vitals</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <div style="background:#0F172A;border-radius:8px;padding:.5rem .7rem;display:flex;gap:.5rem;align-items:flex-start">
+            <div style="background:#0D9488;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;color:white;flex-shrink:0;margin-top:1px">1</div>
+            <div style="font-size:.72rem;color:#CBD5E1">Doctor writes prescription on paper as normal (BP: 124/82, Wt: 72kg, etc.)</div>
+          </div>
+          <div style="background:#0F172A;border-radius:8px;padding:.5rem .7rem;display:flex;gap:.5rem;align-items:flex-start">
+            <div style="background:#0D9488;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;color:white;flex-shrink:0;margin-top:1px">2</div>
+            <div style="font-size:.72rem;color:#CBD5E1">Receptionist or patient photos the prescription → uploads to HealthBridge</div>
+          </div>
+          <div style="background:#0F172A;border-radius:8px;padding:.5rem .7rem;display:flex;gap:.5rem;align-items:flex-start">
+            <div style="background:#0D9488;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;color:white;flex-shrink:0;margin-top:1px">3</div>
+            <div style="font-size:.72rem;color:#CBD5E1">Google Vision API + LLM extract: vitals, medicines, diagnosis, dosage → auto-populate patient record</div>
+          </div>
+          <div style="background:#14B8A620;border:1px solid #14B8A630;border-radius:8px;padding:.5rem .7rem">
+            <div style="font-size:.7rem;color:#CBD5E1;font-weight:600">Result: Doctor never touches the app. Patient gets a digital record of every paper prescription. Vitals trend is built automatically over time.</div>
+          </div>
+        </div>
+      </div>
+      <div class="annotation" style="border-color:#F59E0B"><strong>Why this is the right MVP choice</strong>
+      Asking doctors to type vitals into an app during consultation adds friction and resistance. But they already write vitals on prescriptions. OCR extraction after the fact costs zero doctor effort and gives HealthBridge the same data. The "Quick Vitals Update" screen exists for forward-thinking doctors who go digital-first, but it's never the default flow. Zero doctor behavior change required for Phase 1.</div>
+    </div>
+
+  </div>
+</div>
+
+<div style="background:#1E293B;text-align:center;padding:2rem;color:#64748B;font-size:.82rem">
+  <strong style="color:#F8FAFC">HealthBridge UI Mockups — File 3 of 4: Doctor Experience</strong><br>
+  <div style="margin-top:.5rem">
+    <a href="mockup-02-patient-screens.html" style="color:#14B8A6;text-decoration:none">← File 2: Patient Journey</a> ·
+    <a href="mockup-04-clinic-admin.html" style="color:#14B8A6;text-decoration:none;margin-left:.5rem">File 4 → Clinic Admin</a>
+  </div>
+</div>
+
+</body>
+</html>

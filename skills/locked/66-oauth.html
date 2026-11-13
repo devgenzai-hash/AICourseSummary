@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth 2.0 - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="sidebar-overlay"></div>
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h2>System Design</h2>
+        <p class="sidebar-subtitle">Beginner &rarr; Advanced &bull; 68 Topics</p>
+    </div>
+    <nav>
+        <ul>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html">01 &mdash; Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html">02 &mdash; Context Switching</a></li>
+            <li><a href="03-race-conditions.html">03 &mdash; Race Conditions</a></li>
+            <li><a href="04-critical-sections.html">04 &mdash; Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html">05 &mdash; Mutex Locks</a></li>
+            <li><a href="06-deadlocks.html">06 &mdash; Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html">07 &mdash; Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html">08 &mdash; Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html">09 &mdash; Atomic Operations &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html">10 &mdash; Memory Visibility</a></li>
+            <li><a href="11-happens-before.html">11 &mdash; Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html">12 &mdash; Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html">13 &mdash; False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html">14 &mdash; Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html">15 &mdash; Futures, Promises &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html">16 &mdash; Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html">17 &mdash; Blocking vs Non-Blocking</a></li>
+            <li><a href="18-actor-model.html">18 &mdash; Actor Model</a></li>
+            <li><a href="19-csp-channels.html">19 &mdash; CSP &amp; Channels</a></li>
+            <li><a href="20-stm.html">20 &mdash; Software Transactional Memory</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-fallacies-distributed.html">21 &mdash; Fallacies of Distributed Computing</a></li>
+            <li><a href="22-cap-theorem.html">22 &mdash; CAP Theorem</a></li>
+            <li><a href="23-consistency-models.html">23 &mdash; Consistency Models</a></li>
+            <li><a href="24-replication.html">24 &mdash; Replication</a></li>
+            <li><a href="25-partitioning-sharding.html">25 &mdash; Partitioning &amp; Sharding</a></li>
+            <li><a href="26-consensus-algorithms.html">26 &mdash; Consensus Algorithms</a></li>
+            <li><a href="27-vector-clocks.html">27 &mdash; Vector Clocks</a></li>
+            <li><a href="28-gossip-protocols.html">28 &mdash; Gossip Protocols</a></li>
+            <li><a href="29-distributed-hash-tables.html">29 &mdash; Distributed Hash Tables</a></li>
+            <li><a href="30-leader-election.html">30 &mdash; Leader Election</a></li>
+            <li><a href="31-distributed-transactions.html">31 &mdash; Distributed Transactions</a></li>
+            <li><a href="32-crdt.html">32 &mdash; CRDTs</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-circuit-breaker.html">33 &mdash; Circuit Breaker</a></li>
+            <li><a href="34-retry-backoff.html">34 &mdash; Retry &amp; Backoff</a></li>
+            <li><a href="35-bulkhead.html">35 &mdash; Bulkhead</a></li>
+            <li><a href="36-timeout-patterns.html">36 &mdash; Timeout Patterns</a></li>
+            <li><a href="37-health-checks.html">37 &mdash; Health Checks</a></li>
+            <li><a href="38-graceful-degradation.html">38 &mdash; Graceful Degradation</a></li>
+            <li><a href="39-chaos-engineering.html">39 &mdash; Chaos Engineering</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-acid-transactions.html">40 &mdash; ACID Transactions</a></li>
+            <li><a href="41-isolation-levels.html">41 &mdash; Isolation Levels</a></li>
+            <li><a href="42-indexing-strategies.html">42 &mdash; Indexing Strategies</a></li>
+            <li><a href="43-query-optimization.html">43 &mdash; Query Optimization</a></li>
+            <li><a href="44-connection-pooling.html">44 &mdash; Connection Pooling</a></li>
+            <li><a href="45-nosql-patterns.html">45 &mdash; NoSQL Patterns</a></li>
+            <li><a href="46-event-sourcing.html">46 &mdash; Event Sourcing</a></li>
+            <li><a href="47-cqrs.html">47 &mdash; CQRS</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-microservices.html">48 &mdash; Microservices</a></li>
+            <li><a href="49-service-mesh.html">49 &mdash; Service Mesh</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-load-balancing.html">50 &mdash; Load Balancing</a></li>
+            <li><a href="51-caching-strategies.html">51 &mdash; Caching Strategies</a></li>
+            <li><a href="52-cdn.html">52 &mdash; CDN</a></li>
+            <li><a href="53-message-queues.html">53 &mdash; Message Queues</a></li>
+            <li><a href="54-rate-limiting.html">54 &mdash; Rate Limiting</a></li>
+            <li><a href="55-backpressure.html">55 &mdash; Backpressure</a></li>
+            <li><a href="56-idempotency.html">56 &mdash; Idempotency</a></li>
+            <li><a href="57-saga-pattern.html">57 &mdash; Saga Pattern</a></li>
+            <li><a href="58-strangler-fig.html">58 &mdash; Strangler Fig</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-rest-api-design.html">59 &mdash; REST API Design</a></li>
+            <li><a href="60-graphql.html">60 &mdash; GraphQL</a></li>
+            <li><a href="61-grpc.html">61 &mdash; gRPC</a></li>
+            <li><a href="62-websockets.html">62 &mdash; WebSockets</a></li>
+            <li><a href="63-sse.html">63 &mdash; Server-Sent Events</a></li>
+            <li><a href="64-api-gateway.html">64 &mdash; API Gateway</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html">65 &mdash; JWT</a></li>
+            <li><a href="66-oauth.html" class="active">66 &mdash; OAuth 2.0</a></li>
+            <li><a href="67-csrf.html">67 &mdash; CSRF Protection</a></li>
+            <li><a href="68-tls-mtls.html">68 &mdash; TLS &amp; mTLS</a></li>
+        </ul>
+    </nav>
+    <div class="progress-tracker">
+        <span class="progress-label">Progress</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: 97%;"></div></div>
+        <span class="progress-text">66 / 68</span>
+    </div>
+</aside>
+
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Toggle sidebar">&#9776;</button>
+    <h1>System Design Course</h1>
+    <span class="topic-count">Topic 66 of 68</span>
+</header>
+
+<main class="main-content">
+    <section class="hero">
+        <div class="hero-tags">
+            <span class="tag tag-intermediate">Intermediate</span>
+            <span class="tag tag-security">Security</span>
+            <span class="tag tag-pattern">Pattern</span>
+        </div>
+        <h1>OAuth 2.0</h1>
+        <p class="hero-description">Delegated authorization &mdash; letting third-party apps access user resources without sharing credentials.</p>
+    </section>
+
+    <div class="analogy-box">
+        <h3>&#128161; Analogy</h3>
+        <p>A valet key &mdash; gives limited access to your car (drive only, no trunk) without handing over your master key. The valet can move your car but cannot open the glove box or trunk. OAuth works the same way: you grant an application specific, limited permissions without ever revealing your password.</p>
+    </div>
+
+    <h2>Core Concepts</h2>
+
+    <h3>OAuth 2.0 Roles</h3>
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Description</th>
+                <th>Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Resource Owner</strong></td>
+                <td>The user who owns the data and grants access</td>
+                <td>You (the GitHub user)</td>
+            </tr>
+            <tr>
+                <td><strong>Client</strong></td>
+                <td>The application requesting access on behalf of the user</td>
+                <td>A CI/CD tool requesting repo access</td>
+            </tr>
+            <tr>
+                <td><strong>Authorization Server</strong></td>
+                <td>Issues tokens after authenticating the resource owner</td>
+                <td>GitHub&rsquo;s OAuth server</td>
+            </tr>
+            <tr>
+                <td><strong>Resource Server</strong></td>
+                <td>Hosts the protected resources, validates tokens</td>
+                <td>GitHub API (api.github.com)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Grant Types</h3>
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Grant Type</th>
+                <th>Use Case</th>
+                <th>Security Level</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Authorization Code</strong></td>
+                <td>Server-side web apps with a backend</td>
+                <td>High &mdash; code exchanged server-to-server</td>
+            </tr>
+            <tr>
+                <td><strong>Authorization Code + PKCE</strong></td>
+                <td>SPAs, mobile apps, public clients</td>
+                <td>High &mdash; prevents code interception</td>
+            </tr>
+            <tr>
+                <td><strong>Client Credentials</strong></td>
+                <td>Machine-to-machine, no user context</td>
+                <td>Medium &mdash; requires secure secret storage</td>
+            </tr>
+            <tr>
+                <td><strong>Refresh Token</strong></td>
+                <td>Obtaining new access tokens without re-auth</td>
+                <td>High &mdash; rotated on each use</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Scopes &amp; Tokens</h3>
+    <p>Scopes define the boundaries of access &mdash; like <code>read:user</code>, <code>repo:write</code>, or <code>openid profile email</code>. The authorization server issues two types of tokens:</p>
+    <ul>
+        <li><strong>Access Token</strong> &mdash; short-lived (minutes to hours), sent with each API request</li>
+        <li><strong>Refresh Token</strong> &mdash; long-lived, used to obtain new access tokens without user interaction</li>
+    </ul>
+
+    <h3>OpenID Connect (OIDC)</h3>
+    <p>OIDC is an identity layer built on top of OAuth 2.0. While OAuth handles <em>authorization</em> (what can you access?), OIDC adds <em>authentication</em> (who are you?) by introducing an ID token &mdash; a JWT containing user identity claims.</p>
+
+    <h2>Implementation</h2>
+
+    <h3>Authorization Code Flow with PKCE</h3>
+    <pre><code><span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> secrets
+<span class="token-keyword">import</span> base64
+<span class="token-keyword">import</span> urllib.parse
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional
+<span class="token-keyword">import</span> time
+
+
+<span class="token-keyword">class</span> <span class="token-class">PKCEChallenge</span>:
+    <span class="token-comment">"""Generate PKCE code verifier and challenge for public clients."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        <span class="token-comment"># Generate a cryptographically random verifier (43-128 chars)</span>
+        self.verifier = secrets.token_urlsafe(<span class="token-number">32</span>)
+        self.challenge = self.<span class="token-function">_compute_challenge</span>()
+
+    <span class="token-keyword">def</span> <span class="token-function">_compute_challenge</span>(self) -> str:
+        <span class="token-comment"># S256: BASE64URL(SHA256(code_verifier))</span>
+        digest = hashlib.sha256(self.verifier.encode(<span class="token-string">"ascii"</span>)).digest()
+        <span class="token-keyword">return</span> base64.urlsafe_b64encode(digest).rstrip(<span class="token-string">b"="</span>).decode(<span class="token-string">"ascii"</span>)
+
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-class">OAuthConfig</span>:
+    client_id: str
+    client_secret: Optional[str]  <span class="token-comment"># None for public clients</span>
+    authorize_url: str
+    token_url: str
+    redirect_uri: str
+    scopes: list = field(default_factory=list)
+
+
+<span class="token-keyword">class</span> <span class="token-class">OAuthClient</span>:
+    <span class="token-comment">"""OAuth 2.0 Authorization Code flow with PKCE support."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, config: OAuthConfig):
+        self.config = config
+        self.pkce = <span class="token-keyword">None</span>
+        self.state = <span class="token-keyword">None</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">build_authorization_url</span>(self, use_pkce: bool = True) -> str:
+        <span class="token-comment"># Generate state parameter to prevent CSRF</span>
+        self.state = secrets.token_urlsafe(<span class="token-number">16</span>)
+
+        params = {
+            <span class="token-string">"response_type"</span>: <span class="token-string">"code"</span>,
+            <span class="token-string">"client_id"</span>: self.config.client_id,
+            <span class="token-string">"redirect_uri"</span>: self.config.redirect_uri,
+            <span class="token-string">"scope"</span>: <span class="token-string">" "</span>.join(self.config.scopes),
+            <span class="token-string">"state"</span>: self.state,
+        }
+
+        <span class="token-keyword">if</span> use_pkce:
+            self.pkce = <span class="token-function">PKCEChallenge</span>()
+            params[<span class="token-string">"code_challenge"</span>] = self.pkce.challenge
+            params[<span class="token-string">"code_challenge_method"</span>] = <span class="token-string">"S256"</span>
+
+        <span class="token-keyword">return</span> <span class="token-string">f"</span>{self.config.authorize_url}?{urllib.parse.urlencode(params)}<span class="token-string">"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">exchange_code_for_token</span>(self, code: str, state: str) -> dict:
+        <span class="token-comment"># Verify state matches to prevent CSRF attacks</span>
+        <span class="token-keyword">if</span> state != self.state:
+            <span class="token-keyword">raise</span> ValueError(<span class="token-string">"State mismatch &mdash; possible CSRF attack"</span>)
+
+        payload = {
+            <span class="token-string">"grant_type"</span>: <span class="token-string">"authorization_code"</span>,
+            <span class="token-string">"code"</span>: code,
+            <span class="token-string">"redirect_uri"</span>: self.config.redirect_uri,
+            <span class="token-string">"client_id"</span>: self.config.client_id,
+        }
+
+        <span class="token-comment"># Confidential clients include client_secret</span>
+        <span class="token-keyword">if</span> self.config.client_secret:
+            payload[<span class="token-string">"client_secret"</span>] = self.config.client_secret
+
+        <span class="token-comment"># Public clients include PKCE verifier</span>
+        <span class="token-keyword">if</span> self.pkce:
+            payload[<span class="token-string">"code_verifier"</span>] = self.pkce.verifier
+
+        <span class="token-comment"># POST to token endpoint (use httpx/requests in production)</span>
+        <span class="token-keyword">return</span> payload  <span class="token-comment"># Send as POST body</span></code></pre>
+
+    <h3>Scope Validation Middleware</h3>
+    <pre><code><span class="token-keyword">from</span> functools <span class="token-keyword">import</span> wraps
+
+
+<span class="token-keyword">class</span> <span class="token-class">ScopeValidator</span>:
+    <span class="token-comment">"""Validate that an access token has the required scopes."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, token_scopes: list[str]):
+        self.granted = set(token_scopes)
+
+    <span class="token-keyword">def</span> <span class="token-function">has_scope</span>(self, required: str) -> bool:
+        <span class="token-comment"># Support hierarchical scopes: "repo:write" implies "repo:read"</span>
+        <span class="token-keyword">if</span> required <span class="token-keyword">in</span> self.granted:
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+        <span class="token-comment"># Check parent scope</span>
+        parent = required.rsplit(<span class="token-string">":"</span>, <span class="token-number">1</span>)[<span class="token-number">0</span>]
+        <span class="token-keyword">return</span> <span class="token-string">f"</span>{parent}:write<span class="token-string">"</span> <span class="token-keyword">in</span> self.granted
+
+    <span class="token-keyword">def</span> <span class="token-function">require_all</span>(self, scopes: list[str]) -> bool:
+        <span class="token-keyword">return</span> all(self.<span class="token-function">has_scope</span>(s) <span class="token-keyword">for</span> s <span class="token-keyword">in</span> scopes)
+
+
+<span class="token-keyword">def</span> <span class="token-function">require_scopes</span>(*scopes: str):
+    <span class="token-comment">"""Decorator to enforce scope requirements on endpoints."""</span>
+    <span class="token-keyword">def</span> <span class="token-function">decorator</span>(func):
+        @wraps(func)
+        <span class="token-keyword">def</span> <span class="token-function">wrapper</span>(request, *args, **kwargs):
+            token_scopes = request.auth.get(<span class="token-string">"scope"</span>, <span class="token-string">""</span>).split()
+            validator = <span class="token-function">ScopeValidator</span>(token_scopes)
+            <span class="token-keyword">if not</span> validator.<span class="token-function">require_all</span>(list(scopes)):
+                <span class="token-keyword">raise</span> PermissionError(
+                    <span class="token-string">f"Insufficient scope. Required: </span>{scopes}<span class="token-string">"</span>
+                )
+            <span class="token-keyword">return</span> func(request, *args, **kwargs)
+        <span class="token-keyword">return</span> wrapper
+    <span class="token-keyword">return</span> decorator
+
+
+<span class="token-comment"># Usage</span>
+@<span class="token-function">require_scopes</span>(<span class="token-string">"repo:read"</span>, <span class="token-string">"user:email"</span>)
+<span class="token-keyword">def</span> <span class="token-function">get_user_repos</span>(request):
+    <span class="token-keyword">return</span> {<span class="token-string">"repos"</span>: [<span class="token-string">"project-a"</span>, <span class="token-string">"project-b"</span>]}</code></pre>
+
+    <h3>Token Refresh Logic</h3>
+    <pre><code><span class="token-keyword">class</span> <span class="token-class">TokenManager</span>:
+    <span class="token-comment">"""Manages access and refresh token lifecycle."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, access_token: str, refresh_token: str, expires_in: int):
+        self.access_token = access_token
+        self.refresh_token = refresh_token
+        self.expires_at = time.time() + expires_in
+        self.token_url = <span class="token-string">""</span>
+        self.client_id = <span class="token-string">""</span>
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">is_expired</span>(self) -> bool:
+        <span class="token-comment"># Add 30s buffer to avoid edge-case expiry during request</span>
+        <span class="token-keyword">return</span> time.time() >= (self.expires_at - <span class="token-number">30</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">get_valid_token</span>(self) -> str:
+        <span class="token-keyword">if</span> self.is_expired:
+            self.<span class="token-function">_refresh</span>()
+        <span class="token-keyword">return</span> self.access_token
+
+    <span class="token-keyword">def</span> <span class="token-function">_refresh</span>(self):
+        <span class="token-comment"># Token rotation: each refresh returns a new refresh_token</span>
+        payload = {
+            <span class="token-string">"grant_type"</span>: <span class="token-string">"refresh_token"</span>,
+            <span class="token-string">"refresh_token"</span>: self.refresh_token,
+            <span class="token-string">"client_id"</span>: self.client_id,
+        }
+        <span class="token-comment"># POST payload to self.token_url</span>
+        <span class="token-comment"># Update self.access_token, self.refresh_token, self.expires_at</span>
+        <span class="token-keyword">pass</span></code></pre>
+
+    <div class="industry-box">
+        <h3>&#127981; Industry Implementations</h3>
+        <ul>
+            <li><strong>Google OAuth</strong> &mdash; supports Authorization Code + PKCE, incremental consent, and offline access via refresh tokens</li>
+            <li><strong>GitHub OAuth</strong> &mdash; used by CI/CD tools and IDE extensions; scopes like <code>repo</code>, <code>read:org</code>, <code>workflow</code></li>
+            <li><strong>Keycloak</strong> &mdash; open-source identity provider with full OAuth 2.0 + OIDC; supports realm-based multi-tenancy</li>
+            <li><strong>Auth0</strong> &mdash; managed identity platform; provides universal login, social connections, and machine-to-machine grants</li>
+            <li><strong>Okta</strong> &mdash; enterprise SSO with OAuth 2.0, supports workforce and customer identity</li>
+            <li><strong>Azure AD (Entra ID)</strong> &mdash; Microsoft&rsquo;s identity platform; supports multi-tenant apps, conditional access, and managed identities</li>
+        </ul>
+    </div>
+
+    <div class="summary-box">
+        <h3>&#128203; Summary</h3>
+        <ul>
+            <li>OAuth 2.0 separates <em>authorization</em> from <em>authentication</em> &mdash; it delegates access without sharing credentials</li>
+            <li>Four roles: Resource Owner, Client, Authorization Server, Resource Server</li>
+            <li>Authorization Code + PKCE is the recommended flow for all modern clients (web, mobile, SPA)</li>
+            <li>Scopes define the boundary of what a token can access &mdash; principle of least privilege</li>
+            <li>Access tokens are short-lived; refresh tokens provide long-lived sessions with rotation</li>
+            <li>OIDC extends OAuth with an identity layer &mdash; the ID token (JWT) carries user claims</li>
+        </ul>
+    </div>
+
+    <div class="mental-model">
+        <h3>&#129504; Mental Model</h3>
+        <div class="model-visual">
+            <pre>
+┌──────────────┐     1. Auth Request      ┌───────────────────┐
+│   Resource   │ ─────────────────────────▶│   Authorization   │
+│    Owner     │◀───── 2. Login + Consent  │      Server       │
+└──────────────┘                           └─────────┬─────────┘
+                                                     │
+                                           3. Auth Code (via redirect)
+                                                     │
+┌──────────────┐     4. Code + Verifier    ┌─────────▼─────────┐
+│    Client    │ ─────────────────────────▶│   Token Endpoint   │
+│ Application  │◀───── 5. Access + Refresh │                    │
+└──────┬───────┘           Tokens          └────────────────────┘
+       │
+       │  6. API Request + Access Token
+       ▼
+┌──────────────┐
+│   Resource   │
+│    Server    │
+└──────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <div class="mistakes-box">
+        <h3>&#9888;&#65039; Common Mistakes</h3>
+        <ul>
+            <li><strong>Storing tokens in localStorage</strong> &mdash; vulnerable to XSS attacks; use httpOnly cookies or secure in-memory storage instead</li>
+            <li><strong>Skipping state parameter validation</strong> &mdash; opens the door to CSRF attacks where an attacker can force a victim to authorize their account</li>
+            <li><strong>Using Implicit Grant for new apps</strong> &mdash; deprecated in OAuth 2.1; always use Authorization Code + PKCE instead</li>
+            <li><strong>Overly broad scopes</strong> &mdash; requesting more permissions than needed violates least privilege and erodes user trust</li>
+        </ul>
+    </div>
+
+    <div class="exercise-box">
+        <h3>&#128221; Exercises</h3>
+        <ol>
+            <li>Implement a complete Authorization Code + PKCE flow using a local HTTP server as the redirect endpoint &mdash; print the access token on success</li>
+            <li>Build a scope validation middleware that supports hierarchical scopes (e.g., <code>admin</code> implies <code>read</code> and <code>write</code>)</li>
+            <li>Create a token manager that handles automatic refresh with exponential backoff on failure and detects refresh token rotation violations</li>
+            <li>Design a multi-tenant OAuth system where each tenant has its own set of scopes, redirect URIs, and token lifetimes</li>
+        </ol>
+    </div>
+
+    <nav class="page-nav">
+        <a href="65-jwt.html" class="prev">&larr; JWT</a>
+        <a href="67-csrf.html" class="next">CSRF Protection &rarr;</a>
+    </nav>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

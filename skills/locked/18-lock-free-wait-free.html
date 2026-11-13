@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lock-Free &amp; Wait-Free Algorithms - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Lock-Free &amp; Wait-Free Algorithms</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Lock-Free &amp; Wait-Free Algorithms</h1>
+                <p class="subtitle">Data structures that work correctly under concurrency WITHOUT any locks. Maximum performance, maximum difficulty.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">The Self-Service Gas Station</div>
+                <p><strong>Lock-based</strong>: Only one car can use the pump at a time. Others queue up.</p>
+<p><strong>Lock-free</strong>: Multiple cars can try to pump simultaneously. If two grab the same nozzle, one retries. At least one always makes progress.</p>
+<p><strong>Wait-free</strong>: Every car is GUARANTEED to finish pumping within a bounded number of steps. No starvation possible.</p>
+            </div>
+
+
+            <h2>Progress Guarantees</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Level</th><th>Guarantee</th><th>Performance</th><th>Difficulty</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Blocking (locks)</strong></td><td>None — can deadlock</td><td>Good in low contention</td><td>Easy</td></tr>
+                    <tr><td><strong>Lock-free</strong></td><td>At least ONE thread progresses</td><td>Great under contention</td><td>Hard</td></tr>
+                    <tr><td><strong>Wait-free</strong></td><td>ALL threads progress in bounded steps</td><td>Best worst-case</td><td>Extremely hard</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Lock-Free Stack (using CAS)</h2>
+<pre><code><span class="token-keyword">import</span> threading
+
+<span class="token-keyword">class</span> <span class="token-class">Node</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, value, next_node=<span class="token-keyword">None</span>):
+        self.value = value
+        self.next = next_node
+
+<span class="token-keyword">class</span> <span class="token-class">LockFreeStack</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._top = <span class="token-keyword">None</span>
+        self._lock = threading.Lock()  <span class="token-comment"># Simulates CAS</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_cas</span>(self, expected, new_value):
+        <span class="token-keyword">with</span> self._lock:
+            <span class="token-keyword">if</span> self._top <span class="token-keyword">is</span> expected:
+                self._top = new_value
+                <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">push</span>(self, value):
+        <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+            old_top = self._top
+            new_node = Node(value, old_top)
+            <span class="token-keyword">if</span> self._cas(old_top, new_node):
+                <span class="token-keyword">return</span>  <span class="token-comment"># Success!</span>
+            <span class="token-comment"># CAS failed — someone else pushed. Retry.</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">pop</span>(self):
+        <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+            old_top = self._top
+            <span class="token-keyword">if</span> old_top <span class="token-keyword">is</span> <span class="token-keyword">None</span>:
+                <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+            new_top = old_top.next
+            <span class="token-keyword">if</span> self._cas(old_top, new_top):
+                <span class="token-keyword">return</span> old_top.value  <span class="token-comment"># Success!</span>
+            <span class="token-comment"># CAS failed — retry</span></code></pre>
+
+            <h2>When to Use Lock-Free</h2>
+            <div class="callout callout-info">
+                <div class="callout-title">Decision Guide</div>
+                <p><strong>Use locks</strong> when: correctness matters more than speed, low contention, complex operations.<br>
+                <strong>Use lock-free</strong> when: high contention, real-time requirements (cannot afford to block), simple operations (counter, stack, queue).</p>
+            </div>
+
+            <div class="industry-box">
+                <h4>Industry Usage</h4>
+                <ul>
+                    <li><strong>Java ConcurrentLinkedQueue</strong> — Lock-free queue using CAS (Michael-Scott algorithm)</li>
+                    <li><strong>LMAX Disruptor</strong> — Lock-free ring buffer for ultra-low-latency trading (millions msgs/sec)</li>
+                    <li><strong>Linux kernel RCU</strong> — Read-Copy-Update: readers never block, writers do the work</li>
+                    <li><strong>Intel TBB</strong> — Lock-free concurrent containers for C++</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>Lock-free: at least one thread always makes progress (no deadlock possible)</li>
+<li>Wait-free: ALL threads make progress in bounded steps (strongest guarantee)</li>
+<li>Built on CAS (Compare-And-Swap) retry loops</li>
+<li>Faster than locks under high contention but much harder to implement correctly</li>
+<li>Use for simple structures: counters, stacks, queues</li>
+<li>Not worth it for complex operations — locks are simpler and usually fast enough</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">LOCK-BASED:
+    Thread A: [acquire lock] → work → [release]
+    Thread B: [waiting......] → [acquire] → work → [release]
+    Risk: A holds lock forever = B stuck forever (deadlock)
+
+LOCK-FREE (CAS loop):
+    Thread A: read → compute → CAS(success!) → done
+    Thread B: read → compute → CAS(FAIL! retry) → read → compute → CAS(success!) → done
+    Guarantee: At least one thread always succeeds per round</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Using lock-free when not needed</strong> — Locks are simpler and often fast enough. Profile first.</li>
+<li><strong>ABA problem</strong> — CAS can succeed incorrectly if value changes A→B→A. Use version counters.</li>
+<li><strong>Memory reclamation</strong> — When can you safely free a popped node? Other threads might still read it.</li>
+<li><strong>Testing difficulty</strong> — Lock-free bugs are extremely rare and hard to reproduce. Formal verification needed.</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Implement a lock-free counter using CAS retry loop. Test with 10 threads.</li>
+<li>Implement a lock-free stack (push/pop). Verify correctness under contention.</li>
+<li>Benchmark: lock-free stack vs lock-based stack with 10 threads, 1M operations.</li>
+<li>Demonstrate ABA problem with a lock-free stack (hint: pop node, push it back).</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="17-blocking-vs-nonblocking.html" class="prev">Blocking vs Non-Blocking</a>
+                <a href="19-read-write-locks.html" class="next">Read-Write Locks</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

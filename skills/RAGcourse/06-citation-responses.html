@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citation-Backed Responses - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Citation Responses
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 6: Citation-Backed Responses</h1>
+                <p class="subtitle">Every major claim links back to exact chunks, documents, or timestamps. Full traceability — like a research paper with footnotes.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-code">Code</span>
+                    <span class="tag tag-production">Production</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: Academic Paper References</div>
+                <p>When a scientist writes a paper saying "Coffee reduces heart disease risk by 12%," they don't just state it — they add a reference: <strong>[Smith et al., 2023, Journal of Medicine, p.45]</strong>.</p>
+                <p>This lets anyone verify the claim by checking the original source. If the reference doesn't support the claim, the paper gets retracted.</p>
+                <p><strong>Citation-backed responses work the same way.</strong> Every fact the AI states comes with a link to the exact document and passage that says so. Users can click and verify. If it's wrong, you can trace exactly where the error came from.</p>
+            </div>
+
+            <!-- ===== WHY CITATIONS ===== -->
+            <h2>Why Citations Are Non-Negotiable</h2>
+
+            <ul>
+                <li><strong>Trust:</strong> Users can verify claims by checking the source themselves</li>
+                <li><strong>Accountability:</strong> If something is wrong, you know exactly which document caused the error</li>
+                <li><strong>Debugging:</strong> Engineers can trace which retrieval step produced the cited chunk</li>
+                <li><strong>Legal compliance:</strong> Many industries require traceability of AI-generated answers</li>
+                <li><strong>Hallucination detection:</strong> A claim without a citation is immediately suspicious</li>
+            </ul>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Key Insight</div>
+                <p>If the model can't cite a source for a claim, that claim is almost certainly hallucinated. Citations are both an output feature AND a hallucination detection mechanism.</p>
+            </div>
+
+            <!-- ===== CITATION TYPES ===== -->
+            <h2>Types of Citations</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Citation Type</th>
+                        <th>What It Links To</th>
+                        <th>Example</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Document-level</strong></td>
+                        <td>The entire source document</td>
+                        <td>[HR Policy v3.2]</td>
+                        <td>Simple answers from one doc</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Chunk-level</strong></td>
+                        <td>Specific chunk/paragraph</td>
+                        <td>[HR Policy v3.2, Section 4.1, Para 2]</td>
+                        <td>Precise claim verification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quote-level</strong></td>
+                        <td>Exact verbatim text from source</td>
+                        <td>"Employees receive 20 days..." [Source A]</td>
+                        <td>Maximum verifiability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Timestamped</strong></td>
+                        <td>Document + version + date</td>
+                        <td>[HR Policy, v3.2, updated 2024-03-15]</td>
+                        <td>Time-sensitive information</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== IMPLEMENTATION ===== -->
+            <h2>How to Implement Citations</h2>
+
+            <h3>Step 1: Format Context with Source IDs</h3>
+<pre><code><span class="token-keyword">def</span> <span class="token-function">format_context_with_citations</span>(chunks: List[Dict]) -> <span class="token-builtin">str</span>:
+    <span class="token-string">"""
+    Format retrieved chunks with clear source identifiers
+    that the LLM can reference in its answer.
+    """</span>
+    formatted_sections = []
+    
+    <span class="token-keyword">for</span> i, chunk <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(chunks):
+        source_id = <span class="token-string">f"[Source {i+1}]"</span>
+        metadata = chunk[<span class="token-string">"metadata"</span>]
+        
+        section = <span class="token-string">f"""--- {source_id} ---
+Document: {metadata['title']}
+Section: {metadata.get('section', 'N/A')}
+Date: {metadata['updated_at']}
+Confidence: {chunk.get('confidence', {}).get('overall', 'N/A')}
+Content:
+{chunk['content']}
+---"""</span>
+        formatted_sections.append(section)
+    
+    <span class="token-keyword">return</span> <span class="token-string">"\n\n"</span>.join(formatted_sections)</code></pre>
+
+            <h3>Step 2: Prompt for Inline Citations</h3>
+<pre><code>CITATION_PROMPT = <span class="token-string">"""Answer the question using the provided sources.
+
+CITATION RULES:
+1. Every factual claim MUST end with a citation: [Source N]
+2. If a claim combines info from multiple sources: [Source 1, Source 3]
+3. Direct quotes must be in quotation marks with citation
+4. If you cannot cite a source for a claim, DO NOT include that claim
+5. Use this format: "statement of fact [Source N]"
+
+Example:
+"Employees receive 20 vacation days per year [Source 1]. Remote workers 
+get an additional 5 days [Source 2]. The policy was last updated in 
+March 2024 [Source 1]."
+
+Sources:
+{formatted_context}
+
+Question: {query}
+
+Answer (with inline citations):"""</span></code></pre>
+
+            <h3>Step 3: Parse and Validate Citations</h3>
+<pre><code><span class="token-keyword">import</span> re
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict, Tuple
+
+<span class="token-keyword">def</span> <span class="token-function">parse_citations</span>(answer: <span class="token-builtin">str</span>, num_sources: <span class="token-builtin">int</span>) -> Dict:
+    <span class="token-string">"""
+    Parse citations from the generated answer and validate them.
+    
+    Returns:
+        - Parsed citations with their claims
+        - Uncited claims (potential hallucinations)
+        - Invalid citations (referencing non-existent sources)
+    """</span>
+    <span class="token-comment"># Find all citations in [Source N] format</span>
+    citation_pattern = <span class="token-string">r'\[Source\s+(\d+(?:\s*,\s*\d+)*)\]'</span>
+    
+    <span class="token-comment"># Split answer into sentences</span>
+    sentences = re.split(<span class="token-string">r'(?<=[.!?])\s+'</span>, answer)
+    
+    cited_claims = []
+    uncited_claims = []
+    invalid_citations = []
+    
+    <span class="token-keyword">for</span> sentence <span class="token-keyword">in</span> sentences:
+        sentence = sentence.strip()
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> sentence:
+            <span class="token-keyword">continue</span>
+        
+        <span class="token-comment"># Find citations in this sentence</span>
+        citations = re.findall(citation_pattern, sentence)
+        
+        <span class="token-keyword">if</span> citations:
+            <span class="token-comment"># Extract source numbers</span>
+            source_nums = []
+            <span class="token-keyword">for</span> citation <span class="token-keyword">in</span> citations:
+                nums = [<span class="token-builtin">int</span>(n.strip()) <span class="token-keyword">for</span> n <span class="token-keyword">in</span> citation.split(<span class="token-string">","</span>)]
+                source_nums.extend(nums)
+            
+            <span class="token-comment"># Validate source numbers exist</span>
+            valid_nums = [n <span class="token-keyword">for</span> n <span class="token-keyword">in</span> source_nums <span class="token-keyword">if</span> <span class="token-number">1</span> <= n <= num_sources]
+            invalid_nums = [n <span class="token-keyword">for</span> n <span class="token-keyword">in</span> source_nums <span class="token-keyword">if</span> n < <span class="token-number">1</span> <span class="token-keyword">or</span> n > num_sources]
+            
+            <span class="token-keyword">if</span> invalid_nums:
+                invalid_citations.append({
+                    <span class="token-string">"claim"</span>: sentence,
+                    <span class="token-string">"invalid_sources"</span>: invalid_nums
+                })
+            
+            cited_claims.append({
+                <span class="token-string">"claim"</span>: re.sub(citation_pattern, <span class="token-string">""</span>, sentence).strip(),
+                <span class="token-string">"sources"</span>: valid_nums
+            })
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># No citation found — potential hallucination</span>
+            <span class="token-keyword">if</span> <span class="token-builtin">len</span>(sentence.split()) > <span class="token-number">5</span>:  <span class="token-comment"># Skip short connector phrases</span>
+                uncited_claims.append(sentence)
+    
+    <span class="token-keyword">return</span> {
+        <span class="token-string">"cited_claims"</span>: cited_claims,
+        <span class="token-string">"uncited_claims"</span>: uncited_claims,
+        <span class="token-string">"invalid_citations"</span>: invalid_citations,
+        <span class="token-string">"citation_coverage"</span>: <span class="token-builtin">len</span>(cited_claims) / 
+            (<span class="token-builtin">len</span>(cited_claims) + <span class="token-builtin">len</span>(uncited_claims)) <span class="token-keyword">if</span> 
+            (cited_claims <span class="token-keyword">or</span> uncited_claims) <span class="token-keyword">else</span> <span class="token-number">0</span>
+    }</code></pre>
+
+            <h3>Step 4: Verify Citation Accuracy</h3>
+<pre><code><span class="token-keyword">def</span> <span class="token-function">verify_citation_accuracy</span>(
+    cited_claims: List[Dict],
+    source_chunks: List[Dict]
+) -> List[Dict]:
+    <span class="token-string">"""
+    Verify that each citation actually supports its claim.
+    
+    A citation is accurate if the source chunk contains
+    information that supports the claim being made.
+    """</span>
+    verified_claims = []
+    
+    <span class="token-keyword">for</span> claim_info <span class="token-keyword">in</span> cited_claims:
+        claim_text = claim_info[<span class="token-string">"claim"</span>]
+        source_indices = claim_info[<span class="token-string">"sources"</span>]
+        
+        <span class="token-comment"># Check if any cited source actually supports this claim</span>
+        supporting_sources = []
+        <span class="token-keyword">for</span> idx <span class="token-keyword">in</span> source_indices:
+            source_content = source_chunks[idx - <span class="token-number">1</span>][<span class="token-string">"content"</span>]  <span class="token-comment"># 1-indexed</span>
+            
+            <span class="token-comment"># Use NLI or semantic similarity to verify support</span>
+            support_score = check_entailment(source_content, claim_text)
+            
+            <span class="token-keyword">if</span> support_score > <span class="token-number">0.7</span>:
+                supporting_sources.append({
+                    <span class="token-string">"source_idx"</span>: idx,
+                    <span class="token-string">"support_score"</span>: support_score
+                })
+        
+        verified_claims.append({
+            <span class="token-string">"claim"</span>: claim_text,
+            <span class="token-string">"cited_sources"</span>: source_indices,
+            <span class="token-string">"verified_support"</span>: <span class="token-builtin">len</span>(supporting_sources) > <span class="token-number">0</span>,
+            <span class="token-string">"support_details"</span>: supporting_sources
+        })
+    
+    <span class="token-keyword">return</span> verified_claims</code></pre>
+
+            <!-- ===== FULL CITATION PIPELINE ===== -->
+            <h2>Complete Citation Pipeline</h2>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">CitationEngine</span>:
+    <span class="token-string">"""
+    End-to-end citation system.
+    Generates cited answers and verifies every citation.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, llm, verifier):
+        self.llm = llm
+        self.verifier = verifier
+    
+    <span class="token-keyword">def</span> <span class="token-function">generate_cited_answer</span>(
+        self,
+        query: <span class="token-builtin">str</span>,
+        context_chunks: List[Dict]
+    ) -> Dict:
+        <span class="token-string">"""Generate an answer with verified citations."""</span>
+        
+        <span class="token-comment"># 1. Format context with source IDs</span>
+        formatted = format_context_with_citations(context_chunks)
+        
+        <span class="token-comment"># 2. Generate cited answer</span>
+        answer = self.llm.generate(
+            CITATION_PROMPT.format(
+                formatted_context=formatted, 
+                query=query
+            ),
+            temperature=<span class="token-number">0.1</span>
+        )
+        
+        <span class="token-comment"># 3. Parse citations from the answer</span>
+        parsed = parse_citations(answer, <span class="token-builtin">len</span>(context_chunks))
+        
+        <span class="token-comment"># 4. Verify citation accuracy</span>
+        verified = verify_citation_accuracy(
+            parsed[<span class="token-string">"cited_claims"</span>], context_chunks
+        )
+        
+        <span class="token-comment"># 5. Flag any issues</span>
+        issues = []
+        <span class="token-keyword">if</span> parsed[<span class="token-string">"uncited_claims"</span>]:
+            issues.append(<span class="token-string">f"{len(parsed['uncited_claims'])} uncited claims detected"</span>)
+        
+        unverified = [v <span class="token-keyword">for</span> v <span class="token-keyword">in</span> verified <span class="token-keyword">if not</span> v[<span class="token-string">"verified_support"</span>]]
+        <span class="token-keyword">if</span> unverified:
+            issues.append(<span class="token-string">f"{len(unverified)} citations don't match their source"</span>)
+        
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"answer"</span>: answer,
+            <span class="token-string">"citations"</span>: parsed,
+            <span class="token-string">"verification"</span>: verified,
+            <span class="token-string">"citation_coverage"</span>: parsed[<span class="token-string">"citation_coverage"</span>],
+            <span class="token-string">"issues"</span>: issues,
+            <span class="token-string">"quality_score"</span>: self._compute_quality(parsed, verified),
+            <span class="token-string">"source_documents"</span>: [
+                {
+                    <span class="token-string">"id"</span>: c[<span class="token-string">"chunk_id"</span>],
+                    <span class="token-string">"title"</span>: c[<span class="token-string">"metadata"</span>][<span class="token-string">"title"</span>],
+                    <span class="token-string">"url"</span>: c[<span class="token-string">"metadata"</span>].get(<span class="token-string">"url"</span>, <span class="token-string">""</span>),
+                    <span class="token-string">"date"</span>: c[<span class="token-string">"metadata"</span>][<span class="token-string">"updated_at"</span>]
+                }
+                <span class="token-keyword">for</span> c <span class="token-keyword">in</span> context_chunks
+            ]
+        }
+    
+    <span class="token-keyword">def</span> <span class="token-function">_compute_quality</span>(self, parsed, verified) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""Compute overall citation quality score 0-1."""</span>
+        coverage = parsed[<span class="token-string">"citation_coverage"</span>]
+        accuracy = (
+            sum(<span class="token-number">1</span> <span class="token-keyword">for</span> v <span class="token-keyword">in</span> verified <span class="token-keyword">if</span> v[<span class="token-string">"verified_support"</span>]) / 
+            <span class="token-builtin">len</span>(verified) <span class="token-keyword">if</span> verified <span class="token-keyword">else</span> <span class="token-number">0</span>
+        )
+        <span class="token-keyword">return</span> (coverage * <span class="token-number">0.4</span>) + (accuracy * <span class="token-number">0.6</span>)</code></pre>
+
+            <!-- ===== RENDERING CITATIONS ===== -->
+            <h2>Rendering Citations for Users</h2>
+            <p>How you display citations in the final UI matters for user trust:</p>
+
+<pre><code><span class="token-comment"># Example output rendered for the user:</span>
+
+<span class="token-string">"""
+Answer:
+Remote workers receive 25 vacation days per year [1]. This includes 
+the standard 20 days [1] plus a 5-day remote work bonus [2]. 
+The policy was updated in March 2024 [1].
+
+━━━ Sources ━━━
+[1] HR Policy v3.2 – "Vacation & Leave Guidelines"
+    Updated: March 15, 2024 | Confidence: High
+    📄 View document →
+
+[2] Remote Work Addendum – "Benefits for Remote Employees"  
+    Updated: January 8, 2024 | Confidence: High
+    📄 View document →
+"""</span></code></pre>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>Perplexity AI</strong> — Shows numbered citations inline with clickable source links</li>
+                    <li><strong>Google Gemini (with search)</strong> — Provides "View sources" with snippet previews</li>
+                    <li><strong>Enterprise RAG (Microsoft Copilot)</strong> — Links to SharePoint/Confluence pages with highlighted passages</li>
+                    <li><strong>Legal AI tools</strong> — Require paragraph-level citations with exact page/section numbers</li>
+                    <li><strong>Best practice:</strong> Show citation inline + expandable source panel with full context</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>Every factual claim in the response MUST link to a specific source document/chunk</li>
+                    <li>Citations serve dual purpose: user trust AND hallucination detection</li>
+                    <li>Uncited claims are immediate red flags — likely hallucinations</li>
+                    <li>Verify citations programmatically: does the cited source actually support the claim?</li>
+                    <li>Include metadata in citations: document title, date, confidence, direct link</li>
+                    <li>Citation quality score = (coverage × 0.4) + (accuracy × 0.6)</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+Answer: "The budget for Q3 is $2.5M [Source 1], allocated across 
+         3 departments [Source 2]."
+
+Verification:
+├── "budget for Q3 is $2.5M" → Check Source 1 → ✅ Source says "$2.5M for Q3"
+├── "allocated across 3 departments" → Check Source 2 → ✅ Source lists 3 depts
+└── Citation quality: 100% coverage, 100% accuracy → PASS
+
+Red flag example:
+Answer: "The budget is $2.5M [Source 1] and will increase next year."
+                                                    ↑ NO CITATION = likely hallucinated
+                </div>
+                <p><strong>Think of it as:</strong> A lawyer who can't make a claim in court without pointing to evidence. No evidence = claim gets thrown out.</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>Document-level only citations:</strong> "Based on the HR Policy..." is too vague. Cite the specific section/paragraph.</li>
+                    <li><strong>Not verifying citations:</strong> Models sometimes cite the wrong source number. Always programmatically check.</li>
+                    <li><strong>Allowing uncited claims:</strong> If a claim has no citation, either add one or remove the claim entirely.</li>
+                    <li><strong>Citations without links:</strong> Users need to click through and verify. A citation without a way to check the source is useless.</li>
+                    <li><strong>Not showing confidence:</strong> Not all citations are equal. Show the confidence level of each source so users know which citations are rock-solid vs. uncertain.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Citation System</h3>
+                <ol>
+                    <li>Create 5 source documents about a topic (e.g., company travel policy)</li>
+                    <li>Implement the citation prompt template from above</li>
+                    <li>Generate an answer with inline citations using an LLM</li>
+                    <li>Parse the citations from the generated text (extract [Source N] references)</li>
+                    <li>Build a verification function that checks if each citation matches its source</li>
+                    <li>Calculate citation coverage (% of claims that are cited) and accuracy (% of citations that actually support their claims)</li>
+                    <li>Render the final output with a sources panel showing document metadata</li>
+                    <li><strong>Bonus:</strong> Handle the case where the model cites a source that doesn't exist (hallucinated citation)</li>
+                </ol>
+                <p><strong>Success criteria:</strong> Achieve 90%+ citation coverage and 85%+ citation accuracy on 5 test queries.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="05-constrained-generation.html" class="prev">Constrained Generation</a>
+                <a href="07-hallucination-fallback.html" class="next">Hallucination Fallback</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

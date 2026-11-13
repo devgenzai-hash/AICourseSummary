@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAP Theorem - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> CAP Theorem</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>CAP Theorem</h1>
+                <p class="subtitle">You can only pick two out of three: Consistency, Availability, and Partition Tolerance. Every distributed system must choose which trade-off to live with.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-distributed">Distributed</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">&#127968; Daily-Life Analogy: The Phone Game Between Friends</div>
+                <p>Imagine you have three friends in different cities. They all share one bank account and need to know the balance at all times.</p>
+                <p><strong>Consistency</strong>: All three friends always see the same balance. If one spends $50, the others instantly know.</p>
+                <p><strong>Availability</strong>: Any friend can check or spend from the account at any time — the "bank" never says "system down, come back later."</p>
+                <p><strong>Partition Tolerance</strong>: Even when phone lines between cities go down (network partition), the system still works somehow.</p>
+                <p>Here's the catch: <strong>you can't have all three perfectly at the same time.</strong> If the phone line goes down (partition happens), you must choose:</p>
+                <ul>
+                    <li><strong>Option A (CP)</strong>: Freeze the account until communication is restored. Everyone sees the same balance (consistent), but some friends can't access it (not available).</li>
+                    <li><strong>Option B (AP)</strong>: Let everyone keep spending independently. Everyone can access it (available), but balances might not match (not consistent).</li>
+                </ul>
+            </div>
+
+            <h2>What Is the CAP Theorem?</h2>
+            <p>The CAP theorem (also called Brewer's Theorem, proposed by Eric Brewer in 2000) states that a distributed data system can only guarantee <strong>two out of three</strong> properties simultaneously:</p>
+
+            <table class="comparison-table">
+                <thead><tr><th>Property</th><th>Simple Meaning</th><th>Technical Definition</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>C</strong>onsistency</td><td>Everyone sees the same data at the same time</td><td>Every read receives the most recent write or an error. All nodes return the same value for the same query at any point in time.</td></tr>
+                    <tr><td><strong>A</strong>vailability</td><td>The system always responds — never says "I'm busy"</td><td>Every request receives a (non-error) response, without guarantee that it contains the most recent write.</td></tr>
+                    <tr><td><strong>P</strong>artition Tolerance</td><td>The system survives when network connections break</td><td>The system continues to operate despite arbitrary message loss or failure of part of the network.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Why You Can't Have All Three</h2>
+            <p>In any real distributed system, <strong>network partitions WILL happen</strong>. Cables get cut. Data centers lose connectivity. This means Partition Tolerance is not optional — it's a requirement. So the real choice is:</p>
+
+            <div class="callout callout-warning">
+                <strong>The Real Choice:</strong> When a network partition occurs, do you sacrifice Consistency (AP) or Availability (CP)? You MUST pick one.
+            </div>
+
+            <h3>CP System (Consistency + Partition Tolerance)</h3>
+            <p>When a partition happens, the system <strong>refuses to serve requests</strong> that might return stale data. It waits until communication is restored.</p>
+            <ul>
+                <li><strong>Behavior</strong>: Returns errors or timeouts during partition rather than stale data</li>
+                <li><strong>Use when</strong>: Correctness is critical (bank transfers, inventory counts, leader election)</li>
+                <li><strong>Examples</strong>: MongoDB (in strong consistency mode), HBase, Zookeeper, etcd, Redis (with WAIT command)</li>
+            </ul>
+
+            <h3>AP System (Availability + Partition Tolerance)</h3>
+            <p>When a partition happens, the system <strong>keeps serving requests</strong> but different nodes might return different (stale) data.</p>
+            <ul>
+                <li><strong>Behavior</strong>: Always returns data, but it might be outdated during partitions</li>
+                <li><strong>Use when</strong>: Uptime is critical, eventual consistency is acceptable (social feeds, DNS, shopping carts)</li>
+                <li><strong>Examples</strong>: Cassandra, DynamoDB, CouchDB, DNS</li>
+            </ul>
+
+            <h3>CA System (Consistency + Availability) — Only Without Partitions</h3>
+            <p>A system that gives both C and A but can't handle network partitions. This is essentially a <strong>single-node system</strong> (like a traditional SQL database on one machine).</p>
+            <ul>
+                <li><strong>Behavior</strong>: Perfect consistency and availability, but crashes entirely if there's a network issue</li>
+                <li><strong>Examples</strong>: Single-node PostgreSQL, single-node MySQL (technically not "distributed")</li>
+            </ul>
+
+            <h2>CAP in Practice: The Spectrum</h2>
+            <p>Real systems don't fit neatly into CP or AP boxes. They exist on a <strong>spectrum</strong> and often let you configure the trade-off per operation.</p>
+
+<pre><code><span class="token-comment"># Example: Cassandra lets you tune consistency per query</span>
+<span class="token-comment"># This is how you choose CP vs AP at the query level</span>
+
+<span class="token-keyword">from</span> cassandra.cluster <span class="token-keyword">import</span> Cluster
+<span class="token-keyword">from</span> cassandra <span class="token-keyword">import</span> ConsistencyLevel
+
+cluster = Cluster([<span class="token-string">'node1'</span>, <span class="token-string">'node2'</span>, <span class="token-string">'node3'</span>])
+session = cluster.connect(<span class="token-string">'my_keyspace'</span>)
+
+<span class="token-comment"># AP mode: Read from ANY node (fast, might be stale)</span>
+stmt = session.prepare(<span class="token-string">"SELECT * FROM users WHERE id = ?"</span>)
+stmt.consistency_level = ConsistencyLevel.ONE  <span class="token-comment"># Just one node needs to respond</span>
+result = session.execute(stmt, [user_id])
+
+<span class="token-comment"># CP mode: Read from QUORUM (majority must agree — consistent but slower)</span>
+stmt.consistency_level = ConsistencyLevel.QUORUM  <span class="token-comment"># Majority of nodes must respond</span>
+result = session.execute(stmt, [user_id])
+
+<span class="token-comment"># Strongest CP: ALL nodes must respond (slowest, most consistent)</span>
+stmt.consistency_level = ConsistencyLevel.ALL
+result = session.execute(stmt, [user_id])</code></pre>
+
+            <h2>How Real Companies Choose</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Company</th><th>System</th><th>Choice</th><th>Why</th></tr></thead>
+                <tbody>
+                    <tr><td>Google</td><td>Spanner</td><td>CP (with high A)</td><td>Uses TrueTime + synchronized clocks to minimize availability cost</td></tr>
+                    <tr><td>Amazon</td><td>DynamoDB</td><td>AP (configurable)</td><td>Shopping cart must always work — resolve conflicts later</td></tr>
+                    <tr><td>Netflix</td><td>Cassandra</td><td>AP</td><td>Streaming catalog can be slightly stale — uptime matters most</td></tr>
+                    <tr><td>Banks</td><td>Traditional SQL</td><td>CP</td><td>Wrong balance = lawsuit. Downtime during partition is acceptable.</td></tr>
+                    <tr><td>Facebook</td><td>TAO (social graph)</td><td>AP</td><td>"I see a post 2 seconds late" is fine — "Facebook is down" is not</td></tr>
+                </tbody>
+            </table>
+
+            <h2>PACELC: The Extended CAP Theorem</h2>
+            <p>CAP only talks about what happens <strong>during a partition</strong>. But what about when things are normal? That's where PACELC comes in:</p>
+            <div class="callout callout-info">
+                <strong>PACELC</strong>: If there's a <strong>P</strong>artition, choose <strong>A</strong>vailability or <strong>C</strong>onsistency. <strong>E</strong>lse (normal operation), choose <strong>L</strong>atency or <strong>C</strong>onsistency.
+            </div>
+            <p>This is more practical because even without partitions, you still face a trade-off between response speed and data freshness:</p>
+            <ul>
+                <li><strong>PA/EL</strong> (DynamoDB, Cassandra): During partition → Available. Normal time → Low Latency. (Sacrifice consistency both times)</li>
+                <li><strong>PC/EC</strong> (MongoDB strong mode, Zookeeper): During partition → Consistent. Normal time → Consistent. (Sacrifice availability/latency both times)</li>
+                <li><strong>PA/EC</strong> (Some configs): During partition → Available. Normal time → Consistent. (Best of both worlds but complex)</li>
+            </ul>
+
+<pre><code><span class="token-comment"># PACELC decision matrix in code</span>
+<span class="token-keyword">class</span> <span class="token-class">PACELCDecision</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, system_name):
+        self.system = system_name
+
+    <span class="token-keyword">def</span> <span class="token-function">during_partition</span>(self, prefer):
+        <span class="token-string">"""During network partition: choose 'availability' or 'consistency'"""</span>
+        <span class="token-keyword">if</span> prefer == <span class="token-string">"availability"</span>:
+            <span class="token-keyword">return</span> <span class="token-string">"Serve stale data, fix later (AP)"</span>
+        <span class="token-keyword">return</span> <span class="token-string">"Reject requests until partition heals (CP)"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">normal_operation</span>(self, prefer):
+        <span class="token-string">"""No partition: choose 'latency' or 'consistency'"""</span>
+        <span class="token-keyword">if</span> prefer == <span class="token-string">"latency"</span>:
+            <span class="token-keyword">return</span> <span class="token-string">"Read from nearest replica (fast, maybe stale)"</span>
+        <span class="token-keyword">return</span> <span class="token-string">"Read from leader/quorum (slower, always fresh)"</span>
+
+<span class="token-comment"># Example decisions</span>
+dynamo = PACELCDecision(<span class="token-string">"DynamoDB"</span>)
+<span class="token-keyword">print</span>(dynamo.during_partition(<span class="token-string">"availability"</span>))  <span class="token-comment"># PA</span>
+<span class="token-keyword">print</span>(dynamo.normal_operation(<span class="token-string">"latency"</span>))       <span class="token-comment"># EL</span>
+
+zookeeper = PACELCDecision(<span class="token-string">"Zookeeper"</span>)
+<span class="token-keyword">print</span>(zookeeper.during_partition(<span class="token-string">"consistency"</span>))  <span class="token-comment"># PC</span>
+<span class="token-keyword">print</span>(zookeeper.normal_operation(<span class="token-string">"consistency"</span>))  <span class="token-comment"># EC</span></code></pre>
+
+            <h2>Common Misconceptions About CAP</h2>
+            <div class="callout callout-warning">
+                <strong>Myth 1</strong>: "CAP means you permanently give up one property."<br>
+                <strong>Reality</strong>: You only lose one property <em>during a partition</em>. When the network is healthy, you can have all three.
+            </div>
+            <div class="callout callout-warning">
+                <strong>Myth 2</strong>: "Consistency in CAP = ACID consistency."<br>
+                <strong>Reality</strong>: CAP consistency means "all nodes see the same data at the same time" (linearizability). ACID consistency means "the database moves from one valid state to another" (integrity constraints). They're different concepts.
+            </div>
+            <div class="callout callout-warning">
+                <strong>Myth 3</strong>: "You must choose CP or AP for the entire system."<br>
+                <strong>Reality</strong>: Different parts of your system can make different choices. Your payment service might be CP while your recommendation service is AP.
+            </div>
+
+            <h2>Implementing CAP Trade-offs in Code</h2>
+<pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> random
+
+<span class="token-keyword">class</span> <span class="token-class">DistributedStore</span>:
+    <span class="token-string">"""Simulates a distributed key-value store with CAP trade-offs"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, mode=<span class="token-string">"ap"</span>):
+        self.mode = mode  <span class="token-comment"># "cp" or "ap"</span>
+        self.nodes = {
+            <span class="token-string">"node1"</span>: {},
+            <span class="token-string">"node2"</span>: {},
+            <span class="token-string">"node3"</span>: {},
+        }
+        self.partition_active = <span class="token-keyword">False</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">write</span>(self, key, value):
+        <span class="token-string">"""Write to the store — behavior depends on CAP mode"""</span>
+        <span class="token-keyword">if</span> self.partition_active:
+            <span class="token-keyword">if</span> self.mode == <span class="token-string">"cp"</span>:
+                <span class="token-comment"># CP: Refuse write if we can't reach all nodes</span>
+                <span class="token-keyword">raise</span> Exception(<span class="token-string">"Write rejected: cannot guarantee consistency during partition"</span>)
+            <span class="token-keyword">else</span>:
+                <span class="token-comment"># AP: Write to reachable nodes only (might create inconsistency)</span>
+                reachable = self._get_reachable_nodes()
+                <span class="token-keyword">for</span> node <span class="token-keyword">in</span> reachable:
+                    self.nodes[node][key] = value
+                <span class="token-keyword">return</span> <span class="token-string">f"Written to {len(reachable)} nodes (may be inconsistent)"</span>
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># No partition: write to all nodes (both C and A satisfied)</span>
+            <span class="token-keyword">for</span> node <span class="token-keyword">in</span> self.nodes:
+                self.nodes[node][key] = value
+            <span class="token-keyword">return</span> <span class="token-string">"Written to all nodes successfully"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">read</span>(self, key):
+        <span class="token-string">"""Read from the store — behavior depends on CAP mode"""</span>
+        <span class="token-keyword">if</span> self.partition_active:
+            <span class="token-keyword">if</span> self.mode == <span class="token-string">"cp"</span>:
+                <span class="token-comment"># CP: Refuse read if we can't verify consistency</span>
+                <span class="token-keyword">raise</span> Exception(<span class="token-string">"Read rejected: cannot guarantee consistency during partition"</span>)
+            <span class="token-keyword">else</span>:
+                <span class="token-comment"># AP: Return whatever data we have (might be stale)</span>
+                reachable = self._get_reachable_nodes()
+                node = reachable[<span class="token-number">0</span>]
+                <span class="token-keyword">return</span> self.nodes[node].get(key, <span class="token-keyword">None</span>)
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># No partition: read from any node (all are consistent)</span>
+            <span class="token-keyword">return</span> self.nodes[<span class="token-string">"node1"</span>].get(key, <span class="token-keyword">None</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">_get_reachable_nodes</span>(self):
+        <span class="token-comment"># Simulate: during partition, only some nodes are reachable</span>
+        <span class="token-keyword">return</span> [<span class="token-string">"node1"</span>]  <span class="token-comment"># Only one node reachable</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">simulate_partition</span>(self):
+        self.partition_active = <span class="token-keyword">True</span>
+        <span class="token-keyword">print</span>(<span class="token-string">"⚡ Network partition! Nodes can't talk to each other."</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">heal_partition</span>(self):
+        self.partition_active = <span class="token-keyword">False</span>
+        <span class="token-comment"># Sync all nodes (anti-entropy repair)</span>
+        master_data = self.nodes[<span class="token-string">"node1"</span>]
+        <span class="token-keyword">for</span> node <span class="token-keyword">in</span> self.nodes:
+            self.nodes[node] = dict(master_data)
+        <span class="token-keyword">print</span>(<span class="token-string">"✅ Partition healed. Nodes synchronized."</span>)
+
+<span class="token-comment"># Demo: CP System</span>
+cp_store = DistributedStore(mode=<span class="token-string">"cp"</span>)
+cp_store.write(<span class="token-string">"balance"</span>, <span class="token-number">1000</span>)
+cp_store.simulate_partition()
+<span class="token-keyword">try</span>:
+    cp_store.read(<span class="token-string">"balance"</span>)  <span class="token-comment"># FAILS — CP refuses during partition</span>
+<span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+    <span class="token-keyword">print</span>(<span class="token-string">f"CP response: {e}"</span>)
+
+<span class="token-comment"># Demo: AP System</span>
+ap_store = DistributedStore(mode=<span class="token-string">"ap"</span>)
+ap_store.write(<span class="token-string">"balance"</span>, <span class="token-number">1000</span>)
+ap_store.simulate_partition()
+result = ap_store.read(<span class="token-string">"balance"</span>)  <span class="token-comment"># WORKS — might be stale though</span>
+<span class="token-keyword">print</span>(<span class="token-string">f"AP response: {result}"</span>)  <span class="token-comment"># Returns 1000 (could be outdated)</span></code></pre>
+
+            <h2>When to Choose What</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Scenario</th><th>Best Choice</th><th>Reasoning</th></tr></thead>
+                <tbody>
+                    <tr><td>Banking / Financial transactions</td><td>CP</td><td>Wrong balance is worse than temporary downtime</td></tr>
+                    <tr><td>Social media feeds</td><td>AP</td><td>Seeing a post 2 sec late is fine; "app down" is not</td></tr>
+                    <tr><td>Inventory count (e-commerce)</td><td>CP</td><td>Overselling creates real-world problems</td></tr>
+                    <tr><td>User session data</td><td>AP</td><td>User occasionally re-logging in is okay</td></tr>
+                    <tr><td>DNS</td><td>AP</td><td>Stale DNS record (minutes) is fine; no resolution = internet broken</td></tr>
+                    <tr><td>Leader election / Config</td><td>CP</td><td>Two leaders = split brain = catastrophe</td></tr>
+                    <tr><td>Analytics / Metrics</td><td>AP</td><td>Approximate counts are acceptable; losing data is not</td></tr>
+                </tbody>
+            </table>
+
+            <div class="collapsible">
+                <div class="collapsible-header">Advanced: Formal Proof of CAP Impossibility</div>
+                <div class="collapsible-content">
+                    <p>The proof is surprisingly simple:</p>
+                    <ol>
+                        <li>Assume we have two nodes (N1, N2) with a network partition between them.</li>
+                        <li>A client writes value V1 to N1.</li>
+                        <li>Another client reads from N2.</li>
+                        <li>Since N1 can't communicate with N2 (partition), N2 doesn't know about V1.</li>
+                        <li>N2 must either: (a) return stale data (violates Consistency) or (b) refuse to respond (violates Availability).</li>
+                    </ol>
+                    <p>This proves that during a partition, you cannot simultaneously guarantee both Consistency and Availability. QED.</p>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+                    <li>CAP = Consistency + Availability + Partition Tolerance — pick any 2</li>
+                    <li>Since partitions are unavoidable in distributed systems, the real choice is CP vs AP</li>
+                    <li>CP systems refuse to serve during partitions (guarantee correct answers)</li>
+                    <li>AP systems always serve but might give stale data during partitions</li>
+                    <li>PACELC extends CAP: what trade-off do you make when there IS no partition?</li>
+                    <li>Most real systems are tunable — you choose per operation, not per system</li>
+                    <li>CAP consistency ≠ ACID consistency — don't confuse them</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">
+    Network Partition Happens:
+    ┌─────────┐         ✂️ BROKEN ✂️        ┌─────────┐
+    │  Node A │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─  │  Node B │
+    │ data: X │                             │ data: ? │
+    └─────────┘                             └─────────┘
+
+    CP Choice: "Sorry, can't serve you until I verify with Node A"
+    AP Choice: "Here's what I have — might be wrong but at least you get an answer"
+
+    Rule of thumb:
+    - Money/inventory/elections → CP (wrong answer = disaster)
+    - Social feeds/analytics/caches → AP (slow answer = disaster)
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+                    <li><strong>Thinking CAP is binary</strong> — It's a spectrum. Systems can be "mostly CP" with AP fallbacks for certain operations.</li>
+                    <li><strong>Ignoring PACELC</strong> — CAP only matters during failures. Most of the time your system is healthy — the latency vs consistency trade-off matters more day-to-day.</li>
+                    <li><strong>Choosing AP for everything</strong> — "Eventual consistency" sounds easy until you have to resolve conflicts (last-write-wins can lose data).</li>
+                    <li><strong>Confusing CAP-C with ACID-C</strong> — They're completely different concepts with the same name.</li>
+                    <li><strong>Thinking single-machine databases have CAP trade-offs</strong> — CAP only applies to distributed (multi-node) systems.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+                    <li>Run the DistributedStore code above. Trigger a partition and observe the different behaviors of CP vs AP.</li>
+                    <li>Modify the AP store to track "version numbers" on writes. After healing the partition, write a conflict resolution function.</li>
+                    <li>Design a system for a ride-sharing app (like Uber). Which parts would be CP? Which parts would be AP? Write down your reasoning.</li>
+                    <li>Research: How does Google Spanner claim to be "effectively CA" despite being distributed? (Hint: TrueTime, synchronized atomic clocks)</li>
+                </ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="20-semaphore-latch-barrier.html" class="prev">Semaphore/Latch/Barrier</a>
+                <a href="22-acid-properties.html" class="next">ACID Properties</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

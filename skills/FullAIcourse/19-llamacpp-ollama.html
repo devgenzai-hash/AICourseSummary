@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>llama.cpp & Ollama — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 5</a> <span>›</span> llama.cpp & Ollama</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>llama.cpp & Ollama</h1>
+                <p>Run AI models 100% locally on your computer — no internet, no API keys, no data leaving your machine. This is the foundation of local AI and privacy-first inference.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>llama.cpp = a homemade espresso machine.</strong> You build it from parts, it's powerful and customizable, but takes effort to set up. Great for enthusiasts and developers.</p>
+                <p><strong>Ollama = a Nespresso machine.</strong> Press one button, get great coffee. It uses llama.cpp under the hood, but wraps it in the simplest possible interface. Great for everyone.</p>
+            </div>
+
+            <h2 id="ollama">Ollama: The Easiest Way</h2>
+
+            <h3>Getting Started (2 minutes):</h3>
+            <pre><code><span class="token-comment"># Install Ollama</span>
+<span class="token-comment"># Windows/Mac: Download from https://ollama.com</span>
+<span class="token-comment"># Linux: curl -fsSL https://ollama.com/install.sh | sh</span>
+
+<span class="token-comment"># Pull and run a model (one command!)</span>
+<span class="token-comment"># ollama run llama3.1:8b</span>
+
+<span class="token-comment"># That's it! You're now chatting with an 8B model locally.</span>
+<span class="token-comment"># No API key. No internet. No data leaving your machine.</span></code></pre>
+
+            <h3>Essential Ollama Commands:</h3>
+            <pre><code><span class="token-comment"># List available models</span>
+<span class="token-comment"># ollama list</span>
+
+<span class="token-comment"># Pull models (downloads to ~/.ollama/models)</span>
+<span class="token-comment"># ollama pull llama3.1:8b           # Default Q4_K_M quantization</span>
+<span class="token-comment"># ollama pull llama3.1:70b          # Large model (needs 48GB+)</span>
+<span class="token-comment"># ollama pull qwen2.5:7b            # Chinese/English bilingual</span>
+<span class="token-comment"># ollama pull codestral:22b         # Code-specialized</span>
+<span class="token-comment"># ollama pull nomic-embed-text      # Embedding model</span>
+
+<span class="token-comment"># Run with custom parameters</span>
+<span class="token-comment"># ollama run llama3.1:8b --verbose  # Show token/sec stats</span>
+
+<span class="token-comment"># Set system prompt</span>
+<span class="token-comment"># ollama run llama3.1:8b "You are a pirate. Respond accordingly."</span>
+
+<span class="token-comment"># Remove a model</span>
+<span class="token-comment"># ollama rm llama3.1:8b</span>
+
+<span class="token-comment"># Show model info</span>
+<span class="token-comment"># ollama show llama3.1:8b</span></code></pre>
+
+            <h3>Using Ollama with Python (OpenAI-compatible API):</h3>
+            <pre><code><span class="token-comment"># Ollama exposes an OpenAI-compatible API on localhost:11434</span>
+<span class="token-comment"># pip install openai</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+<span class="token-comment"># Connect to local Ollama</span>
+client = OpenAI(
+    base_url=<span class="token-string">"http://localhost:11434/v1"</span>,
+    api_key=<span class="token-string">"ollama"</span>,  <span class="token-comment"># Required but ignored</span>
+)
+
+<span class="token-comment"># Chat completion (same API as OpenAI!)</span>
+response = client.chat.completions.create(
+    model=<span class="token-string">"llama3.1:8b"</span>,
+    messages=[
+        {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a helpful coding assistant."</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Write a Python function to reverse a linked list"</span>},
+    ],
+    temperature=<span class="token-number">0.7</span>,
+    max_tokens=<span class="token-number">500</span>,
+)
+<span class="token-builtin">print</span>(response.choices[<span class="token-number">0</span>].message.content)
+
+<span class="token-comment"># Streaming (tokens appear as generated)</span>
+stream = client.chat.completions.create(
+    model=<span class="token-string">"llama3.1:8b"</span>,
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Explain recursion simply"</span>}],
+    stream=<span class="token-keyword">True</span>,
+)
+<span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> stream:
+    <span class="token-keyword">if</span> chunk.choices[<span class="token-number">0</span>].delta.content:
+        <span class="token-builtin">print</span>(chunk.choices[<span class="token-number">0</span>].delta.content, end=<span class="token-string">""</span>)</code></pre>
+
+            <h3>Ollama Native API:</h3>
+            <pre><code><span class="token-comment"># Using Ollama's native Python library</span>
+<span class="token-comment"># pip install ollama</span>
+<span class="token-keyword">import</span> ollama
+
+<span class="token-comment"># Simple chat</span>
+response = ollama.chat(
+    model=<span class="token-string">"llama3.1:8b"</span>,
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"What is machine learning?"</span>}]
+)
+<span class="token-builtin">print</span>(response[<span class="token-string">"message"</span>][<span class="token-string">"content"</span>])
+
+<span class="token-comment"># Generate embeddings</span>
+embedding = ollama.embed(model=<span class="token-string">"nomic-embed-text"</span>, input=<span class="token-string">"Hello world"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Embedding dimension: {len(embedding['embeddings'][0])}"</span>)
+
+<span class="token-comment"># Streaming</span>
+<span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> ollama.chat(
+    model=<span class="token-string">"llama3.1:8b"</span>,
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Write a poem"</span>}],
+    stream=<span class="token-keyword">True</span>,
+):
+    <span class="token-builtin">print</span>(chunk[<span class="token-string">"message"</span>][<span class="token-string">"content"</span>], end=<span class="token-string">""</span>)</code></pre>
+
+            <h3>Custom Models (Modelfile):</h3>
+            <pre><code><span class="token-comment"># Create a custom model with specific behavior</span>
+<span class="token-comment"># Create a file called "Modelfile":</span>
+
+FROM llama3.1:8b
+
+<span class="token-comment"># Set parameters</span>
+PARAMETER temperature 0.3
+PARAMETER num_ctx 8192
+PARAMETER top_p 0.9
+
+<span class="token-comment"># Set system prompt</span>
+SYSTEM """You are a senior Python developer. You write clean, efficient code with 
+proper error handling. Always explain your code with comments. Follow PEP 8."""
+
+<span class="token-comment"># Create the custom model:</span>
+<span class="token-comment"># ollama create python-expert -f Modelfile</span>
+<span class="token-comment"># ollama run python-expert</span></code></pre>
+
+            <h2 id="llamacpp">llama.cpp: Maximum Control</h2>
+
+            <h3>Using llama-cpp-python:</h3>
+            <pre><code><span class="token-comment"># pip install llama-cpp-python</span>
+<span class="token-comment"># For GPU support: CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python</span>
+<span class="token-keyword">from</span> llama_cpp <span class="token-keyword">import</span> Llama
+
+<span class="token-comment"># Load a GGUF model</span>
+llm = Llama(
+    model_path=<span class="token-string">"./models/llama-3.1-8b-instruct-Q4_K_M.gguf"</span>,
+    n_ctx=<span class="token-number">8192</span>,          <span class="token-comment"># Context window</span>
+    n_threads=<span class="token-number">8</span>,         <span class="token-comment"># CPU threads (set to your core count)</span>
+    n_gpu_layers=-<span class="token-number">1</span>,     <span class="token-comment"># -1 = offload ALL layers to GPU</span>
+    verbose=<span class="token-keyword">False</span>,
+)
+
+<span class="token-comment"># Chat completion (OpenAI-compatible)</span>
+output = llm.create_chat_completion(
+    messages=[
+        {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"You are a helpful assistant."</span>},
+        {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Explain Docker in simple terms"</span>},
+    ],
+    max_tokens=<span class="token-number">500</span>,
+    temperature=<span class="token-number">0.7</span>,
+    top_p=<span class="token-number">0.9</span>,
+)
+<span class="token-builtin">print</span>(output[<span class="token-string">"choices"</span>][<span class="token-number">0</span>][<span class="token-string">"message"</span>][<span class="token-string">"content"</span>])
+
+<span class="token-comment"># Streaming</span>
+<span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> llm.create_chat_completion(
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Write a haiku about AI"</span>}],
+    stream=<span class="token-keyword">True</span>,
+):
+    delta = chunk[<span class="token-string">"choices"</span>][<span class="token-number">0</span>][<span class="token-string">"delta"</span>]
+    <span class="token-keyword">if</span> <span class="token-string">"content"</span> <span class="token-keyword">in</span> delta:
+        <span class="token-builtin">print</span>(delta[<span class="token-string">"content"</span>], end=<span class="token-string">""</span>)</code></pre>
+
+            <h3>Running as an OpenAI-compatible Server:</h3>
+            <pre><code><span class="token-comment"># Start llama.cpp as a server (same API as OpenAI)</span>
+<span class="token-comment"># python -m llama_cpp.server --model ./models/model.gguf --n_gpu_layers -1 --port 8000</span>
+
+<span class="token-comment"># Now any OpenAI-compatible code works!</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+client = OpenAI(base_url=<span class="token-string">"http://localhost:8000/v1"</span>, api_key=<span class="token-string">"dummy"</span>)
+response = client.chat.completions.create(
+    model=<span class="token-string">"local-model"</span>,
+    messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Hello!"</span>}]
+)
+<span class="token-builtin">print</span>(response.choices[<span class="token-number">0</span>].message.content)</code></pre>
+
+            <div class="comparison-table">
+                <h3>Ollama vs llama.cpp vs LM Studio:</h3>
+                <table>
+                    <thead><tr><th>Feature</th><th>Ollama</th><th>llama-cpp-python</th><th>LM Studio</th></tr></thead>
+                    <tbody>
+                        <tr><td>Ease of use</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td></tr>
+                        <tr><td>API compatibility</td><td>OpenAI API ✅</td><td>OpenAI API ✅</td><td>OpenAI API ✅</td></tr>
+                        <tr><td>Model management</td><td>Automatic (pull)</td><td>Manual (download GGUF)</td><td>GUI download</td></tr>
+                        <tr><td>GPU support</td><td>Auto-detected</td><td>Needs CMAKE flags</td><td>Auto-detected</td></tr>
+                        <tr><td>Customization</td><td>Modelfile</td><td>Full Python control</td><td>GUI settings</td></tr>
+                        <tr><td>Server mode</td><td>Always running</td><td>Manual start</td><td>GUI toggle</td></tr>
+                        <tr><td>Best for</td><td>Developers, CI/CD</td><td>Python apps, embedding</td><td>Non-developers, testing</td></tr>
+                        <tr><td>Platform</td><td>Win/Mac/Linux</td><td>Win/Mac/Linux</td><td>Win/Mac</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Ollama is the de-facto standard for local AI</strong> — Used by developers, CI/CD pipelines, and local AI apps.</li>
+                    <li><strong>OpenAI-compatible API is key</strong> — Write code once, swap between Ollama/OpenAI/vLLM with one config change.</li>
+                    <li><strong>GGUF is the universal local format</strong> — All local tools (Ollama, llama.cpp, LM Studio) use GGUF.</li>
+                    <li><strong>Q4_K_M is the default quantization</strong> — Ollama uses it by default. Best quality/size tradeoff.</li>
+                    <li><strong>GPU offloading matters</strong> — Even partial GPU offloading (some layers on GPU) dramatically improves speed.</li>
+                    <li><strong>Context window affects memory</strong> — Setting n_ctx higher uses more RAM. Only set what you need.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Ollama</strong> = simplest way to run models locally. One command to start.</li>
+                    <li><strong>llama.cpp</strong> = maximum control. Use llama-cpp-python for Python apps.</li>
+                    <li>Both expose <strong>OpenAI-compatible APIs</strong> — code is portable between providers.</li>
+                    <li><strong>Modelfile</strong> = customize model behavior, system prompt, parameters.</li>
+                    <li>Everything runs locally — no data sent to the cloud, no API costs.</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Not using GPU offloading</strong> — CPU-only inference is 5-20x slower. Set <code>n_gpu_layers=-1</code> if you have a GPU.</li>
+                    <li><strong>Setting context too large</strong> — n_ctx=128000 will eat all your RAM. Start with 4096, increase as needed.</li>
+                    <li><strong>Running Ollama without checking it started</strong> — Run <code>ollama serve</code> first, then <code>ollama run</code> in another terminal.</li>
+                    <li><strong>Using base models instead of instruct</strong> — Always use "-instruct" or "-chat" variants for conversation.</li>
+                    <li><strong>Hardcoding OpenAI URLs</strong> — Use environment variables for base_url so you can switch providers easily.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Set Up Local AI</h4>
+                <ol>
+                    <li>Install Ollama and run: <code>ollama run llama3.1:8b</code></li>
+                    <li>Create a Python script that chats with Ollama using the OpenAI library</li>
+                    <li>Create a custom Modelfile for a "Python tutor" persona</li>
+                    <li>Try 3 different models: llama3.1, qwen2.5, phi3 — compare speed and quality</li>
+                    <li>Build a simple CLI chatbot with history using the ollama Python library</li>
+                    <li><strong>Bonus:</strong> Download a GGUF model manually and load it with llama-cpp-python</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="18-gpu-vram-basics.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">GPU & VRAM</span>
+                </a>
+                <a href="20-vllm-mlx.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">vLLM & MLX</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

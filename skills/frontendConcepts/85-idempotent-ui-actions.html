@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idempotent UI Actions - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li class="active"><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Idempotent UI Actions
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Idempotent UI Actions</h1>
+                <p class="subtitle">Designing user interactions so that performing them multiple times produces the same result as performing them once — preventing double submissions, duplicate state mutations, and accidental repeated side effects.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-patterns">Architecture</span>
+                    <span class="tag tag-reliability">Reliability</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🔘 Analogy: Elevator Button</div>
+                <p>Pressing an elevator's "up" button once calls the elevator. Pressing it 20 more times doesn't call 20 more elevators. The action is <strong>idempotent</strong> — the effect of pressing it N times is the same as pressing it once. Your UI actions should work the same way: double-clicking "Submit Order" shouldn't create two orders.</p>
+            </div>
+
+            <h2>The Problem: Double Submissions and Replay Attacks</h2>
+<pre><code><span class="token-comment">// Real-world scenarios where non-idempotent actions cause damage:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 1. Double-click on "Place Order" → two charges on credit card</span>
+<span class="token-comment">// 2. Network retry sends form data twice → duplicate database entries</span>
+<span class="token-comment">// 3. React strict mode calls effect twice → double API call in dev</span>
+<span class="token-comment">// 4. Browser back/forward replays form POST → duplicate submission</span>
+<span class="token-comment">// 5. Optimistic UI retry on failure → action applied twice</span>
+<span class="token-comment">// 6. User rage-clicks slow button → multiple requests in flight</span>
+
+<span class="token-comment">// NON-IDEMPOTENT (dangerous):</span>
+<span class="token-keyword">async</span> <span class="token-keyword">function</span> <span class="token-function">handleSubmit</span>() {
+    <span class="token-comment">// Every call creates a NEW order — double-click = double charge</span>
+    <span class="token-keyword">await</span> fetch(<span class="token-string">'/api/orders'</span>, { method: <span class="token-string">'POST'</span>, body: orderData });
+}
+
+<span class="token-comment">// IDEMPOTENT (safe):</span>
+<span class="token-keyword">async</span> <span class="token-keyword">function</span> <span class="token-function">handleSubmit</span>() {
+    <span class="token-comment">// Uses idempotency key — server deduplicates</span>
+    <span class="token-keyword">await</span> fetch(<span class="token-string">'/api/orders'</span>, {
+        method: <span class="token-string">'POST'</span>,
+        headers: { <span class="token-string">'Idempotency-Key'</span>: uniqueOrderId },
+        body: orderData
+    });
+    <span class="token-comment">// Calling twice with same key → same result, no duplicate order</span>
+}
+</code></pre>
+
+            <h2>Frontend Idempotency Patterns</h2>
+
+            <h3>Pattern 1: Disable on Submit (UI Lock)</h3>
+<pre><code><span class="token-comment">// Simplest approach: prevent the action from being triggered again</span>
+
+<span class="token-keyword">function</span> <span class="token-function">SubmitButton</span>({ onSubmit }) {
+    <span class="token-keyword">const</span> [isSubmitting, setIsSubmitting] = useState(<span class="token-keyword">false</span>);
+
+    <span class="token-keyword">const</span> handleClick = <span class="token-keyword">async</span> () =&gt; {
+        <span class="token-keyword">if</span> (isSubmitting) <span class="token-keyword">return</span>; <span class="token-comment">// Guard against race condition</span>
+        setIsSubmitting(<span class="token-keyword">true</span>);
+        
+        <span class="token-keyword">try</span> {
+            <span class="token-keyword">await</span> onSubmit();
+        } <span class="token-keyword">finally</span> {
+            setIsSubmitting(<span class="token-keyword">false</span>); <span class="token-comment">// Re-enable on completion (or error)</span>
+        }
+    };
+
+    <span class="token-keyword">return</span> (
+        &lt;button 
+            onClick={handleClick} 
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}
+        &gt;
+            {isSubmitting ? <span class="token-string">'Submitting...'</span> : <span class="token-string">'Submit Order'</span>}
+        &lt;/button&gt;
+    );
+}
+
+<span class="token-comment">// LIMITATION: This only prevents UI-level duplicates</span>
+<span class="token-comment">// Network retries, back button, and programmatic calls bypass it</span>
+<span class="token-comment">// You STILL need server-side idempotency</span>
+</code></pre>
+
+            <h3>Pattern 2: Idempotency Keys (Client-Generated)</h3>
+<pre><code><span class="token-comment">// Generate a unique key per logical operation</span>
+<span class="token-comment">// Send it with every request — server deduplicates</span>
+
+<span class="token-keyword">function</span> <span class="token-function">useIdempotentSubmit</span>(submitFn) {
+    <span class="token-keyword">const</span> [idempotencyKey, setIdempotencyKey] = useState(() =&gt; crypto.randomUUID());
+    <span class="token-keyword">const</span> [status, setStatus] = useState(<span class="token-string">'idle'</span>); <span class="token-comment">// idle | pending | success | error</span>
+
+    <span class="token-keyword">const</span> submit = <span class="token-keyword">async</span> (data) =&gt; {
+        <span class="token-keyword">if</span> (status === <span class="token-string">'pending'</span>) <span class="token-keyword">return</span>; <span class="token-comment">// Already in flight</span>
+        setStatus(<span class="token-string">'pending'</span>);
+        
+        <span class="token-keyword">try</span> {
+            <span class="token-comment">// Same key = same logical operation, even if called multiple times</span>
+            <span class="token-keyword">const</span> result = <span class="token-keyword">await</span> submitFn(data, idempotencyKey);
+            setStatus(<span class="token-string">'success'</span>);
+            <span class="token-keyword">return</span> result;
+        } <span class="token-keyword">catch</span> (error) {
+            setStatus(<span class="token-string">'error'</span>);
+            <span class="token-comment">// DON'T regenerate key on error — retry should use SAME key</span>
+            <span class="token-comment">// This ensures the retry is idempotent</span>
+            <span class="token-keyword">throw</span> error;
+        }
+    };
+
+    <span class="token-keyword">const</span> reset = () =&gt; {
+        <span class="token-comment">// New operation = new key (e.g., user starts a fresh form)</span>
+        setIdempotencyKey(crypto.randomUUID());
+        setStatus(<span class="token-string">'idle'</span>);
+    };
+
+    <span class="token-keyword">return</span> { submit, reset, status, idempotencyKey };
+}
+
+<span class="token-comment">// Usage:</span>
+<span class="token-keyword">function</span> <span class="token-function">OrderForm</span>() {
+    <span class="token-keyword">const</span> { submit, reset, status } = useIdempotentSubmit(
+        (data, key) =&gt; fetch(<span class="token-string">'/api/orders'</span>, {
+            method: <span class="token-string">'POST'</span>,
+            headers: { <span class="token-string">'Idempotency-Key'</span>: key },
+            body: JSON.stringify(data)
+        })
+    );
+    
+    <span class="token-comment">// Even if user double-clicks, network retries, or component re-renders</span>
+    <span class="token-comment">// the server only processes the order ONCE per key</span>
+}
+</code></pre>
+
+            <h3>Pattern 3: State Machine Guards</h3>
+<pre><code><span class="token-comment">// Model the action as a state machine — invalid transitions are impossible</span>
+
+<span class="token-keyword">const</span> orderMachine = {
+    idle: { SUBMIT: <span class="token-string">'submitting'</span> },
+    submitting: { SUCCESS: <span class="token-string">'confirmed'</span>, ERROR: <span class="token-string">'error'</span> },
+    confirmed: { RESET: <span class="token-string">'idle'</span> }, <span class="token-comment">// Can't submit from confirmed state</span>
+    error: { RETRY: <span class="token-string">'submitting'</span>, RESET: <span class="token-string">'idle'</span> }
+};
+
+<span class="token-keyword">function</span> <span class="token-function">useStateMachine</span>(machine, initial) {
+    <span class="token-keyword">const</span> [state, setState] = useState(initial);
+    
+    <span class="token-keyword">const</span> send = (event) =&gt; {
+        <span class="token-keyword">const</span> nextState = machine[state]?.[event];
+        <span class="token-keyword">if</span> (nextState) {
+            setState(nextState);
+            <span class="token-keyword">return</span> <span class="token-keyword">true</span>; <span class="token-comment">// Transition accepted</span>
+        }
+        <span class="token-keyword">return</span> <span class="token-keyword">false</span>; <span class="token-comment">// Transition rejected (idempotent: no state change)</span>
+    };
+    
+    <span class="token-keyword">return</span> [state, send];
+}
+
+<span class="token-comment">// "SUBMIT" while already "submitting" → no transition → no duplicate request</span>
+<span class="token-comment">// The state machine makes illegal states unrepresentable</span>
+</code></pre>
+
+            <h3>Pattern 4: Debounce and Deduplication</h3>
+<pre><code><span class="token-comment">// For actions that fire rapidly (search, autosave, etc.)</span>
+
+<span class="token-keyword">function</span> <span class="token-function">useIdempotentFetch</span>(url) {
+    <span class="token-keyword">const</span> inflightRef = useRef(<span class="token-keyword">null</span>); <span class="token-comment">// Track current request</span>
+
+    <span class="token-keyword">return</span> <span class="token-keyword">async</span> (params) =&gt; {
+        <span class="token-keyword">const</span> key = JSON.stringify(params); <span class="token-comment">// Dedup key from params</span>
+        
+        <span class="token-comment">// If same request is already in flight, return its promise</span>
+        <span class="token-comment">// (don't fire a duplicate)</span>
+        <span class="token-keyword">if</span> (inflightRef.current?.key === key) {
+            <span class="token-keyword">return</span> inflightRef.current.promise;
+        }
+        
+        <span class="token-comment">// New request — cancel previous if different params</span>
+        inflightRef.current?.controller.abort();
+        
+        <span class="token-keyword">const</span> controller = <span class="token-keyword">new</span> AbortController();
+        <span class="token-keyword">const</span> promise = fetch(<span class="token-string">`${url}?${<span class="token-keyword">new</span> URLSearchParams(params)}`</span>, {
+            signal: controller.signal
+        }).then(r =&gt; r.json());
+        
+        inflightRef.current = { key, promise, controller };
+        <span class="token-keyword">return</span> promise;
+    };
+}
+
+<span class="token-comment">// Calling with same params multiple times → only ONE network request</span>
+<span class="token-comment">// Calling with different params → cancels previous, starts new</span>
+</code></pre>
+
+            <h3>Pattern 5: Optimistic UI with Rollback</h3>
+<pre><code><span class="token-comment">// Optimistic updates must be idempotent when retried</span>
+
+<span class="token-keyword">function</span> <span class="token-function">useLikeButton</span>(postId, initialCount) {
+    <span class="token-keyword">const</span> [liked, setLiked] = useState(<span class="token-keyword">false</span>);
+    <span class="token-keyword">const</span> [count, setCount] = useState(initialCount);
+    <span class="token-keyword">const</span> pendingRef = useRef(<span class="token-keyword">false</span>);
+
+    <span class="token-keyword">const</span> toggleLike = <span class="token-keyword">async</span> () =&gt; {
+        <span class="token-keyword">if</span> (pendingRef.current) <span class="token-keyword">return</span>; <span class="token-comment">// Prevent double-toggle</span>
+        pendingRef.current = <span class="token-keyword">true</span>;
+        
+        <span class="token-keyword">const</span> newLiked = !liked;
+        <span class="token-keyword">const</span> newCount = count + (newLiked ? 1 : -1);
+        
+        <span class="token-comment">// Optimistic update</span>
+        setLiked(newLiked);
+        setCount(newCount);
+        
+        <span class="token-keyword">try</span> {
+            <span class="token-comment">// PUT is idempotent by HTTP spec — safe to retry</span>
+            <span class="token-comment">// Server state: liked=true, not "add another like"</span>
+            <span class="token-keyword">await</span> fetch(<span class="token-string">`/api/posts/${postId}/like`</span>, {
+                method: <span class="token-string">'PUT'</span>, <span class="token-comment">// PUT = set state (idempotent)</span>
+                body: JSON.stringify({ liked: newLiked })
+            });
+        } <span class="token-keyword">catch</span> {
+            <span class="token-comment">// Rollback on failure</span>
+            setLiked(liked);
+            setCount(count);
+        } <span class="token-keyword">finally</span> {
+            pendingRef.current = <span class="token-keyword">false</span>;
+        }
+    };
+
+    <span class="token-keyword">return</span> { liked, count, toggleLike };
+}
+
+<span class="token-comment">// KEY INSIGHT: Use PUT/PATCH with absolute state ("liked: true")</span>
+<span class="token-comment">// NOT POST with relative mutation ("add one like")</span>
+<span class="token-comment">// PUT with same body twice → same result (idempotent)</span>
+<span class="token-comment">// POST "increment" twice → count goes up by 2 (NOT idempotent)</span>
+</code></pre>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Stripe API</strong> — Every mutating endpoint accepts an <code>Idempotency-Key</code> header. Replaying the same request returns the cached response without re-executing the charge.</li>
+                <li><strong>React 18 Strict Mode</strong> — Calls effects twice in development to expose non-idempotent side effects (double mounting catches setup/teardown bugs).</li>
+                <li><strong>Shopify Checkout</strong> — Uses client-generated idempotency tokens to prevent double-charges even on network timeout + retry scenarios.</li>
+                <li><strong>Google Forms</strong> — Disables submit button + uses form token to prevent duplicate submissions from impatient double-clicks.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Only disabling the button</strong> — UI-level prevention doesn't protect against network retries, back button, or programmatic submission. Always pair with server-side idempotency.</li>
+                <li><strong>Generating new idempotency key on retry</strong> — The SAME key must be used for retries of the same logical operation. New key = server treats it as a new operation.</li>
+                <li><strong>Using POST for toggle-style actions</strong> — POST "like" is not idempotent. Use PUT with the desired state: <code>{ liked: true }</code>.</li>
+                <li><strong>Ignoring React Strict Mode double-invocation</strong> — If your effect fires an API call and crashes on double-mount, your action isn't idempotent.</li>
+                <li><strong>Race conditions with async state updates</strong> — Two rapid clicks can both read <code>isSubmitting === false</code> before either sets it to true. Use refs or state machines.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Idempotent UI Actions When...</h3>
+                <p>You can identify whether an action is idempotent (same result if applied 1× or N×), explain the difference between UI-level guards (button disable) and protocol-level idempotency (keys, PUT semantics), and design a system where network failures + retries NEVER cause duplicate side effects.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a "Transfer Money" form where: (1) double-click is impossible, (2) network timeout + automatic retry doesn't create two transfers, (3) browser back button doesn't re-submit, (4) React strict mode doesn't double-fire. Test all four scenarios.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Idempotent UI Actions connects to: <strong>Optimistic UI Rollback</strong> (optimistic updates must handle retries), <strong>Event Sourcing</strong> (events with IDs enable deduplication), and <strong>Race Conditions in UI State</strong> (concurrent mutations that must be idempotent).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="84-deterministic-rendering.html" class="nav-btn nav-btn-prev">← Deterministic Rendering</a>
+                <a href="86-accessibility-tree.html" class="nav-btn nav-btn-next">Accessibility Tree →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

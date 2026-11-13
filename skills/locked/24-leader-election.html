@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leader Election - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Leader Election</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Leader Election</h1>
+                <p class="subtitle">Choosing one node to coordinate work so the cluster doesn't behave like a group project with no owner. Someone must be in charge.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-distributed">Distributed</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">&#127968; Daily-Life Analogy: The Group Project Captain</div>
+                <p>Imagine 5 people working on a school project. Without a captain, chaos happens:</p>
+                <ul>
+                    <li>Two people write the same section</li>
+                    <li>Nobody submits the final version</li>
+                    <li>Everyone assumes someone else is handling the deadline</li>
+                </ul>
+                <p>So they elect a <strong>captain</strong>. The captain assigns work, collects results, and submits the final version. If the captain gets sick, the group quickly picks a new captain and continues.</p>
+                <p>In distributed systems, this captain is called the <strong>leader</strong>. The process of picking the captain is <strong>leader election</strong>.</p>
+            </div>
+
+            <h2>Why Do We Need Leader Election?</h2>
+            <p>Many distributed systems need ONE node to be "special" — the coordinator. Without a leader:</p>
+            <ul>
+                <li><strong>Split brain</strong>: Two nodes both think they're in charge → conflicting decisions</li>
+                <li><strong>Duplicate work</strong>: Multiple nodes process the same task</li>
+                <li><strong>No coordination</strong>: Who decides the order of operations? Who handles the write?</li>
+            </ul>
+
+            <h3>What the Leader Does</h3>
+            <table class="comparison-table">
+                <thead><tr><th>System</th><th>What the Leader Does</th></tr></thead>
+                <tbody>
+                    <tr><td>Database (e.g., MongoDB)</td><td>Accepts all writes, replicates to followers</td></tr>
+                    <tr><td>Kafka</td><td>Partition leader handles all reads/writes for that partition</td></tr>
+                    <tr><td>Kubernetes</td><td>Controller manager leader runs all control loops</td></tr>
+                    <tr><td>Raft consensus</td><td>Leader proposes values, coordinates log replication</td></tr>
+                    <tr><td>Distributed cron</td><td>Leader decides which node runs each scheduled job</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Algorithm 1: Bully Election</h2>
+            <p>The simplest leader election algorithm. Every node has a unique ID (number). The rule is simple: <strong>the node with the highest ID always wins</strong>.</p>
+
+<pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> random
+
+<span class="token-keyword">class</span> <span class="token-class">BullyNode</span>:
+    <span class="token-string">"""Implements the Bully Election Algorithm"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, node_id, all_nodes):
+        self.id = node_id
+        self.all_nodes = all_nodes  <span class="token-comment"># List of all node IDs in cluster</span>
+        self.leader = <span class="token-keyword">None</span>
+        self.is_alive = <span class="token-keyword">True</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">start_election</span>(self):
+        <span class="token-string">"""Start an election when we detect the leader is dead"""</span>
+        <span class="token-keyword">print</span>(<span class="token-string">f"Node {self.id}: Starting election!"</span>)
+
+        <span class="token-comment"># Send "ELECTION" message to all nodes with HIGHER IDs</span>
+        higher_nodes = [n <span class="token-keyword">for</span> n <span class="token-keyword">in</span> self.all_nodes <span class="token-keyword">if</span> n > self.id]
+
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> higher_nodes:
+            <span class="token-comment"># I have the highest ID → I am the leader!</span>
+            self.declare_victory()
+            <span class="token-keyword">return</span>
+
+        <span class="token-comment"># Ask higher nodes if they're alive</span>
+        responses = []
+        <span class="token-keyword">for</span> node_id <span class="token-keyword">in</span> higher_nodes:
+            response = self.send_election_message(node_id)
+            <span class="token-keyword">if</span> response:
+                responses.append(node_id)
+
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> responses:
+            <span class="token-comment"># No higher node responded → I win!</span>
+            self.declare_victory()
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># Higher node exists → wait for them to declare victory</span>
+            <span class="token-keyword">print</span>(<span class="token-string">f"Node {self.id}: Higher node(s) responded. Waiting..."</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">declare_victory</span>(self):
+        <span class="token-string">"""Announce to everyone: I am the new leader"""</span>
+        self.leader = self.id
+        <span class="token-keyword">print</span>(<span class="token-string">f"Node {self.id}: I AM THE NEW LEADER! 👑"</span>)
+        <span class="token-comment"># Broadcast COORDINATOR message to all nodes</span>
+        <span class="token-keyword">for</span> node_id <span class="token-keyword">in</span> self.all_nodes:
+            <span class="token-keyword">if</span> node_id != self.id:
+                self.send_coordinator_message(node_id)
+
+    <span class="token-keyword">def</span> <span class="token-function">send_election_message</span>(self, target_id):
+        <span class="token-string">"""Simulate sending election message (returns True if node is alive)"""</span>
+        <span class="token-comment"># In real system: network call with timeout</span>
+        <span class="token-keyword">return</span> target_id <span class="token-keyword">in</span> self.all_nodes  <span class="token-comment"># Simplified</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">send_coordinator_message</span>(self, target_id):
+        <span class="token-keyword">print</span>(<span class="token-string">f"Node {self.id} → Node {target_id}: I'm your new leader"</span>)
+
+
+<span class="token-comment"># Simulation</span>
+all_nodes = [<span class="token-number">1</span>, <span class="token-number">2</span>, <span class="token-number">3</span>, <span class="token-number">4</span>, <span class="token-number">5</span>]
+<span class="token-comment"># Node 5 (leader) dies. Node 3 detects it and starts election.</span>
+node3 = BullyNode(<span class="token-number">3</span>, [<span class="token-number">1</span>, <span class="token-number">2</span>, <span class="token-number">3</span>, <span class="token-number">4</span>])  <span class="token-comment"># Node 5 removed (dead)</span>
+node3.start_election()  <span class="token-comment"># Node 4 will respond → Node 4 becomes leader</span></code></pre>
+
+            <h2>Algorithm 2: Ring Election</h2>
+            <p>Nodes are arranged in a logical ring. When a node detects the leader is dead, it sends an election message around the ring. Each node adds its ID. The highest ID wins.</p>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">RingElection</span>:
+    <span class="token-string">"""Ring-based leader election"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, nodes):
+        self.nodes = sorted(nodes)  <span class="token-comment"># Nodes arranged in a ring</span>
+        self.leader = <span class="token-keyword">None</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">elect</span>(self, initiator):
+        <span class="token-string">"""Initiator starts election, message goes around the ring"""</span>
+        <span class="token-keyword">print</span>(<span class="token-string">f"Node {initiator} starts ring election"</span>)
+
+        <span class="token-comment"># Election message collects all alive node IDs as it travels</span>
+        election_msg = [initiator]
+        current = self._next_node(initiator)
+
+        <span class="token-comment"># Pass message around the ring</span>
+        <span class="token-keyword">while</span> current != initiator:
+            <span class="token-keyword">print</span>(<span class="token-string">f"  Message at Node {current}, candidates so far: {election_msg}"</span>)
+            election_msg.append(current)
+            current = self._next_node(current)
+
+        <span class="token-comment"># Message returned to initiator — pick highest ID</span>
+        self.leader = max(election_msg)
+        <span class="token-keyword">print</span>(<span class="token-string">f"Election complete! Leader: Node {self.leader} 👑"</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">_next_node</span>(self, node_id):
+        idx = self.nodes.index(node_id)
+        <span class="token-keyword">return</span> self.nodes[(idx + <span class="token-number">1</span>) % len(self.nodes)]
+
+ring = RingElection([<span class="token-number">1</span>, <span class="token-number">2</span>, <span class="token-number">3</span>, <span class="token-number">4</span>, <span class="token-number">5</span>])
+ring.elect(<span class="token-number">3</span>)  <span class="token-comment"># Node 3 initiates → Node 5 wins</span></code></pre>
+
+            <h2>Algorithm 3: Raft Leader Election (Industry Standard)</h2>
+            <p>Raft is the most practical leader election algorithm used in production. It uses <strong>terms</strong> (numbered rounds) and <strong>heartbeats</strong>.</p>
+
+<pre><code><span class="token-keyword">import</span> random
+<span class="token-keyword">import</span> time
+<span class="token-keyword">from</span> enum <span class="token-keyword">import</span> Enum
+
+<span class="token-keyword">class</span> <span class="token-class">State</span>(Enum):
+    FOLLOWER = <span class="token-string">"follower"</span>
+    CANDIDATE = <span class="token-string">"candidate"</span>
+    LEADER = <span class="token-string">"leader"</span>
+
+<span class="token-keyword">class</span> <span class="token-class">RaftNode</span>:
+    <span class="token-string">"""Simplified Raft leader election"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, node_id, cluster_size):
+        self.id = node_id
+        self.state = State.FOLLOWER
+        self.current_term = <span class="token-number">0</span>        <span class="token-comment"># Election epoch (increases each election)</span>
+        self.voted_for = <span class="token-keyword">None</span>         <span class="token-comment"># Who I voted for this term</span>
+        self.votes_received = <span class="token-number">0</span>
+        self.cluster_size = cluster_size
+        self.leader_id = <span class="token-keyword">None</span>
+
+        <span class="token-comment"># Random election timeout (prevents everyone voting at once)</span>
+        self.election_timeout = random.uniform(<span class="token-number">150</span>, <span class="token-number">300</span>)  <span class="token-comment"># ms</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">start_election</span>(self):
+        <span class="token-string">"""Called when election timeout fires (no heartbeat from leader)"""</span>
+        self.state = State.CANDIDATE
+        self.current_term += <span class="token-number">1</span>
+        self.voted_for = self.id  <span class="token-comment"># Vote for myself</span>
+        self.votes_received = <span class="token-number">1</span>
+        <span class="token-keyword">print</span>(<span class="token-string">f"Node {self.id}: Starting election for term {self.current_term}"</span>)
+        <span class="token-comment"># Request votes from all other nodes</span>
+        <span class="token-keyword">return</span> self._request_votes()
+
+    <span class="token-keyword">def</span> <span class="token-function">_request_votes</span>(self):
+        <span class="token-string">"""Send RequestVote RPC to all other nodes"""</span>
+        <span class="token-comment"># In real Raft: send (term, candidateId, lastLogIndex, lastLogTerm)</span>
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"type"</span>: <span class="token-string">"RequestVote"</span>,
+            <span class="token-string">"term"</span>: self.current_term,
+            <span class="token-string">"candidate_id"</span>: self.id
+        }
+
+    <span class="token-keyword">def</span> <span class="token-function">receive_vote</span>(self, granted):
+        <span class="token-string">"""Handle vote response"""</span>
+        <span class="token-keyword">if</span> granted:
+            self.votes_received += <span class="token-number">1</span>
+            <span class="token-comment"># Need majority to win (e.g., 3 out of 5)</span>
+            majority = (self.cluster_size // <span class="token-number">2</span>) + <span class="token-number">1</span>
+            <span class="token-keyword">if</span> self.votes_received >= majority:
+                self.become_leader()
+
+    <span class="token-keyword">def</span> <span class="token-function">become_leader</span>(self):
+        self.state = State.LEADER
+        self.leader_id = self.id
+        <span class="token-keyword">print</span>(<span class="token-string">f"Node {self.id}: Won election for term {self.current_term}! 👑"</span>)
+        <span class="token-comment"># Start sending heartbeats to maintain leadership</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">receive_heartbeat</span>(self, leader_id, term):
+        <span class="token-string">"""Leader sends periodic heartbeats to prevent new elections"""</span>
+        <span class="token-keyword">if</span> term >= self.current_term:
+            self.state = State.FOLLOWER
+            self.current_term = term
+            self.leader_id = leader_id
+            <span class="token-comment"># Reset election timeout (leader is alive!)</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">handle_vote_request</span>(self, candidate_id, term):
+        <span class="token-string">"""Decide whether to vote for a candidate"""</span>
+        <span class="token-keyword">if</span> term > self.current_term <span class="token-keyword">and</span> self.voted_for <span class="token-keyword">is</span> <span class="token-keyword">None</span>:
+            self.voted_for = candidate_id
+            self.current_term = term
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>   <span class="token-comment"># Grant vote</span>
+        <span class="token-keyword">return</span> <span class="token-keyword">False</span>  <span class="token-comment"># Deny vote</span></code></pre>
+
+            <h2>Comparison of Election Algorithms</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Algorithm</th><th>Complexity</th><th>Split-Brain Safe?</th><th>Used By</th></tr></thead>
+                <tbody>
+                    <tr><td>Bully</td><td>O(n²) messages</td><td>No (in async networks)</td><td>Simple internal systems</td></tr>
+                    <tr><td>Ring</td><td>O(n) messages</td><td>No (ring can break)</td><td>Educational, token rings</td></tr>
+                    <tr><td>Raft</td><td>O(n) per election</td><td>Yes (majority required)</td><td>etcd, Consul, CockroachDB</td></tr>
+                    <tr><td>Paxos</td><td>O(n) per round</td><td>Yes (majority required)</td><td>Google Chubby, Spanner</td></tr>
+                    <tr><td>ZAB (Zookeeper)</td><td>O(n)</td><td>Yes (majority required)</td><td>Apache Zookeeper, Kafka</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Leader Election via Distributed Lock (Practical Approach)</h2>
+            <p>In practice, many systems use an external coordination service (like Zookeeper or etcd) for leader election:</p>
+
+<pre><code><span class="token-comment"># Leader election using Redis (practical production approach)</span>
+<span class="token-keyword">import</span> redis
+<span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> uuid
+
+<span class="token-keyword">class</span> <span class="token-class">RedisLeaderElection</span>:
+    <span class="token-string">"""Simple leader election using Redis SET NX (set if not exists)"""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, redis_client, election_key, ttl=<span class="token-number">10</span>):
+        self.redis = redis_client
+        self.key = election_key
+        self.ttl = ttl  <span class="token-comment"># Leader lease duration in seconds</span>
+        self.node_id = str(uuid.uuid4())  <span class="token-comment"># Unique identity for this node</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">try_become_leader</span>(self):
+        <span class="token-string">"""Attempt to become leader (returns True if successful)"""</span>
+        <span class="token-comment"># SET NX = "Set if Not eXists" — atomic operation</span>
+        <span class="token-comment"># Only succeeds if no one else holds the lock</span>
+        acquired = self.redis.set(
+            self.key,
+            self.node_id,
+            nx=<span class="token-keyword">True</span>,      <span class="token-comment"># Only set if key doesn't exist</span>
+            ex=self.ttl   <span class="token-comment"># Auto-expire after TTL seconds</span>
+        )
+        <span class="token-keyword">return</span> acquired <span class="token-keyword">is</span> <span class="token-keyword">not</span> <span class="token-keyword">None</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">renew_leadership</span>(self):
+        <span class="token-string">"""Leader must renew before TTL expires (heartbeat)"""</span>
+        current_holder = self.redis.get(self.key)
+        <span class="token-keyword">if</span> current_holder <span class="token-keyword">and</span> current_holder.decode() == self.node_id:
+            self.redis.expire(self.key, self.ttl)
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+        <span class="token-keyword">return</span> <span class="token-keyword">False</span>  <span class="token-comment"># Lost leadership!</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">am_i_leader</span>(self):
+        current_holder = self.redis.get(self.key)
+        <span class="token-keyword">return</span> current_holder <span class="token-keyword">and</span> current_holder.decode() == self.node_id
+
+    <span class="token-keyword">def</span> <span class="token-function">step_down</span>(self):
+        <span class="token-string">"""Voluntarily give up leadership"""</span>
+        <span class="token-keyword">if</span> self.am_i_leader():
+            self.redis.delete(self.key)
+
+<span class="token-comment"># Usage: Each node runs this loop</span>
+<span class="token-keyword">def</span> <span class="token-function">leader_election_loop</span>(redis_client):
+    election = RedisLeaderElection(redis_client, <span class="token-string">"myapp:leader"</span>)
+
+    <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+        <span class="token-keyword">if</span> election.am_i_leader():
+            <span class="token-comment"># I'm the leader — do leader work</span>
+            do_leader_work()
+            election.renew_leadership()
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># Try to become leader</span>
+            <span class="token-keyword">if</span> election.try_become_leader():
+                <span class="token-keyword">print</span>(<span class="token-string">"I'm the new leader! 👑"</span>)
+            <span class="token-keyword">else</span>:
+                <span class="token-keyword">print</span>(<span class="token-string">"Someone else is leader. Standing by..."</span>)
+
+        time.sleep(<span class="token-number">5</span>)  <span class="token-comment"># Check every 5 seconds</span></code></pre>
+
+            <h2>The Split-Brain Problem</h2>
+            <div class="callout callout-warning">
+                <strong>Split Brain</strong>: The worst thing that can happen — TWO nodes both believe they are the leader. This causes conflicting writes, data corruption, and chaos.
+            </div>
+            <p>Causes of split brain:</p>
+            <ul>
+                <li>Network partition separates the leader from some followers</li>
+                <li>Followers think leader is dead → elect new leader</li>
+                <li>Old leader is still alive on the other side of the partition</li>
+                <li>Now you have TWO leaders! Both accept writes → data diverges</li>
+            </ul>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+                <li><strong>Fencing tokens</strong>: Each leader gets a monotonically increasing token. Requests with old tokens are rejected.</li>
+                <li><strong>Lease-based leadership</strong>: Leader must renew its lease. If it can't (due to partition), it steps down.</li>
+                <li><strong>Majority quorum</strong>: Raft/Paxos require majority vote — can't get majority on both sides of a partition.</li>
+            </ul>
+
+            <div class="industry-box">
+                <h4>Real-World Leader Election</h4>
+                <ul>
+                    <li><strong>Kubernetes</strong> — Uses etcd (Raft) for controller manager leader election</li>
+                    <li><strong>Apache Kafka</strong> — Uses Zookeeper (ZAB) for partition leader election</li>
+                    <li><strong>MongoDB</strong> — Replica set uses a Raft-like protocol to elect primary</li>
+                    <li><strong>Redis Sentinel</strong> — Monitors Redis masters, elects new master on failure</li>
+                    <li><strong>Google Chubby</strong> — Uses Paxos for lock service / leader election</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+                    <li>Leader election picks ONE node to coordinate work in a distributed system</li>
+                    <li>Without a leader: duplicate work, conflicting decisions, split brain</li>
+                    <li>Bully algorithm: highest ID wins (simple but not partition-safe)</li>
+                    <li>Raft: uses terms, timeouts, and majority votes (production-grade)</li>
+                    <li>Practical: use Redis/etcd/Zookeeper for leader election via distributed locks</li>
+                    <li>Split brain = two leaders = disaster. Solve with fencing tokens, leases, or quorum.</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">
+    Normal operation:
+    [Leader 👑] ──heartbeat──→ [Follower]
+                ──heartbeat──→ [Follower]
+                ──heartbeat──→ [Follower]
+
+    Leader dies:
+    [Leader 💀]              [Follower] ← "No heartbeat for 300ms!"
+                              [Follower] ← "Let's vote!"
+                              [Follower]
+
+    Election:
+    [Dead]        [Candidate] → "Vote for me! Term 2"
+                  [Voter] → "OK, you have my vote"
+                  [Voter] → "OK, you have my vote"
+
+    Result:       [New Leader 👑] ← Got majority (2/3 votes)
+                  Starts sending heartbeats immediately
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+                    <li><strong>Not handling split brain</strong> — If you build leader election without fencing, network partitions WILL cause two leaders.</li>
+                    <li><strong>Using timestamps for ordering</strong> — Clocks drift. Use logical clocks (terms) instead of wall-clock time.</li>
+                    <li><strong>Building your own instead of using etcd/Zookeeper</strong> — Leader election is extremely hard to get right. Use battle-tested tools.</li>
+                    <li><strong>No leader health check</strong> — If the leader hangs (doesn't crash but stops responding), followers must detect this and re-elect.</li>
+                    <li><strong>Same election timeout for all nodes</strong> — This causes everyone to start elections simultaneously. Use randomized timeouts (Raft's key insight).</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+                    <li>Implement the BullyNode class. Simulate 5 nodes where the leader (node 5) dies. Verify node 4 becomes the new leader.</li>
+                    <li>Implement Redis-based leader election. Run 3 instances of your program simultaneously — verify only ONE becomes leader.</li>
+                    <li>Add a fencing token to your Redis election. Each new leader gets an incremented token. Verify that stale leaders are rejected.</li>
+                    <li>Research: What happens in Raft if two candidates start an election in the same term? How is the tie broken?</li>
+                </ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="23-consistent-hashing.html" class="prev">Consistent Hashing</a>
+                <a href="25-distributed-consensus.html" class="next">Distributed Consensus</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

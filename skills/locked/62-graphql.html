@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="sidebar-overlay"></div>
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h2>System Design</h2>
+        <p class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</p>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-module">
+            <h3>Concurrency Foundations</h3>
+            <ul>
+                <li><a href="01-threads-vs-processes.html">01. Threads vs Processes</a></li>
+                <li><a href="02-context-switching.html">02. Context Switching</a></li>
+                <li><a href="03-race-conditions.html">03. Race Conditions</a></li>
+                <li><a href="04-critical-sections.html">04. Critical Sections</a></li>
+                <li><a href="05-mutex-locks.html">05. Mutex Locks</a></li>
+                <li><a href="06-deadlocks.html">06. Deadlocks</a></li>
+                <li><a href="07-livelocks-starvation.html">07. Livelocks &amp; Starvation</a></li>
+                <li><a href="08-thread-safety.html">08. Thread Safety</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>Low-Level Concurrency</h3>
+            <ul>
+                <li><a href="09-atomic-operations-cas.html">09. Atomic Operations &amp; CAS</a></li>
+                <li><a href="10-memory-visibility.html">10. Memory Visibility</a></li>
+                <li><a href="11-happens-before.html">11. Happens-Before</a></li>
+                <li><a href="12-volatile-vs-synchronized.html">12. Volatile vs Synchronized</a></li>
+                <li><a href="13-false-sharing.html">13. False Sharing</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>Concurrency Patterns</h3>
+            <ul>
+                <li><a href="14-thread-pools.html">14. Thread Pools</a></li>
+                <li><a href="15-futures-promises-async.html">15. Futures, Promises &amp; Async</a></li>
+                <li><a href="16-producer-consumer.html">16. Producer-Consumer</a></li>
+                <li><a href="17-blocking-vs-nonblocking.html">17. Blocking vs Non-Blocking</a></li>
+                <li><a href="18-event-loops.html">18. Event Loops</a></li>
+                <li><a href="19-actor-model.html">19. Actor Model</a></li>
+                <li><a href="20-coroutines-green-threads.html">20. Coroutines &amp; Green Threads</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>Distributed Systems Core</h3>
+            <ul>
+                <li><a href="21-cap-theorem.html">21. CAP Theorem</a></li>
+                <li><a href="22-consistency-models.html">22. Consistency Models</a></li>
+                <li><a href="23-distributed-consensus.html">23. Distributed Consensus</a></li>
+                <li><a href="24-leader-election.html">24. Leader Election</a></li>
+                <li><a href="25-replication-strategies.html">25. Replication Strategies</a></li>
+                <li><a href="26-partitioning-sharding.html">26. Partitioning &amp; Sharding</a></li>
+                <li><a href="27-consistent-hashing.html">27. Consistent Hashing</a></li>
+                <li><a href="28-vector-clocks.html">28. Vector Clocks</a></li>
+                <li><a href="29-gossip-protocols.html">29. Gossip Protocols</a></li>
+                <li><a href="30-distributed-transactions.html">30. Distributed Transactions</a></li>
+                <li><a href="31-saga-pattern.html">31. Saga Pattern</a></li>
+                <li><a href="32-cdn-edge-computing.html">32. CDN &amp; Edge Computing</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>Resilience Patterns</h3>
+            <ul>
+                <li><a href="33-circuit-breaker.html">33. Circuit Breaker</a></li>
+                <li><a href="34-retry-backoff.html">34. Retry &amp; Backoff</a></li>
+                <li><a href="35-bulkhead-pattern.html">35. Bulkhead Pattern</a></li>
+                <li><a href="36-timeout-patterns.html">36. Timeout Patterns</a></li>
+                <li><a href="37-graceful-degradation.html">37. Graceful Degradation</a></li>
+                <li><a href="38-health-checks.html">38. Health Checks</a></li>
+                <li><a href="39-chaos-engineering.html">39. Chaos Engineering</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>Database Engineering</h3>
+            <ul>
+                <li><a href="40-sql-vs-nosql.html">40. SQL vs NoSQL</a></li>
+                <li><a href="41-indexing-strategies.html">41. Indexing Strategies</a></li>
+                <li><a href="42-query-optimization.html">42. Query Optimization</a></li>
+                <li><a href="43-connection-pooling.html">43. Connection Pooling</a></li>
+                <li><a href="44-replication-failover.html">44. Replication &amp; Failover</a></li>
+                <li><a href="45-database-sharding.html">45. Database Sharding</a></li>
+                <li><a href="46-caching-strategies.html">46. Caching Strategies</a></li>
+                <li><a href="47-event-sourcing-cqrs.html">47. Event Sourcing &amp; CQRS</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>Architecture Patterns</h3>
+            <ul>
+                <li><a href="48-monolith-vs-microservices.html">48. Monolith vs Microservices</a></li>
+                <li><a href="49-service-mesh.html">49. Service Mesh</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>Design Patterns</h3>
+            <ul>
+                <li><a href="50-rate-limiting.html">50. Rate Limiting</a></li>
+                <li><a href="51-load-balancing.html">51. Load Balancing</a></li>
+                <li><a href="52-api-gateway.html">52. API Gateway</a></li>
+                <li><a href="53-message-queues.html">53. Message Queues</a></li>
+                <li><a href="54-pub-sub.html">54. Pub/Sub</a></li>
+                <li><a href="55-event-driven-architecture.html">55. Event-Driven Architecture</a></li>
+                <li><a href="56-backpressure.html">56. Backpressure</a></li>
+                <li><a href="57-idempotency.html">57. Idempotency</a></li>
+                <li><a href="58-distributed-locking.html">58. Distributed Locking</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>API &amp; Communication</h3>
+            <ul>
+                <li><a href="59-rest-api-design.html">59. REST API Design</a></li>
+                <li><a href="60-websockets.html">60. WebSockets</a></li>
+                <li><a href="61-reverse-proxy.html">61. Reverse Proxy</a></li>
+                <li><a href="62-graphql.html" class="active">62. GraphQL</a></li>
+                <li><a href="63-grpc.html">63. gRPC</a></li>
+                <li><a href="64-api-versioning.html">64. API Versioning</a></li>
+            </ul>
+        </div>
+        <div class="nav-module">
+            <h3>Security</h3>
+            <ul>
+                <li><a href="65-authentication-authorization.html">65. Authentication &amp; Authorization</a></li>
+                <li><a href="66-oauth-jwt.html">66. OAuth &amp; JWT</a></li>
+                <li><a href="67-encryption-tls.html">67. Encryption &amp; TLS</a></li>
+                <li><a href="68-api-security.html">68. API Security</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="progress-tracker">
+        <span class="progress-label">Progress</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: 91%;"></div></div>
+        <span class="progress-text">62 / 68 topics</span>
+    </div>
+</aside>
+
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Toggle sidebar">&#9776;</button>
+    <h1>System Design Course</h1>
+    <span class="topic-indicator">Topic 62 of 68</span>
+</header>
+
+<main class="main-content">
+    <section class="hero">
+        <div class="hero-tags">
+            <span class="tag tag-intermediate">Intermediate</span>
+            <span class="tag tag-api">API</span>
+            <span class="tag tag-concept">Concept</span>
+        </div>
+        <h1>GraphQL</h1>
+        <p class="hero-subtitle">A query language for APIs that gives clients the power to ask for exactly what they need &mdash; nothing more, nothing less.</p>
+    </section>
+
+    <div class="analogy-box">
+        <h3>&#127860; The Analogy &mdash; Buffet vs Fixed Menu</h3>
+        <p>REST is like a fixed menu &mdash; you order &ldquo;Dish #7&rdquo; and get everything the chef decided to include, whether you want the garnish or not. GraphQL is a buffet &mdash; you walk up with your plate and pick <em>exactly</em> the items you want. No more paying for food you won&rsquo;t eat (over-fetching), no more going back to the counter three times for sides (under-fetching).</p>
+    </div>
+
+    <h2>Why GraphQL Exists</h2>
+    <p>Facebook created GraphQL in 2012 to solve a mobile performance problem. Their News Feed required data from <em>dozens</em> of REST endpoints &mdash; users, posts, comments, likes, media. Each round-trip added latency on slow 3G connections. GraphQL collapsed those requests into a single, precise query.</p>
+
+    <h3>The Over-Fetching / Under-Fetching Problem</h3>
+    <p><strong>Over-fetching</strong> &mdash; a <code>GET /users/42</code> returns 30 fields when you only need <code>name</code> and <code>avatar</code>. Wasted bandwidth, wasted parsing time.</p>
+    <p><strong>Under-fetching</strong> &mdash; you need a user&rsquo;s posts <em>and</em> each post&rsquo;s comments. REST forces <code>GET /users/42</code>, then <code>GET /users/42/posts</code>, then <code>GET /posts/{id}/comments</code> for each post. Multiple round-trips.</p>
+    <p>GraphQL solves both &mdash; one request, one response, shaped exactly like your query.</p>
+
+    <h2>Core Concepts</h2>
+
+    <h3>Schema &mdash; The Contract</h3>
+    <p>The schema defines every type, field, and relationship available. It&rsquo;s strongly typed using SDL (Schema Definition Language):</p>
+    <div class="code">
+        <pre>
+<span class="keyword">type</span> <span class="class-name">User</span> {
+    <span class="field">id</span>: <span class="type">ID!</span>
+    <span class="field">name</span>: <span class="type">String!</span>
+    <span class="field">email</span>: <span class="type">String!</span>
+    <span class="field">posts</span>: [<span class="type">Post!</span>]!
+}
+
+<span class="keyword">type</span> <span class="class-name">Post</span> {
+    <span class="field">id</span>: <span class="type">ID!</span>
+    <span class="field">title</span>: <span class="type">String!</span>
+    <span class="field">body</span>: <span class="type">String!</span>
+    <span class="field">author</span>: <span class="type">User!</span>
+    <span class="field">comments</span>: [<span class="type">Comment!</span>]!
+}
+
+<span class="keyword">type</span> <span class="class-name">Query</span> {
+    <span class="function">user</span>(<span class="param">id</span>: <span class="type">ID!</span>): <span class="type">User</span>
+    <span class="function">posts</span>(<span class="param">limit</span>: <span class="type">Int</span>): [<span class="type">Post!</span>]!
+}</pre>
+    </div>
+
+    <h3>Queries &mdash; Reading Data</h3>
+    <p>Clients describe the shape of the response they want:</p>
+    <div class="code">
+        <pre>
+<span class="keyword">query</span> {
+    <span class="function">user</span>(<span class="param">id</span>: <span class="string">"42"</span>) {
+        <span class="field">name</span>
+        <span class="field">posts</span> {
+            <span class="field">title</span>
+            <span class="field">comments</span> {
+                <span class="field">body</span>
+            }
+        }
+    }
+}</pre>
+    </div>
+    <p>The response mirrors this structure exactly &mdash; no extra fields, no missing data.</p>
+
+    <h3>Mutations &mdash; Writing Data</h3>
+    <p>Mutations modify server-side state and return the updated result:</p>
+    <div class="code">
+        <pre>
+<span class="keyword">mutation</span> {
+    <span class="function">createPost</span>(<span class="param">title</span>: <span class="string">"GraphQL 101"</span>, <span class="param">body</span>: <span class="string">"..."</span>) {
+        <span class="field">id</span>
+        <span class="field">title</span>
+        <span class="field">author</span> { <span class="field">name</span> }
+    }
+}</pre>
+    </div>
+
+    <h3>Subscriptions &mdash; Real-Time Data</h3>
+    <p>Subscriptions use WebSockets to push updates when data changes:</p>
+    <div class="code">
+        <pre>
+<span class="keyword">subscription</span> {
+    <span class="function">newComment</span>(<span class="param">postId</span>: <span class="string">"99"</span>) {
+        <span class="field">body</span>
+        <span class="field">author</span> { <span class="field">name</span> }
+    }
+}</pre>
+    </div>
+
+    <h2>GraphQL vs REST</h2>
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Dimension</th>
+                    <th>REST</th>
+                    <th>GraphQL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Endpoints</td><td>Multiple per resource</td><td>Single <code>/graphql</code> endpoint</td></tr>
+                <tr><td>Data shape</td><td>Server decides</td><td>Client decides</td></tr>
+                <tr><td>Over-fetching</td><td>Common</td><td>Eliminated</td></tr>
+                <tr><td>Under-fetching</td><td>Requires multiple calls</td><td>Solved in one query</td></tr>
+                <tr><td>Versioning</td><td><code>/v1/</code>, <code>/v2/</code></td><td>Schema evolution &mdash; deprecate fields</td></tr>
+                <tr><td>Caching</td><td>HTTP caching built-in</td><td>Requires custom strategies</td></tr>
+                <tr><td>Tooling</td><td>Swagger/OpenAPI</td><td>Introspection, GraphiQL, Apollo Studio</td></tr>
+                <tr><td>Learning curve</td><td>Low</td><td>Moderate</td></tr>
+                <tr><td>File uploads</td><td>Native multipart</td><td>Needs spec extensions</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Python Implementation</h2>
+    <h3>Schema &amp; Resolvers with Strawberry</h3>
+    <div class="code">
+        <pre>
+<span class="keyword">import</span> strawberry
+<span class="keyword">from</span> typing <span class="keyword">import</span> List
+
+<span class="decorator">@strawberry.type</span>
+<span class="keyword">class</span> <span class="class-name">User</span>:
+    <span class="field">id</span>: <span class="type">str</span>
+    <span class="field">name</span>: <span class="type">str</span>
+    <span class="field">email</span>: <span class="type">str</span>
+
+<span class="decorator">@strawberry.type</span>
+<span class="keyword">class</span> <span class="class-name">Post</span>:
+    <span class="field">id</span>: <span class="type">str</span>
+    <span class="field">title</span>: <span class="type">str</span>
+    <span class="field">body</span>: <span class="type">str</span>
+    <span class="field">author</span>: <span class="type">User</span>
+
+<span class="decorator">@strawberry.type</span>
+<span class="keyword">class</span> <span class="class-name">Query</span>:
+    <span class="decorator">@strawberry.field</span>
+    <span class="keyword">def</span> <span class="function">user</span>(<span class="param">self</span>, <span class="param">id</span>: <span class="type">str</span>) -> <span class="type">User</span>:
+        <span class="comment"># In production &rarr; fetch from DB</span>
+        <span class="keyword">return</span> User(id=id, name=<span class="string">"Alice"</span>, email=<span class="string">"alice@dev.io"</span>)
+
+    <span class="decorator">@strawberry.field</span>
+    <span class="keyword">def</span> <span class="function">posts</span>(<span class="param">self</span>, <span class="param">limit</span>: <span class="type">int</span> = <span class="number">10</span>) -> List[<span class="type">Post</span>]:
+        <span class="keyword">return</span> fetch_posts(limit)
+
+<span class="field">schema</span> = strawberry.Schema(query=Query)</pre>
+    </div>
+
+    <h3>Solving N+1 with DataLoader</h3>
+    <p>The <strong>N+1 problem</strong> &mdash; if you query 50 posts and each needs its author, a naive resolver fires 50 separate DB queries. DataLoader batches them into one:</p>
+    <div class="code">
+        <pre>
+<span class="keyword">from</span> strawberry.dataloader <span class="keyword">import</span> DataLoader
+
+<span class="keyword">async</span> <span class="keyword">def</span> <span class="function">batch_load_users</span>(<span class="param">user_ids</span>: List[<span class="type">str</span>]) -> List[<span class="type">User</span>]:
+    <span class="comment"># Single query: SELECT * FROM users WHERE id IN (...)</span>
+    users = <span class="keyword">await</span> db.fetch_users_by_ids(user_ids)
+    <span class="keyword">return</span> [users[uid] <span class="keyword">for</span> uid <span class="keyword">in</span> user_ids]
+
+<span class="field">user_loader</span> = DataLoader(load_fn=batch_load_users)
+
+<span class="comment"># In resolver &mdash; automatically batched</span>
+<span class="keyword">async</span> <span class="keyword">def</span> <span class="function">resolve_author</span>(<span class="param">self</span>) -> <span class="type">User</span>:
+    <span class="keyword">return</span> <span class="keyword">await</span> user_loader.load(self.author_id)</pre>
+    </div>
+
+    <h3>Federation &mdash; Scaling GraphQL</h3>
+    <p>Apollo Federation lets you split a monolithic schema across multiple services. Each service owns its types, and a gateway composes them into one unified graph:</p>
+    <div class="code">
+        <pre>
+<span class="comment"># Users service</span>
+<span class="keyword">type</span> <span class="class-name">User</span> <span class="decorator">@key</span>(<span class="param">fields</span>: <span class="string">"id"</span>) {
+    <span class="field">id</span>: <span class="type">ID!</span>
+    <span class="field">name</span>: <span class="type">String!</span>
+}
+
+<span class="comment"># Posts service &mdash; extends User</span>
+<span class="keyword">extend type</span> <span class="class-name">User</span> <span class="decorator">@key</span>(<span class="param">fields</span>: <span class="string">"id"</span>) {
+    <span class="field">id</span>: <span class="type">ID!</span> <span class="decorator">@external</span>
+    <span class="field">posts</span>: [<span class="type">Post!</span>]!
+}</pre>
+    </div>
+
+    <div class="industry-box">
+        <h3>&#127966; Industry Usage</h3>
+        <ul>
+            <li><strong>Facebook</strong> &mdash; Created GraphQL in 2012; powers the News Feed on mobile</li>
+            <li><strong>GitHub API v4</strong> &mdash; Entire public API is GraphQL; REST v3 is legacy</li>
+            <li><strong>Shopify</strong> &mdash; Storefront API uses GraphQL for flexible e-commerce queries</li>
+            <li><strong>Apollo</strong> &mdash; Open-source ecosystem &mdash; Client, Server, Federation, Studio</li>
+            <li><strong>Hasura</strong> &mdash; Instant GraphQL APIs over Postgres with real-time subscriptions</li>
+            <li><strong>Netflix</strong> &mdash; Uses federation to compose 1000+ microservices into one graph</li>
+        </ul>
+    </div>
+
+    <div class="summary-box">
+        <h3>&#128203; Key Takeaways</h3>
+        <ul>
+            <li>GraphQL is a <em>query language</em> and <em>runtime</em> &mdash; not a database</li>
+            <li>Single endpoint, client-driven data shape &mdash; eliminates over/under-fetching</li>
+            <li>Strongly typed schema acts as a contract between frontend and backend</li>
+            <li>DataLoader solves the N+1 problem through automatic batching</li>
+            <li>Federation enables scaling across teams and services</li>
+            <li>Trade-off &mdash; caching is harder than REST; complexity cost is real</li>
+        </ul>
+    </div>
+
+    <div class="mental-model">
+        <h3>&#129504; Mental Model</h3>
+        <p>Think of GraphQL as a <strong>typed, composable SQL for your API</strong>. The schema is your DDL, queries are your SELECT statements, mutations are INSERT/UPDATE, and the resolver layer is your query engine that knows how to fetch data from any backing service.</p>
+    </div>
+
+    <div class="mistakes-box">
+        <h3>&#9888;&#65039; Common Mistakes</h3>
+        <ol>
+            <li><strong>Ignoring the N+1 problem</strong> &mdash; Without DataLoader or batching, nested queries explode into hundreds of DB calls. Always profile resolver execution.</li>
+            <li><strong>Exposing the entire database schema</strong> &mdash; GraphQL schemas should model the <em>domain</em>, not mirror table structure. Design for client use-cases.</li>
+            <li><strong>No query depth/complexity limits</strong> &mdash; Malicious clients can craft deeply nested queries that DOS your server. Set max depth (e.g., 7) and complexity scoring.</li>
+            <li><strong>Treating mutations like REST POST</strong> &mdash; Mutations should be named actions (<code>publishPost</code>) not generic CRUD. Model the <em>intent</em>, not the operation.</li>
+        </ol>
+    </div>
+
+    <div class="exercise-box">
+        <h3>&#128187; Exercises</h3>
+        <ol>
+            <li><strong>Schema Design</strong> &mdash; Design a GraphQL schema for a Twitter clone with users, tweets, likes, and followers. Include queries for a user&rsquo;s timeline and a single tweet with its like count.</li>
+            <li><strong>DataLoader Implementation</strong> &mdash; Given a <code>posts</code> query returning 100 posts each with an <code>author</code> field, implement a DataLoader that batches author lookups into a single SQL query.</li>
+            <li><strong>Security Hardening</strong> &mdash; Add query depth limiting (max 5), complexity analysis (max cost 1000), and persisted queries to a GraphQL server. Test with a malicious nested query.</li>
+            <li><strong>REST-to-GraphQL Migration</strong> &mdash; Take three related REST endpoints (<code>/users</code>, <code>/users/:id/posts</code>, <code>/posts/:id/comments</code>) and wrap them behind a single GraphQL schema using resolvers that call the existing REST APIs.</li>
+        </ol>
+    </div>
+
+    <nav class="page-nav">
+        <a href="61-reverse-proxy.html" class="prev">&larr; Prev: Reverse Proxy</a>
+        <a href="63-grpc.html" class="next">Next: gRPC &rarr;</a>
+    </nav>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

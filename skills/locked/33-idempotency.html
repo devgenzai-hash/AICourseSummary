@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idempotency - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Resilience Patterns &rarr; Idempotency</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Resilience</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Idempotency</h1>
+            <p class="hero-subtitle">Designing operations that can be safely retried without causing unintended side effects &mdash; the cornerstone of reliable distributed systems.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of pressing an elevator button. No matter how many times you press it &mdash; once, twice, or fifty times in frustration &mdash; the elevator is only called once. The result is the same regardless of how many times the operation is performed. That&rsquo;s idempotency: repeated applications produce the same outcome as a single application.</p>
+        </div>
+
+        <h2>What Is Idempotency?</h2>
+        <p>An operation is <strong>idempotent</strong> if performing it multiple times has the same effect as performing it once. Mathematically: <em>f(f(x)) = f(x)</em>. In distributed systems, this property is critical because networks are unreliable &mdash; requests can be duplicated, retried, or delivered out of order.</p>
+
+        <h3>Why Idempotency Matters</h3>
+        <p>Consider a payment API. A client sends a &ldquo;charge $50&rdquo; request but the response times out. Did the charge go through? The client has no way to know. Without idempotency, retrying could charge the customer twice. With idempotency, the retry is safe &mdash; the system recognizes it as a duplicate and returns the original result.</p>
+
+        <h2>HTTP Methods and Idempotency</h2>
+        <p>The HTTP specification defines idempotency expectations for each method:</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>HTTP Method</th>
+                        <th>Idempotent?</th>
+                        <th>Safe?</th>
+                        <th>Explanation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>GET</strong></td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>Reading data never changes state</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PUT</strong></td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Sets resource to a specific state; repeating is harmless</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DELETE</strong></td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Deleting an already-deleted resource is a no-op</td>
+                    </tr>
+                    <tr>
+                        <td><strong>POST</strong></td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Creates new resources; duplicates cause multiple creations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PATCH</strong></td>
+                        <td>Not guaranteed</td>
+                        <td>No</td>
+                        <td>Depends on the patch operation (increment vs set)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Implementing Idempotent APIs</h2>
+        <h3>Idempotency Keys</h3>
+        <p>The most common approach is using <strong>idempotency keys</strong> &mdash; unique client-generated tokens sent with each request. The server stores the key and its result; if the same key arrives again, the stored result is returned without re-executing the operation.</p>
+
+        <pre><code><span class="token-keyword">import</span> uuid
+<span class="token-keyword">import</span> time
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Dict, Any, Optional
+
+<span class="token-keyword">class</span> <span class="token-class">IdempotencyStore</span>:
+    <span class="token-string">"""Stores idempotency keys and their results."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, ttl_seconds: int = <span class="token-number">86400</span>):
+        self._store: Dict[str, dict] = {}
+        self._ttl = ttl_seconds
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str) -> Optional[dict]:
+        <span class="token-string">"""Retrieve stored result for an idempotency key."""</span>
+        entry = self._store.get(key)
+        <span class="token-keyword">if</span> entry <span class="token-keyword">and</span> time.time() - entry[<span class="token-string">"created_at"</span>] < self._ttl:
+            <span class="token-keyword">return</span> entry[<span class="token-string">"result"</span>]
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">store</span>(self, key: str, result: dict) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Store the result of an operation."""</span>
+        self._store[key] = {
+            <span class="token-string">"result"</span>: result,
+            <span class="token-string">"created_at"</span>: time.time()
+        }
+
+<span class="token-comment"># Usage in a payment endpoint</span>
+idempotency_store = <span class="token-class">IdempotencyStore</span>()
+
+<span class="token-keyword">def</span> <span class="token-function">process_payment</span>(idempotency_key: str, amount: float, customer_id: str) -> dict:
+    <span class="token-comment"># Check if we already processed this request</span>
+    existing = idempotency_store.<span class="token-function">get</span>(idempotency_key)
+    <span class="token-keyword">if</span> existing:
+        <span class="token-keyword">return</span> existing  <span class="token-comment"># Return cached result</span>
+
+    <span class="token-comment"># Process the payment (side effect happens only once)</span>
+    result = {
+        <span class="token-string">"payment_id"</span>: str(uuid.uuid4()),
+        <span class="token-string">"amount"</span>: amount,
+        <span class="token-string">"customer_id"</span>: customer_id,
+        <span class="token-string">"status"</span>: <span class="token-string">"completed"</span>
+    }
+
+    <span class="token-comment"># Store result before returning</span>
+    idempotency_store.<span class="token-function">store</span>(idempotency_key, result)
+    <span class="token-keyword">return</span> result</code></pre>
+
+        <h3>Database-Level Idempotency with UPSERT</h3>
+        <p>For database operations, <strong>UPSERT</strong> (INSERT ... ON CONFLICT UPDATE) and unique constraints provide idempotency at the storage layer:</p>
+
+        <pre><code><span class="token-keyword">import</span> sqlite3
+
+<span class="token-keyword">def</span> <span class="token-function">upsert_user_balance</span>(conn: sqlite3.Connection, user_id: str, balance: float):
+    <span class="token-string">"""Set user balance idempotently &mdash; safe to retry."""</span>
+    conn.execute(<span class="token-string">"""
+        INSERT INTO accounts (user_id, balance, updated_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id)
+        DO UPDATE SET balance = excluded.balance,
+                      updated_at = CURRENT_TIMESTAMP
+    """</span>, (user_id, balance))
+    conn.commit()
+
+<span class="token-keyword">def</span> <span class="token-function">idempotent_create_order</span>(conn: sqlite3.Connection, order_id: str, items: list):
+    <span class="token-string">"""Create order using client-generated ID as natural idempotency key."""</span>
+    <span class="token-keyword">try</span>:
+        conn.execute(<span class="token-string">"""
+            INSERT INTO orders (order_id, items, status)
+            VALUES (?, ?, 'pending')
+        """</span>, (order_id, str(items)))
+        conn.commit()
+        <span class="token-keyword">return</span> {<span class="token-string">"order_id"</span>: order_id, <span class="token-string">"status"</span>: <span class="token-string">"created"</span>}
+    <span class="token-keyword">except</span> sqlite3.IntegrityError:
+        <span class="token-comment"># Duplicate &mdash; return existing order</span>
+        row = conn.execute(
+            <span class="token-string">"SELECT order_id, status FROM orders WHERE order_id = ?"</span>,
+            (order_id,)
+        ).fetchone()
+        <span class="token-keyword">return</span> {<span class="token-string">"order_id"</span>: row[<span class="token-number">0</span>], <span class="token-string">"status"</span>: row[<span class="token-number">1</span>]}</code></pre>
+
+        <h2>Idempotent vs Non-Idempotent Operations</h2>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Operation Type</th>
+                        <th>Idempotent Example</th>
+                        <th>Non-Idempotent Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Assignment</td>
+                        <td><code>balance = 100</code></td>
+                        <td><code>balance += 50</code></td>
+                    </tr>
+                    <tr>
+                        <td>Database</td>
+                        <td><code>UPDATE SET x = 5</code></td>
+                        <td><code>UPDATE SET x = x + 1</code></td>
+                    </tr>
+                    <tr>
+                        <td>File system</td>
+                        <td>Write entire file contents</td>
+                        <td>Append to file</td>
+                    </tr>
+                    <tr>
+                        <td>API</td>
+                        <td>PUT /users/123 {name: &quot;Alice&quot;}</td>
+                        <td>POST /emails/send</td>
+                    </tr>
+                    <tr>
+                        <td>Queue</td>
+                        <td>Set message as processed</td>
+                        <td>Increment retry counter</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Stripe</strong> uses idempotency keys extensively. Every mutating API call accepts an <code>Idempotency-Key</code> header. Keys are stored for 24 hours. If a request with the same key arrives, Stripe returns the cached response &mdash; even if it was an error. This makes their payment API safe to retry on network failures without risking double charges.</p>
+            <p><strong>AWS</strong> uses client tokens for idempotent EC2 instance launches. Calling <code>RunInstances</code> with the same client token within 48 hours returns the same instance IDs without launching new ones.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Idempotent operations produce the same result regardless of how many times they execute</li>
+                <li>Idempotency keys are client-generated tokens that identify unique requests</li>
+                <li>GET, PUT, and DELETE are inherently idempotent; POST typically is not</li>
+                <li>Database UPSERT and unique constraints provide storage-level idempotency</li>
+                <li>Always store the result alongside the key to return consistent responses on retries</li>
+                <li>Set a TTL on idempotency records to prevent unbounded storage growth</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of idempotency as a <strong>checkpoint system</strong>. Before executing, check if you&rsquo;ve been here before. If yes, return the saved result. If no, execute, save, and return.</p>
+            <div class="model-visual">
+                <pre>
+Request arrives with Key "abc-123"
+        │
+        ▼
+┌─────────────────────┐
+│  Key exists in DB?  │
+└─────────────────────┘
+     │           │
+    YES          NO
+     │           │
+     ▼           ▼
+┌─────────┐  ┌──────────────┐
+│ Return  │  │ Execute op   │
+│ cached  │  │ Store result │
+│ result  │  │ Return result│
+└─────────┘  └──────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Using server-generated keys:</strong> The client must generate the idempotency key &mdash; otherwise retries after timeout create new keys each time, defeating the purpose.</li>
+                <li><strong>Not handling concurrent duplicates:</strong> Two identical requests arriving simultaneously can both pass the &ldquo;key not found&rdquo; check. Use database locks or compare-and-swap to prevent this race condition.</li>
+                <li><strong>Ignoring partial failures:</strong> If an operation fails midway, storing the error as the cached result means retries will always return the error. Distinguish between retryable and permanent failures.</li>
+                <li><strong>No TTL on stored keys:</strong> Without expiration, idempotency storage grows forever. Set a reasonable TTL (e.g., 24&ndash;48 hours) based on your retry window.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build an idempotent transfer API:</strong> Implement a money transfer endpoint that accepts an idempotency key. Verify that calling it three times with the same key only moves money once.</li>
+                <li><strong>Handle concurrent duplicates:</strong> Modify your implementation to handle two simultaneous requests with the same idempotency key using database-level locking.</li>
+                <li><strong>Design TTL cleanup:</strong> Add a background process that expires old idempotency records. Test that expired keys allow re-execution.</li>
+                <li><strong>Convert a non-idempotent endpoint:</strong> Take a POST /notifications/send endpoint and redesign it to be idempotent using a combination of idempotency keys and deduplication.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="32-saga-pattern.html" class="prev">&larr; Saga Pattern</a>
+            <a href="34-delivery-guarantees.html" class="next">Delivery Guarantees &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

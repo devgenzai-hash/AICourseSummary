@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Invalidation - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Database Engineering &rarr; Cache Invalidation</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Advanced</span>
+                <span class="tag">Database</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Cache Invalidation</h1>
+            <p class="hero-subtitle">Knowing when cached data is stale and must be refreshed &mdash; famously called &ldquo;one of the two hard problems in computer science&rdquo; alongside naming things and off-by-one errors.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Imagine you have a <strong>printed map of a city</strong> that keeps changing &mdash; new roads are built, old ones are demolished, buildings appear and disappear. When do you print new maps? Print too often and you waste paper and money. Print too rarely and people get lost following outdated directions. You need a strategy: maybe you reprint every month (TTL), or you reprint only when someone reports an error (event-based), or you stamp a version number on each map and let people check if theirs is current (ETags). <strong>Cache invalidation is deciding when your &ldquo;map&rdquo; (cached data) no longer reflects reality.</strong></p>
+        </div>
+
+        <h2>Why Cache Invalidation Is Hard</h2>
+        <p>Phil Karlton famously said: <em>&ldquo;There are only two hard things in Computer Science: cache invalidation and naming things.&rdquo;</em> The difficulty arises because:</p>
+        <ul>
+            <li><strong>Distributed state:</strong> Cache and database are separate systems &mdash; no atomic operation spans both</li>
+            <li><strong>Race conditions:</strong> Between reading stale data and writing fresh data, another process may write again</li>
+            <li><strong>Cascading dependencies:</strong> Invalidating one key may require invalidating dozens of derived keys</li>
+            <li><strong>Invisible staleness:</strong> You don&rsquo;t know data is stale until someone checks the source of truth</li>
+            <li><strong>Cost of over-invalidation:</strong> Invalidating too aggressively destroys hit ratio and hammers the database</li>
+        </ul>
+
+        <h2>TTL-Based Expiry</h2>
+        <p>The simplest approach &mdash; every cached entry has a Time-To-Live after which it&rsquo;s automatically discarded:</p>
+        <ul>
+            <li><strong>Pros:</strong> Zero coordination needed, eventual consistency guaranteed, bounded staleness window</li>
+            <li><strong>Cons:</strong> Data is stale until TTL expires, choosing the right TTL is guesswork, cache misses spike at expiry</li>
+            <li><strong>Best for:</strong> Data that changes infrequently or where brief staleness is acceptable (product catalog, config settings)</li>
+        </ul>
+
+        <h2>Event-Based Invalidation</h2>
+        <p>When the source of truth changes, it actively notifies the cache to discard stale entries. This gives near-real-time consistency:</p>
+        <ul>
+            <li><strong>Database triggers:</strong> A trigger fires on UPDATE/DELETE and publishes an invalidation event</li>
+            <li><strong>Application-level events:</strong> The write path explicitly invalidates after a successful DB write</li>
+            <li><strong>Change Data Capture (CDC):</strong> Tools like Debezium stream DB changes to Kafka, consumers invalidate caches</li>
+        </ul>
+
+        <h2>Write-Through Invalidation</h2>
+        <p>Every write to the database simultaneously updates or deletes the corresponding cache entry. The cache is always consistent because writes flow through it:</p>
+        <ul>
+            <li><strong>Update approach:</strong> Write new value to both DB and cache atomically &mdash; higher write latency but zero stale reads</li>
+            <li><strong>Delete approach:</strong> Write to DB, then delete cache key &mdash; next read triggers a cache miss and refill</li>
+            <li><strong>Delete is safer:</strong> Avoids race conditions where two concurrent updates leave stale data in cache</li>
+        </ul>
+
+        <h2>Pub/Sub Invalidation</h2>
+        <p>A publish-subscribe channel broadcasts invalidation messages to all cache nodes. When any node writes to the DB, it publishes a message; all subscribers evict the stale key:</p>
+        <ul>
+            <li><strong>Redis Pub/Sub:</strong> <code>PUBLISH invalidate:users user:42</code> &mdash; all subscribers evict user:42</li>
+            <li><strong>Kafka topics:</strong> Invalidation events consumed by all application instances</li>
+            <li><strong>Advantage:</strong> Works across multiple cache instances and data centers</li>
+            <li><strong>Risk:</strong> Message loss (pub/sub is fire-and-forget) &mdash; pair with TTL as a safety net</li>
+        </ul>
+
+        <h2>Version-Based Invalidation (ETags)</h2>
+        <p>Each cached entry stores a version identifier. On read, the client sends its version to the server; if it matches, the server returns &ldquo;304 Not Modified&rdquo; (no data transfer). If it doesn&rsquo;t match, the server returns fresh data:</p>
+        <ul>
+            <li><strong>HTTP ETags:</strong> <code>ETag: "abc123"</code> header, client sends <code>If-None-Match: "abc123"</code></li>
+            <li><strong>Database version columns:</strong> Every row has a <code>version</code> or <code>updated_at</code> column compared on read</li>
+            <li><strong>Advantage:</strong> No unnecessary data transfer, precise freshness check</li>
+            <li><strong>Disadvantage:</strong> Still requires a round-trip to check &mdash; not a true &ldquo;zero-latency&rdquo; cache hit</li>
+        </ul>
+
+        <h2>Tag-Based Invalidation</h2>
+        <p>Cache entries are tagged with categories. Invalidating a tag purges all entries with that tag &mdash; useful for cascading invalidation:</p>
+        <ul>
+            <li><strong>Example:</strong> A user profile page is tagged <code>["user:42", "team:engineering", "org:acme"]</code></li>
+            <li><strong>Invalidation:</strong> When team membership changes, invalidate tag <code>"team:engineering"</code> &mdash; all related pages are purged</li>
+            <li><strong>CDN support:</strong> Fastly Surrogate-Key headers, Cloudflare Cache Tags, Varnish hashtwo</li>
+        </ul>
+
+        <h2>Stale-While-Revalidate</h2>
+        <p>Serve stale data immediately while asynchronously fetching fresh data in the background. The user gets instant response; the cache is refreshed for the next request:</p>
+        <ul>
+            <li><strong>HTTP:</strong> <code>Cache-Control: max-age=60, stale-while-revalidate=300</code></li>
+            <li><strong>Application-level:</strong> Return stale value, trigger background refresh, update cache when fresh data arrives</li>
+            <li><strong>Advantage:</strong> Zero-latency responses even on cache expiry, smooth transition to fresh data</li>
+            <li><strong>Trade-off:</strong> The first requester after expiry sees stale data (usually acceptable)</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Consistency</th>
+                        <th>Complexity</th>
+                        <th>Latency Impact</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>TTL-Based</strong></td>
+                        <td>Eventual (bounded by TTL)</td>
+                        <td>Very Low</td>
+                        <td>None (until expiry spike)</td>
+                        <td>Infrequently changing data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Event-Based</strong></td>
+                        <td>Near-real-time</td>
+                        <td>Medium</td>
+                        <td>Slight write overhead</td>
+                        <td>User-facing mutable data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Write-Through</strong></td>
+                        <td>Strong</td>
+                        <td>Low</td>
+                        <td>Higher write latency</td>
+                        <td>Read-heavy, consistency-critical</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pub/Sub</strong></td>
+                        <td>Near-real-time (multi-node)</td>
+                        <td>High</td>
+                        <td>Minimal</td>
+                        <td>Distributed cache clusters</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Version/ETag</strong></td>
+                        <td>Strong (on access)</td>
+                        <td>Medium</td>
+                        <td>Validation round-trip</td>
+                        <td>HTTP caching, API responses</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tag-Based</strong></td>
+                        <td>Near-real-time</td>
+                        <td>Medium</td>
+                        <td>Bulk purge cost</td>
+                        <td>Content with shared dependencies</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stale-While-Revalidate</strong></td>
+                        <td>Eventual (one-request delay)</td>
+                        <td>Low</td>
+                        <td>Zero (serves stale)</td>
+                        <td>Latency-sensitive UIs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementation</h2>
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> threading
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Any, Optional, Dict, Set
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># STRATEGY 1: TTL-Based Invalidation</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">TTLCache</span>:
+    <span class="token-string">"""Simple TTL-based cache &mdash; entries auto-expire after a set duration."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, default_ttl: int = <span class="token-number">300</span>):
+        self._store: Dict[str, Any] = {}
+        self._expiry: Dict[str, float] = {}
+        self.default_ttl = default_ttl
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str) -> Optional[Any]:
+        <span class="token-keyword">if</span> key <span class="token-keyword">in</span> self._expiry:
+            <span class="token-keyword">if</span> time.time() > self._expiry[key]:
+                <span class="token-comment"># Expired &mdash; remove and return None</span>
+                <span class="token-keyword">del</span> self._store[key]
+                <span class="token-keyword">del</span> self._expiry[key]
+                <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        <span class="token-keyword">return</span> self._store.get(key)
+
+    <span class="token-keyword">def</span> <span class="token-function">set</span>(self, key: str, value: Any, ttl: int = <span class="token-keyword">None</span>):
+        self._store[key] = value
+        self._expiry[key] = time.time() + (ttl <span class="token-keyword">or</span> self.default_ttl)
+
+    <span class="token-keyword">def</span> <span class="token-function">delete</span>(self, key: str):
+        self._store.pop(key, <span class="token-keyword">None</span>)
+        self._expiry.pop(key, <span class="token-keyword">None</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># STRATEGY 2: Event-Based with Pub/Sub</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">InvalidationBus</span>:
+    <span class="token-string">"""Simple pub/sub bus for broadcasting cache invalidation events."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._subscribers: list = []
+
+    <span class="token-keyword">def</span> <span class="token-function">subscribe</span>(self, callback):
+        self._subscribers.append(callback)
+
+    <span class="token-keyword">def</span> <span class="token-function">publish</span>(self, event_type: str, key: str):
+        <span class="token-string">"""Broadcast invalidation to all subscribers."""</span>
+        <span class="token-keyword">for</span> callback <span class="token-keyword">in</span> self._subscribers:
+            callback(event_type, key)
+
+
+<span class="token-keyword">class</span> <span class="token-class">EventDrivenCache</span>:
+    <span class="token-string">"""Cache that listens for invalidation events via pub/sub."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, bus: InvalidationBus, ttl: int = <span class="token-number">600</span>):
+        self._cache = TTLCache(default_ttl=ttl)
+        self._bus = bus
+        <span class="token-comment"># Subscribe to invalidation events</span>
+        self._bus.subscribe(self._on_invalidate)
+
+    <span class="token-keyword">def</span> <span class="token-function">_on_invalidate</span>(self, event_type: str, key: str):
+        <span class="token-keyword">if</span> event_type == <span class="token-string">"invalidate"</span>:
+            self._cache.delete(key)
+            print(f<span class="token-string">"  [Cache] Invalidated key: {key}"</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str) -> Optional[Any]:
+        <span class="token-keyword">return</span> self._cache.get(key)
+
+    <span class="token-keyword">def</span> <span class="token-function">set</span>(self, key: str, value: Any):
+        self._cache.set(key, value)
+
+
+<span class="token-keyword">class</span> <span class="token-class">DatabaseWithEvents</span>:
+    <span class="token-string">"""Database that publishes invalidation events on writes."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, bus: InvalidationBus):
+        self._data = {<span class="token-string">"user:1"</span>: {<span class="token-string">"name"</span>: <span class="token-string">"Alice"</span>, <span class="token-string">"v"</span>: <span class="token-number">1</span>}}
+        self._bus = bus
+
+    <span class="token-keyword">def</span> <span class="token-function">write</span>(self, key: str, value: dict):
+        self._data[key] = value
+        <span class="token-comment"># Publish invalidation event after write</span>
+        self._bus.publish(<span class="token-string">"invalidate"</span>, key)
+
+    <span class="token-keyword">def</span> <span class="token-function">read</span>(self, key: str) -> Optional[dict]:
+        <span class="token-keyword">return</span> self._data.get(key)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># STRATEGY 3: Version-Based (ETag-style)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">VersionedCache</span>:
+    <span class="token-string">"""Cache that stores version hashes and validates before serving."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._store: Dict[str, dict] = {}  <span class="token-comment"># key → {data, etag}</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">_compute_etag</span>(self, data: Any) -> str:
+        <span class="token-keyword">return</span> hashlib.md5(json.dumps(data, sort_keys=<span class="token-keyword">True</span>).encode()).hexdigest()[:<span class="token-number">8</span>]
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str, current_etag: str = <span class="token-keyword">None</span>) -> dict:
+        <span class="token-string">"""Returns {data, etag, fresh} &mdash; fresh=True if etag matches."""</span>
+        entry = self._store.get(key)
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> entry:
+            <span class="token-keyword">return</span> {<span class="token-string">"data"</span>: <span class="token-keyword">None</span>, <span class="token-string">"etag"</span>: <span class="token-keyword">None</span>, <span class="token-string">"fresh"</span>: <span class="token-keyword">False</span>}
+        <span class="token-keyword">if</span> current_etag <span class="token-keyword">and</span> current_etag == entry[<span class="token-string">"etag"</span>]:
+            <span class="token-keyword">return</span> {<span class="token-string">"data"</span>: <span class="token-keyword">None</span>, <span class="token-string">"etag"</span>: entry[<span class="token-string">"etag"</span>], <span class="token-string">"fresh"</span>: <span class="token-keyword">True</span>}
+        <span class="token-keyword">return</span> {<span class="token-string">"data"</span>: entry[<span class="token-string">"data"</span>], <span class="token-string">"etag"</span>: entry[<span class="token-string">"etag"</span>], <span class="token-string">"fresh"</span>: <span class="token-keyword">False</span>}
+
+    <span class="token-keyword">def</span> <span class="token-function">set</span>(self, key: str, data: Any):
+        etag = self._compute_etag(data)
+        self._store[key] = {<span class="token-string">"data"</span>: data, <span class="token-string">"etag"</span>: etag}
+        <span class="token-keyword">return</span> etag
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: All strategies in action</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+print(<span class="token-string">"=== Cache Invalidation Strategies ==="</span>)
+print()
+
+<span class="token-comment"># 1. TTL-Based</span>
+print(<span class="token-string">"--- TTL-Based Invalidation ---"</span>)
+ttl_cache = TTLCache(default_ttl=<span class="token-number">2</span>)  <span class="token-comment"># 2-second TTL for demo</span>
+ttl_cache.set(<span class="token-string">"product:99"</span>, {<span class="token-string">"price"</span>: <span class="token-number">29.99</span>})
+print(f<span class="token-string">"  Cached: {ttl_cache.get('product:99')}"</span>)
+time.sleep(<span class="token-number">2.1</span>)
+print(f<span class="token-string">"  After TTL: {ttl_cache.get('product:99')}"</span>)  <span class="token-comment"># None</span>
+print()
+
+<span class="token-comment"># 2. Event-Based with Pub/Sub</span>
+print(<span class="token-string">"--- Event-Based Invalidation ---"</span>)
+bus = InvalidationBus()
+cache = EventDrivenCache(bus)
+db = DatabaseWithEvents(bus)
+cache.set(<span class="token-string">"user:1"</span>, {<span class="token-string">"name"</span>: <span class="token-string">"Alice"</span>})
+print(f<span class="token-string">"  Before write: {cache.get('user:1')}"</span>)
+db.write(<span class="token-string">"user:1"</span>, {<span class="token-string">"name"</span>: <span class="token-string">"Alice Updated"</span>})
+print(f<span class="token-string">"  After write: {cache.get('user:1')}"</span>)  <span class="token-comment"># None (invalidated)</span>
+print()
+
+<span class="token-comment"># 3. Version-Based</span>
+print(<span class="token-string">"--- Version-Based (ETag) Invalidation ---"</span>)
+vcache = VersionedCache()
+etag = vcache.set(<span class="token-string">"config"</span>, {<span class="token-string">"theme"</span>: <span class="token-string">"dark"</span>})
+print(f<span class="token-string">"  Stored with ETag: {etag}"</span>)
+result = vcache.get(<span class="token-string">"config"</span>, current_etag=etag)
+print(f<span class="token-string">"  Same ETag → fresh={result['fresh']}, no data transfer"</span>)
+vcache.set(<span class="token-string">"config"</span>, {<span class="token-string">"theme"</span>: <span class="token-string">"light"</span>})
+result = vcache.get(<span class="token-string">"config"</span>, current_etag=etag)
+print(f<span class="token-string">"  Stale ETag → fresh={result['fresh']}, new data: {result['data']}"</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Cloudflare / Fastly CDN Purge:</strong> CDNs cache HTTP responses at edge locations worldwide. Invalidation happens via purge APIs &mdash; purge by URL, purge by tag (Surrogate-Key/Cache-Tag), or purge everything. Fastly purges propagate globally in ~150ms. Cloudflare supports instant purge by cache tag for Enterprise plans.</p>
+            <p><strong>Redis Keyspace Notifications:</strong> Redis can publish events when keys are modified, expired, or evicted. Clients subscribe to <code>__keyevent@0__:expired</code> to react to key expiry. Used for building real-time invalidation across distributed application instances.</p>
+            <p><strong>Facebook TAO Cache:</strong> Facebook&rsquo;s graph cache uses write-through invalidation with a pub/sub layer. When a user updates their profile, the write propagates through the TAO cache hierarchy. TAO handles billions of reads/second with sub-millisecond consistency across data centers using an invalidation daemon called &ldquo;cache refill.&rdquo;</p>
+            <p><strong>HTTP Cache-Control:</strong> The <code>Cache-Control</code> header is the web&rsquo;s built-in invalidation mechanism. Key directives: <code>max-age</code> (TTL), <code>must-revalidate</code> (check server after TTL), <code>stale-while-revalidate</code> (serve stale, refresh in background), <code>no-cache</code> (always revalidate), <code>no-store</code> (never cache).</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>TTL is the simplest invalidation &mdash; set it as a safety net even when using other strategies</li>
+                <li>Event-based invalidation gives near-real-time consistency but requires infrastructure (pub/sub, CDC)</li>
+                <li>Write-through delete (not update) avoids race conditions between concurrent writers</li>
+                <li>Version-based (ETag) avoids unnecessary data transfer but still requires a validation round-trip</li>
+                <li>Tag-based invalidation solves cascading dependencies &mdash; invalidate a category, not individual keys</li>
+                <li>Stale-while-revalidate is the best UX trade-off &mdash; instant response with background refresh</li>
+                <li>Always combine strategies: event-based for writes + TTL as a safety net for missed events</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Cache invalidation strategies form a spectrum from passive (time-based) to active (event-driven). The more active your invalidation, the fresher your data &mdash; but the more infrastructure complexity you take on.</p>
+            <div class="model-visual">
+                <pre>
+  INVALIDATION SPECTRUM:
+  ══════════════════════════════════════════════════════
+
+  Passive                                        Active
+  Simple                                        Complex
+  Stale window                             Near-realtime
+  ◄─────────────────────────────────────────────────────►
+
+   TTL        ETag/Version    Write-Through    Pub/Sub+CDC
+    │              │                │               │
+    │  Set timer,  │  Check version │  Invalidate   │  Broadcast
+    │  forget      │  on each read  │  on every     │  to all nodes
+    │              │                │  write         │  in real-time
+    └──────────────┴────────────────┴───────────────┘
+
+  INVALIDATION DECISION TREE:
+  ┌─────────────────────────────────────────────────────┐
+  │ Data changes?                                       │
+  │   Rarely → TTL (long, e.g. 1 hour)                 │
+  │   Frequently → Event-based or Write-through        │
+  │                                                     │
+  │ Staleness tolerance?                                │
+  │   High → TTL + stale-while-revalidate              │
+  │   Low → Write-through + pub/sub                    │
+  │                                                     │
+  │ Multi-node cache?                                   │
+  │   Yes → Pub/Sub bus + TTL safety net               │
+  │   No → Simple write-through delete                 │
+  │                                                     │
+  │ Cascading dependencies?                             │
+  │   Yes → Tag-based invalidation                     │
+  │   No → Key-level invalidation                      │
+  └─────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>No TTL safety net:</strong> Relying solely on event-based invalidation without a TTL fallback. If an event is lost (network partition, bug in publisher), the cache entry stays stale forever. Always set a maximum TTL even when using active invalidation &mdash; it&rsquo;s your last line of defense.</li>
+                <li><strong>Updating cache instead of deleting on write:</strong> When two concurrent writes happen, updating the cache can leave it holding the older value (last-write-wins race). Deleting the key is safer &mdash; the next read will fetch the latest value from the database, eliminating the race window.</li>
+                <li><strong>Invalidating before the DB write commits:</strong> If you delete the cache entry before the database transaction commits, a concurrent reader may refill the cache with the old DB value. Always invalidate AFTER the write is confirmed: <code>DB.commit() → cache.delete(key)</code>.</li>
+                <li><strong>Over-invalidation destroying hit ratio:</strong> Invalidating entire cache partitions when only one key changed. For example, purging all product cache when one product&rsquo;s price changes. Use fine-grained key-level or tag-level invalidation to keep hit ratios above 95%.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a pub/sub invalidation system:</strong> Implement a multi-node cache where 3 application instances share a Redis pub/sub channel. When one instance writes, all instances invalidate. Verify with concurrent readers that no stale data is served after invalidation propagates.</li>
+                <li><strong>ETag-based HTTP caching:</strong> Build a REST API with proper ETag support. Return <code>ETag</code> headers on GET, handle <code>If-None-Match</code> on subsequent requests. Measure bandwidth savings when clients cache responses and only receive 304 Not Modified.</li>
+                <li><strong>Tag-based invalidation engine:</strong> Implement a cache where entries can have multiple tags. Support <code>invalidate_by_tag("team:engineering")</code> that purges all entries with that tag. Test with a blog system where posts belong to categories and authors.</li>
+                <li><strong>Stale-while-revalidate pattern:</strong> Implement a cache that returns stale data immediately while triggering a background refresh. Measure p99 latency compared to a cache that blocks until fresh data is loaded. Run under load with 1000 req/s.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="45-caching-strategies.html" class="prev">&larr; Caching Strategies</a>
+            <a href="47-cache-stampede.html" class="next">Cache Stampede &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

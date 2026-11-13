@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detached DOM Nodes - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing Complexity</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop (Macro vs Microta…</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interoperabil…</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver Internals</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver Loop Limits</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver Cost</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle Traps</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation Strategies</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preco…</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture & State Machines</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+            <li><a href="64-finite-state-modeling.html"><span class="nav-number">64</span> Finite State Modeling</a></li>
+            <li><a href="65-event-sourcing-frontend.html"><span class="nav-number">65</span> Event Sourcing in Frontend</a></li>
+            <li><a href="66-optimistic-ui-rollback.html"><span class="nav-number">66</span> Optimistic UI Rollback Strat…</a></li>
+            <li class="module-label">Offline & Collaboration</li>
+            <li><a href="67-offline-conflict-resolution.html"><span class="nav-number">67</span> Offline Conflict Resolution</a></li>
+            <li><a href="68-crdt-basics.html"><span class="nav-number">68</span> CRDT Basics for Collaboration</a></li>
+            <li><a href="69-webrtc.html"><span class="nav-number">69</span> WebRTC</a></li>
+            <li class="module-label">Streams & Async Patterns</li>
+            <li><a href="70-backpressure-streams.html"><span class="nav-number">70</span> Backpressure in Streams API</a></li>
+            <li><a href="71-abort-controller.html"><span class="nav-number">71</span> AbortController</a></li>
+            <li><a href="72-streaming-fetch.html"><span class="nav-number">72</span> Streaming Fetch Response Han…</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (I…</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async …</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/88 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Detached DOM Nodes
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Detached DOM Nodes</h1>
+                <p class="subtitle">A DOM node is "detached" when it has been removed from the document tree but is still referenced by JavaScript — living in memory as a ghost that the garbage collector cannot reclaim. Detached nodes are the single largest category of memory leaks in SPAs, often retaining entire subtrees of hundreds of elements.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span> <span class="tag tag-concept">Memory & GC</span> <span class="tag tag-performance">Debugging</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📚 Analogy: Demolished Buildings with Active Leases</div>
+                <p>Imagine a city where buildings are demolished (removed from the DOM), but tenants still hold signed leases (JavaScript references). The city can't reclaim the land because legally, someone still "owns" a unit in that building. The building is physically gone from the skyline (not rendered), but it still occupies space in the city's records (memory). Only when every lease is terminated (all references nulled) can the land be freed.</p>
+            </div>
+
+            <h2>The Problem: Invisible Memory Hogs</h2>
+<pre><code><span class="token-comment">// A detached DOM node is NOT in the document, but IS in memory</span>
+<span class="token-comment">// It's invisible to the user but costs memory as if it were visible</span>
+
+<span class="token-comment">// Example: A modal with 500 child elements</span>
+<span class="token-keyword">let</span> modalRef = <span class="token-keyword">null</span>;
+
+<span class="token-keyword">function</span> <span class="token-function">openModal</span>() {
+  <span class="token-keyword">const</span> modal = document.createElement(<span class="token-string">'div'</span>);
+  modal.innerHTML = generateComplexForm(); <span class="token-comment">// 500 elements, 2MB</span>
+  document.body.appendChild(modal);
+  modalRef = modal; <span class="token-comment">// Store reference for later use</span>
+}
+
+<span class="token-keyword">function</span> <span class="token-function">closeModal</span>() {
+  modalRef.remove(); <span class="token-comment">// Removed from DOM (no longer rendered)</span>
+  <span class="token-comment">// BUG: modalRef still points to the removed tree!</span>
+  <span class="token-comment">// The 500-element tree (2MB) is "detached" — alive in memory</span>
+  <span class="token-comment">// GC cannot collect it because modalRef is reachable from the window</span>
+}
+
+<span class="token-comment">// User opens/closes modal 50 times:</span>
+<span class="token-comment">// 50 × 2MB = 100MB of detached DOM trees in memory</span>
+<span class="token-comment">// Only the LAST one is referenced by modalRef</span>
+<span class="token-comment">// But the others might be held by event listeners or closures...</span>
+
+<span class="token-comment">// FIX:</span>
+<span class="token-keyword">function</span> <span class="token-function">closeModalFixed</span>() {
+  modalRef.remove();
+  modalRef = <span class="token-keyword">null</span>; <span class="token-comment">// Release reference → GC can collect the tree</span>
+}
+</code></pre>
+
+            <h2>How Nodes Become Detached but Retained</h2>
+<pre><code><span class="token-comment">// There are 5 main ways detached nodes stay alive:</span>
+
+<span class="token-comment">// === 1. Direct variable reference ===</span>
+<span class="token-keyword">let</span> savedNode = document.querySelector(<span class="token-string">'.card'</span>);
+document.querySelector(<span class="token-string">'.card'</span>).remove();
+<span class="token-comment">// savedNode still points to the removed element</span>
+<span class="token-comment">// FIX: savedNode = null;</span>
+
+<span class="token-comment">// === 2. Event listener closure ===</span>
+<span class="token-keyword">function</span> <span class="token-function">setupCard</span>(card) {
+  <span class="token-keyword">const</span> button = card.querySelector(<span class="token-string">'.delete-btn'</span>);
+  button.addEventListener(<span class="token-string">'click'</span>, () => {
+    card.remove();
+    <span class="token-comment">// BUG: 'card' is captured in this closure</span>
+    <span class="token-comment">// The click listener on 'button' (a child of card) references card</span>
+    <span class="token-comment">// button is also detached (it's inside card)</span>
+    <span class="token-comment">// But the listener keeps the closure alive, which keeps card alive</span>
+  });
+}
+<span class="token-comment">// Even though card is removed, the button's listener retains it</span>
+<span class="token-comment">// FIX: Remove event listeners before removing the node</span>
+
+<span class="token-comment">// === 3. Array/Map/Set collection ===</span>
+<span class="token-keyword">const</span> allCards = [];
+document.querySelectorAll(<span class="token-string">'.card'</span>).forEach(card => allCards.push(card));
+<span class="token-comment">// Later: cards are removed from DOM but allCards[] still holds them</span>
+<span class="token-comment">// FIX: Use WeakRef[] or remove from array when DOM node is removed</span>
+
+<span class="token-comment">// === 4. MutationObserver or IntersectionObserver ===</span>
+<span class="token-keyword">const</span> observer = <span class="token-keyword">new</span> MutationObserver((mutations) => { <span class="token-comment">/*...*/</span> });
+observer.observe(someNode, { childList: <span class="token-keyword">true</span> });
+someNode.remove();
+<span class="token-comment">// Observer still holds reference to someNode internally</span>
+<span class="token-comment">// FIX: observer.disconnect() before removing the node</span>
+
+<span class="token-comment">// === 5. React/framework refs ===</span>
+<span class="token-keyword">function</span> <span class="token-function">Component</span>() {
+  <span class="token-keyword">const</span> ref = useRef(<span class="token-keyword">null</span>);
+  <span class="token-comment">// If this component is conditionally rendered but ref.current</span>
+  <span class="token-comment">// is stored in a parent's state or a global store:</span>
+  <span class="token-comment">// the DOM node ref.current points to becomes detached but retained</span>
+  <span class="token-keyword">return</span> &lt;div ref={ref}&gt;Complex subtree&lt;/div&gt;;
+}
+</code></pre>
+
+            <h2>Detection: Finding Detached Nodes in DevTools</h2>
+<pre><code><span class="token-comment">// Chrome DevTools → Memory → Heap Snapshot</span>
+<span class="token-comment">// Type "Detached" in the filter box — shows all detached DOM trees</span>
+
+<span class="token-comment">// What you'll see:</span>
+<span class="token-comment">// - "Detached HTMLDivElement" (root of a detached tree)</span>
+<span class="token-comment">// - "Detached InternalNode" (text nodes, etc.)</span>
+<span class="token-comment">// - Retained size shows the full tree cost</span>
+
+<span class="token-comment">// The RETAINER PATH tells you WHY it's alive:</span>
+<span class="token-comment">//   Detached HTMLDivElement</span>
+<span class="token-comment">//     ← modalRef in closeModal (variable in script.js:42)</span>
+<span class="token-comment">//     ← Window (GC root)</span>
+<span class="token-comment">// This means: window → modalRef → the detached div</span>
+<span class="token-comment">// Fix: set modalRef = null</span>
+
+<span class="token-comment">// === Programmatic detection ===</span>
+<span class="token-keyword">function</span> <span class="token-function">isDetached</span>(node) {
+  <span class="token-comment">// A node is detached if it's not connected to the document</span>
+  <span class="token-keyword">return</span> !node.isConnected;
+  <span class="token-comment">// Equivalent to: !document.contains(node)</span>
+}
+
+<span class="token-comment">// Development-mode detector: warn if refs point to detached nodes</span>
+<span class="token-keyword">function</span> <span class="token-function">auditRefs</span>(refs) {
+  <span class="token-keyword">for</span> (<span class="token-keyword">const</span> [name, ref] <span class="token-keyword">of</span> Object.entries(refs)) {
+    <span class="token-keyword">if</span> (ref <span class="token-keyword">instanceof</span> Node && !ref.isConnected) {
+      console.warn(
+        <span class="token-string">`⚠️ Detached DOM node: "${name}" references a node not in the document.`</span>,
+        <span class="token-string">`\n  Tag: ${ref.tagName}, Children: ${ref.childElementCount}`</span>,
+        <span class="token-string">`\n  This is a memory leak — null out the reference.`</span>
+      );
+    }
+  }
+}
+
+<span class="token-comment">// Console shortcut: find all detached nodes in any object</span>
+<span class="token-comment">// In DevTools console:</span>
+<span class="token-comment">// queryObjects(HTMLElement) — shows all HTMLElement instances</span>
+<span class="token-comment">// Filter those where .isConnected === false</span>
+</code></pre>
+
+            <h2>Prevention Patterns</h2>
+<pre><code><span class="token-comment">// === Pattern 1: Null references on removal ===</span>
+<span class="token-keyword">class</span> <span class="token-function">Tooltip</span> {
+  <span class="token-keyword">constructor</span>() {
+    <span class="token-keyword">this</span>.element = document.createElement(<span class="token-string">'div'</span>);
+    <span class="token-keyword">this</span>.element.className = <span class="token-string">'tooltip'</span>;
+  }
+
+  <span class="token-function">show</span>(target, text) {
+    <span class="token-keyword">this</span>.element.textContent = text;
+    document.body.appendChild(<span class="token-keyword">this</span>.element);
+  }
+
+  <span class="token-function">destroy</span>() {
+    <span class="token-keyword">this</span>.element.remove();
+    <span class="token-keyword">this</span>.element = <span class="token-keyword">null</span>; <span class="token-comment">// Break reference → allows GC</span>
+  }
+}
+
+<span class="token-comment">// === Pattern 2: WeakRef for optional DOM references ===</span>
+<span class="token-keyword">class</span> <span class="token-function">DOMCache</span> {
+  <span class="token-keyword">constructor</span>() {
+    <span class="token-keyword">this</span>.cache = <span class="token-keyword">new</span> Map(); <span class="token-comment">// selector → WeakRef&lt;Element&gt;</span>
+  }
+
+  <span class="token-function">get</span>(selector) {
+    <span class="token-keyword">const</span> ref = <span class="token-keyword">this</span>.cache.get(selector);
+    <span class="token-keyword">if</span> (!ref) <span class="token-keyword">return</span> <span class="token-keyword">null</span>;
+
+    <span class="token-keyword">const</span> node = ref.deref();
+    <span class="token-keyword">if</span> (!node || !node.isConnected) {
+      <span class="token-comment">// Node was GC'd or detached — remove stale entry</span>
+      <span class="token-keyword">this</span>.cache.delete(selector);
+      <span class="token-keyword">return</span> <span class="token-keyword">null</span>;
+    }
+    <span class="token-keyword">return</span> node;
+  }
+
+  <span class="token-function">set</span>(selector, node) {
+    <span class="token-keyword">this</span>.cache.set(selector, <span class="token-keyword">new</span> WeakRef(node));
+  }
+}
+
+<span class="token-comment">// === Pattern 3: Disposable component pattern (VS Code style) ===</span>
+<span class="token-keyword">class</span> <span class="token-function">Widget</span> {
+  <span class="token-keyword">constructor</span>() {
+    <span class="token-keyword">this</span>.disposables = [];
+    <span class="token-keyword">this</span>.element = document.createElement(<span class="token-string">'div'</span>);
+
+    <span class="token-comment">// Track every resource that needs cleanup</span>
+    <span class="token-keyword">const</span> controller = <span class="token-keyword">new</span> AbortController();
+    <span class="token-keyword">this</span>.disposables.push(() => controller.abort());
+
+    <span class="token-keyword">this</span>.element.addEventListener(<span class="token-string">'click'</span>, <span class="token-keyword">this</span>.onClick, {
+      signal: controller.signal
+    });
+
+    <span class="token-keyword">this</span>.observer = <span class="token-keyword">new</span> ResizeObserver(<span class="token-keyword">this</span>.onResize);
+    <span class="token-keyword">this</span>.observer.observe(<span class="token-keyword">this</span>.element);
+    <span class="token-keyword">this</span>.disposables.push(() => <span class="token-keyword">this</span>.observer.disconnect());
+  }
+
+  <span class="token-function">dispose</span>() {
+    <span class="token-comment">// Single call cleans up EVERYTHING — no leaks possible</span>
+    <span class="token-keyword">this</span>.disposables.forEach(fn => fn());
+    <span class="token-keyword">this</span>.element.remove();
+    <span class="token-keyword">this</span>.element = <span class="token-keyword">null</span>;
+    <span class="token-keyword">this</span>.observer = <span class="token-keyword">null</span>;
+  }
+}
+
+<span class="token-comment">// === Pattern 4: React — cleanup refs in useEffect ===</span>
+<span class="token-keyword">function</span> <span class="token-function">VideoPlayer</span>({ src }) {
+  <span class="token-keyword">const</span> videoRef = useRef(<span class="token-keyword">null</span>);
+  <span class="token-keyword">const</span> canvasRef = useRef(<span class="token-keyword">null</span>);
+
+  useEffect(() => {
+    <span class="token-keyword">const</span> ctx = canvasRef.current?.getContext(<span class="token-string">'2d'</span>);
+    <span class="token-comment">// Draw video frames to canvas...</span>
+
+    <span class="token-keyword">return</span> () => {
+      <span class="token-comment">// Cleanup: don't let refs point to stale DOM nodes</span>
+      <span class="token-comment">// React handles ref cleanup, but external references need manual work</span>
+      <span class="token-keyword">if</span> (videoRef.current) {
+        videoRef.current.src = <span class="token-string">''</span>; <span class="token-comment">// Release media resources</span>
+        videoRef.current.load();
+      }
+    };
+  }, [src]);
+
+  <span class="token-keyword">return</span> (
+    &lt;&gt;
+      &lt;video ref={videoRef} /&gt;
+      &lt;canvas ref={canvasRef} /&gt;
+    &lt;/&gt;
+  );
+}
+</code></pre>
+
+            <h2>Real-World Usage</h2>
+            <ul>
+                <li><strong>Gmail / Google Docs</strong> — Long-running SPAs that accumulate detached DOM from opened/closed panels, popups, and autocomplete dropdowns. Teams built automated heap regression tests to catch new detached node leaks.</li>
+                <li><strong>Figma</strong> — Canvas-based editor where off-screen layers could create detached DOM if not carefully managed. They use a virtual rendering approach: only nodes in the viewport have DOM elements.</li>
+                <li><strong>React Portals</strong> — When a Portal's container is removed from the DOM but React doesn't unmount the portal content, you get a detached tree that React still "owns" in its fiber tree.</li>
+                <li><strong>Third-party widgets (chat, analytics)</strong> — Widgets that inject DOM elements but don't clean up when removed. A tooltip library that doesn't remove its container div when destroyed = detached leak.</li>
+                <li><strong>Virtual scrolling libraries</strong> — Recycled DOM nodes that are removed from the document but cached for reuse. This is intentional (performance optimization), but the cache must be bounded.</li>
+            </ul>
+
+            <h2>Trade-offs & Alternatives</h2>
+            <table>
+                <thead><tr><th>Strategy</th><th>Strengths</th><th>Weaknesses</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Null references on remove</td>
+                        <td>Simple; immediate; guaranteed cleanup</td>
+                        <td>Manual; easy to forget one reference; doesn't scale</td>
+                    </tr>
+                    <tr>
+                        <td>WeakRef for DOM caches</td>
+                        <td>Automatic cleanup by GC; no manual nulling needed</td>
+                        <td>Non-deterministic; node may disappear unexpectedly; need fallback</td>
+                    </tr>
+                    <tr>
+                        <td>Disposable pattern (collect + dispose)</td>
+                        <td>Systematic; scales to complex components; hard to leak</td>
+                        <td>More boilerplate; must remember to call dispose(); architectural overhead</td>
+                    </tr>
+                    <tr>
+                        <td>DOM recycling (keep detached intentionally)</td>
+                        <td>Avoids createElement cost; faster re-rendering</td>
+                        <td>Uses memory intentionally; cache must be bounded; stale state risk</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Thinking element.remove() frees memory</strong> — <code>remove()</code> only removes the node from the document tree (rendering). It does NOT free memory unless all JavaScript references to it are also released. The node becomes "detached" — still alive, just invisible.</li>
+                <li><strong>Storing DOM nodes in module-level variables</strong> — <code>const header = document.querySelector('.header')</code> at module scope means the reference lives for the entire page lifetime. If that header is ever dynamically removed, it becomes a detached leak.</li>
+                <li><strong>Not disconnecting observers</strong> — MutationObserver, IntersectionObserver, and ResizeObserver all hold internal references to observed nodes. If you remove a node without <code>observer.unobserve(node)</code> or <code>observer.disconnect()</code>, the node is retained.</li>
+                <li><strong>jQuery's .detach() vs .remove()</strong> — jQuery's <code>.detach()</code> intentionally keeps event handlers for re-insertion. If you never re-insert, you've created a permanent detached tree. Use <code>.remove()</code> unless you specifically plan to re-attach.</li>
+                <li><strong>Circular references between DOM and JS</strong> — A DOM node has a JS property pointing to an object, and that object points back to the node. Modern GC handles this fine for attached nodes, but detached nodes with circular references in older engines (IE) were genuinely unrecoverable leaks.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Detached DOM Nodes When...</h3>
+                <p>You can look at a heap snapshot, filter for "Detached", pick any entry, read its retainer path, and immediately identify: (1) which line of code created the reference that prevents GC, (2) whether it's an intentional cache or an unintentional leak, and (3) the minimal code change (one line) to allow the entire retained tree to be garbage collected.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a tab component where each tab renders a unique complex UI (100+ DOM nodes each). On tab switch, the inactive tab's DOM is fully removed. Add intentional leaks: store each tab's root in an array, add an event listener that captures the tab node in a closure, and keep a ResizeObserver active. Take heap snapshots to prove the leaks, then fix them one by one, verifying each fix reduces retained detached nodes to zero.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Detached DOM Nodes connects to: <strong>Browser Memory Leak Detection</strong> (detached nodes are the #1 finding in heap snapshot analysis), <strong>Garbage Collection Timing</strong> (even without leaks, detached nodes persist until the next GC cycle), and <strong>MutationObserver Cost</strong> (observers that hold references to removed nodes create detached trees).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="73-memory-leak-detection.html" class="nav-btn nav-btn-prev">← Browser Memory Leak Detection</a>
+                <a href="75-garbage-collection-timing.html" class="nav-btn nav-btn-next">Garbage Collection Timing →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

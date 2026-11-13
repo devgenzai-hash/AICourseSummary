@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observability & Tracing - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Observability
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 10: Observability &amp; Tracing</h1>
+                <p class="subtitle">Trace retrieval paths, chunk rankings, token attribution, and failure points. You can't fix what you can't see.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-production">Production</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: Security Cameras in a Building</div>
+                <p>Imagine a large building (hospital, airport, factory) with <strong>no security cameras</strong>. When something goes wrong — someone steals something, someone gets hurt, equipment breaks — you have NO idea what happened or why.</p>
+                <p>Now imagine the same building with cameras everywhere: every hallway, every room, every entrance. When something happens, you rewind the footage and see <strong>exactly</strong> what led to the problem.</p>
+                <p><strong>Observability is security cameras for your RAG pipeline.</strong> Every query's journey is recorded — which documents were found, how they were ranked, what the LLM did with them, and where things went wrong. When a user reports a bad answer, you rewind the trace and see exactly why.</p>
+            </div>
+
+            <!-- ===== THREE PILLARS ===== -->
+            <h2>The Three Pillars of Observability</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Pillar</th>
+                        <th>What It Is</th>
+                        <th>RAG Example</th>
+                        <th>Tool</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Traces</strong></td>
+                        <td>The full journey of a request through all pipeline stages</td>
+                        <td>Query → Embed → Search → Rerank → Generate → Verify</td>
+                        <td>OpenTelemetry, Jaeger</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Metrics</strong></td>
+                        <td>Numerical measurements aggregated over time</td>
+                        <td>P95 latency, hallucination rate, cache hit %</td>
+                        <td>Prometheus, Grafana</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Logs</strong></td>
+                        <td>Detailed event records for debugging specific requests</td>
+                        <td>Which chunks were retrieved, reranker scores, LLM prompt</td>
+                        <td>ELK Stack, Loki</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== TRACING ===== -->
+            <h2>1. Distributed Tracing for RAG</h2>
+            <p><strong>A trace</strong> shows the entire path a query takes through your system. Each step is a "span" with timing, inputs, and outputs.</p>
+
+<pre><code><span class="token-keyword">from</span> opentelemetry <span class="token-keyword">import</span> trace
+<span class="token-keyword">from</span> opentelemetry.sdk.trace <span class="token-keyword">import</span> TracerProvider
+<span class="token-keyword">from</span> opentelemetry.sdk.trace.export <span class="token-keyword">import</span> BatchSpanProcessor
+<span class="token-keyword">from</span> opentelemetry.exporter.otlp.proto.grpc.trace_exporter <span class="token-keyword">import</span> OTLPSpanExporter
+
+<span class="token-comment"># Setup OpenTelemetry tracing</span>
+provider = TracerProvider()
+exporter = OTLPSpanExporter(endpoint=<span class="token-string">"http://jaeger:4317"</span>)
+provider.add_span_processor(BatchSpanProcessor(exporter))
+trace.set_tracer_provider(provider)
+
+tracer = trace.get_tracer(<span class="token-string">"rag.pipeline"</span>)
+
+<span class="token-keyword">class</span> <span class="token-class">TracedRAGPipeline</span>:
+    <span class="token-string">"""RAG pipeline with full OpenTelemetry tracing."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">answer_query</span>(self, query: <span class="token-builtin">str</span>, session_id: <span class="token-builtin">str</span>) -> Dict:
+        <span class="token-comment"># Parent span: the entire query lifecycle</span>
+        <span class="token-keyword">with</span> tracer.start_as_current_span(<span class="token-string">"rag.query"</span>) <span class="token-keyword">as</span> span:
+            span.set_attribute(<span class="token-string">"query.text"</span>, query)
+            span.set_attribute(<span class="token-string">"session.id"</span>, session_id)
+            
+            <span class="token-comment"># Step 1: Embed the query</span>
+            <span class="token-keyword">with</span> tracer.start_as_current_span(<span class="token-string">"rag.embed_query"</span>) <span class="token-keyword">as</span> embed_span:
+                embedding = self.embedder.embed(query)
+                embed_span.set_attribute(<span class="token-string">"embedding.model"</span>, <span class="token-string">"text-embedding-3-small"</span>)
+                embed_span.set_attribute(<span class="token-string">"embedding.dimensions"</span>, <span class="token-number">1536</span>)
+            
+            <span class="token-comment"># Step 2: Retrieve candidates</span>
+            <span class="token-keyword">with</span> tracer.start_as_current_span(<span class="token-string">"rag.retrieve"</span>) <span class="token-keyword">as</span> ret_span:
+                candidates = self.retriever.search(embedding, k=<span class="token-number">50</span>)
+                ret_span.set_attribute(<span class="token-string">"retrieval.candidates_count"</span>, <span class="token-builtin">len</span>(candidates))
+                ret_span.set_attribute(<span class="token-string">"retrieval.strategy"</span>, <span class="token-string">"hybrid_bm25_vector"</span>)
+                ret_span.set_attribute(<span class="token-string">"retrieval.top_score"</span>, candidates[<span class="token-number">0</span>].score)
+            
+            <span class="token-comment"># Step 3: Rerank</span>
+            <span class="token-keyword">with</span> tracer.start_as_current_span(<span class="token-string">"rag.rerank"</span>) <span class="token-keyword">as</span> rerank_span:
+                reranked = self.reranker.rerank(query, candidates, top_k=<span class="token-number">5</span>)
+                rerank_span.set_attribute(<span class="token-string">"rerank.model"</span>, <span class="token-string">"cohere-rerank-v3"</span>)
+                rerank_span.set_attribute(<span class="token-string">"rerank.input_count"</span>, <span class="token-builtin">len</span>(candidates))
+                rerank_span.set_attribute(<span class="token-string">"rerank.output_count"</span>, <span class="token-builtin">len</span>(reranked))
+                
+                <span class="token-comment"># Log individual chunk rankings</span>
+                <span class="token-keyword">for</span> i, chunk <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(reranked):
+                    rerank_span.set_attribute(
+                        <span class="token-string">f"rerank.chunk_{i}.id"</span>, chunk.id
+                    )
+                    rerank_span.set_attribute(
+                        <span class="token-string">f"rerank.chunk_{i}.score"</span>, chunk.score
+                    )
+            
+            <span class="token-comment"># Step 4: Generate answer</span>
+            <span class="token-keyword">with</span> tracer.start_as_current_span(<span class="token-string">"rag.generate"</span>) <span class="token-keyword">as</span> gen_span:
+                answer = self.generator.generate(query, reranked)
+                gen_span.set_attribute(<span class="token-string">"generation.model"</span>, <span class="token-string">"gpt-4o"</span>)
+                gen_span.set_attribute(<span class="token-string">"generation.input_tokens"</span>, answer.input_tokens)
+                gen_span.set_attribute(<span class="token-string">"generation.output_tokens"</span>, answer.output_tokens)
+                gen_span.set_attribute(<span class="token-string">"generation.cost_usd"</span>, answer.cost)
+            
+            <span class="token-comment"># Step 5: Verify (hallucination check)</span>
+            <span class="token-keyword">with</span> tracer.start_as_current_span(<span class="token-string">"rag.verify"</span>) <span class="token-keyword">as</span> verify_span:
+                verification = self.verifier.check(answer, reranked)
+                verify_span.set_attribute(<span class="token-string">"verify.confidence"</span>, verification.confidence)
+                verify_span.set_attribute(<span class="token-string">"verify.decision"</span>, verification.decision)
+                verify_span.set_attribute(<span class="token-string">"verify.hallucinated_claims"</span>, verification.flagged_count)
+            
+            <span class="token-comment"># Final attributes on parent span</span>
+            span.set_attribute(<span class="token-string">"result.decision"</span>, verification.decision)
+            span.set_attribute(<span class="token-string">"result.latency_ms"</span>, total_latency)
+            span.set_attribute(<span class="token-string">"result.cache_hit"</span>, <span class="token-keyword">False</span>)
+            
+            <span class="token-keyword">return</span> answer</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 What a Trace Looks Like</div>
+                <pre style="background: var(--bg-code); padding: 1rem; border-radius: 8px; font-size: 0.85rem;">
+Trace: rag.query [total: 2847ms]
+├── rag.embed_query       [  89ms] model=text-embedding-3-small
+├── rag.retrieve          [ 234ms] candidates=50, strategy=hybrid
+├── rag.rerank            [ 412ms] model=cohere-v3, 50→5 chunks
+├── rag.generate          [1890ms] model=gpt-4o, tokens=1240
+└── rag.verify            [ 222ms] confidence=0.91, decision=ANSWER
+                </pre>
+                <p>Now when someone reports a bad answer, you look up the trace ID and see exactly what happened at every step.</p>
+            </div>
+
+            <!-- ===== METRICS ===== -->
+            <h2>2. Key Metrics Dashboard</h2>
+
+<pre><code><span class="token-keyword">from</span> prometheus_client <span class="token-keyword">import</span> Counter, Histogram, Gauge
+
+<span class="token-comment"># Define RAG-specific metrics</span>
+QUERY_LATENCY = Histogram(
+    <span class="token-string">"rag_query_latency_seconds"</span>,
+    <span class="token-string">"End-to-end query latency"</span>,
+    buckets=[<span class="token-number">0.1</span>, <span class="token-number">0.5</span>, <span class="token-number">1.0</span>, <span class="token-number">2.0</span>, <span class="token-number">5.0</span>, <span class="token-number">10.0</span>]
+)
+
+QUERY_TOTAL = Counter(
+    <span class="token-string">"rag_queries_total"</span>,
+    <span class="token-string">"Total queries processed"</span>,
+    [<span class="token-string">"decision"</span>]  <span class="token-comment"># answered, refused, escalated</span>
+)
+
+CACHE_HIT = Counter(
+    <span class="token-string">"rag_cache_hits_total"</span>,
+    <span class="token-string">"Cache hit count"</span>,
+    [<span class="token-string">"cache_type"</span>]  <span class="token-comment"># exact, semantic</span>
+)
+
+HALLUCINATION_DETECTED = Counter(
+    <span class="token-string">"rag_hallucination_detected_total"</span>,
+    <span class="token-string">"Hallucination events detected"</span>
+)
+
+RETRIEVAL_EMPTY = Counter(
+    <span class="token-string">"rag_retrieval_empty_total"</span>,
+    <span class="token-string">"Queries where no relevant documents were found"</span>
+)
+
+CONFIDENCE_SCORE = Histogram(
+    <span class="token-string">"rag_confidence_score"</span>,
+    <span class="token-string">"Distribution of confidence scores"</span>,
+    buckets=[<span class="token-number">0.1</span>, <span class="token-number">0.2</span>, <span class="token-number">0.3</span>, <span class="token-number">0.4</span>, <span class="token-number">0.5</span>, <span class="token-number">0.6</span>, <span class="token-number">0.7</span>, <span class="token-number">0.8</span>, <span class="token-number">0.9</span>, <span class="token-number">1.0</span>]
+)
+
+TOKEN_COST = Counter(
+    <span class="token-string">"rag_token_cost_usd_total"</span>,
+    <span class="token-string">"Cumulative LLM API cost in USD"</span>
+)
+
+<span class="token-comment"># Usage in the pipeline</span>
+<span class="token-keyword">def</span> <span class="token-function">record_metrics</span>(result):
+    QUERY_LATENCY.observe(result.latency_seconds)
+    QUERY_TOTAL.labels(decision=result.decision).inc()
+    CONFIDENCE_SCORE.observe(result.confidence)
+    TOKEN_COST.inc(result.cost_usd)
+    
+    <span class="token-keyword">if</span> result.hallucination_detected:
+        HALLUCINATION_DETECTED.inc()
+    <span class="token-keyword">if</span> result.cache_hit:
+        CACHE_HIT.labels(cache_type=result.cache_type).inc()</code></pre>
+
+            <!-- ===== TOKEN ATTRIBUTION ===== -->
+            <h2>3. Token Attribution</h2>
+            <p><strong>Token attribution</strong> answers: "For each part of the generated answer, which chunk did it come from?"</p>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">TokenAttributor</span>:
+    <span class="token-string">"""
+    Track which source chunk contributed to which 
+    part of the generated answer.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">attribute_answer</span>(
+        self, 
+        answer: <span class="token-builtin">str</span>, 
+        source_chunks: List[Dict]
+    ) -> List[Dict]:
+        <span class="token-string">"""
+        For each sentence in the answer, identify which 
+        chunk(s) it was derived from.
+        """</span>
+        sentences = self._split_sentences(answer)
+        attributions = []
+        
+        <span class="token-keyword">for</span> sentence <span class="token-keyword">in</span> sentences:
+            best_chunk = <span class="token-keyword">None</span>
+            best_overlap = <span class="token-number">0.0</span>
+            
+            <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> source_chunks:
+                overlap = self._compute_overlap(sentence, chunk[<span class="token-string">"text"</span>])
+                <span class="token-keyword">if</span> overlap > best_overlap:
+                    best_overlap = overlap
+                    best_chunk = chunk
+            
+            attributions.append({
+                <span class="token-string">"sentence"</span>: sentence,
+                <span class="token-string">"source_chunk_id"</span>: best_chunk[<span class="token-string">"id"</span>] <span class="token-keyword">if</span> best_chunk <span class="token-keyword">else</span> <span class="token-keyword">None</span>,
+                <span class="token-string">"overlap_score"</span>: best_overlap,
+                <span class="token-string">"grounded"</span>: best_overlap > <span class="token-number">0.3</span>  <span class="token-comment"># Threshold</span>
+            })
+        
+        <span class="token-keyword">return</span> attributions
+    
+    <span class="token-keyword">def</span> <span class="token-function">flag_ungrounded</span>(self, attributions: List[Dict]) -> List[<span class="token-builtin">str</span>]:
+        <span class="token-string">"""Identify sentences that aren't supported by any chunk."""</span>
+        <span class="token-keyword">return</span> [
+            a[<span class="token-string">"sentence"</span>] <span class="token-keyword">for</span> a <span class="token-keyword">in</span> attributions 
+            <span class="token-keyword">if not</span> a[<span class="token-string">"grounded"</span>]
+        ]</code></pre>
+
+            <!-- ===== FAILURE DETECTION ===== -->
+            <h2>4. Failure Point Detection</h2>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">FailureDetector</span>:
+    <span class="token-string">"""
+    Detect and categorize failure patterns in the RAG pipeline.
+    """</span>
+    
+    FAILURE_CATEGORIES = {
+        <span class="token-string">"retrieval_miss"</span>: <span class="token-string">"No relevant docs found for answerable query"</span>,
+        <span class="token-string">"wrong_chunks"</span>: <span class="token-string">"Retrieved docs don't match query intent"</span>,
+        <span class="token-string">"rerank_failure"</span>: <span class="token-string">"Correct doc retrieved but ranked too low"</span>,
+        <span class="token-string">"generation_halluc"</span>: <span class="token-string">"LLM added info not in chunks"</span>,
+        <span class="token-string">"generation_miss"</span>: <span class="token-string">"LLM failed to extract correct info from chunks"</span>,
+        <span class="token-string">"confidence_miscal"</span>: <span class="token-string">"High confidence on wrong answer"</span>,
+    }
+    
+    <span class="token-keyword">def</span> <span class="token-function">diagnose</span>(self, trace_data: Dict) -> Dict:
+        <span class="token-string">"""
+        Given a trace, determine where and why a failure occurred.
+        """</span>
+        diagnosis = {
+            <span class="token-string">"query"</span>: trace_data[<span class="token-string">"query"</span>],
+            <span class="token-string">"failure_point"</span>: <span class="token-keyword">None</span>,
+            <span class="token-string">"root_cause"</span>: <span class="token-keyword">None</span>,
+            <span class="token-string">"recommendation"</span>: <span class="token-keyword">None</span>
+        }
+        
+        <span class="token-comment"># Check: Were relevant docs in the index at all?</span>
+        <span class="token-keyword">if</span> trace_data[<span class="token-string">"retrieval"</span>][<span class="token-string">"candidates"</span>] == <span class="token-number">0</span>:
+            diagnosis[<span class="token-string">"failure_point"</span>] = <span class="token-string">"retrieval_miss"</span>
+            diagnosis[<span class="token-string">"root_cause"</span>] = <span class="token-string">"No documents matched the query"</span>
+            diagnosis[<span class="token-string">"recommendation"</span>] = <span class="token-string">"Check if relevant docs are ingested and properly chunked"</span>
+            <span class="token-keyword">return</span> diagnosis
+        
+        <span class="token-comment"># Check: Were correct docs retrieved but ranked poorly?</span>
+        <span class="token-keyword">if</span> trace_data[<span class="token-string">"correct_doc_rank"</span>] > <span class="token-number">10</span>:
+            diagnosis[<span class="token-string">"failure_point"</span>] = <span class="token-string">"rerank_failure"</span>
+            diagnosis[<span class="token-string">"root_cause"</span>] = <span class="token-string">f"Correct doc at rank {trace_data['correct_doc_rank']}"</span>
+            diagnosis[<span class="token-string">"recommendation"</span>] = <span class="token-string">"Tune reranker or increase retrieval k"</span>
+            <span class="token-keyword">return</span> diagnosis
+        
+        <span class="token-comment"># Check: Did the LLM hallucinate beyond the chunks?</span>
+        <span class="token-keyword">if</span> trace_data[<span class="token-string">"verification"</span>][<span class="token-string">"hallucinated_claims"</span>] > <span class="token-number">0</span>:
+            diagnosis[<span class="token-string">"failure_point"</span>] = <span class="token-string">"generation_halluc"</span>
+            diagnosis[<span class="token-string">"root_cause"</span>] = <span class="token-string">f"{trace_data['verification']['hallucinated_claims']} ungrounded claims"</span>
+            diagnosis[<span class="token-string">"recommendation"</span>] = <span class="token-string">"Strengthen constrained generation prompt"</span>
+            <span class="token-keyword">return</span> diagnosis
+        
+        <span class="token-keyword">return</span> diagnosis
+    
+    <span class="token-keyword">def</span> <span class="token-function">aggregate_failures</span>(self, traces: List[Dict]) -> Dict:
+        <span class="token-string">"""Get failure distribution across many traces."""</span>
+        failure_counts = {}
+        
+        <span class="token-keyword">for</span> t <span class="token-keyword">in</span> traces:
+            diag = self.diagnose(t)
+            point = diag[<span class="token-string">"failure_point"</span>]
+            <span class="token-keyword">if</span> point:
+                failure_counts[point] = failure_counts.get(point, <span class="token-number">0</span>) + <span class="token-number">1</span>
+        
+        total_failures = sum(failure_counts.values())
+        
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"total_failures"</span>: total_failures,
+            <span class="token-string">"failure_rate"</span>: total_failures / <span class="token-builtin">len</span>(traces),
+            <span class="token-string">"breakdown"</span>: {
+                k: {<span class="token-string">"count"</span>: v, <span class="token-string">"pct"</span>: v/total_failures}
+                <span class="token-keyword">for</span> k, v <span class="token-keyword">in</span> sorted(
+                    failure_counts.items(), 
+                    key=<span class="token-keyword">lambda</span> x: x[<span class="token-number">1</span>], 
+                    reverse=<span class="token-keyword">True</span>
+                )
+            }
+        }</code></pre>
+
+            <!-- ===== DASHBOARDS ===== -->
+            <h2>5. The RAG Observability Dashboard</h2>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ Essential Dashboard Panels</div>
+                <p>A production RAG dashboard should show these panels at minimum:</p>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Panel</th>
+                        <th>Metric</th>
+                        <th>Alert Threshold</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Query Volume</strong></td>
+                        <td>Queries per minute</td>
+                        <td>Drop >50% from baseline</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Latency P50/P95/P99</strong></td>
+                        <td>End-to-end response time</td>
+                        <td>P95 > 5 seconds</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cache Hit Rate</strong></td>
+                        <td>% of queries served from cache</td>
+                        <td>Drop below 20%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hallucination Rate</strong></td>
+                        <td>% of answers flagged as ungrounded</td>
+                        <td>Exceeds 2%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Refusal Rate</strong></td>
+                        <td>% of queries where system refused to answer</td>
+                        <td>Exceeds 30% (too conservative)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Retrieval Empty Rate</strong></td>
+                        <td>% of queries with 0 relevant docs</td>
+                        <td>Exceeds 15%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cost per Query</strong></td>
+                        <td>Average USD per query (LLM tokens)</td>
+                        <td>Exceeds $0.10</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Error Rate</strong></td>
+                        <td>% of queries that hit exceptions</td>
+                        <td>Exceeds 1%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Documents Scale</div>
+                <ul>
+                    <li><strong>Trace volume:</strong> At 10K queries/day, that's 10K full traces with 5+ spans each = 50K+ spans/day. Use sampling (10-100%) in production.</li>
+                    <li><strong>Storage costs:</strong> Full traces for every query = ~500MB/day. Most teams store full traces for 7 days, sampled traces for 30 days.</li>
+                    <li><strong>Debugging value:</strong> When a VP reports "the system gave me wrong info," you can look up their exact query trace in seconds.</li>
+                    <li><strong>Optimization:</strong> Traces reveal which stage is the bottleneck. Often: LLM generation (60%+ of latency). Cache it.</li>
+                    <li><strong>Compliance:</strong> In regulated industries (finance, healthcare), traces serve as audit logs proving why each answer was given.</li>
+                </ul>
+            </div>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>LangSmith / LangFuse</strong> — Purpose-built observability for LLM applications with prompt traces</li>
+                    <li><strong>Arize Phoenix</strong> — Open-source LLM observability with retrieval analysis</li>
+                    <li><strong>OpenTelemetry + Jaeger</strong> — Standard distributed tracing adapted for RAG spans</li>
+                    <li><strong>Weights & Biases</strong> — Experiment tracking extended to production monitoring</li>
+                    <li><strong>Custom dashboards:</strong> Most serious teams build Grafana dashboards with RAG-specific panels</li>
+                    <li><strong>Alerting:</strong> PagerDuty/Opsgenie alerts on hallucination rate spikes, latency degradation</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>Observability = traces + metrics + logs. All three are needed.</li>
+                    <li>Traces show the full query journey: embed → retrieve → rerank → generate → verify</li>
+                    <li>Metrics give you dashboards and alerting on aggregate health</li>
+                    <li>Token attribution answers "where did each part of the answer come from?"</li>
+                    <li>Failure detection diagnoses root causes: retrieval miss, rerank failure, or LLM hallucination</li>
+                    <li>Essential alerts: hallucination rate, latency P95, retrieval empty rate, error rate</li>
+                    <li>At scale: sample traces, set retention policies, and build RAG-specific dashboards</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+User reports: "The system gave me wrong info about parental leave"
+
+Your debugging workflow WITH observability:
+┌───────────────────────────────────────────────────────┐
+│ 1. Look up user's query in trace search               │
+│ 2. Open the trace → see all 5 spans                   │
+│ 3. Check retrieval span:                              │
+│    → Found: parental_leave_policy_v2.pdf ✅            │
+│    → But also: old_policy_2019.pdf (ranked #2)        │
+│ 4. Check rerank span:                                 │
+│    → Old policy ranked higher! 0.87 vs 0.82           │
+│ 5. Root cause: Reranker prefers longer docs           │
+│    → Old policy is 5 pages, new one is 2 pages        │
+│ 6. Fix: Add recency boost to reranker scoring         │
+└───────────────────────────────────────────────────────┘
+Time to diagnose: 5 minutes
+
+WITHOUT observability:
+┌───────────────────────────────────────────────────────┐
+│ 1. Try to reproduce the query                         │
+│ 2. Can't reproduce (non-deterministic LLM)            │
+│ 3. Add logging everywhere                             │
+│ 4. Wait for it to happen again                        │
+│ 5. Still can't figure it out                          │
+│ 6. Blame the LLM                                     │
+└───────────────────────────────────────────────────────┘
+Time to diagnose: days/never
+                </div>
+                <p><strong>Think of it as:</strong> A flight recorder (black box) for your RAG system. When something crashes, you replay the recording and know exactly what went wrong.</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>No tracing at all:</strong> "We'll add it later." Later never comes, and debugging production issues becomes guesswork.</li>
+                    <li><strong>Tracing without context:</strong> Recording latencies but not recording WHAT was retrieved or generated. Include chunk IDs, scores, and prompts.</li>
+                    <li><strong>No alerting:</strong> Beautiful dashboards nobody watches. Set up automated alerts for critical metrics.</li>
+                    <li><strong>Logging sensitive data:</strong> Don't log full user queries in plaintext if they contain PII. Implement scrubbing/hashing.</li>
+                    <li><strong>100% trace sampling forever:</strong> At scale, storing every trace is expensive. Use intelligent sampling: 100% for failures, 10% for successes.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build RAG Observability</h3>
+                <ol>
+                    <li>Instrument a mock RAG pipeline with OpenTelemetry spans (5 stages: embed, retrieve, rerank, generate, verify)</li>
+                    <li>Record at least 3 attributes per span (model name, input count, latency, scores)</li>
+                    <li>Define 5 Prometheus-style metrics (query count, latency histogram, hallucination counter, cache hits, cost)</li>
+                    <li>Implement a FailureDetector that categorizes failures into at least 4 types</li>
+                    <li>Build a token attribution function that maps answer sentences to source chunks</li>
+                    <li>Simulate 20 queries and produce a failure analysis report</li>
+                    <li><strong>Bonus:</strong> Set up an alert condition that fires when hallucination rate exceeds 2% over a 1-hour window</li>
+                </ol>
+                <p><strong>Success criteria:</strong> You can trace any query end-to-end, identify where failures happen, and have alerting for the most critical metrics.</p>
+            </div>
+
+            <!-- ===== COURSE COMPLETE ===== -->
+            <div class="callout callout-success">
+                <div class="callout-title">🎉 Congratulations! Course Complete!</div>
+                <p>You've now learned all 10 stages of building a production RAG pipeline for 10M documents with zero hallucination. From ingestion to observability, you understand the full picture.</p>
+                <p><strong>Your complete pipeline:</strong></p>
+                <ol>
+                    <li>Ingest &amp; Normalize (dedup, clean, chunk)</li>
+                    <li>Hybrid Retrieval (BM25 + vector + RRF)</li>
+                    <li>ANN &amp; Reranking (HNSW + cross-encoder)</li>
+                    <li>Source Confidence (freshness, trust, agreement)</li>
+                    <li>Constrained Generation (grounded prompting)</li>
+                    <li>Citation Responses (verifiable references)</li>
+                    <li>Hallucination Fallback (refuse when uncertain)</li>
+                    <li>Continuous Evaluations (catch regressions)</li>
+                    <li>Caching &amp; Memory (speed + consistency)</li>
+                    <li>Observability &amp; Tracing (debug + monitor)</li>
+                </ol>
+                <p><strong>Next step:</strong> Build it. Start with stages 1-3, add quality layers (4-7), then operationalize (8-10).</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="09-caching-memory.html" class="prev">Caching &amp; Memory</a>
+                <a href="project-overview.html" class="next">Capstone: Project Overview</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

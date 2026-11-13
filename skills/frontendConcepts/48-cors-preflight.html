@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Preflight - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preconnect</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> CORS Preflight
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>CORS Preflight</h1>
+                <p class="subtitle">Why the browser sends an OPTIONS request before your actual request — the security mechanism that protects servers from unexpected cross-origin mutations, and how to avoid the latency penalty.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Security</span>
+                    <span class="tag tag-browser">HTTP / CORS</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📞 Daily-Life Analogy: Calling Ahead Before Visiting</div>
+                <p>You want to deliver a heavy package (PUT request with custom headers) to a building on another street (cross-origin). Before driving there, you call ahead: "Hey, do you accept deliveries from my street? Can I bring a 50kg package?" (OPTIONS preflight). The building says "Yes, we accept deliveries from your street, up to 100kg, and you can use the back entrance" (CORS headers). Now you make the actual trip. Without the call, the building would refuse you at the door — wasted trip.</p>
+            </div>
+
+            <h2>The Problem: Why Preflight Exists</h2>
+<pre><code><span class="token-comment">/*
+  Before CORS existed, browsers enforced same-origin policy strictly.
+  Servers ASSUMED: "If a request reaches me, it's from my own pages."
+  
+  When CORS was introduced, a dangerous scenario emerged:
+  
+  1. Evil site at evil.com has JavaScript that sends:
+     DELETE https://bank.com/api/account/123
+     Authorization: Bearer stolen-token
+     
+  2. If the browser just sent this directly, the bank's server would
+     process it (it was designed before CORS — it trusts all requests).
+     
+  3. PREFLIGHT prevents this: the browser first asks bank.com:
+     "Hey, does evil.com have permission to send DELETE with Auth headers?"
+     Bank says NO → browser never sends the actual DELETE.
+     
+  Preflight protects SERVERS that were built before CORS existed.
+  It ensures they explicitly opt-in to cross-origin requests.
+*/</span>
+</code></pre>
+
+            <h2>When Does a Preflight Happen?</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Request Type</th><th>Preflight?</th><th>Why</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>GET with standard headers</td><td>❌ No (simple request)</td><td>GET doesn't mutate data, standard headers were always possible via forms</td></tr>
+                    <tr><td>POST with <code>Content-Type: application/x-www-form-urlencoded</code></td><td>❌ No (simple)</td><td>HTML forms could always do this — servers already expect it</td></tr>
+                    <tr><td>POST with <code>Content-Type: application/json</code></td><td>✅ Yes</td><td>JSON content type wasn't possible without JS — server might not expect cross-origin JSON</td></tr>
+                    <tr><td>PUT, DELETE, PATCH</td><td>✅ Yes</td><td>These methods weren't possible from HTML forms — servers might not expect cross-origin mutations</td></tr>
+                    <tr><td>Any request with custom headers</td><td>✅ Yes</td><td>Custom headers (Authorization, X-Custom) require explicit server permission</td></tr>
+                </tbody>
+            </table>
+
+            <h3>"Simple" (Non-Preflighted) Requests</h3>
+<pre><code><span class="token-comment">// These NEVER trigger preflight:</span>
+<span class="token-comment">// Methods: GET, HEAD, POST</span>
+<span class="token-comment">// Headers: Accept, Accept-Language, Content-Language, Content-Type (only if value is:</span>
+<span class="token-comment">//   application/x-www-form-urlencoded, multipart/form-data, or text/plain)</span>
+
+<span class="token-comment">// ✅ No preflight (simple request)</span>
+fetch(<span class="token-string">'https://api.other.com/data'</span>, { method: <span class="token-string">'GET'</span> });
+
+<span class="token-comment">// ✅ No preflight (form-compatible POST)</span>
+fetch(<span class="token-string">'https://api.other.com/submit'</span>, {
+    method: <span class="token-string">'POST'</span>,
+    headers: { <span class="token-string">'Content-Type'</span>: <span class="token-string">'application/x-www-form-urlencoded'</span> },
+    body: <span class="token-string">'name=hello&value=world'</span>
+});
+
+<span class="token-comment">// ❌ TRIGGERS preflight (JSON content type)</span>
+fetch(<span class="token-string">'https://api.other.com/data'</span>, {
+    method: <span class="token-string">'POST'</span>,
+    headers: { <span class="token-string">'Content-Type'</span>: <span class="token-string">'application/json'</span> }, <span class="token-comment">// ← not "simple"</span>
+    body: JSON.stringify({ name: <span class="token-string">'hello'</span> })
+});
+
+<span class="token-comment">// ❌ TRIGGERS preflight (custom header)</span>
+fetch(<span class="token-string">'https://api.other.com/data'</span>, {
+    headers: { <span class="token-string">'Authorization'</span>: <span class="token-string">'Bearer token123'</span> } <span class="token-comment">// ← custom header</span>
+});
+</code></pre>
+
+            <h2>The Preflight Flow</h2>
+<pre><code><span class="token-comment">/*
+  Step 1: Browser sends OPTIONS (automatically, you can't prevent it):
+  
+  OPTIONS /api/users HTTP/1.1
+  Host: api.other.com
+  Origin: https://mysite.com
+  Access-Control-Request-Method: PUT
+  Access-Control-Request-Headers: Content-Type, Authorization
+  
+  Step 2: Server responds (if it allows this):
+  
+  HTTP/1.1 204 No Content
+  Access-Control-Allow-Origin: https://mysite.com
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Max-Age: 86400        ← Cache this preflight for 24 hours!
+  
+  Step 3: Browser NOW sends the actual request:
+  
+  PUT /api/users HTTP/1.1
+  Host: api.other.com
+  Origin: https://mysite.com
+  Content-Type: application/json
+  Authorization: Bearer token123
+  
+  {"name": "Akash"}
+*/</span>
+</code></pre>
+
+            <h2>Avoiding Preflight Latency</h2>
+<pre><code><span class="token-comment">// Strategy 1: Access-Control-Max-Age (cache the preflight)</span>
+<span class="token-comment">// Server sends: Access-Control-Max-Age: 86400</span>
+<span class="token-comment">// Browser caches the preflight result for 24 hours</span>
+<span class="token-comment">// Subsequent requests to same URL skip the OPTIONS call</span>
+<span class="token-comment">// Chrome caps at 7200 (2 hours), Firefox at 86400 (24 hours)</span>
+
+<span class="token-comment">// Strategy 2: Same-origin proxy (avoid CORS entirely)</span>
+<span class="token-comment">// Instead of: fetch('https://api.other.com/data')</span>
+<span class="token-comment">// Use: fetch('/api/proxy/data') → your server forwards to other.com</span>
+<span class="token-comment">// No cross-origin = no CORS = no preflight</span>
+
+<span class="token-comment">// Strategy 3: Use simple requests where possible</span>
+<span class="token-comment">// If your API can accept form-encoded data for non-sensitive endpoints,</span>
+<span class="token-comment">// you avoid preflight on those requests</span>
+
+<span class="token-comment">// Strategy 4: Batch requests</span>
+<span class="token-comment">// Instead of 10 separate cross-origin calls (each with preflight),</span>
+<span class="token-comment">// combine into 1 GraphQL or batch endpoint (1 preflight total)</span>
+</code></pre>
+
+            <h2>Server-Side Configuration</h2>
+<pre><code><span class="token-comment">// Express.js CORS configuration</span>
+<span class="token-keyword">const</span> cors = require(<span class="token-string">'cors'</span>);
+
+app.use(cors({
+    origin: [<span class="token-string">'https://mysite.com'</span>, <span class="token-string">'https://staging.mysite.com'</span>],
+    methods: [<span class="token-string">'GET'</span>, <span class="token-string">'POST'</span>, <span class="token-string">'PUT'</span>, <span class="token-string">'DELETE'</span>],
+    allowedHeaders: [<span class="token-string">'Content-Type'</span>, <span class="token-string">'Authorization'</span>],
+    credentials: <span class="token-keyword">true</span>,      <span class="token-comment">// Allow cookies cross-origin</span>
+    maxAge: 86400,            <span class="token-comment">// Cache preflight for 24h</span>
+}));
+
+<span class="token-comment">// ⚠️ NEVER use in production:</span>
+<span class="token-comment">// Access-Control-Allow-Origin: *     (allows ALL origins)</span>
+<span class="token-comment">// + credentials: true                 (doesn't work anyway — browser rejects)</span>
+<span class="token-comment">// Wildcard + credentials is explicitly forbidden by the spec</span>
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Every cross-origin API call</strong> — Any time your frontend at <code>app.example.com</code> calls <code>api.example.com</code>, CORS applies (different subdomain = different origin).</li>
+                <li><strong>GraphQL APIs</strong> — Almost always trigger preflight (POST with <code>application/json</code>). GraphQL servers universally handle OPTIONS.</li>
+                <li><strong>CDN-hosted SPAs</strong> — SPAs on Vercel/Netlify calling APIs on different domains deal with CORS on every data fetch.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Thinking CORS is security for the CLIENT</strong> — CORS protects SERVERS from unexpected cross-origin requests. The browser enforces it, but it's the server's protection mechanism.</li>
+                <li><strong>Using <code>Access-Control-Allow-Origin: *</code> with credentials</strong> — The spec forbids this combination. You must echo the specific origin when using <code>credentials: true</code>.</li>
+                <li><strong>Not setting <code>Access-Control-Max-Age</code></strong> — Without it, every single non-simple request triggers a preflight OPTIONS call. On mobile, that's 100-300ms added latency per request.</li>
+                <li><strong>Forgetting <code>Vary: Origin</code></strong> — If your server sends different CORS headers per origin and a CDN caches the response, the CDN might serve wrong CORS headers. Add <code>Vary: Origin</code>.</li>
+                <li><strong>Debugging on the wrong layer</strong> — "CORS error" in the console often means the SERVER isn't sending the right headers, not that your frontend code is wrong.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand CORS Preflight When...</h3>
+                <p>You can explain why <code>POST</code> with <code>Content-Type: text/plain</code> skips preflight (HTML forms could always do this, so servers already handle it) but <code>POST</code> with <code>Content-Type: application/json</code> triggers preflight (only possible via JS, servers might not expect it cross-origin).</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Set up two local servers on different ports. Make a cross-origin <code>fetch()</code> with a custom header. Observe the preflight in DevTools Network tab (filter by "Other" to see OPTIONS). Then add <code>Access-Control-Max-Age: 600</code> and verify the second request skips the preflight.</p>
+                <h3>🔗 Connect It</h3>
+                <p>CORS Preflight connects to: <strong>SameSite Cookies</strong> (cross-origin cookie sending rules), <strong>HTTP/3</strong> (preflight latency reduced by 0-RTT connections), and <strong>Preconnect</strong> (warming the connection before the preflight reduces total latency).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="47-preload-prefetch-preconnect.html" class="nav-btn nav-btn-prev">← Preload vs Prefetch vs Preconnect</a>
+                <a href="49-samesite-cookies.html" class="nav-btn nav-btn-next">SameSite Cookie Modes →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

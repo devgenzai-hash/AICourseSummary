@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Import Chunking - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing Complexity</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop (Macro vs Microta…</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interoperabil…</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver Internals</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver Loop Limits</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver Cost</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle Traps</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation Strategies</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preco…</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture & State Machines</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+            <li><a href="64-finite-state-modeling.html"><span class="nav-number">64</span> Finite State Modeling</a></li>
+            <li><a href="65-event-sourcing-frontend.html"><span class="nav-number">65</span> Event Sourcing in Frontend</a></li>
+            <li><a href="66-optimistic-ui-rollback.html"><span class="nav-number">66</span> Optimistic UI Rollback Strat…</a></li>
+            <li class="module-label">Offline & Collaboration</li>
+            <li><a href="67-offline-conflict-resolution.html"><span class="nav-number">67</span> Offline Conflict Resolution</a></li>
+            <li><a href="68-crdt-basics.html"><span class="nav-number">68</span> CRDT Basics for Collaboration</a></li>
+            <li><a href="69-webrtc.html"><span class="nav-number">69</span> WebRTC</a></li>
+            <li class="module-label">Streams & Async Patterns</li>
+            <li><a href="70-backpressure-streams.html"><span class="nav-number">70</span> Backpressure in Streams API</a></li>
+            <li><a href="71-abort-controller.html"><span class="nav-number">71</span> AbortController</a></li>
+            <li><a href="72-streaming-fetch.html"><span class="nav-number">72</span> Streaming Fetch Response Han…</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (I…</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async …</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/88 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Dynamic Import Chunking
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Dynamic Import Chunking</h1>
+                <p class="subtitle">How bundlers transform <code>import()</code> expressions into separate network-fetchable chunks — the low-level mechanism that powers code splitting, lazy loading, and on-demand module resolution.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span> <span class="tag tag-concept">Concept</span> <span class="tag tag-performance">Performance</span>
+                </div>
+            </div>
+
+
+            <div class="analogy-box">
+                <div class="analogy-title">📚 Analogy: A Library with a Delivery Service</div>
+                <p>Static imports are like having all books on your desk before you start working — everything is there whether you read it or not. Dynamic imports are like a library delivery service: you request a specific book <strong>when you need it</strong>, it arrives in a package (chunk), and you can start reading immediately. The library (bundler) pre-organizes books into efficient packages so related material arrives together.</p>
+            </div>
+
+            <h2>The Problem: Static Imports Load Everything Upfront</h2>
+<pre><code><span class="token-comment">// Static imports — resolved at parse time, bundled into one file</span>
+<span class="token-keyword">import</span> { heavyChart } <span class="token-keyword">from</span> <span class="token-string">'./charts/HeavyChart'</span>;      <span class="token-comment">// 150KB</span>
+<span class="token-keyword">import</span> { pdfExporter } <span class="token-keyword">from</span> <span class="token-string">'./export/PDFExporter'</span>;    <span class="token-comment">// 200KB</span>
+<span class="token-keyword">import</span> { markdownEditor } <span class="token-keyword">from</span> <span class="token-string">'./editor/Markdown'</span>;    <span class="token-comment">// 180KB</span>
+
+<span class="token-comment">// ALL 530KB loads upfront, even if user never uses charts or PDF export</span>
+<span class="token-comment">// Static import = compile-time dependency = must be in initial bundle</span>
+
+<span class="token-comment">// The ES2020 solution: dynamic import()</span>
+<span class="token-comment">// import() is a FUNCTION that returns a Promise&lt;Module&gt;</span>
+<span class="token-comment">// The bundler sees it and creates a separate chunk file</span>
+<span class="token-keyword">const</span> module = <span class="token-keyword">await import</span>(<span class="token-string">'./charts/HeavyChart'</span>);
+<span class="token-comment">// ↑ This triggers a network request for a chunk at runtime</span>
+</code></pre>
+
+            <h2>How Dynamic Import Becomes a Chunk</h2>
+            <p>When the bundler encounters <code>import()</code>, it performs these steps:</p>
+            <ol>
+                <li><strong>Identify the split point</strong> — The <code>import()</code> expression marks a boundary in the dependency graph.</li>
+                <li><strong>Trace the subgraph</strong> — Starting from the imported module, walk all its dependencies to determine what goes in this chunk.</li>
+                <li><strong>Deduplicate shared modules</strong> — If a dependency is already in the main bundle or another chunk, don't duplicate it.</li>
+                <li><strong>Emit a chunk file</strong> — Generate a separate JS file (e.g., <code>chunk-abc123.js</code>) containing only the subgraph modules.</li>
+                <li><strong>Replace import() with runtime loader</strong> — The original <code>import()</code> becomes a function that fetches and executes the chunk via a script tag or fetch+eval.</li>
+            </ol>
+
+<pre><code><span class="token-comment">// YOUR SOURCE CODE:</span>
+<span class="token-keyword">async function</span> <span class="token-function">showChart</span>() {
+  <span class="token-keyword">const</span> { renderChart } = <span class="token-keyword">await import</span>(<span class="token-string">'./charts/HeavyChart'</span>);
+  renderChart(data);
+}
+
+<span class="token-comment">// WHAT THE BUNDLER OUTPUTS (simplified Webpack runtime):</span>
+<span class="token-keyword">async function</span> <span class="token-function">showChart</span>() {
+  <span class="token-comment">// __webpack_require__.e = "ensure chunk is loaded"</span>
+  <span class="token-comment">// It creates a &lt;script&gt; tag pointing to the chunk URL</span>
+  <span class="token-keyword">const</span> { renderChart } = <span class="token-keyword">await</span> __webpack_require__.e(<span class="token-string">"chunk-charts"</span>)
+    .then(__webpack_require__.bind(null, <span class="token-string">"./src/charts/HeavyChart.js"</span>));
+  renderChart(data);
+}
+
+<span class="token-comment">// The runtime loader does:</span>
+<span class="token-comment">// 1. Check if chunk is already loaded (cache hit → return immediately)</span>
+<span class="token-comment">// 2. Create a &lt;script src="/static/js/chunk-charts.abc123.js"&gt; tag</span>
+<span class="token-comment">// 3. Wait for script to execute (it registers its modules)</span>
+<span class="token-comment">// 4. Resolve the Promise with the requested module's exports</span>
+</code></pre>
+
+            <h2>Chunk Naming and Content Hashing</h2>
+<pre><code><span class="token-comment">// Webpack output configuration controls chunk filenames</span>
+module.exports = {
+  output: {
+    <span class="token-comment">// [name] = chunk name (from magic comment or auto-generated)</span>
+    <span class="token-comment">// [contenthash] = hash of chunk contents (changes only when code changes)</span>
+    chunkFilename: <span class="token-string">'[name].[contenthash:8].js'</span>,
+    <span class="token-comment">// Results in: charts.a1b2c3d4.js, settings.e5f6g7h8.js</span>
+  }
+};
+
+<span class="token-comment">// Magic comments let you control chunk names:</span>
+<span class="token-keyword">const</span> Charts = lazy(() => <span class="token-keyword">import</span>(
+  <span class="token-comment">/* webpackChunkName: "charts" */</span>
+  <span class="token-string">'./charts/HeavyChart'</span>
+));
+<span class="token-comment">// Output: charts.a1b2c3d4.js (named, cacheable, debuggable)</span>
+
+<span class="token-comment">// Without magic comment: 437.a1b2c3d4.js (numeric ID, harder to debug)</span>
+
+<span class="token-comment">// Content hash is CRITICAL for caching:</span>
+<span class="token-comment">// - Deploy v1: charts.a1b2c3d4.js → cached by CDN/browser</span>
+<span class="token-comment">// - Deploy v2 (charts unchanged): same hash → cache hit, no re-download</span>
+<span class="token-comment">// - Deploy v3 (charts modified): charts.x9y8z7w6.js → new file, fresh download</span>
+</code></pre>
+
+            <h2>The Chunking Algorithm: What Goes Where</h2>
+<pre><code><span class="token-comment">// Consider this dependency graph:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">//   entry.js</span>
+<span class="token-comment">//     ├── import('./PageA') → PageA.js</span>
+<span class="token-comment">//     │     ├── utils.js        (shared with PageB)</span>
+<span class="token-comment">//     │     └── ComponentA.js   (unique to PageA)</span>
+<span class="token-comment">//     └── import('./PageB') → PageB.js</span>
+<span class="token-comment">//           ├── utils.js        (shared with PageA)</span>
+<span class="token-comment">//           └── ComponentB.js   (unique to PageB)</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// QUESTION: Where does utils.js end up?</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// OPTION 1: Duplicate into both chunks (wasteful)</span>
+<span class="token-comment">//   chunk-PageA.js = PageA + utils + ComponentA</span>
+<span class="token-comment">//   chunk-PageB.js = PageB + utils + ComponentB</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// OPTION 2: Extract shared module into its own chunk (efficient)</span>
+<span class="token-comment">//   chunk-PageA.js = PageA + ComponentA</span>
+<span class="token-comment">//   chunk-PageB.js = PageB + ComponentB</span>
+<span class="token-comment">//   chunk-shared.js = utils</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// OPTION 3: Put shared module in parent (entry) chunk</span>
+<span class="token-comment">//   main.js = entry + utils</span>
+<span class="token-comment">//   chunk-PageA.js = PageA + ComponentA</span>
+<span class="token-comment">//   chunk-PageB.js = PageB + ComponentB</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Webpack's splitChunks decides based on:</span>
+<span class="token-comment">// - minSize: Is utils.js large enough to justify a separate request?</span>
+<span class="token-comment">// - minChunks: How many chunks share it? (threshold: usually 2+)</span>
+<span class="token-comment">// - maxAsyncRequests: Would extracting create too many parallel requests?</span>
+</code></pre>
+
+            <h2>Dynamic Import Patterns</h2>
+
+            <h3>Pattern 1: Conditional Dynamic Import</h3>
+<pre><code><span class="token-comment">// Load different implementations based on runtime conditions</span>
+<span class="token-keyword">async function</span> <span class="token-function">getRenderer</span>(format) {
+  <span class="token-keyword">switch</span> (format) {
+    <span class="token-keyword">case</span> <span class="token-string">'pdf'</span>:
+      <span class="token-comment">// Each case creates a SEPARATE chunk — only one downloads at runtime</span>
+      <span class="token-keyword">return import</span>(<span class="token-string">'./renderers/PDFRenderer'</span>);
+    <span class="token-keyword">case</span> <span class="token-string">'csv'</span>:
+      <span class="token-keyword">return import</span>(<span class="token-string">'./renderers/CSVRenderer'</span>);
+    <span class="token-keyword">case</span> <span class="token-string">'excel'</span>:
+      <span class="token-keyword">return import</span>(<span class="token-string">'./renderers/ExcelRenderer'</span>);
+    <span class="token-keyword">default</span>:
+      <span class="token-keyword">return import</span>(<span class="token-string">'./renderers/TextRenderer'</span>);
+  }
+}
+
+<span class="token-comment">// Bundler creates 4 chunks — but only 1 is fetched per call</span>
+<span class="token-comment">// chunk-PDFRenderer.js, chunk-CSVRenderer.js, etc.</span>
+</code></pre>
+
+            <h3>Pattern 2: Dynamic Path (Computed Module Specifier)</h3>
+<pre><code><span class="token-comment">// PARTIALLY dynamic path — bundler can still analyze it</span>
+<span class="token-keyword">async function</span> <span class="token-function">loadLocale</span>(lang) {
+  <span class="token-comment">// Template literal with dynamic segment</span>
+  <span class="token-keyword">const</span> module = <span class="token-keyword">await import</span>(`./locales/${lang}.js`);
+  <span class="token-keyword">return</span> module.default;
+}
+
+<span class="token-comment">// How the bundler handles this:</span>
+<span class="token-comment">// 1. Scans ./locales/ directory at build time</span>
+<span class="token-comment">// 2. Finds: en.js, fr.js, de.js, ja.js, es.js</span>
+<span class="token-comment">// 3. Creates a chunk for EACH matching file</span>
+<span class="token-comment">// 4. At runtime, the correct chunk is fetched based on `lang` value</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Webpack calls this a "context module" — it creates a map:</span>
+<span class="token-comment">// { './en.js': () => import('./locales/en.js'),</span>
+<span class="token-comment">//   './fr.js': () => import('./locales/fr.js'), ... }</span>
+
+<span class="token-comment">// FULLY dynamic path — CANNOT be chunked (bundler can't know at build time)</span>
+<span class="token-keyword">async function</span> <span class="token-function">loadPlugin</span>(pluginUrl) {
+  <span class="token-comment">// This is just a runtime fetch — no chunking possible</span>
+  <span class="token-keyword">const</span> module = <span class="token-keyword">await import</span>(pluginUrl); <span class="token-comment">// Webpack warns about this!</span>
+}
+</code></pre>
+
+            <h3>Pattern 3: Webpack Magic Comments</h3>
+<pre><code><span class="token-comment">// Magic comments give you fine-grained control over chunk behavior</span>
+
+<span class="token-comment">// Name the chunk (for debugging and cache identification)</span>
+<span class="token-keyword">import</span>(<span class="token-comment">/* webpackChunkName: "dashboard" */</span> <span class="token-string">'./Dashboard'</span>);
+
+<span class="token-comment">// Prefetch: download during browser idle time (low priority)</span>
+<span class="token-keyword">import</span>(<span class="token-comment">/* webpackPrefetch: true */</span> <span class="token-string">'./HelpModal'</span>);
+<span class="token-comment">// Inserts: &lt;link rel="prefetch" href="help-modal.chunk.js"&gt;</span>
+
+<span class="token-comment">// Preload: download immediately with current navigation (high priority)</span>
+<span class="token-keyword">import</span>(<span class="token-comment">/* webpackPreload: true */</span> <span class="token-string">'./CriticalWidget'</span>);
+<span class="token-comment">// Inserts: &lt;link rel="preload" href="critical-widget.chunk.js" as="script"&gt;</span>
+
+<span class="token-comment">// Include mode for context modules (dynamic paths)</span>
+<span class="token-keyword">import</span>(
+  <span class="token-comment">/* webpackInclude: /\.(en|fr|de)\.js$/ */</span>
+  <span class="token-comment">/* webpackExclude: /\.test\.js$/ */</span>
+  `./locales/${lang}.js`
+);
+<span class="token-comment">// Only creates chunks for en, fr, de — ignores other locale files</span>
+<span class="token-comment">// Reduces total chunk count from 40 locales to just 3</span>
+
+<span class="token-comment">// Export mode: controls what's included from the target module</span>
+<span class="token-keyword">import</span>(<span class="token-comment">/* webpackExports: ["default", "helper"] */</span> <span class="token-string">'./bigModule'</span>);
+<span class="token-comment">// Only includes 'default' and 'helper' exports in chunk (tree-shakes the rest)</span>
+</code></pre>
+
+            <h3>Pattern 4: Parallel Chunk Loading</h3>
+<pre><code><span class="token-comment">// Load multiple chunks simultaneously when you need several modules</span>
+<span class="token-keyword">async function</span> <span class="token-function">initDashboard</span>() {
+  <span class="token-comment">// BAD: Sequential loading (waterfall)</span>
+  <span class="token-keyword">const</span> charts = <span class="token-keyword">await import</span>(<span class="token-string">'./Charts'</span>);     <span class="token-comment">// Wait 200ms...</span>
+  <span class="token-keyword">const</span> tables = <span class="token-keyword">await import</span>(<span class="token-string">'./DataTable'</span>);  <span class="token-comment">// Then wait 150ms...</span>
+  <span class="token-keyword">const</span> filters = <span class="token-keyword">await import</span>(<span class="token-string">'./Filters'</span>);  <span class="token-comment">// Then wait 100ms...</span>
+  <span class="token-comment">// Total: 450ms sequential</span>
+
+  <span class="token-comment">// GOOD: Parallel loading (all chunks download simultaneously)</span>
+  <span class="token-keyword">const</span> [charts, tables, filters] = <span class="token-keyword">await</span> Promise.all([
+    <span class="token-keyword">import</span>(<span class="token-string">'./Charts'</span>),
+    <span class="token-keyword">import</span>(<span class="token-string">'./DataTable'</span>),
+    <span class="token-keyword">import</span>(<span class="token-string">'./Filters'</span>),
+  ]);
+  <span class="token-comment">// Total: ~200ms (limited by slowest chunk, not sum)</span>
+}
+
+<span class="token-comment">// Even better: start loading early, await later</span>
+<span class="token-keyword">function</span> <span class="token-function">DashboardRoute</span>() {
+  <span class="token-comment">// Fire off requests immediately (don't await yet)</span>
+  <span class="token-keyword">const</span> chartsPromise = <span class="token-keyword">import</span>(<span class="token-string">'./Charts'</span>);
+  <span class="token-keyword">const</span> dataPromise = fetchDashboardData(); <span class="token-comment">// API call in parallel</span>
+
+  <span class="token-comment">// Await both when actually needed</span>
+  <span class="token-keyword">return</span> Promise.all([chartsPromise, dataPromise]).then(([Charts, data]) => {
+    Charts.render(data);
+  });
+}
+</code></pre>
+
+            <h2>Chunk Loading Failure Handling</h2>
+<pre><code><span class="token-comment">// Dynamic imports can FAIL (network error, timeout, 404 after deploy)</span>
+<span class="token-comment">// Production apps MUST handle this gracefully</span>
+
+<span class="token-keyword">async function</span> <span class="token-function">loadWithRetry</span>(importFn, retries = 3) {
+  <span class="token-keyword">for</span> (<span class="token-keyword">let</span> i = 0; i < retries; i++) {
+    <span class="token-keyword">try</span> {
+      <span class="token-keyword">return await</span> importFn();
+    } <span class="token-keyword">catch</span> (error) {
+      <span class="token-keyword">if</span> (i === retries - 1) <span class="token-keyword">throw</span> error;
+      <span class="token-comment">// Exponential backoff before retry</span>
+      <span class="token-keyword">await new</span> Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+      <span class="token-comment">// Clear failed module from cache so retry actually re-fetches</span>
+      <span class="token-comment">// (some bundler runtimes cache the rejection)</span>
+    }
+  }
+}
+
+<span class="token-comment">// React error boundary for chunk load failures</span>
+<span class="token-keyword">class</span> <span class="token-function">ChunkErrorBoundary</span> <span class="token-keyword">extends</span> React.Component {
+  state = { hasError: <span class="token-keyword">false</span>, error: <span class="token-keyword">null</span> };
+
+  <span class="token-keyword">static</span> getDerivedStateFromError(error) {
+    <span class="token-comment">// ChunkLoadError is Webpack's error type for failed dynamic imports</span>
+    <span class="token-keyword">if</span> (error.name === <span class="token-string">'ChunkLoadError'</span>) {
+      <span class="token-keyword">return</span> { hasError: <span class="token-keyword">true</span>, error };
+    }
+    <span class="token-keyword">throw</span> error; <span class="token-comment">// Re-throw non-chunk errors to parent boundary</span>
+  }
+
+  handleRetry = () => {
+    <span class="token-comment">// Force a full page reload to get fresh chunk manifest</span>
+    <span class="token-comment">// After deploy, old chunk URLs 404 — reload gets new HTML with new URLs</span>
+    window.location.reload();
+  };
+
+  render() {
+    <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.state.hasError) {
+      <span class="token-keyword">return</span> (
+        &lt;div className="chunk-error"&gt;
+          &lt;p&gt;Failed to load this section.&lt;/p&gt;
+          &lt;button onClick={<span class="token-keyword">this</span>.handleRetry}&gt;Reload page&lt;/button&gt;
+        &lt;/div&gt;
+      );
+    }
+    <span class="token-keyword">return this</span>.props.children;
+  }
+}
+</code></pre>
+
+            <h2>How Vite/Rollup Handles Dynamic Imports Differently</h2>
+<pre><code><span class="token-comment">// Vite uses Rollup for production builds — different chunking strategy</span>
+
+<span class="token-comment">// vite.config.js</span>
+<span class="token-keyword">export default</span> defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        <span class="token-comment">// Manual chunks: explicit grouping of modules into named chunks</span>
+        manualChunks(id) {
+          <span class="token-comment">// Group all react-related packages into one chunk</span>
+          <span class="token-keyword">if</span> (id.includes(<span class="token-string">'node_modules/react'</span>)) {
+            <span class="token-keyword">return</span> <span class="token-string">'vendor-react'</span>;
+          }
+          <span class="token-comment">// Group all chart libraries together</span>
+          <span class="token-keyword">if</span> (id.includes(<span class="token-string">'node_modules/d3'</span>) || id.includes(<span class="token-string">'node_modules/recharts'</span>)) {
+            <span class="token-keyword">return</span> <span class="token-string">'vendor-charts'</span>;
+          }
+          <span class="token-comment">// Everything else from node_modules goes into 'vendor'</span>
+          <span class="token-keyword">if</span> (id.includes(<span class="token-string">'node_modules'</span>)) {
+            <span class="token-keyword">return</span> <span class="token-string">'vendor'</span>;
+          }
+        },
+      },
+    },
+  },
+});
+
+<span class="token-comment">// Key difference from Webpack:</span>
+<span class="token-comment">// Rollup produces ES modules in production (import/export preserved)</span>
+<span class="token-comment">// Webpack wraps everything in its own module system (__webpack_require__)</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Rollup output:</span>
+<span class="token-comment">//   import { useState } from './vendor-react.js';</span>
+<span class="token-comment">//   // Browser-native ES module loading (no runtime overhead)</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Webpack output:</span>
+<span class="token-comment">//   __webpack_require__(/* react */ "react")</span>
+<span class="token-comment">//   // Custom module system (small runtime cost, more features)</span>
+</code></pre>
+
+            <h2>The Chunk Manifest and Runtime</h2>
+<pre><code><span class="token-comment">// The bundler generates a MANIFEST — a mapping of chunk IDs to filenames</span>
+<span class="token-comment">// This lives in the entry chunk (or a separate runtime chunk)</span>
+
+<span class="token-comment">// Simplified Webpack chunk manifest (embedded in runtime):</span>
+<span class="token-keyword">const</span> chunkMap = {
+  <span class="token-string">"dashboard"</span>: <span class="token-string">"dashboard.a1b2c3d4.js"</span>,
+  <span class="token-string">"settings"</span>: <span class="token-string">"settings.e5f6g7h8.js"</span>,
+  <span class="token-string">"charts"</span>: <span class="token-string">"charts.i9j0k1l2.js"</span>,
+};
+
+<span class="token-comment">// When import('./Dashboard') executes at runtime:</span>
+<span class="token-comment">// 1. Runtime looks up "dashboard" in chunkMap → "dashboard.a1b2c3d4.js"</span>
+<span class="token-comment">// 2. Constructs full URL: publicPath + filename</span>
+<span class="token-comment">//    → "https://cdn.example.com/static/js/dashboard.a1b2c3d4.js"</span>
+<span class="token-comment">// 3. Creates &lt;script&gt; tag or uses fetch() to load it</span>
+<span class="token-comment">// 4. Script executes and registers its modules with the runtime</span>
+<span class="token-comment">// 5. Promise resolves with the module's exports</span>
+
+<span class="token-comment">// WHY the manifest matters for deploys:</span>
+<span class="token-comment">// - Deploy v1: manifest says dashboard = "dashboard.a1b2c3d4.js"</span>
+<span class="token-comment">// - Deploy v2: manifest says dashboard = "dashboard.m3n4o5p6.js"</span>
+<span class="token-comment">// - User loaded v1's HTML but navigates after v2 deploys</span>
+<span class="token-comment">// - v1's manifest still points to "dashboard.a1b2c3d4.js"</span>
+<span class="token-comment">// - If CDN already purged that file → ChunkLoadError!</span>
+<span class="token-comment">// - Solution: keep old chunks alive for 1-2 hours after deploy</span>
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Next.js</strong> — Every page/route becomes a dynamic import automatically. The framework generates optimal chunks with shared commons extraction. Uses <code>next/dynamic</code> for component-level splitting with SSR support.</li>
+                <li><strong>Webpack 5</strong> — The <code>SplitChunksPlugin</code> uses graph-based analysis to determine optimal chunk boundaries. Supports chunk groups, entry points, and async chunks with configurable size thresholds.</li>
+                <li><strong>Vite (Rollup)</strong> — Uses <code>manualChunks</code> for explicit control or automatic splitting at dynamic import boundaries. Produces native ESM chunks that leverage browser's built-in module loader.</li>
+                <li><strong>Vercel Commerce / Shopify Hydrogen</strong> — Aggressive dynamic import chunking for product pages. Each product detail section (reviews, recommendations, related items) is a separate chunk loaded on scroll.</li>
+            </ul>
+
+            <h2>Trade-offs & Alternatives</h2>
+            <table>
+                <thead>
+                    <tr><th>Approach</th><th>Pros</th><th>Cons</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dynamic import()</td>
+                        <td>Standard ES syntax; works everywhere; bundler-agnostic</td>
+                        <td>Async boundary; requires Promise handling; loading states</td>
+                    </tr>
+                    <tr>
+                        <td>Static import (no splitting)</td>
+                        <td>Synchronous; no loading states; simpler mental model</td>
+                        <td>Everything in one bundle; poor initial load performance</td>
+                    </tr>
+                    <tr>
+                        <td>Module Federation</td>
+                        <td>Share chunks across separately deployed applications</td>
+                        <td>Complex config; version conflicts; Webpack-specific</td>
+                    </tr>
+                    <tr>
+                        <td>Script tags (manual)</td>
+                        <td>No bundler needed; simple for legacy systems</td>
+                        <td>No dependency resolution; global scope pollution; manual ordering</td>
+                    </tr>
+                    <tr>
+                        <td>Import maps (native)</td>
+                        <td>Browser-native; no build step needed for mapping</td>
+                        <td>No automatic chunking; limited browser support; no tree-shaking</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Not handling chunk load failures</strong> — After a deploy, old chunk URLs return 404. Without error boundaries or retry logic, users see blank screens or unhandled promise rejections.</li>
+                <li><strong>Creating circular chunk dependencies</strong> — If chunk A dynamically imports chunk B, and chunk B imports chunk A, you get infinite loading or duplicate module instances.</li>
+                <li><strong>Using import() with fully dynamic paths</strong> — <code>import(userInput)</code> can't be analyzed at build time. The bundler either bundles everything in the directory or produces a warning and skips chunking entirely.</li>
+                <li><strong>Ignoring chunk size analysis</strong> — A dynamic import that produces a 3KB chunk adds more HTTP overhead than it saves. Only split when the chunk is substantial (>20KB).</li>
+                <li><strong>Sequential awaits instead of parallel</strong> — Writing <code>await import(A); await import(B);</code> creates a waterfall. Use <code>Promise.all</code> for independent chunks.</li>
+                <li><strong>Not considering the cascade</strong> — A chunk might have its own dynamic imports (nested chunks). This creates a loading waterfall: main → chunk A → chunk A's dependency. Use prefetch hints or flatten the chain.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Dynamic Import Chunking When...</h3>
+                <p>You can trace the full lifecycle of a dynamic import from source code through bundler transformation to runtime execution: how the bundler decides chunk boundaries, how the runtime resolves chunk URLs from the manifest, how the browser fetches and executes the chunk, and what happens when any step in that chain fails.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a multi-route app with Vite. Add a dynamic import with a template literal path (<code>import(`./pages/${name}.js`)</code>). Inspect the build output to see how Rollup creates context-module chunks. Then intentionally break one chunk URL and implement graceful error recovery with retry logic and user feedback.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Dynamic Import Chunking connects to: <strong>Code Splitting Strategies</strong> (the higher-level patterns that use dynamic imports), <strong>Tree Shaking</strong> (dead code elimination within each chunk), and <strong>Module Federation</strong> (sharing dynamic chunks across independently deployed applications).</p>
+            </div>
+
+
+            <div class="nav-footer">
+                <a href="21-code-splitting-strategies.html" class="nav-btn nav-btn-prev">← Code Splitting Strategies</a>
+                <a href="23-module-federation.html" class="nav-btn nav-btn-next">Module Federation →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

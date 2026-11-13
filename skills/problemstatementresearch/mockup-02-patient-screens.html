@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HealthBridge — Patient Journey Screens (File 2 of 4)</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#0F172A;color:#F8FAFC;line-height:1.5}
+
+    .page-header{background:linear-gradient(135deg,#0D9488,#3B82F6);padding:3rem 2rem;text-align:center}
+    .page-header .file-badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
+      border-radius:20px;padding:.25rem .9rem;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:.8rem}
+    .page-header h1{font-size:2.2rem;font-weight:800;margin-bottom:.4rem}
+    .page-header p{font-size:1rem;opacity:.85;max-width:580px;margin:0 auto}
+
+    .file-nav{background:#1E293B;padding:1rem 2rem;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;
+      border-bottom:1px solid #334155}
+    .file-nav a{color:#94A3B8;text-decoration:none;font-size:.8rem;padding:.3rem .7rem;border-radius:6px;
+      border:1px solid #334155;transition:.2s}
+    .file-nav a:hover,.file-nav a.active{background:#0D9488;color:white;border-color:#0D9488}
+
+    .section{padding:2.5rem 2rem;border-bottom:1px solid #1E293B}
+    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#64748B;margin-bottom:.4rem}
+    .section h2{font-size:1.5rem;font-weight:800;margin-bottom:.4rem}
+    .section .desc{font-size:.88rem;color:#94A3B8;max-width:900px;margin-bottom:2rem}
+
+    /* FLOW LABEL */
+    .flow-title{display:inline-flex;align-items:center;gap:.6rem;background:#1E293B;border:1px solid #334155;
+      border-radius:8px;padding:.4rem .9rem;font-size:.78rem;font-weight:700;color:#94A3B8;margin-bottom:1.5rem}
+    .flow-title .step-num{background:#0D9488;color:white;border-radius:50%;width:20px;height:20px;
+      display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0}
+
+    /* ARROW */
+    .arrow-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .flow-arrow{font-size:1.5rem;color:#334155;flex-shrink:0;align-self:center;margin-top:20px}
+
+    /* PHONE */
+    .phone{flex-shrink:0;width:260px}
+    .phone-label{text-align:center;font-size:.72rem;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem}
+    .phone-device{background:#1a1a2e;border-radius:36px;padding:9px;
+      box-shadow:0 0 0 2px #2a2a4a,0 24px 60px rgba(0,0,0,.5);position:relative}
+    .phone-notch{width:80px;height:20px;background:#1a1a2e;border-radius:0 0 12px 12px;
+      position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:5}
+    .phone-screen{border-radius:28px;overflow:hidden;height:540px;display:flex;flex-direction:column;
+      background:#F8FAFC}
+    .status-bar{display:flex;justify-content:space-between;align-items:center;
+      padding:24px 16px 5px;font-size:10px;font-weight:700;flex-shrink:0}
+    .bottom-nav{display:flex;border-top:1px solid #F1F5F9;flex-shrink:0;background:white}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0 8px;gap:2px}
+    .nav-item .ni{font-size:16px}
+    .nav-item .nl{font-size:8px;font-weight:600;color:#94A3B8}
+    .nav-item.a .nl{color:#0D9488}
+    .scr{overflow-y:auto;flex:1}
+    .scr::-webkit-scrollbar{display:none}
+
+    /* desktop mockup */
+    .desktop-frame{background:#1E293B;border-radius:12px;border:1.5px solid #334155;overflow:hidden;
+      box-shadow:0 16px 48px rgba(0,0,0,.4)}
+    .desktop-topbar{background:#334155;height:32px;display:flex;align-items:center;padding:0 .8rem;gap:.4rem}
+    .desktop-dot{width:10px;height:10px;border-radius:50%}
+    .desktop-url{flex:1;background:#1E293B;border-radius:4px;height:18px;margin:0 .5rem;display:flex;align-items:center;
+      padding:0 .5rem;font-size:.65rem;color:#64748B}
+    .desktop-screen{display:flex;height:420px}
+    .desktop-sidebar{width:180px;background:#0F172A;border-right:1px solid #334155;padding:.75rem 0;flex-shrink:0}
+    .ds-logo{padding:.4rem .8rem .7rem;border-bottom:1px solid #1E293B;margin-bottom:.4rem}
+    .ds-logo div:first-child{font-size:.82rem;font-weight:800;color:white}
+    .ds-logo div:last-child{font-size:.65rem;color:#64748B}
+    .ds-item{padding:.45rem .8rem;display:flex;align-items:center;gap:.5rem;font-size:.73rem;color:#64748B;cursor:pointer}
+    .ds-item.act{background:#0D948820;color:#14B8A6;border-left:3px solid #0D9488}
+    .ds-item.act .di{color:#14B8A6}
+    .di{font-size:14px}
+    .desktop-content{flex:1;overflow:hidden;padding:.75rem}
+    .annotation{background:#1E293B;border-left:3px solid #0D9488;border-radius:0 8px 8px 0;
+      padding:.75rem 1rem;font-size:.82rem;color:#CBD5E1;margin-top:.75rem}
+    .annotation strong{color:#F8FAFC;display:block;margin-bottom:.2rem}
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="file-badge">📱 File 2 of 4 — Patient Journey</div>
+  <h1>Patient Experience Screens</h1>
+  <p>Complete patient flow — onboarding to daily use. Design A (Clinical Clarity) used throughout. Annotated with UX decisions.</p>
+</div>
+<div class="file-nav">
+  <a href="mockup-01-design-systems.html">1 · Design Systems</a>
+  <a href="mockup-02-patient-screens.html" class="active">2 · Patient Journey</a>
+  <a href="mockup-03-doctor-screens.html">3 · Doctor Experience</a>
+  <a href="mockup-04-clinic-admin.html">4 · Clinic Admin</a>
+</div>
+
+<!-- ══════════════════════════════
+     FLOW 1: ONBOARDING
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Flow 1</div>
+  <h2>Patient Onboarding</h2>
+  <div class="desc">First-time patient signup — independent of any clinic. 3 screens, under 2 minutes. No irrelevant fields.</div>
+
+  <div class="arrow-row">
+
+    <!-- S1: Splash -->
+    <div class="phone">
+      <div class="phone-label">1a — Splash</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" style="background:linear-gradient(160deg,#0D9488 0%,#0F766E 50%,#134E4A 100%)">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
+            <div style="width:72px;height:72px;background:rgba(255,255,255,.15);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:32px;border:2px solid rgba(255,255,255,.25);margin-bottom:1rem">🏥</div>
+            <div style="color:white;font-size:1.5rem;font-weight:800;letter-spacing:-.5px">HealthBridge</div>
+            <div style="color:rgba(255,255,255,.6);font-size:.75rem;margin-top:.25rem">आपकी सेहत, हमेशा साथ</div>
+            <!-- dots -->
+            <div style="display:flex;gap:.4rem;margin-top:3rem">
+              <div style="width:20px;height:6px;background:white;border-radius:3px"></div>
+              <div style="width:6px;height:6px;background:rgba(255,255,255,.4);border-radius:3px"></div>
+              <div style="width:6px;height:6px;background:rgba(255,255,255,.4);border-radius:3px"></div>
+            </div>
+            <div style="color:white;font-size:.85rem;font-weight:600;margin-top:.8rem">All your reports in one place</div>
+            <div style="color:rgba(255,255,255,.6);font-size:.72rem;text-align:center;margin-top:.3rem;max-width:180px">Upload any report, get AI explanation in your language</div>
+          </div>
+          <div style="padding:1.5rem">
+            <div style="background:white;color:#0D9488;text-align:center;padding:.75rem;border-radius:14px;font-size:.9rem;font-weight:700;margin-bottom:.6rem">Create Free Account</div>
+            <div style="border:1.5px solid rgba(255,255,255,.3);color:white;text-align:center;padding:.65rem;border-radius:14px;font-size:.85rem;font-weight:600">Already have account? Sign In</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- S2: Register -->
+    <div class="phone">
+      <div class="phone-label">1b — Register</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:white">
+            <div style="background:#0D9488;padding:.7rem 1rem .9rem">
+              <div style="color:rgba(255,255,255,.7);font-size:.68rem;margin-bottom:.2rem">Step 1 of 2</div>
+              <div style="color:white;font-size:.95rem;font-weight:700">Create your account</div>
+              <div style="background:rgba(255,255,255,.2);border-radius:20px;height:4px;margin-top:.6rem;overflow:hidden">
+                <div style="width:50%;height:100%;background:white;border-radius:20px"></div>
+              </div>
+            </div>
+            <div style="padding:1rem .9rem">
+              <div style="font-size:.75rem;font-weight:600;color:#374151;margin-bottom:.3rem">Full Name</div>
+              <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:.6rem .8rem;font-size:.82rem;color:#0F172A;margin-bottom:.75rem">Meena Sharma</div>
+
+              <div style="font-size:.75rem;font-weight:600;color:#374151;margin-bottom:.3rem">Mobile Number</div>
+              <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:.6rem .8rem;font-size:.82rem;color:#94A3B8;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem"><span style="color:#374151;font-size:.75rem">+91</span><span>98XXXXXXXX</span></div>
+
+              <div style="font-size:.75rem;font-weight:600;color:#374151;margin-bottom:.3rem">Date of Birth</div>
+              <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:.6rem .8rem;font-size:.82rem;color:#94A3B8;margin-bottom:.75rem">DD / MM / YYYY</div>
+
+              <div style="font-size:.75rem;font-weight:600;color:#374151;margin-bottom:.4rem">Preferred Language</div>
+              <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.9rem">
+                <div style="background:#0D9488;color:white;border-radius:20px;padding:.25rem .7rem;font-size:.72rem;font-weight:700">English</div>
+                <div style="background:#F0FDFA;border:1px solid #99F6E4;color:#0D9488;border-radius:20px;padding:.25rem .7rem;font-size:.72rem">हिंदी</div>
+                <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.25rem .7rem;font-size:.72rem">தமிழ்</div>
+                <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.25rem .7rem;font-size:.72rem">বাংলা</div>
+                <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.25rem .7rem;font-size:.72rem">తెలుగు</div>
+              </div>
+
+              <div style="background:#0D9488;color:white;text-align:center;padding:.7rem;border-radius:12px;font-size:.88rem;font-weight:700">Continue →</div>
+              <div style="text-align:center;font-size:.68rem;color:#94A3B8;margin-top:.6rem">🔒 Your data is private and encrypted</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- S3: OTP -->
+    <div class="phone">
+      <div class="phone-label">1c — OTP Verify</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:white">
+            <div style="background:#0D9488;padding:.7rem 1rem .9rem">
+              <div style="color:rgba(255,255,255,.7);font-size:.68rem;margin-bottom:.2rem">Step 2 of 2</div>
+              <div style="color:white;font-size:.95rem;font-weight:700">Verify your number</div>
+              <div style="background:rgba(255,255,255,.2);border-radius:20px;height:4px;margin-top:.6rem;overflow:hidden">
+                <div style="width:100%;height:100%;background:white;border-radius:20px"></div>
+              </div>
+            </div>
+            <div style="padding:1.5rem .9rem;text-align:center">
+              <div style="font-size:2.5rem;margin-bottom:.8rem">📱</div>
+              <div style="font-size:.9rem;font-weight:700;color:#0F172A;margin-bottom:.3rem">Enter OTP</div>
+              <div style="font-size:.78rem;color:#64748B;margin-bottom:1.5rem">Sent to <strong>+91 98XXXXXXXX</strong></div>
+              <!-- OTP boxes -->
+              <div style="display:flex;gap:.5rem;justify-content:center;margin-bottom:1.5rem">
+                <div style="width:44px;height:50px;border:2px solid #0D9488;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;color:#0D9488">4</div>
+                <div style="width:44px;height:50px;border:2px solid #0D9488;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;color:#0D9488">7</div>
+                <div style="width:44px;height:50px;border:2px solid #0D9488;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;color:#0D9488">2</div>
+                <div style="width:44px;height:50px;border:2px solid #0D9488;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;color:#94A3B8">_</div>
+              </div>
+              <div style="background:#0D9488;color:white;text-align:center;padding:.7rem;border-radius:12px;font-size:.88rem;font-weight:700;margin-bottom:.8rem">Verify & Continue</div>
+              <div style="font-size:.72rem;color:#94A3B8">Didn't receive? <span style="color:#0D9488;font-weight:600">Resend in 25s</span></div>
+              <div style="font-size:.72rem;color:#94A3B8;margin-top:.4rem">Or <span style="color:#0D9488;font-weight:600">login via WhatsApp OTP</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- S4: Done + Home -->
+    <div class="phone">
+      <div class="phone-label">1d — Account Created!</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:white;padding:1.5rem .9rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+            <div style="width:72px;height:72px;background:#F0FDF4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:.8rem;border:3px solid #22C55E">✅</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#0F172A;margin-bottom:.3rem">Welcome, Meena!</div>
+            <div style="font-size:.8rem;color:#64748B;margin-bottom:2rem;max-width:200px">Your health record is ready. Let's add your first report.</div>
+
+            <div style="width:100%">
+              <div style="background:#0D9488;color:white;text-align:center;padding:.7rem;border-radius:12px;font-size:.88rem;font-weight:700;margin-bottom:.5rem">📁 Upload a Report Now</div>
+              <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;color:#374151;text-align:center;padding:.65rem;border-radius:12px;font-size:.85rem;font-weight:600">Skip · Explore First</div>
+            </div>
+
+            <div style="margin-top:2rem;background:#F0FDFA;border:1px solid #99F6E4;border-radius:12px;padding:.9rem;width:100%;text-align:left">
+              <div style="font-size:.7rem;font-weight:700;color:#0D9488;margin-bottom:.5rem">📍 WHAT YOU CAN DO</div>
+              <div style="font-size:.75rem;color:#374151;display:flex;flex-direction:column;gap:.3rem">
+                <div>📁 Upload reports from any clinic</div>
+                <div>🤖 Get AI explanations in Hindi</div>
+                <div>📅 Book appointments online</div>
+                <div>💊 Track your medicines</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end arrow-row -->
+
+  <div class="annotation"><strong>Onboarding UX Notes</strong>
+  Only 2 required fields at signup (name + mobile). Date of birth and language are optional but shown because they immediately improve the experience. OTP over password — lower friction for semi-digital users. "Login via WhatsApp OTP" is the India-specific killer feature — zero password fatigue.</div>
+</div>
+
+<!-- ══════════════════════════════
+     FLOW 2: REPORT UPLOAD
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Flow 2</div>
+  <h2>Upload Report + AI Analysis</h2>
+  <div class="desc">The core patient value: snap a photo of any lab report → AI extracts data → explains in plain language → saved forever.</div>
+
+  <div class="arrow-row">
+
+    <!-- Reports list -->
+    <div class="phone">
+      <div class="phone-label">My Reports</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:#0D9488;padding:.7rem 1rem">
+              <div style="color:rgba(255,255,255,.7);font-size:.68rem">All Reports</div>
+              <div style="color:white;font-size:.95rem;font-weight:700">My Health Records</div>
+            </div>
+            <!-- search + filter -->
+            <div style="padding:.6rem .8rem;background:white;border-bottom:1px solid #F1F5F9;display:flex;gap:.4rem">
+              <div style="flex:1;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:8px;padding:.4rem .6rem;font-size:.72rem;color:#94A3B8;display:flex;align-items:center;gap:.3rem"><span>🔍</span> Search reports…</div>
+              <div style="background:#F0FDFA;border:1px solid #99F6E4;border-radius:8px;padding:.4rem .6rem;font-size:.72rem;color:#0D9488">Filter</div>
+            </div>
+            <!-- filter chips -->
+            <div style="padding:.5rem .8rem;display:flex;gap:.35rem;background:white;border-bottom:1px solid #F1F5F9">
+              <div style="background:#0D9488;color:white;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;font-weight:700">All</div>
+              <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">Blood</div>
+              <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">Radiology</div>
+              <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">ECG</div>
+            </div>
+            <!-- report items -->
+            <div style="padding:.5rem .7rem">
+              <div style="font-size:.68rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:.4rem 0 .3rem">MAY 2026</div>
+              <div style="background:white;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:.4rem">
+                <div style="padding:.6rem .75rem;display:flex;align-items:center;gap:.55rem">
+                  <div style="width:36px;height:36px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🩸</div>
+                  <div style="flex:1">
+                    <div style="font-size:.8rem;font-weight:700;color:#0F172A">Blood CBC Panel</div>
+                    <div style="font-size:.67rem;color:#94A3B8">Thyrocare · 28 May 2026</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                    <span style="background:#F0FDF4;color:#16A34A;border-radius:4px;padding:.1rem .4rem;font-size:.62rem;font-weight:700">Normal</span>
+                    <span style="color:#94A3B8;font-size:.62rem">→</span>
+                  </div>
+                </div>
+              </div>
+              <div style="background:white;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:.4rem">
+                <div style="padding:.6rem .75rem;display:flex;align-items:center;gap:.55rem">
+                  <div style="width:36px;height:36px;background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🧪</div>
+                  <div style="flex:1">
+                    <div style="font-size:.8rem;font-weight:700;color:#0F172A">Lipid Profile</div>
+                    <div style="font-size:.67rem;color:#94A3B8">Dr. Lal PathLabs · 20 May</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                    <span style="background:#FFFBEB;color:#D97706;border-radius:4px;padding:.1rem .4rem;font-size:.62rem;font-weight:700">Review</span>
+                    <span style="color:#94A3B8;font-size:.62rem">→</span>
+                  </div>
+                </div>
+              </div>
+              <div style="background:white;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:.4rem">
+                <div style="padding:.6rem .75rem;display:flex;align-items:center;gap:.55rem">
+                  <div style="width:36px;height:36px;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">❤️</div>
+                  <div style="flex:1">
+                    <div style="font-size:.8rem;font-weight:700;color:#0F172A">ECG Report</div>
+                    <div style="font-size:.67rem;color:#94A3B8">Apollo Clinic · 14 May</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                    <span style="background:#F0FDF4;color:#16A34A;border-radius:4px;padding:.1rem .4rem;font-size:.62rem;font-weight:700">Normal</span>
+                    <span style="color:#94A3B8;font-size:.62rem">→</span>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size:.68rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin:.5rem 0 .3rem">APRIL 2026</div>
+              <div style="background:white;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:.4rem">
+                <div style="padding:.6rem .75rem;display:flex;align-items:center;gap:.55rem">
+                  <div style="width:36px;height:36px;background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🫁</div>
+                  <div style="flex:1">
+                    <div style="font-size:.8rem;font-weight:700;color:#0F172A">Chest X-Ray</div>
+                    <div style="font-size:.67rem;color:#94A3B8">City Hospital · 2 Apr</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                    <span style="background:#F0FDF4;color:#16A34A;border-radius:4px;padding:.1rem .4rem;font-size:.62rem;font-weight:700">Normal</span>
+                    <span style="color:#94A3B8;font-size:.62rem">→</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- FAB upload button -->
+          <div style="position:absolute;bottom:52px;right:12px;width:44px;height:44px;background:#0D9488;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(13,148,136,.4);z-index:10">+</div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item"><div class="ni">📋</div><div class="nl">Journal</div></div>
+            <div class="nav-item a"><div class="ni">📁</div><div class="nl" style="color:#0D9488">Reports</div></div>
+            <div class="nav-item"><div class="ni">📅</div><div class="nl">Appts</div></div>
+            <div class="nav-item"><div class="ni">⋯</div><div class="nl">More</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- Upload modal -->
+    <div class="phone">
+      <div class="phone-label">Upload Report</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:white">
+            <div style="background:#0D9488;padding:.7rem 1rem;display:flex;align-items:center;gap:.5rem">
+              <span style="color:rgba(255,255,255,.7);font-size:14px">✕</span>
+              <div style="color:white;font-size:.9rem;font-weight:700">Upload Report</div>
+            </div>
+            <div style="padding:.9rem .9rem">
+              <!-- upload area -->
+              <div style="border:2px dashed #0D9488;border-radius:14px;padding:1.5rem;text-align:center;background:#F0FDFA;margin-bottom:.9rem">
+                <div style="font-size:2.5rem;margin-bottom:.4rem">📷</div>
+                <div style="font-size:.85rem;font-weight:700;color:#0F172A;margin-bottom:.25rem">Take a photo or upload</div>
+                <div style="font-size:.72rem;color:#64748B;margin-bottom:.9rem">Any lab report, prescription, scan or X-ray</div>
+                <div style="display:flex;gap:.5rem;justify-content:center">
+                  <div style="background:#0D9488;color:white;border-radius:8px;padding:.45rem .8rem;font-size:.75rem;font-weight:700">📷 Camera</div>
+                  <div style="background:#F0FDFA;border:1.5px solid #0D9488;color:#0D9488;border-radius:8px;padding:.45rem .8rem;font-size:.75rem;font-weight:700">📁 Gallery</div>
+                </div>
+              </div>
+
+              <!-- preview (after upload) -->
+              <div style="background:#F8FAFC;border-radius:10px;padding:.7rem;margin-bottom:.7rem;border:1.5px solid #E2E8F0">
+                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
+                  <div style="width:40px;height:50px;background:linear-gradient(135deg,#E2E8F0,#CBD5E1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🧾</div>
+                  <div style="flex:1">
+                    <div style="font-size:.78rem;font-weight:700;color:#0F172A">CBC_Report_May28.jpg</div>
+                    <div style="font-size:.68rem;color:#94A3B8">Uploaded · 1.2 MB</div>
+                    <div style="background:#E2E8F0;border-radius:20px;height:4px;margin-top:.3rem;overflow:hidden">
+                      <div style="width:75%;height:100%;background:#0D9488;border-radius:20px"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="font-size:.75rem;font-weight:600;color:#374151;margin-bottom:.35rem">Report Type</div>
+              <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.7rem">
+                <div style="background:#0D9488;color:white;border-radius:20px;padding:.25rem .6rem;font-size:.68rem;font-weight:700">🩸 Blood Test</div>
+                <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.25rem .6rem;font-size:.68rem">🫁 Radiology</div>
+                <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.25rem .6rem;font-size:.68rem">❤️ ECG</div>
+                <div style="background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B;border-radius:20px;padding:.25rem .6rem;font-size:.68rem">💊 Prescription</div>
+              </div>
+
+              <div style="font-size:.75rem;font-weight:600;color:#374151;margin-bottom:.35rem">Clinic / Lab (optional)</div>
+              <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;padding:.55rem .8rem;font-size:.78rem;color:#94A3B8;margin-bottom:.9rem">e.g., Thyrocare, Dr. Lal…</div>
+
+              <div style="background:#0D9488;color:white;text-align:center;padding:.72rem;border-radius:12px;font-size:.88rem;font-weight:700">🤖 Analyze with AI</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- AI Processing -->
+    <div class="phone">
+      <div class="phone-label">AI Processing</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;text-align:center">
+            <!-- animated pulse circle -->
+            <div style="width:80px;height:80px;background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:1rem;box-shadow:0 0 0 16px #0D948820">🤖</div>
+            <div style="font-size:.95rem;font-weight:700;color:#0F172A;margin-bottom:.35rem">Analyzing your report…</div>
+            <div style="font-size:.75rem;color:#64748B;margin-bottom:1.5rem;max-width:180px">Reading values, comparing ranges, preparing your summary</div>
+            <!-- steps -->
+            <div style="background:#F8FAFC;border-radius:12px;padding:.9rem;width:100%;text-align:left">
+              <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
+                <span style="color:#22C55E;font-size:14px">✓</span>
+                <span style="font-size:.75rem;color:#374151">Report photo extracted</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
+                <span style="color:#22C55E;font-size:14px">✓</span>
+                <span style="font-size:.75rem;color:#374151">OCR text recognized</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
+                <div style="width:14px;height:14px;border-radius:50%;border:2px solid #0D9488;border-top-color:transparent;flex-shrink:0"></div>
+                <span style="font-size:.75rem;color:#0D9488;font-weight:600">Understanding values…</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:.5rem;opacity:.4">
+                <div style="width:14px;height:14px;border-radius:50%;border:2px solid #CBD5E1;flex-shrink:0"></div>
+                <span style="font-size:.75rem;color:#94A3B8">Generating explanation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- AI Result -->
+    <div class="phone">
+      <div class="phone-label">AI Report Ready</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:#0D9488;padding:.7rem 1rem;display:flex;align-items:center;gap:.5rem">
+              <span style="color:rgba(255,255,255,.7);font-size:14px">←</span>
+              <div>
+                <div style="color:white;font-size:.85rem;font-weight:700">Blood CBC Panel</div>
+                <div style="color:rgba(255,255,255,.65);font-size:.67rem">28 May 2026 · Thyrocare</div>
+              </div>
+              <div style="margin-left:auto;font-size:.68rem;color:rgba(255,255,255,.7)">🌐 EN</div>
+            </div>
+            <div style="padding:.7rem .75rem">
+              <!-- AI card -->
+              <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:12px;padding:.9rem;color:white;margin-bottom:.65rem">
+                <div style="font-size:.65rem;font-weight:700;opacity:.75;margin-bottom:.3rem">🤖 AI EXPLANATION — Simple Language</div>
+                <div style="font-size:.78rem;line-height:1.5;margin-bottom:.5rem">Your blood test is <strong>mostly normal</strong>. Haemoglobin is a little low (11.2 g/dL) — this means your blood has slightly less oxygen-carrying capacity. You may feel more tired than usual. This can be improved with diet.</div>
+                <div style="font-size:.65rem;opacity:.65;font-style:italic">For information only. Always follow your doctor's advice.</div>
+              </div>
+              <!-- values table -->
+              <div style="background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.05);margin-bottom:.65rem">
+                <div style="display:flex;padding:.45rem .7rem;background:#F8FAFC;font-size:.65rem;font-weight:700;color:#94A3B8;border-bottom:1px solid #F1F5F9">
+                  <div style="flex:1.5">Test</div><div style="flex:1;text-align:right">Value</div><div style="flex:1;text-align:right">Normal</div><div style="flex:.5;text-align:right"></div>
+                </div>
+                <div style="display:flex;padding:.45rem .7rem;border-bottom:1px solid #F1F5F9;align-items:center">
+                  <div style="flex:1.5;font-size:.75rem;color:#334155">Haemoglobin</div>
+                  <div style="flex:1;text-align:right;font-size:.75rem;font-weight:700;color:#F59E0B">11.2</div>
+                  <div style="flex:1;text-align:right;font-size:.65rem;color:#94A3B8">12–16</div>
+                  <div style="flex:.5;text-align:right"><div style="width:6px;height:6px;border-radius:50%;background:#F59E0B;display:inline-block"></div></div>
+                </div>
+                <div style="display:flex;padding:.45rem .7rem;border-bottom:1px solid #F1F5F9;align-items:center">
+                  <div style="flex:1.5;font-size:.75rem;color:#334155">WBC</div>
+                  <div style="flex:1;text-align:right;font-size:.75rem;font-weight:700;color:#22C55E">7,200</div>
+                  <div style="flex:1;text-align:right;font-size:.65rem;color:#94A3B8">4K–11K</div>
+                  <div style="flex:.5;text-align:right"><div style="width:6px;height:6px;border-radius:50%;background:#22C55E;display:inline-block"></div></div>
+                </div>
+                <div style="display:flex;padding:.45rem .7rem;align-items:center">
+                  <div style="flex:1.5;font-size:.75rem;color:#334155">Platelets</div>
+                  <div style="flex:1;text-align:right;font-size:.75rem;font-weight:700;color:#22C55E">2.1L</div>
+                  <div style="flex:1;text-align:right;font-size:.65rem;color:#94A3B8">1.5–4L</div>
+                  <div style="flex:.5;text-align:right"><div style="width:6px;height:6px;border-radius:50%;background:#22C55E;display:inline-block"></div></div>
+                </div>
+              </div>
+              <!-- ask AI input -->
+              <div style="background:white;border-radius:10px;padding:.7rem;box-shadow:0 2px 6px rgba(0,0,0,.05)">
+                <div style="font-size:.68rem;font-weight:700;color:#0D9488;margin-bottom:.4rem">Ask anything about this report</div>
+                <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.4rem">
+                  <div style="background:#F0FDFA;border:1px solid #99F6E4;border-radius:20px;padding:.2rem .5rem;font-size:.65rem;color:#0D9488">Iron-rich foods?</div>
+                  <div style="background:#F0FDFA;border:1px solid #99F6E4;border-radius:20px;padding:.2rem .5rem;font-size:.65rem;color:#0D9488">Is this serious?</div>
+                  <div style="background:#F0FDFA;border:1px solid #99F6E4;border-radius:20px;padding:.2rem .5rem;font-size:.65rem;color:#0D9488">हिंदी में समझाएं</div>
+                </div>
+                <div style="display:flex;gap:.35rem">
+                  <div style="flex:1;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:8px;padding:.45rem .6rem;font-size:.7rem;color:#94A3B8">Type your question…</div>
+                  <div style="background:#0D9488;border-radius:8px;padding:.45rem .55rem;font-size:.75rem;color:white">↑</div>
+                </div>
+              </div>
+              <div style="height:8px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item"><div class="ni">📋</div><div class="nl">Journal</div></div>
+            <div class="nav-item a"><div class="ni">📁</div><div class="nl" style="color:#0D9488">Reports</div></div>
+            <div class="nav-item"><div class="ni">📅</div><div class="nl">Appts</div></div>
+            <div class="nav-item"><div class="ni">⋯</div><div class="nl">More</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end arrow-row 2 -->
+  <div class="annotation"><strong>Report Upload UX Notes</strong>
+  FAB (floating action button) for upload is always visible on the reports page — one tap to start. Camera option shown first because most Indian patients have physical reports. OCR progress shown as steps to build trust. AI output always has a disclaimer. "हिंदी में समझाएं" quick chip is a killer feature — most Indian patients will immediately tap this.</div>
+</div>
+
+<!-- ══════════════════════════════
+     FLOW 3: BOOK APPOINTMENT
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Flow 3</div>
+  <h2>Book an Appointment</h2>
+  <div class="desc">Patient books a slot at a connected clinic — 3 taps. Or schedules a follow-up from a reminder.</div>
+
+  <div class="arrow-row">
+
+    <!-- Search clinic -->
+    <div class="phone">
+      <div class="phone-label">Find a Clinic</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:#0D9488;padding:.7rem 1rem">
+              <div style="color:white;font-size:.95rem;font-weight:700">Book Appointment</div>
+            </div>
+            <div style="padding:.6rem .8rem">
+              <div style="background:white;border:1.5px solid #E2E8F0;border-radius:10px;padding:.5rem .7rem;font-size:.78rem;color:#94A3B8;display:flex;align-items:center;gap:.4rem;margin-bottom:.7rem;box-shadow:0 2px 6px rgba(0,0,0,.05)">🔍 <span>Search doctor or clinic…</span></div>
+              <div style="font-size:.68rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.4rem">YOUR CONNECTED CLINICS</div>
+              <!-- clinic 1 -->
+              <div style="background:white;border-radius:12px;padding:.85rem;margin-bottom:.5rem;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+                <div style="display:flex;gap:.6rem;align-items:flex-start">
+                  <div style="width:40px;height:40px;background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏥</div>
+                  <div style="flex:1">
+                    <div style="font-size:.82rem;font-weight:700;color:#0F172A">Apollo Clinic, Andheri</div>
+                    <div style="font-size:.7rem;color:#64748B">General Medicine · 3 doctors</div>
+                    <div style="font-size:.68rem;color:#22C55E;margin-top:2px;font-weight:600">● Open · Next slot: Tomorrow 10 AM</div>
+                  </div>
+                  <div style="background:#0D9488;color:white;border-radius:8px;padding:.3rem .6rem;font-size:.72rem;font-weight:700">Book</div>
+                </div>
+              </div>
+              <!-- clinic 2 -->
+              <div style="background:white;border-radius:12px;padding:.85rem;margin-bottom:.5rem;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+                <div style="display:flex;gap:.6rem;align-items:flex-start">
+                  <div style="width:40px;height:40px;background:linear-gradient(135deg,#3B82F6,#60A5FA);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🩺</div>
+                  <div style="flex:1">
+                    <div style="font-size:.82rem;font-weight:700;color:#0F172A">Dr. Priya Mehta Clinic</div>
+                    <div style="font-size:.7rem;color:#64748B">Diabetologist · Bandra West</div>
+                    <div style="font-size:.68rem;color:#22C55E;margin-top:2px;font-weight:600">● Open · Next slot: Today 3 PM</div>
+                  </div>
+                  <div style="background:#0D9488;color:white;border-radius:8px;padding:.3rem .6rem;font-size:.72rem;font-weight:700">Book</div>
+                </div>
+              </div>
+              <div style="font-size:.68rem;font-weight:700;color:#64748B;text-transform:uppercase;margin:.5rem 0 .4rem">NEARBY CLINICS ON HEALTHBRIDGE</div>
+              <div style="background:white;border-radius:12px;padding:.85rem;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+                <div style="display:flex;gap:.6rem;align-items:flex-start">
+                  <div style="width:40px;height:40px;background:linear-gradient(135deg,#8B5CF6,#A78BFA);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏥</div>
+                  <div style="flex:1">
+                    <div style="font-size:.82rem;font-weight:700;color:#0F172A">Shree Clinic</div>
+                    <div style="font-size:.7rem;color:#64748B">Multi-specialty · Goregaon</div>
+                    <div style="font-size:.68rem;color:#F59E0B;margin-top:2px;font-weight:600">⏱ Next slot: Monday 9 AM</div>
+                  </div>
+                  <div style="background:#0D9488;color:white;border-radius:8px;padding:.3rem .6rem;font-size:.72rem;font-weight:700">Book</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item"><div class="ni">�</div><div class="nl">Journal</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item a"><div class="ni">📅</div><div class="nl" style="color:#0D9488">Appts</div></div>
+            <div class="nav-item"><div class="ni">⋯</div><div class="nl">More</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- Pick slot -->
+    <div class="phone">
+      <div class="phone-label">Pick a Slot</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:#0D9488;padding:.7rem 1rem;display:flex;align-items:center;gap:.5rem">
+              <span style="color:rgba(255,255,255,.7);font-size:14px">←</span>
+              <div>
+                <div style="color:white;font-size:.85rem;font-weight:700">Apollo Clinic</div>
+                <div style="color:rgba(255,255,255,.65);font-size:.67rem">Select doctor & time</div>
+              </div>
+            </div>
+            <div style="padding:.65rem .8rem">
+              <!-- doctor select -->
+              <div style="font-size:.68rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Select Doctor</div>
+              <div style="display:flex;gap:.4rem;margin-bottom:.75rem">
+                <div style="flex:1;border:2px solid #0D9488;border-radius:10px;padding:.5rem;text-align:center;background:#F0FDFA">
+                  <div style="font-size:16px;margin-bottom:2px">👩‍⚕️</div>
+                  <div style="font-size:.68rem;font-weight:700;color:#0D9488">Dr. Priya</div>
+                  <div style="font-size:.6rem;color:#64748B">General</div>
+                </div>
+                <div style="flex:1;border:1.5px solid #E2E8F0;border-radius:10px;padding:.5rem;text-align:center">
+                  <div style="font-size:16px;margin-bottom:2px">👨‍⚕️</div>
+                  <div style="font-size:.68rem;font-weight:700;color:#374151">Dr. Amit</div>
+                  <div style="font-size:.6rem;color:#64748B">Cardio</div>
+                </div>
+                <div style="flex:1;border:1.5px solid #E2E8F0;border-radius:10px;padding:.5rem;text-align:center">
+                  <div style="font-size:16px;margin-bottom:2px">👩‍⚕️</div>
+                  <div style="font-size:.68rem;font-weight:700;color:#374151">Dr. Sonal</div>
+                  <div style="font-size:.6rem;color:#64748B">Gynec</div>
+                </div>
+              </div>
+
+              <!-- date picker -->
+              <div style="font-size:.68rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Select Date</div>
+              <div style="display:flex;gap:.35rem;margin-bottom:.75rem;overflow-x:auto;padding-bottom:.2rem">
+                <div style="flex-shrink:0;text-align:center;padding:.4rem .5rem;border-radius:8px;border:1.5px solid #E2E8F0">
+                  <div style="font-size:.6rem;color:#94A3B8">THU</div>
+                  <div style="font-size:.9rem;font-weight:700;color:#94A3B8">30</div>
+                </div>
+                <div style="flex-shrink:0;text-align:center;padding:.4rem .5rem;border-radius:8px;background:#0D9488;border:1.5px solid #0D9488">
+                  <div style="font-size:.6rem;color:rgba(255,255,255,.7)">FRI</div>
+                  <div style="font-size:.9rem;font-weight:700;color:white">31</div>
+                </div>
+                <div style="flex-shrink:0;text-align:center;padding:.4rem .5rem;border-radius:8px;border:1.5px solid #E2E8F0">
+                  <div style="font-size:.6rem;color:#94A3B8">SAT</div>
+                  <div style="font-size:.9rem;font-weight:700;color:#94A3B8">1</div>
+                </div>
+                <div style="flex-shrink:0;text-align:center;padding:.4rem .5rem;border-radius:8px;border:1.5px solid #E2E8F0">
+                  <div style="font-size:.6rem;color:#94A3B8">MON</div>
+                  <div style="font-size:.9rem;font-weight:700;color:#94A3B8">3</div>
+                </div>
+                <div style="flex-shrink:0;text-align:center;padding:.4rem .5rem;border-radius:8px;border:1.5px solid #E2E8F0">
+                  <div style="font-size:.6rem;color:#94A3B8">TUE</div>
+                  <div style="font-size:.9rem;font-weight:700;color:#94A3B8">4</div>
+                </div>
+              </div>
+
+              <!-- time slots -->
+              <div style="font-size:.68rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Available Slots — Fri 31 May</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.35rem;margin-bottom:.8rem">
+                <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:8px;padding:.4rem;text-align:center;font-size:.72rem;color:#94A3B8">9:00 AM</div>
+                <div style="background:#0D9488;border-radius:8px;padding:.4rem;text-align:center;font-size:.72rem;font-weight:700;color:white">11:00 AM ✓</div>
+                <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:8px;padding:.4rem;text-align:center;font-size:.72rem;color:#94A3B8">2:00 PM</div>
+                <div style="background:#F1F5F9;border-radius:8px;padding:.4rem;text-align:center;font-size:.72rem;color:#CBD5E1;text-decoration:line-through">3:00 PM</div>
+                <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:8px;padding:.4rem;text-align:center;font-size:.72rem;color:#94A3B8">4:00 PM</div>
+                <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:8px;padding:.4rem;text-align:center;font-size:.72rem;color:#94A3B8">5:30 PM</div>
+              </div>
+
+              <div style="background:#0D9488;color:white;text-align:center;padding:.7rem;border-radius:12px;font-size:.88rem;font-weight:700">Confirm Booking →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- Confirmed -->
+    <div class="phone">
+      <div class="phone-label">Confirmed + UPI Pay</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#0D9488;color:white"><span>9:41</span><div style="display:flex;gap:3px;font-size:9px"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:white;padding:1.2rem .9rem">
+            <!-- check -->
+            <div style="text-align:center;margin-bottom:1rem">
+              <div style="width:60px;height:60px;background:#F0FDF4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto .6rem;border:3px solid #22C55E">✅</div>
+              <div style="font-size:1rem;font-weight:800;color:#0F172A">Appointment Confirmed!</div>
+              <div style="font-size:.75rem;color:#64748B;margin-top:.2rem">WhatsApp confirmation sent</div>
+            </div>
+            <!-- booking summary -->
+            <div style="background:#F8FAFC;border-radius:12px;padding:.9rem;margin-bottom:.8rem;border:1.5px solid #E2E8F0">
+              <div style="display:flex;flex-direction:column;gap:.45rem">
+                <div style="display:flex;justify-content:space-between">
+                  <span style="font-size:.75rem;color:#64748B">Doctor</span>
+                  <span style="font-size:.75rem;font-weight:700;color:#0F172A">Dr. Priya Mehta</span>
+                </div>
+                <div style="display:flex;justify-content:space-between">
+                  <span style="font-size:.75rem;color:#64748B">Date & Time</span>
+                  <span style="font-size:.75rem;font-weight:700;color:#0F172A">Fri, 31 May · 11:00 AM</span>
+                </div>
+                <div style="display:flex;justify-content:space-between">
+                  <span style="font-size:.75rem;color:#64748B">Clinic</span>
+                  <span style="font-size:.75rem;font-weight:700;color:#0F172A">Apollo Clinic, Andheri</span>
+                </div>
+                <div style="height:1px;background:#E2E8F0"></div>
+                <div style="display:flex;justify-content:space-between">
+                  <span style="font-size:.78rem;font-weight:700;color:#0F172A">Consultation Fee</span>
+                  <span style="font-size:.78rem;font-weight:700;color:#0F172A">₹500</span>
+                </div>
+              </div>
+            </div>
+            <!-- payment -->
+            <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:12px;padding:.9rem;margin-bottom:.7rem">
+              <div style="font-size:.75rem;font-weight:700;color:#92400E;margin-bottom:.4rem">💳 Pay ₹500 via UPI</div>
+              <div style="font-size:.72rem;color:#78350F;margin-bottom:.6rem">Pay to: apollo-andheri@upi</div>
+              <div style="background:white;border:1.5px solid #FDE68A;border-radius:8px;padding:.5rem;text-align:center;font-size:.72rem;color:#92400E;font-weight:600;margin-bottom:.4rem">📸 Upload payment screenshot</div>
+              <div style="font-size:.65rem;color:#92400E;opacity:.7">Doctor will verify and confirm your spot</div>
+            </div>
+            <div style="font-size:.72rem;color:#94A3B8;text-align:center">Or pay at clinic · Still holds your slot</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end arrow-row 3 -->
+  <div class="annotation"><strong>Appointment Booking UX Notes</strong>
+  Date picker uses a horizontal scroll of days — not a full calendar modal (too complex for mobile). Crossed-out slots are visually struck through. UPI payment is a simple screenshot upload — no payment gateway complexity in MVP. "Or pay at clinic" removes the payment as a booking blocker — conversion rate optimization.</div>
+</div>
+
+<!-- Desktop Layout Preview -->
+<div class="section">
+  <div class="section-label">Desktop View</div>
+  <h2>Patient — Desktop / Tablet Layout</h2>
+  <div class="desc">Same Design A, responsive layout. Sidebar appears on screens >768px. All mobile screens reflow naturally.</div>
+
+  <div class="desktop-frame">
+    <div class="desktop-topbar">
+      <div class="desktop-dot" style="background:#EF4444"></div>
+      <div class="desktop-dot" style="background:#F59E0B"></div>
+      <div class="desktop-dot" style="background:#22C55E"></div>
+      <div class="desktop-url">🔒 healthbridge.in/patient/reports</div>
+    </div>
+    <div class="desktop-screen">
+      <!-- sidebar -->
+      <div class="desktop-sidebar">
+        <div class="ds-logo">
+          <div>HealthBridge</div>
+          <div>Patient Portal</div>
+        </div>
+        <div class="ds-item"><span class="di">📋</span>Health Journal</div>
+        <div class="ds-item act"><span class="di">📁</span>My Reports</div>
+        <div class="ds-item"><span class="di">📅</span>Appointments</div>
+        <div class="ds-item"><span class="di">💊</span>Medicines</div>
+        <div class="ds-item"><span class="di">🏥</span>My Clinics</div>
+        <div class="ds-item"><span class="di">💬</span>Messages</div>
+        <div style="border-top:1px solid #1E293B;margin-top:auto;padding-top:.5rem">
+          <div class="ds-item"><span class="di">⚙️</span>Settings</div>
+          <div class="ds-item"><span class="di">🌐</span>हिंदी</div>
+        </div>
+      </div>
+      <!-- content area -->
+      <div class="desktop-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem">
+          <div>
+            <div style="font-size:.7rem;color:#64748B">My Health Records</div>
+            <div style="font-size:.95rem;font-weight:700;color:#F8FAFC">7 Reports · Last updated 28 May</div>
+          </div>
+          <div style="display:flex;gap:.4rem">
+            <div style="background:#F8FAFC;border:1px solid #334155;border-radius:6px;padding:.3rem .6rem;font-size:.7rem;color:#64748B">🔍 Search</div>
+            <div style="background:#0D9488;border-radius:6px;padding:.3rem .7rem;font-size:.7rem;color:white;font-weight:600">+ Upload</div>
+          </div>
+        </div>
+        <!-- 2-column layout on desktop -->
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:.6rem;height:calc(100% - 48px)">
+          <!-- left: report list -->
+          <div style="background:#1E293B;border-radius:8px;overflow:hidden">
+            <div style="padding:.5rem .7rem;background:#334155;font-size:.65rem;font-weight:700;color:#94A3B8;text-transform:uppercase">All Reports</div>
+            <div style="overflow-y:auto;height:calc(100% - 30px)">
+              <div style="padding:.5rem .7rem;display:flex;align-items:center;gap:.4rem;border-bottom:1px solid #0F172A;background:#0D948820;cursor:pointer">
+                <div style="width:28px;height:28px;background:#EFF6FF;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🩸</div>
+                <div style="flex:1">
+                  <div style="font-size:.72rem;font-weight:700;color:#14B8A6">Blood CBC Panel</div>
+                  <div style="font-size:.62rem;color:#64748B">Thyrocare · 28 May</div>
+                </div>
+                <span style="background:#F0FDF4;color:#16A34A;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:700">Normal</span>
+              </div>
+              <div style="padding:.5rem .7rem;display:flex;align-items:center;gap:.4rem;border-bottom:1px solid #0F172A;cursor:pointer">
+                <div style="width:28px;height:28px;background:#FFFBEB;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🧪</div>
+                <div style="flex:1">
+                  <div style="font-size:.72rem;font-weight:600;color:#CBD5E1">Lipid Profile</div>
+                  <div style="font-size:.62rem;color:#64748B">Dr. Lal · 20 May</div>
+                </div>
+                <span style="background:#FFFBEB;color:#D97706;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:700">Review</span>
+              </div>
+              <div style="padding:.5rem .7rem;display:flex;align-items:center;gap:.4rem;border-bottom:1px solid #0F172A;cursor:pointer">
+                <div style="width:28px;height:28px;background:#F0FDF4;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">❤️</div>
+                <div style="flex:1">
+                  <div style="font-size:.72rem;font-weight:600;color:#CBD5E1">ECG Report</div>
+                  <div style="font-size:.62rem;color:#64748B">Apollo · 14 May</div>
+                </div>
+                <span style="background:#F0FDF4;color:#16A34A;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:700">Normal</span>
+              </div>
+              <div style="padding:.5rem .7rem;display:flex;align-items:center;gap:.4rem;cursor:pointer">
+                <div style="width:28px;height:28px;background:#F5F3FF;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🫁</div>
+                <div style="flex:1">
+                  <div style="font-size:.72rem;font-weight:600;color:#CBD5E1">Chest X-Ray</div>
+                  <div style="font-size:.62rem;color:#64748B">City Hospital · 2 Apr</div>
+                </div>
+                <span style="background:#F0FDF4;color:#16A34A;border-radius:3px;padding:.05rem .3rem;font-size:.58rem;font-weight:700">Normal</span>
+              </div>
+            </div>
+          </div>
+          <!-- right: report detail + AI -->
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:8px;padding:.75rem;flex-shrink:0">
+              <div style="font-size:.6rem;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:.25rem">🤖 AI SUMMARY</div>
+              <div style="font-size:.72rem;color:white;line-height:1.5">Mostly normal. Haemoglobin slightly low at 11.2 g/dL. May feel tired. Consider iron-rich foods.</div>
+            </div>
+            <div style="background:#1E293B;border-radius:8px;padding:.7rem;flex:1">
+              <div style="font-size:.65rem;font-weight:700;color:#94A3B8;text-transform:uppercase;margin-bottom:.5rem">Test Values</div>
+              <div style="display:flex;flex-direction:column;gap:.35rem">
+                <div style="display:flex;justify-content:space-between;font-size:.7rem">
+                  <span style="color:#94A3B8">Haemoglobin</span>
+                  <span style="font-weight:700;color:#F59E0B">11.2 g/dL ↓</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.7rem">
+                  <span style="color:#94A3B8">WBC Count</span>
+                  <span style="font-weight:700;color:#22C55E">7,200 ✓</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.7rem">
+                  <span style="color:#94A3B8">Platelets</span>
+                  <span style="font-weight:700;color:#22C55E">2.1 Lakh ✓</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.7rem">
+                  <span style="color:#94A3B8">HbA1c</span>
+                  <span style="font-weight:700;color:#22C55E">6.8% ✓</span>
+                </div>
+              </div>
+            </div>
+            <div style="background:#1E293B;border-radius:8px;padding:.6rem;flex-shrink:0">
+              <div style="display:flex;gap:.3rem">
+                <div style="flex:1;background:#0F172A;border-radius:5px;padding:.4rem .5rem;font-size:.65rem;color:#475569">Ask AI about this…</div>
+                <div style="background:#0D9488;border-radius:5px;padding:.4rem .5rem;font-size:.65rem;color:white">↑</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation" style="margin-top:1rem"><strong>Desktop Layout: Master-Detail Pattern</strong>
+  Left panel = list. Right panel = detail + AI analysis. No separate page navigation needed. On mobile this becomes full-screen stack navigation (list → tap → detail). Same React components, CSS grid switches at 768px breakpoint. No extra code needed — just media queries.</div>
+</div>
+
+<!-- ══════════════════════════════
+     EHR — PERSONAL HEALTH JOURNAL
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">New Feature — EHR Layer</div>
+  <h2>Personal Health Journal (EHR)</h2>
+  <div class="desc">Patient-owned Electronic Health Records. Log vitals, symptoms, meals, sleep, exercise, mood, and medical events — each entry date-stamped, searchable, and fed to the AI agent. Every entry is vectorized alongside lab reports so the AI has the <em>full picture</em> — not just tests, but lived experience.</div>
+
+  <div class="arrow-row">
+
+    <!-- Journal Home -->
+    <div class="phone">
+      <div class="phone-label">Journal Home</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#F8FAFC"><span style="color:#0F172A">9:41</span><div style="display:flex;gap:3px;font-size:9px;color:#0F172A"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="padding:.6rem .8rem">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+                <div>
+                  <div style="color:#64748B;font-size:.65rem">31 May 2026 · Saturday</div>
+                  <div style="color:#0F172A;font-size:.92rem;font-weight:700">Health Journal</div>
+                </div>
+                <div style="background:#0D948820;border:1px solid #0D944840;border-radius:8px;padding:.3rem .5rem;text-align:center">
+                  <div style="font-size:.65rem;font-weight:800;color:#0D9488">🔥 14</div>
+                  <div style="font-size:.55rem;color:#64748B">day streak</div>
+                </div>
+              </div>
+              <!-- today snapshot -->
+              <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:12px;padding:.8rem;margin-bottom:.65rem">
+                <div style="font-size:.6rem;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:.35rem">TODAY'S SNAPSHOT</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem">
+                  <div style="background:rgba(255,255,255,.15);border-radius:7px;padding:.4rem;text-align:center">
+                    <div style="font-size:.9rem;font-weight:800;color:white">118</div>
+                    <div style="font-size:.55rem;color:rgba(255,255,255,.75)">Sugar mg/dL</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,.15);border-radius:7px;padding:.4rem;text-align:center">
+                    <div style="font-size:.9rem;font-weight:800;color:white">7.5h</div>
+                    <div style="font-size:.55rem;color:rgba(255,255,255,.75)">Sleep</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,.15);border-radius:7px;padding:.4rem;text-align:center">
+                    <div style="font-size:.9rem;font-weight:800;color:white">32 min</div>
+                    <div style="font-size:.55rem;color:rgba(255,255,255,.75)">Walk</div>
+                  </div>
+                </div>
+              </div>
+              <!-- quick log grid -->
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.4rem">Quick Log</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.35rem;margin-bottom:.65rem">
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .25rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="font-size:18px">🩸</div><div style="font-size:.58rem;color:#475569;font-weight:600;margin-top:.15rem">Sugar</div></div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .25rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="font-size:18px">🫀</div><div style="font-size:.58rem;color:#475569;font-weight:600;margin-top:.15rem">BP</div></div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .25rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="font-size:18px">⚖️</div><div style="font-size:.58rem;color:#475569;font-weight:600;margin-top:.15rem">Weight</div></div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .25rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="font-size:18px">💤</div><div style="font-size:.58rem;color:#475569;font-weight:600;margin-top:.15rem">Sleep</div></div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .25rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="font-size:18px">🏃</div><div style="font-size:.58rem;color:#475569;font-weight:600;margin-top:.15rem">Exercise</div></div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .25rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="font-size:18px">🥗</div><div style="font-size:.58rem;color:#475569;font-weight:600;margin-top:.15rem">Meal</div></div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .25rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="font-size:18px">😊</div><div style="font-size:.58rem;color:#475569;font-weight:600;margin-top:.15rem">Mood</div></div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .25rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="font-size:18px">🤒</div><div style="font-size:.58rem;color:#475569;font-weight:600;margin-top:.15rem">Symptom</div></div>
+              </div>
+              <!-- recent entries -->
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.4rem">Recent Entries</div>
+              <div style="display:flex;flex-direction:column;gap:.35rem">
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.55rem .65rem;display:flex;align-items:center;gap:.45rem">
+                  <div style="width:30px;height:30px;background:#FEF3C7;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🩸</div>
+                  <div style="flex:1"><div style="font-size:.73rem;font-weight:600;color:#0F172A">Blood Sugar · 118 mg/dL</div><div style="font-size:.62rem;color:#64748B">Fasting · 7:30 AM today</div></div>
+                  <span style="font-size:.62rem;color:#22C55E;font-weight:700">Good</span>
+                </div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.55rem .65rem;display:flex;align-items:center;gap:.45rem">
+                  <div style="width:30px;height:30px;background:#F0FDF4;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">💤</div>
+                  <div style="flex:1"><div style="font-size:.73rem;font-weight:600;color:#0F172A">Sleep · 7.5 hours</div><div style="font-size:.62rem;color:#64748B">30 May · 11 PM – 6:30 AM</div></div>
+                  <span style="font-size:.62rem;color:#22C55E;font-weight:700">✓</span>
+                </div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.55rem .65rem;display:flex;align-items:center;gap:.45rem">
+                  <div style="width:30px;height:30px;background:#FEE2E2;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🤒</div>
+                  <div style="flex:1"><div style="font-size:.73rem;font-weight:600;color:#0F172A">Symptom · Mild headache</div><div style="font-size:.62rem;color:#64748B">30 May · 3 PM · "after lunch"</div></div>
+                  <span style="font-size:.62rem;color:#F59E0B;font-weight:700">Note</span>
+                </div>
+              </div>
+              <div style="height:10px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#0D9488">Journal</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">📅</div><div class="nl">Appts</div></div>
+            <div class="nav-item"><div class="ni">⋯</div><div class="nl">More</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">tap Sugar →</div>
+
+    <!-- Log Entry -->
+    <div class="phone">
+      <div class="phone-label">Log Reading</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#F8FAFC"><span style="color:#0F172A">9:41</span><div style="display:flex;gap:3px;font-size:9px;color:#0F172A"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:white;padding:.55rem .75rem;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:.5rem">
+              <span style="color:#0D9488;font-size:14px">←</span>
+              <div style="flex:1"><div style="color:#0F172A;font-size:.85rem;font-weight:700">Log Health Entry</div><div style="color:#64748B;font-size:.62rem">31 May 2026</div></div>
+              <div style="background:#0D9488;border-radius:6px;padding:.2rem .5rem;font-size:.65rem;color:white;font-weight:700">Save</div>
+            </div>
+            <div style="padding:.6rem .75rem">
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Category</div>
+              <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.65rem">
+                <div style="background:#0D9488;color:white;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;font-weight:700;display:flex;align-items:center;gap:.2rem"><span>🩸</span> Blood Sugar</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">🫀 BP</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">⚖️ Weight</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">💤 Sleep</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">🏃 Exercise</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">🥗 Meal</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">😊 Mood</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">🤒 Symptom</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">📅 Event</div>
+              </div>
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">Blood Sugar Reading</div>
+              <div style="background:white;border:2px solid #0D9488;border-radius:12px;padding:.75rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem">
+                <div style="font-size:1.6rem;font-weight:800;color:#0F172A;flex:1">118</div>
+                <div style="text-align:right"><div style="font-size:.75rem;font-weight:700;color:#64748B">mg/dL</div><div style="font-size:.6rem;color:#22C55E;font-weight:600">Normal ✓</div></div>
+              </div>
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.3rem">Context</div>
+              <div style="display:flex;gap:.3rem;margin-bottom:.6rem">
+                <div style="background:#0D9488;color:white;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;font-weight:700">Fasting</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">Post meal</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">Random</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:20px;padding:.2rem .55rem;font-size:.65rem">Bedtime</div>
+              </div>
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.3rem">Date & Time</div>
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .65rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;font-size:.73rem">
+                <span style="color:#0F172A;font-weight:600">Today · 7:30 AM</span><span style="color:#0D9488;font-size:.65rem">Change</span>
+              </div>
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.3rem">Notes (optional)</div>
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .65rem;margin-bottom:.5rem;font-size:.72rem;color:#475569;min-height:44px">Took medicine at 7 AM. Walked 20 min…</div>
+              <div style="background:#F8FAFC;border:1.5px dashed #CBD5E1;border-radius:10px;padding:.5rem;text-align:center;font-size:.68rem;color:#64748B;margin-bottom:.55rem">📷 Attach photo (glucometer, etc.)</div>
+              <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:12px;padding:.6rem;text-align:center;font-size:.78rem;font-weight:700;color:white">Save Entry to Journal</div>
+              <div style="height:8px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#0D9488">Journal</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">📅</div><div class="nl">Appts</div></div>
+            <div class="nav-item"><div class="ni">⋯</div><div class="nl">More</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <!-- EHR Timeline -->
+    <div class="phone">
+      <div class="phone-label">Date-wise Timeline</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#F8FAFC"><span style="color:#0F172A">9:41</span><div style="display:flex;gap:3px;font-size:9px;color:#0F172A"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:white;padding:.55rem .75rem;border-bottom:1px solid #F1F5F9">
+              <div style="color:#0F172A;font-size:.85rem;font-weight:700">Health Timeline</div>
+              <div style="display:flex;gap:.3rem;margin-top:.3rem;overflow-x:auto;padding-bottom:.1rem">
+                <div style="background:#0D9488;color:white;border-radius:20px;padding:.15rem .5rem;font-size:.62rem;font-weight:700;white-space:nowrap">All</div>
+                <div style="background:#FEF3C7;color:#D97706;border-radius:20px;padding:.15rem .5rem;font-size:.62rem;white-space:nowrap">🩸 Sugar</div>
+                <div style="background:#F0FDF4;color:#16A34A;border-radius:20px;padding:.15rem .5rem;font-size:.62rem;white-space:nowrap">🫀 BP</div>
+                <div style="background:#F0F9FF;color:#0369A1;border-radius:20px;padding:.15rem .5rem;font-size:.62rem;white-space:nowrap">💤 Sleep</div>
+                <div style="background:#F5F3FF;color:#7C3AED;border-radius:20px;padding:.15rem .5rem;font-size:.62rem;white-space:nowrap">🏃 Exercise</div>
+                <div style="background:#FFF1F2;color:#BE123C;border-radius:20px;padding:.15rem .5rem;font-size:.62rem;white-space:nowrap">🤒 Symptom</div>
+              </div>
+            </div>
+            <div style="padding:.5rem .75rem">
+              <!-- May 31 -->
+              <div style="font-size:.62rem;font-weight:700;color:#0D9488;text-transform:uppercase;margin-bottom:.35rem">Today — 31 May</div>
+              <div style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:.6rem">
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .6rem;display:flex;gap:.4rem">
+                  <div style="width:28px;height:28px;background:#FEF3C7;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🩸</div>
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between"><span style="font-size:.72rem;font-weight:600;color:#0F172A">Blood Sugar</span><span style="font-size:.7rem;font-weight:700;color:#22C55E">118 mg/dL</span></div>
+                    <div style="font-size:.6rem;color:#64748B">7:30 AM · Fasting · Normal</div>
+                  </div>
+                </div>
+              </div>
+              <!-- May 30 -->
+              <div style="font-size:.62rem;font-weight:700;color:#94A3B8;text-transform:uppercase;margin-bottom:.35rem">30 May</div>
+              <div style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:.6rem">
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .6rem;display:flex;gap:.4rem">
+                  <div style="width:28px;height:28px;background:#F0FDF4;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">💤</div>
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between"><span style="font-size:.72rem;font-weight:600;color:#0F172A">Sleep</span><span style="font-size:.7rem;font-weight:700;color:#22C55E">7.5 hrs</span></div>
+                    <div style="font-size:.6rem;color:#64748B">11 PM – 6:30 AM</div>
+                  </div>
+                </div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .6rem;display:flex;gap:.4rem">
+                  <div style="width:28px;height:28px;background:#FEE2E2;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🤒</div>
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between"><span style="font-size:.72rem;font-weight:600;color:#0F172A">Symptom</span><span style="font-size:.7rem;font-weight:700;color:#F59E0B">Mild headache</span></div>
+                    <div style="font-size:.6rem;color:#64748B">3 PM · "felt after lunch"</div>
+                  </div>
+                </div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .6rem;display:flex;gap:.4rem">
+                  <div style="width:28px;height:28px;background:#EDE9FE;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🏃</div>
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between"><span style="font-size:.72rem;font-weight:600;color:#0F172A">Exercise</span><span style="font-size:.7rem;font-weight:700;color:#22C55E">32 min walk</span></div>
+                    <div style="font-size:.6rem;color:#64748B">6:30 AM · Morning</div>
+                  </div>
+                </div>
+              </div>
+              <!-- May 29 -->
+              <div style="font-size:.62rem;font-weight:700;color:#94A3B8;text-transform:uppercase;margin-bottom:.35rem">29 May</div>
+              <div style="display:flex;flex-direction:column;gap:.3rem">
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .6rem;display:flex;gap:.4rem">
+                  <div style="width:28px;height:28px;background:#FEF3C7;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🩸</div>
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between"><span style="font-size:.72rem;font-weight:600;color:#0F172A">Blood Sugar</span><span style="font-size:.7rem;font-weight:700;color:#F59E0B">142 mg/dL</span></div>
+                    <div style="font-size:.6rem;color:#64748B">8 AM · Fasting · "ate late last night"</div>
+                  </div>
+                </div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.5rem .6rem;display:flex;gap:.4rem">
+                  <div style="width:28px;height:28px;background:#F0F9FF;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🫀</div>
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between"><span style="font-size:.72rem;font-weight:600;color:#0F172A">Blood Pressure</span><span style="font-size:.7rem;font-weight:700;color:#22C55E">122/80</span></div>
+                    <div style="font-size:.6rem;color:#64748B">Morning · Post-medication</div>
+                  </div>
+                </div>
+              </div>
+              <div style="height:8px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#0D9488">Journal</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">📅</div><div class="nl">Appts</div></div>
+            <div class="nav-item"><div class="ni">⋯</div><div class="nl">More</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end arrow-row EHR -->
+  <div class="annotation"><strong>EHR Data Architecture — Key Design Decision</strong>
+  Every journal entry is stored as a typed object: <code style="background:#334155;padding:.1rem .3rem;border-radius:3px;font-size:.78rem">{category, value, unit, context, timestamp, notes, photoUrl}</code>. Entries are vectorized alongside lab reports using the same pgvector pipeline. The AI agent then has a single unified query: "30 days of fasting sugar readings" or "headache entries correlated with meals" — no separate databases. The streak counter (🔥 14 days) is a habit-formation mechanic: once patients start logging daily, the data flywheel for AI personalization kicks in. Doctor also sees EHR history on the briefing card.</div>
+</div>
+
+<!-- ══════════════════════════════
+     AI AGENT INTELLIGENCE
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">AI Agent Layer</div>
+  <h2>Personalized AI Health Agent</h2>
+  <div class="desc">Not a generic chatbot — an agent harness that ingests your complete longitudinal health picture: lab reports + daily EHR journal + medications + (Phase 2) wearable data + (Phase 3) genome scans. The more data you provide, the more accurate and personal the insights become. Powered by Claude/GPT-4o with RAG over your personal health vector store.</div>
+
+  <!-- data sources + agent pipeline — desktop view -->
+  <div style="background:#1E293B;border-radius:14px;padding:1.5rem;margin-bottom:2rem;overflow-x:auto">
+    <div style="font-size:.7rem;font-weight:700;color:#94A3B8;text-transform:uppercase;margin-bottom:1rem;text-align:center">How the AI Agent Works — Data Flow</div>
+    <div style="display:flex;gap:0;align-items:stretch;min-width:700px">
+
+      <!-- Step 1 -->
+      <div style="flex:1;background:#0F172A;border-radius:10px;padding:.85rem;border:1px solid #334155">
+        <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.6rem">1 · DATA SOURCES</div>
+        <div style="display:flex;flex-direction:column;gap:.35rem">
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;display:flex;align-items:center;gap:.35rem">
+            <span style="font-size:13px">📁</span><div><div style="font-size:.7rem;font-weight:600;color:#CBD5E1">Lab Reports</div><div style="font-size:.6rem;color:#64748B">7 reports · OCR scanned</div></div>
+          </div>
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;display:flex;align-items:center;gap:.35rem">
+            <span style="font-size:13px">📋</span><div><div style="font-size:.7rem;font-weight:600;color:#CBD5E1">EHR Journal</div><div style="font-size:.6rem;color:#64748B">142 entries · 14-day streak</div></div>
+          </div>
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;display:flex;align-items:center;gap:.35rem">
+            <span style="font-size:13px">💊</span><div><div style="font-size:.7rem;font-weight:600;color:#CBD5E1">Medications</div><div style="font-size:.6rem;color:#64748B">3 active · compliance tracked</div></div>
+          </div>
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;display:flex;align-items:center;gap:.35rem;opacity:.5">
+            <span style="font-size:13px">⌚</span><div><div style="font-size:.7rem;font-weight:600;color:#94A3B8">Wearables</div><div style="font-size:.6rem;color:#64748B">Phase 2 · connect device</div></div>
+          </div>
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;display:flex;align-items:center;gap:.35rem;opacity:.5">
+            <span style="font-size:13px">🧬</span><div><div style="font-size:.7rem;font-weight:600;color:#94A3B8">Genome Scan</div><div style="font-size:.6rem;color:#64748B">Phase 3 · upload VCF file</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;align-items:center;padding:0 .5rem;color:#334155;font-size:1.2rem;flex-shrink:0">→</div>
+
+      <!-- Step 2 -->
+      <div style="flex:1;background:#0F172A;border-radius:10px;padding:.85rem;border:1px solid #334155">
+        <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.6rem">2 · VECTOR EMBEDDING</div>
+        <div style="display:flex;flex-direction:column;gap:.35rem">
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#94A3B8">Each entry → pgvector embedding</div>
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#94A3B8">Personal health vector store (per patient)</div>
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#94A3B8">Date + category + value metadata indexed</div>
+          <div style="background:#14B8A620;border:1px solid #14B8A630;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#CBD5E1;margin-top:.25rem">Semantic search: "high sugar mornings when I skipped walk" works instantly</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;align-items:center;padding:0 .5rem;color:#334155;font-size:1.2rem;flex-shrink:0">→</div>
+
+      <!-- Step 3 -->
+      <div style="flex:1;background:#0F172A;border-radius:10px;padding:.85rem;border:1px solid #334155">
+        <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.6rem">3 · AGENT REASONING</div>
+        <div style="display:flex;flex-direction:column;gap:.35rem">
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#94A3B8">RAG retrieval over personal store</div>
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#94A3B8">Pattern detection: correlations across sources</div>
+          <div style="background:#1E293B;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#94A3B8">Claude/GPT-4o generates insight in plain language</div>
+          <div style="background:#14B8A620;border:1px solid #14B8A630;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#CBD5E1;margin-top:.25rem">Doctor briefing card generated the same way — before every appointment</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display:flex;align-items:center;padding:0 .5rem;color:#334155;font-size:1.2rem;flex-shrink:0">→</div>
+
+      <!-- Step 4 -->
+      <div style="flex:1;background:linear-gradient(135deg,#0D948820,#14B8A610);border-radius:10px;padding:.85rem;border:1px solid #14B8A650">
+        <div style="font-size:.6rem;font-weight:700;color:#14B8A6;text-transform:uppercase;margin-bottom:.6rem">4 · PERSONALIZED OUTPUT</div>
+        <div style="display:flex;flex-direction:column;gap:.35rem">
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#CBD5E1">Patient: Daily health insight + trend alerts</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#CBD5E1">Doctor: AI briefing before consultation</div>
+          <div style="background:#0F172A;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:#CBD5E1">Admin: Proactive care alerts (HbA1c trending)</div>
+          <div style="background:#0D9488;border-radius:6px;padding:.4rem .5rem;font-size:.68rem;color:white;font-weight:600;margin-top:.25rem">Specific to YOU — not generic health tips</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Patient AI Agent phone -->
+  <div class="arrow-row">
+
+    <div class="phone">
+      <div class="phone-label">AI Agent Chat</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#F8FAFC"><span style="color:#0F172A">9:41</span><div style="display:flex;gap:3px;font-size:9px;color:#0F172A"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:white;padding:.55rem .75rem;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:.5rem">
+              <span style="color:#0D9488;font-size:14px">←</span>
+              <div>
+                <div style="color:#0F172A;font-size:.85rem;font-weight:700">AI Health Agent</div>
+                <div style="color:#22C55E;font-size:.6rem;font-weight:600">● Analyzing your data (142 entries + 7 reports)</div>
+              </div>
+            </div>
+            <div style="padding:.6rem .75rem;display:flex;flex-direction:column;gap:.5rem">
+
+              <!-- AI proactive insight card -->
+              <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);border-radius:12px;padding:.75rem">
+                <div style="font-size:.58rem;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:.3rem">🤖 TODAY'S INSIGHT — Based on your data</div>
+                <div style="font-size:.73rem;color:white;line-height:1.55">Your fasting sugar was <strong>142 mg/dL on May 29</strong> (you noted "ate late"). After your morning walk on May 30, it dropped to <strong>118 mg/dL</strong>. Pattern: <span style="background:rgba(255,255,255,.2);border-radius:4px;padding:.05rem .25rem">late dinner → elevated next morning</span>. Try finishing meals by 8 PM.</div>
+              </div>
+
+              <!-- chat messages -->
+              <div style="background:#F1F5F9;border-radius:12px 12px 0 12px;padding:.65rem .75rem;align-self:flex-end;max-width:85%">
+                <div style="font-size:.73rem;color:#0F172A">Why was my sugar high on the 29th?</div>
+              </div>
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:0 12px 12px 12px;padding:.65rem .75rem;max-width:95%">
+                <div style="font-size:.7rem;color:#0F172A;line-height:1.5">Your journal shows you had dinner at 10:30 PM that night. Late meals raise fasting sugar the next morning. Your HbA1c from the May 28 lab report confirms this is a recurring pattern over 3 months. This aligns with what Dr. Priya noted in your last consultation.<br><br><span style="color:#0D9488;font-weight:700">Tip: Log your meal times consistently — I can detect patterns better.</span></div>
+                <div style="font-size:.58rem;color:#94A3B8;margin-top:.25rem">Based on 30d journal + lab report + doctor notes</div>
+              </div>
+
+              <!-- quick prompts -->
+              <div style="font-size:.62rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:0">Try asking:</div>
+              <div style="display:flex;flex-wrap:wrap;gap:.3rem">
+                <div style="background:#F0FDFA;border:1px solid #99F6E4;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#0D9488;font-weight:600">Is my HbA1c improving?</div>
+                <div style="background:#F0FDFA;border:1px solid #99F6E4;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#0D9488;font-weight:600">When is my next medicine refill?</div>
+                <div style="background:#F0FDFA;border:1px solid #99F6E4;border-radius:20px;padding:.2rem .55rem;font-size:.65rem;color:#0D9488;font-weight:600">हिंदी में समझाएं</div>
+              </div>
+
+            </div>
+          </div>
+          <!-- chat input -->
+          <div style="background:white;border-top:1px solid #F1F5F9;padding:.5rem .75rem;display:flex;gap:.4rem;flex-shrink:0">
+            <div style="flex:1;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:20px;padding:.4rem .75rem;font-size:.72rem;color:#94A3B8">Ask about your health…</div>
+            <div style="width:34px;height:34px;background:#0D9488;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">↑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:260px">
+      <div style="background:#1E293B;border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+        <div style="font-size:.7rem;font-weight:700;color:#F59E0B;text-transform:uppercase;margin-bottom:.75rem">📊 Your Health Data Sources</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:.5rem"><span>📁</span><span style="font-size:.78rem;color:#CBD5E1;font-weight:600">Lab Reports</span></div>
+            <div style="display:flex;align-items:center;gap:.3rem"><span style="font-size:.8rem;font-weight:800;color:#22C55E">7</span><span style="font-size:.62rem;color:#64748B">uploaded · indexed</span></div>
+          </div>
+          <div style="background:#334155;border-radius:20px;height:4px;overflow:hidden"><div style="background:#22C55E;width:70%;height:100%"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:.5rem"><span>📋</span><span style="font-size:.78rem;color:#CBD5E1;font-weight:600">Journal Entries</span></div>
+            <div style="display:flex;align-items:center;gap:.3rem"><span style="font-size:.8rem;font-weight:800;color:#14B8A6">142</span><span style="font-size:.62rem;color:#64748B">entries · 14d streak</span></div>
+          </div>
+          <div style="background:#334155;border-radius:20px;height:4px;overflow:hidden"><div style="background:#14B8A6;width:95%;height:100%"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:.5rem"><span>💊</span><span style="font-size:.78rem;color:#CBD5E1;font-weight:600">Medications</span></div>
+            <div style="display:flex;align-items:center;gap:.3rem"><span style="font-size:.8rem;font-weight:800;color:#3B82F6">3</span><span style="font-size:.62rem;color:#64748B">active · tracked</span></div>
+          </div>
+          <div style="background:#334155;border-radius:20px;height:4px;overflow:hidden"><div style="background:#3B82F6;width:40%;height:100%"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;opacity:.5">
+            <div style="display:flex;align-items:center;gap:.5rem"><span>⌚</span><span style="font-size:.78rem;color:#94A3B8;font-weight:600">Wearables</span></div>
+            <span style="font-size:.65rem;color:#64748B;background:#1E293B;border-radius:4px;padding:.1rem .3rem">Phase 2</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;opacity:.5">
+            <div style="display:flex;align-items:center;gap:.5rem"><span>🧬</span><span style="font-size:.78rem;color:#94A3B8;font-weight:600">Genome Scan</span></div>
+            <span style="font-size:.65rem;color:#64748B;background:#1E293B;border-radius:4px;padding:.1rem .3rem">Phase 3</span>
+          </div>
+        </div>
+      </div>
+      <div class="annotation" style="border-color:#14B8A6"><strong>Why this changes everything</strong>
+      Generic health apps give you the same tip 10 million people get. HealthBridge's agent queries YOUR sugar readings + YOUR late-dinner journal notes + YOUR doctor's consultation note + YOUR lab reports. The output is: "On days you walked before 7 AM, your fasting sugar was 22% lower than days you didn't." No generic app can say that.</div>
+    </div>
+
+  </div><!-- end arrow-row agent -->
+
+  <div class="annotation" style="margin-top:1.5rem"><strong>AI Agent Technical Architecture — The Agent Harness Pattern</strong>
+  Inspired by agentic harnesses like Claude Code. Each user query triggers a multi-step agent chain: (1) Intent classification — is this a "trend query", "correlation query", "lab explanation", or "medication query"? (2) RAG retrieval from personal pgvector store filtered by date range + data type. (3) LLM reasoning with retrieved context. (4) Response formatted per language preference. Future: add sub-agents for each data type (wearable agent, lab agent, journal agent) that collaborate to produce unified insights. The more data sources, the more the agent can surface non-obvious correlations — "your headaches correlate with high sugar AND low sleep the previous night" would require 3 data sources working together.</div>
+</div>
+
+<!-- ══════════════════════════════
+     POST-CONSULTATION CARE PLANS
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Post-Consultation Care</div>
+  <h2>Diet Plan & Exercise Plan</h2>
+  <div class="desc">After every consultation, HealthBridge generates a personalized care plan based on diagnosis, latest lab values, and EHR journal history. Not a generic "eat healthy" pamphlet — specific to your HbA1c, LDL, weight, and activity level.</div>
+
+  <div class="arrow-row">
+
+    <!-- Diet Plan -->
+    <div class="phone">
+      <div class="phone-label">Diet Plan</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#F8FAFC"><span style="color:#0F172A">9:41</span><div style="display:flex;gap:3px;font-size:9px;color:#0F172A"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);padding:.6rem .75rem;display:flex;align-items:center;gap:.5rem">
+              <span style="color:rgba(255,255,255,.7);font-size:14px">←</span>
+              <div style="flex:1">
+                <div style="color:white;font-size:.82rem;font-weight:700">Your Diet Plan</div>
+                <div style="color:rgba(255,255,255,.7);font-size:.6rem">AI-generated · 30 May · Dr. Priya Mehta</div>
+              </div>
+              <div style="background:rgba(255,255,255,.2);border-radius:6px;padding:.2rem .4rem;font-size:.6rem;color:white">🤖 AI</div>
+            </div>
+            <div style="padding:.55rem .75rem">
+              <!-- Based on -->
+              <div style="background:#F0FDFA;border:1px solid #CCFBF1;border-radius:8px;padding:.5rem .6rem;margin-bottom:.55rem;font-size:.68rem;color:#0F172A">
+                Based on: <span style="color:#0D9488;font-weight:700">HbA1c 6.8%</span> · <span style="color:#F59E0B;font-weight:700">LDL 142 (borderline)</span> · <span style="color:#0F172A">Weight 72 kg</span>
+              </div>
+              <!-- Eat More -->
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.55rem .65rem;margin-bottom:.4rem">
+                <div style="font-size:.6rem;font-weight:700;color:#22C55E;text-transform:uppercase;margin-bottom:.35rem">✅ Eat More</div>
+                <div style="display:flex;flex-direction:column;gap:.28rem">
+                  <div style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#0F172A"><span>🥦</span> Vegetables — 3+ servings/day</div>
+                  <div style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#0F172A"><span>🫘</span> Dal/Legumes — high fiber, low GI</div>
+                  <div style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#0F172A"><span>🐟</span> Fish / Lean chicken — 3x/week</div>
+                  <div style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#0F172A"><span>🥚</span> Eggs (whites) + nuts (unsalted)</div>
+                  <div style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#0F172A"><span>🫐</span> Berries + citrus — antioxidants</div>
+                </div>
+              </div>
+              <!-- Reduce -->
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.55rem .65rem;margin-bottom:.4rem">
+                <div style="font-size:.6rem;font-weight:700;color:#EF4444;text-transform:uppercase;margin-bottom:.35rem">❌ Reduce</div>
+                <div style="display:flex;flex-direction:column;gap:.28rem">
+                  <div style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#0F172A"><span>🍚</span> White rice — switch to millets/brown rice</div>
+                  <div style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#0F172A"><span>🍬</span> Sugar, sweets, maida products</div>
+                  <div style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#F59E0B">⚠️ <span>Late meals after 8 PM (journal shows elevated sugar next morning)</span></div>
+                </div>
+              </div>
+              <!-- Meal timing -->
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.55rem .65rem;margin-bottom:.4rem">
+                <div style="font-size:.6rem;font-weight:700;color:#3B82F6;text-transform:uppercase;margin-bottom:.3rem">⏰ Meal Timing</div>
+                <div style="display:flex;justify-content:space-between;font-size:.7rem">
+                  <div style="text-align:center"><div style="font-weight:700;color:#0F172A">8 AM</div><div style="color:#64748B;font-size:.62rem">Breakfast</div></div>
+                  <div style="color:#CBD5E1">—</div>
+                  <div style="text-align:center"><div style="font-weight:700;color:#0F172A">1 PM</div><div style="color:#64748B;font-size:.62rem">Lunch</div></div>
+                  <div style="color:#CBD5E1">—</div>
+                  <div style="text-align:center"><div style="font-weight:700;color:#0F172A">4 PM</div><div style="color:#64748B;font-size:.62rem">Snack</div></div>
+                  <div style="color:#CBD5E1">—</div>
+                  <div style="text-align:center"><div style="font-weight:700;color:#EF4444">≤8 PM</div><div style="color:#EF4444;font-size:.62rem">Dinner</div></div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.35rem">
+                <div style="background:#0D9488;border-radius:8px;padding:.45rem;text-align:center;font-size:.68rem;font-weight:700;color:white">💬 Ask Diet AI</div>
+                <div style="background:#F1F5F9;border-radius:8px;padding:.45rem;text-align:center;font-size:.68rem;font-weight:600;color:#475569">📤 Share Plan</div>
+              </div>
+              <div style="height:8px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#0D9488">Journal</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">📅</div><div class="nl">Appts</div></div>
+            <div class="nav-item"><div class="ni">⋯</div><div class="nl">More</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">+</div>
+
+    <!-- Exercise Plan -->
+    <div class="phone">
+      <div class="phone-label">Exercise Plan</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#F8FAFC"><span style="color:#0F172A">9:41</span><div style="display:flex;gap:3px;font-size:9px;color:#0F172A"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:linear-gradient(135deg,#0D9488,#14B8A6);padding:.6rem .75rem;display:flex;align-items:center;gap:.5rem">
+              <span style="color:rgba(255,255,255,.7);font-size:14px">←</span>
+              <div>
+                <div style="color:white;font-size:.82rem;font-weight:700">Exercise Plan</div>
+                <div style="color:rgba(255,255,255,.7);font-size:.6rem">Target: Lower HbA1c + LDL in 90 days</div>
+              </div>
+            </div>
+            <div style="padding:.55rem .75rem">
+              <!-- goal banner -->
+              <div style="background:#F0FDFA;border:1px solid #CCFBF1;border-radius:8px;padding:.5rem .65rem;margin-bottom:.55rem">
+                <div style="font-size:.6rem;font-weight:700;color:#0D9488;margin-bottom:.2rem">🎯 90-DAY GOAL</div>
+                <div style="font-size:.7rem;color:#0F172A">HbA1c → below 6.5% · LDL → below 130 mg/dL. Daily 30-min activity reduces HbA1c by ~0.5% over 3 months.</div>
+              </div>
+              <!-- weekly schedule -->
+              <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem">This Week's Schedule</div>
+              <div style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:.55rem">
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:8px;padding:.5rem .6rem;display:flex;justify-content:space-between;align-items:center">
+                  <div style="display:flex;align-items:center;gap:.4rem"><span style="font-size:14px">🚶</span><div><div style="font-size:.72rem;font-weight:600;color:#0F172A">Brisk Walk · 30 min</div><div style="font-size:.6rem;color:#64748B">Mon · Wed · Fri</div></div></div>
+                  <div style="display:flex;gap:2px"><div style="width:8px;height:8px;border-radius:50%;background:#22C55E"></div><div style="width:8px;height:8px;border-radius:50%;background:#E2E8F0"></div><div style="width:8px;height:8px;border-radius:50%;background:#22C55E"></div></div>
+                </div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:8px;padding:.5rem .6rem;display:flex;justify-content:space-between;align-items:center">
+                  <div style="display:flex;align-items:center;gap:.4rem"><span style="font-size:14px">🧘</span><div><div style="font-size:.72rem;font-weight:600;color:#0F172A">Yoga / Stretching · 20 min</div><div style="font-size:.6rem;color:#64748B">Tue · Thu</div></div></div>
+                  <div style="display:flex;gap:2px"><div style="width:8px;height:8px;border-radius:50%;background:#22C55E"></div><div style="width:8px;height:8px;border-radius:50%;background:#E2E8F0"></div></div>
+                </div>
+                <div style="background:white;border:1px solid #E2E8F0;border-radius:8px;padding:.5rem .6rem;display:flex;justify-content:space-between;align-items:center">
+                  <div style="display:flex;align-items:center;gap:.4rem"><span style="font-size:14px">🏊</span><div><div style="font-size:.72rem;font-weight:600;color:#0F172A">Light Swimming / Cycling</div><div style="font-size:.6rem;color:#64748B">Sat — Optional</div></div></div>
+                  <div style="display:flex;gap:2px"><div style="width:8px;height:8px;border-radius:50%;background:#E2E8F0"></div></div>
+                </div>
+                <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:.5rem .6rem;opacity:.6">
+                  <div style="display:flex;align-items:center;gap:.4rem"><span style="font-size:14px">😴</span><div style="font-size:.72rem;color:#64748B">Sunday · Rest — No strenuous activity</div></div>
+                </div>
+              </div>
+              <!-- this week progress -->
+              <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.3rem">This Week · Progress</div>
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:8px;padding:.5rem .65rem;margin-bottom:.5rem">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem">
+                  <span style="font-size:.72rem;font-weight:600;color:#0F172A">4 of 5 sessions done</span>
+                  <span style="font-size:.72rem;font-weight:700;color:#0D9488">80%</span>
+                </div>
+                <div style="background:#F1F5F9;border-radius:20px;height:6px;overflow:hidden">
+                  <div style="background:linear-gradient(90deg,#0D9488,#14B8A6);width:80%;height:100%;border-radius:20px"></div>
+                </div>
+                <div style="display:flex;gap:.2rem;margin-top:.35rem">
+                  <div style="flex:1;height:18px;background:#22C55E;border-radius:3px;text-align:center;font-size:.55rem;color:white;line-height:18px">M✓</div>
+                  <div style="flex:1;height:18px;background:#22C55E;border-radius:3px;text-align:center;font-size:.55rem;color:white;line-height:18px">T✓</div>
+                  <div style="flex:1;height:18px;background:#22C55E;border-radius:3px;text-align:center;font-size:.55rem;color:white;line-height:18px">W✓</div>
+                  <div style="flex:1;height:18px;background:#22C55E;border-radius:3px;text-align:center;font-size:.55rem;color:white;line-height:18px">T✓</div>
+                  <div style="flex:1;height:18px;background:#0D9488;border-radius:3px;text-align:center;font-size:.55rem;color:white;line-height:18px">F→</div>
+                  <div style="flex:1;height:18px;background:#E2E8F0;border-radius:3px;text-align:center;font-size:.55rem;color:#94A3B8;line-height:18px">Sa</div>
+                  <div style="flex:1;height:18px;background:#F1F5F9;border-radius:3px;text-align:center;font-size:.55rem;color:#94A3B8;line-height:18px">Su</div>
+                </div>
+              </div>
+              <div style="background:#22C55E20;border:1px solid #22C55E40;border-radius:8px;padding:.45rem;text-align:center;font-size:.68rem;color:#16A34A;font-weight:600">🏃 Log Today's Exercise</div>
+              <div style="height:8px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item a"><div class="ni">📋</div><div class="nl" style="color:#0D9488">Journal</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">📅</div><div class="nl">Appts</div></div>
+            <div class="nav-item"><div class="ni">⋯</div><div class="nl">More</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end arrow-row care plans -->
+  <div class="annotation"><strong>Care Plan Generation — AI Architecture Note</strong>
+  The AI agent gets: (1) latest diagnosis from consultation note, (2) last 3 lab reports, (3) EHR journal history (what the patient actually eats / their exercise habits), (4) current medications (some medicines have diet interactions). The late-dinner insight ("⚠️ late meals after 8 PM") comes directly from the patient's own journal data — not a generic rule. A doctor can edit the AI-generated plan before it's sent. Plan updates via WhatsApp so patients don't need to open the app.</div>
+</div>
+
+<!-- ══════════════════════════════
+     HEALTH TREND ANALYTICS
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Trend Analytics</div>
+  <h2>Health Trend Graphs</h2>
+  <div class="desc">Visual trends for all lab report values, journal vitals, and medicine compliance — date-wise. The single most important screen for a chronic patient to understand "what is actually happening to my body over time." Doctors also see these trends in the briefing card.</div>
+
+  <div class="arrow-row" style="margin-bottom:2rem">
+
+    <!-- Trend Graph Mobile -->
+    <div class="phone">
+      <div class="phone-label">Trend View (Mobile)</div>
+      <div class="phone-device">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="status-bar" style="background:#F8FAFC"><span style="color:#0F172A">9:41</span><div style="display:flex;gap:3px;font-size:9px;color:#0F172A"><span>●●●</span><span>🔋</span></div></div>
+          <div class="scr" style="background:#F8FAFC">
+            <div style="background:white;padding:.5rem .75rem;border-bottom:1px solid #F1F5F9">
+              <div style="color:#0F172A;font-size:.85rem;font-weight:700">My Trends</div>
+              <!-- chart type tabs -->
+              <div style="display:flex;gap:.25rem;margin-top:.35rem;overflow-x:auto;padding-bottom:.1rem">
+                <div style="background:#0D9488;color:white;border-radius:6px;padding:.2rem .5rem;font-size:.62rem;font-weight:700;white-space:nowrap">HbA1c</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:6px;padding:.2rem .5rem;font-size:.62rem;white-space:nowrap">Sugar</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:6px;padding:.2rem .5rem;font-size:.62rem;white-space:nowrap">LDL</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:6px;padding:.2rem .5rem;font-size:.62rem;white-space:nowrap">BP</div>
+                <div style="background:#F1F5F9;color:#475569;border-radius:6px;padding:.2rem .5rem;font-size:.62rem;white-space:nowrap">💊 Meds</div>
+              </div>
+            </div>
+            <div style="padding:.6rem .75rem">
+              <!-- current value hero -->
+              <div style="background:linear-gradient(135deg,#F0FDFA,white);border:1.5px solid #CCFBF1;border-radius:12px;padding:.65rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase">HbA1c — Latest</div>
+                  <div style="font-size:1.6rem;font-weight:800;color:#0F172A">6.8<span style="font-size:.85rem;color:#64748B">%</span></div>
+                  <div style="font-size:.65rem;color:#22C55E;font-weight:600">↓ Improving · was 7.2% in Dec</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:.6rem;color:#64748B">Normal &lt; 7.0%</div>
+                  <div style="background:#22C55E20;color:#22C55E;border-radius:20px;padding:.15rem .5rem;font-size:.65rem;font-weight:700;margin-top:.2rem">✓ In range</div>
+                </div>
+              </div>
+              <!-- bar chart — HbA1c 6 months -->
+              <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.35rem;display:flex;justify-content:space-between">
+                <span>6-Month Trend</span>
+                <span style="color:#F59E0B">— threshold 7.0%</span>
+              </div>
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.6rem .65rem;margin-bottom:.5rem">
+                <div style="position:relative;height:72px;display:flex;align-items:flex-end;gap:5px">
+                  <!-- reference line at 60% of 72px = 43px from bottom -->
+                  <div style="position:absolute;left:0;right:0;bottom:43px;border-top:1.5px dashed #F59E0B;z-index:2"></div>
+                  <!-- bars -->
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+                    <div style="font-size:.55rem;color:#F59E0B;font-weight:700">7.2</div>
+                    <div style="width:100%;background:#F59E0B;border-radius:3px 3px 0 0;height:49px"></div>
+                    <div style="font-size:.55rem;color:#94A3B8">Dec</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+                    <div style="font-size:.55rem;color:#F59E0B;font-weight:700">7.0</div>
+                    <div style="width:100%;background:#F59E0B;border-radius:3px 3px 0 0;height:43px"></div>
+                    <div style="font-size:.55rem;color:#94A3B8">Jan</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+                    <div style="font-size:.55rem;color:#F59E0B;font-weight:700">7.1</div>
+                    <div style="width:100%;background:#F59E0B;border-radius:3px 3px 0 0;height:46px"></div>
+                    <div style="font-size:.55rem;color:#94A3B8">Feb</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+                    <div style="font-size:.55rem;color:#22C55E;font-weight:700">6.9</div>
+                    <div style="width:100%;background:#22C55E;border-radius:3px 3px 0 0;height:40px"></div>
+                    <div style="font-size:.55rem;color:#94A3B8">Mar</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+                    <div style="font-size:.55rem;color:#22C55E;font-weight:700">6.7</div>
+                    <div style="width:100%;background:#22C55E;border-radius:3px 3px 0 0;height:35px"></div>
+                    <div style="font-size:.55rem;color:#94A3B8">Apr</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+                    <div style="font-size:.55rem;color:#22C55E;font-weight:700">6.8</div>
+                    <div style="width:100%;background:linear-gradient(180deg,#14B8A6,#0D9488);border-radius:3px 3px 0 0;height:38px;box-shadow:0 0 0 1.5px #0D9488"></div>
+                    <div style="font-size:.55rem;color:#0D9488;font-weight:700">May</div>
+                  </div>
+                </div>
+              </div>
+              <!-- AI trend insight -->
+              <div style="background:#F0FDFA;border:1px solid #CCFBF1;border-radius:10px;padding:.55rem .65rem;margin-bottom:.45rem">
+                <div style="font-size:.6rem;font-weight:700;color:#0D9488;margin-bottom:.2rem">🤖 AI TREND INSIGHT</div>
+                <div style="font-size:.7rem;color:#0F172A;line-height:1.45">HbA1c improved from 7.2% → 6.8% over 6 months. Your morning walk habit (started in March, confirmed by journal) correlates with the improvement. Keep it up — target is 6.5% by August.</div>
+              </div>
+              <!-- medicine compliance mini -->
+              <div style="font-size:.6rem;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:.3rem">Medicine Compliance · Last 30 Days</div>
+              <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:.55rem .65rem">
+                <div style="font-size:.68rem;font-weight:600;color:#0F172A;margin-bottom:.35rem">Metformin 500mg</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2.5px;margin-bottom:.35rem">
+                  <!-- 30 dots: mostly green (taken), few red (missed), few gray (future) -->
+                  <div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#EF4444"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div>
+                  <div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#EF4444"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div>
+                  <div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div>
+                  <div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#EF4444"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div><div style="width:14px;height:14px;border-radius:3px;background:#22C55E"></div>
+                </div>
+                <div style="display:flex;gap:.5rem;font-size:.6rem">
+                  <div style="display:flex;align-items:center;gap:.2rem"><div style="width:8px;height:8px;border-radius:2px;background:#22C55E"></div><span style="color:#64748B">27 taken</span></div>
+                  <div style="display:flex;align-items:center;gap:.2rem"><div style="width:8px;height:8px;border-radius:2px;background:#EF4444"></div><span style="color:#64748B">3 missed</span></div>
+                  <span style="color:#0D9488;font-weight:700;margin-left:auto">90% compliance ✓</span>
+                </div>
+              </div>
+              <div style="height:8px"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><div class="ni">🏠</div><div class="nl">Home</div></div>
+            <div class="nav-item"><div class="ni">📋</div><div class="nl">Journal</div></div>
+            <div class="nav-item"><div class="ni">📁</div><div class="nl">Reports</div></div>
+            <div class="nav-item"><div class="ni">📅</div><div class="nl">Appts</div></div>
+            <div class="nav-item a"><div class="ni">📊</div><div class="nl" style="color:#0D9488">Trends</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- spacer -->
+    <div style="flex-shrink:0;width:32px"></div>
+
+    <!-- notes panel -->
+    <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:.75rem">
+      <div style="background:#1E293B;border-radius:10px;padding:1rem">
+        <div style="font-size:.7rem;font-weight:700;color:#94A3B8;text-transform:uppercase;margin-bottom:.6rem">Charts available (tap tabs to switch)</div>
+        <div style="display:flex;flex-direction:column;gap:.35rem">
+          <div style="background:#0F172A;border-radius:7px;padding:.45rem .6rem;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.72rem;color:#CBD5E1;font-weight:600">📊 HbA1c</span><span style="font-size:.65rem;color:#22C55E">6 months · ↓ Improving</span>
+          </div>
+          <div style="background:#0F172A;border-radius:7px;padding:.45rem .6rem;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.72rem;color:#CBD5E1;font-weight:600">🩸 Blood Sugar</span><span style="font-size:.65rem;color:#22C55E">30 days · daily journal</span>
+          </div>
+          <div style="background:#0F172A;border-radius:7px;padding:.45rem .6rem;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.72rem;color:#CBD5E1;font-weight:600">🧪 LDL Cholesterol</span><span style="font-size:.65rem;color:#F59E0B">3 points · ↑ Rising</span>
+          </div>
+          <div style="background:#0F172A;border-radius:7px;padding:.45rem .6rem;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.72rem;color:#CBD5E1;font-weight:600">🫀 Blood Pressure</span><span style="font-size:.65rem;color:#22C55E">14 days · Stable</span>
+          </div>
+          <div style="background:#0F172A;border-radius:7px;padding:.45rem .6rem;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.72rem;color:#CBD5E1;font-weight:600">💊 Medicine Compliance</span><span style="font-size:.65rem;color:#22C55E">30-day calendar · 90%</span>
+          </div>
+        </div>
+      </div>
+      <div class="annotation" style="margin-top:0"><strong>Why trend graphs beat individual readings</strong>
+      A single HbA1c of 6.8% tells you nothing. Six months of HbA1c from 7.2 → 7.0 → 7.1 → 6.9 → 6.7 → 6.8 tells you the treatment is working but slightly slipping. The medicine compliance calendar (GitHub-style dots) shows the doctor exactly which 3 days were missed — and correlates those with the blood sugar spikes on the same days. This is the insight that used to require a specialist. Now it's automatic.</div>
+    </div>
+
+  </div><!-- end trend arrow-row mobile -->
+
+  <!-- DESKTOP TREND DASHBOARD -->
+  <div class="desktop-frame">
+    <div class="desktop-topbar">
+      <div class="desktop-dot" style="background:#EF4444"></div>
+      <div class="desktop-dot" style="background:#F59E0B"></div>
+      <div class="desktop-dot" style="background:#22C55E"></div>
+      <div class="desktop-url">🔒 healthbridge.in/patient/trends</div>
+    </div>
+    <div class="desktop-screen">
+      <div class="desktop-sidebar">
+        <div class="ds-logo"><div>HealthBridge</div><div>Patient Portal</div></div>
+        <div class="ds-item"><span class="di">📋</span>Health Journal</div>
+        <div class="ds-item"><span class="di">📁</span>My Reports</div>
+        <div class="ds-item"><span class="di">📅</span>Appointments</div>
+        <div class="ds-item"><span class="di">💊</span>Medicines</div>
+        <div class="ds-item act"><span class="di">📊</span>Trends</div>
+        <div class="ds-item"><span class="di">🥗</span>Care Plans</div>
+        <div class="ds-item"><span class="di">🏥</span>My Clinics</div>
+        <div class="ds-item"><span class="di">💬</span>Messages</div>
+        <div style="border-top:1px solid #1E293B;margin-top:auto;padding-top:.3rem">
+          <div class="ds-item"><span class="di">⚙️</span>Settings</div>
+          <div class="ds-item"><span class="di">🌐</span>हिंदी</div>
+        </div>
+      </div>
+      <div class="desktop-content">
+        <!-- date range + header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem">
+          <div>
+            <div style="font-size:.65rem;color:#64748B">Health Analytics</div>
+            <div style="font-size:.9rem;font-weight:700;color:#F8FAFC">Meena Sharma · Trends Dashboard</div>
+          </div>
+          <div style="display:flex;gap:.3rem">
+            <div style="background:#1E293B;border-radius:5px;padding:.25rem .55rem;font-size:.65rem;color:#94A3B8;border:1px solid #334155">3M</div>
+            <div style="background:#0D9488;border-radius:5px;padding:.25rem .55rem;font-size:.65rem;color:white;font-weight:700">6M</div>
+            <div style="background:#1E293B;border-radius:5px;padding:.25rem .55rem;font-size:.65rem;color:#94A3B8;border:1px solid #334155">1Y</div>
+          </div>
+        </div>
+
+        <!-- 2x2 chart grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem;height:calc(100% - 44px)">
+
+          <!-- Chart 1: HbA1c -->
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem .65rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+              <div style="font-size:.65rem;font-weight:700;color:#94A3B8">HbA1c — 6 Month Trend</div>
+              <div style="font-size:.62rem;color:#22C55E;font-weight:600">↓ Improving</div>
+            </div>
+            <div style="position:relative;height:75px;display:flex;align-items:flex-end;gap:4px;margin-bottom:.3rem">
+              <div style="position:absolute;left:0;right:0;bottom:45px;border-top:1px dashed #F59E0B;z-index:2"></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.52rem;color:#F59E0B">7.2</div><div style="width:100%;background:#F59E0B;border-radius:2px 2px 0 0;height:52px"></div><div style="font-size:.5rem;color:#64748B">Dec</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.52rem;color:#F59E0B">7.0</div><div style="width:100%;background:#F59E0B;border-radius:2px 2px 0 0;height:45px"></div><div style="font-size:.5rem;color:#64748B">Jan</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.52rem;color:#F59E0B">7.1</div><div style="width:100%;background:#F59E0B;border-radius:2px 2px 0 0;height:48px"></div><div style="font-size:.5rem;color:#64748B">Feb</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.52rem;color:#22C55E">6.9</div><div style="width:100%;background:#22C55E;border-radius:2px 2px 0 0;height:42px"></div><div style="font-size:.5rem;color:#64748B">Mar</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.52rem;color:#22C55E">6.7</div><div style="width:100%;background:#22C55E;border-radius:2px 2px 0 0;height:36px"></div><div style="font-size:.5rem;color:#64748B">Apr</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.52rem;color:#22C55E">6.8</div><div style="width:100%;background:#14B8A6;border-radius:2px 2px 0 0;height:39px;box-shadow:0 0 0 1.5px #0D9488"></div><div style="font-size:.5rem;color:#14B8A6;font-weight:700">May</div></div>
+            </div>
+            <div style="font-size:.58rem;color:#64748B">Normal &lt; 7.0% · <span style="color:#F59E0B">— dashed line</span></div>
+          </div>
+
+          <!-- Chart 2: Blood Sugar (14 days) -->
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem .65rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+              <div style="font-size:.65rem;font-weight:700;color:#94A3B8">🩸 Fasting Sugar — 14 Days</div>
+              <div style="font-size:.62rem;color:#22C55E;font-weight:600">↓ Better this week</div>
+            </div>
+            <div style="position:relative;height:75px;display:flex;align-items:flex-end;gap:3px;margin-bottom:.3rem">
+              <div style="position:absolute;left:0;right:0;bottom:34px;border-top:1px dashed #F59E0B;z-index:2"></div>
+              <div style="flex:1;background:#F59E0B;border-radius:2px 2px 0 0;height:47px"></div>
+              <div style="flex:1;background:#F59E0B;border-radius:2px 2px 0 0;height:41px"></div>
+              <div style="flex:1;background:#22C55E;border-radius:2px 2px 0 0;height:36px"></div>
+              <div style="flex:1;background:#EF4444;border-radius:2px 2px 0 0;height:57px"></div>
+              <div style="flex:1;background:#22C55E;border-radius:2px 2px 0 0;height:30px"></div>
+              <div style="flex:1;background:#F59E0B;border-radius:2px 2px 0 0;height:44px"></div>
+              <div style="flex:1;background:#22C55E;border-radius:2px 2px 0 0;height:33px"></div>
+              <div style="flex:1;background:#22C55E;border-radius:2px 2px 0 0;height:28px"></div>
+              <div style="flex:1;background:#F59E0B;border-radius:2px 2px 0 0;height:40px"></div>
+              <div style="flex:1;background:#22C55E;border-radius:2px 2px 0 0;height:32px"></div>
+              <div style="flex:1;background:#22C55E;border-radius:2px 2px 0 0;height:27px"></div>
+              <div style="flex:1;background:#22C55E;border-radius:2px 2px 0 0;height:35px"></div>
+              <div style="flex:1;background:#22C55E;border-radius:2px 2px 0 0;height:31px"></div>
+              <div style="flex:1;background:#14B8A6;border-radius:2px 2px 0 0;height:29px;box-shadow:0 0 0 1px #0D9488"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.55rem;color:#64748B"><span>May 17</span><span>May 31 (today)</span></div>
+            <div style="font-size:.58rem;color:#64748B;margin-top:.1rem">Normal &lt; 126 mg/dL · <span style="color:#EF4444">Red = high</span></div>
+          </div>
+
+          <!-- Chart 3: LDL Trend -->
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem .65rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+              <div style="font-size:.65rem;font-weight:700;color:#94A3B8">🧪 LDL Cholesterol — 3 Tests</div>
+              <div style="font-size:.62rem;color:#F59E0B;font-weight:600">↑ Rising — needs attention</div>
+            </div>
+            <div style="position:relative;height:75px;display:flex;align-items:flex-end;gap:16px;margin-bottom:.3rem;padding:0 10px">
+              <div style="position:absolute;left:0;right:0;bottom:44px;border-top:1px dashed #F59E0B;z-index:2"></div>
+              <div style="position:absolute;left:0;right:0;bottom:63px;border-top:1px dashed #EF4444;z-index:2"></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.55rem;color:#22C55E;font-weight:700">95</div><div style="width:100%;background:#22C55E;border-radius:2px 2px 0 0;height:22px"></div><div style="font-size:.52rem;color:#64748B">Dec '25</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.55rem;color:#22C55E;font-weight:700">118</div><div style="width:100%;background:#22C55E;border-radius:2px 2px 0 0;height:36px"></div><div style="font-size:.52rem;color:#64748B">Feb '26</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1.5px"><div style="font-size:.55rem;color:#F59E0B;font-weight:700">142</div><div style="width:100%;background:#F59E0B;border-radius:2px 2px 0 0;height:52px;box-shadow:0 0 0 1.5px #F59E0B"></div><div style="font-size:.52rem;color:#F59E0B;font-weight:700">May '26</div></div>
+            </div>
+            <div style="font-size:.58rem;color:#64748B">Borderline &gt;130 · <span style="color:#F59E0B">— 130</span> · High &gt;160 · <span style="color:#EF4444">— 160</span></div>
+          </div>
+
+          <!-- Chart 4: Medicine Compliance Calendar -->
+          <div style="background:#1E293B;border-radius:8px;padding:.55rem .65rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+              <div style="font-size:.65rem;font-weight:700;color:#94A3B8">💊 Metformin · 30-Day Compliance</div>
+              <div style="font-size:.62rem;color:#22C55E;font-weight:600">90% — 27/30 days ✓</div>
+            </div>
+            <!-- calendar grid — 5 weeks x 7 days -->
+            <div style="display:flex;gap:2px;margin-bottom:.25rem">
+              <div style="font-size:.48rem;color:#64748B;width:18px;text-align:center">M</div><div style="font-size:.48rem;color:#64748B;width:18px;text-align:center">T</div><div style="font-size:.48rem;color:#64748B;width:18px;text-align:center">W</div><div style="font-size:.48rem;color:#64748B;width:18px;text-align:center">T</div><div style="font-size:.48rem;color:#64748B;width:18px;text-align:center">F</div><div style="font-size:.48rem;color:#64748B;width:18px;text-align:center">S</div><div style="font-size:.48rem;color:#64748B;width:18px;text-align:center">S</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="display:flex;gap:2px"><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#EF4444"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div></div>
+              <div style="display:flex;gap:2px"><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div></div>
+              <div style="display:flex;gap:2px"><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#EF4444"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div></div>
+              <div style="display:flex;gap:2px"><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div></div>
+              <div style="display:flex;gap:2px"><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#EF4444"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#22C55E"></div><div style="width:18px;height:14px;border-radius:2px;background:#14B8A6"></div><div style="width:18px;height:14px;border-radius:2px;background:#334155;opacity:.5"></div><div style="width:18px;height:14px;border-radius:2px;background:#334155;opacity:.5"></div></div>
+            </div>
+            <div style="display:flex;gap:.5rem;margin-top:.3rem;font-size:.55rem">
+              <span style="display:flex;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:1px;background:#22C55E"></div><span style="color:#64748B">Taken</span></span>
+              <span style="display:flex;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:1px;background:#EF4444"></div><span style="color:#64748B">Missed</span></span>
+              <span style="display:flex;align-items:center;gap:2px"><div style="width:7px;height:7px;border-radius:1px;background:#14B8A6"></div><span style="color:#64748B">Today</span></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- end desktop frame -->
+
+  <div class="annotation" style="margin-top:1rem"><strong>Trend Graph Data Sources — How each chart is populated</strong>
+  HbA1c / LDL charts pull from lab reports (OCR-extracted values with date). Blood sugar chart pulls from EHR journal entries. Medicine compliance calendar is built from the daily reminder confirmation (patient taps "Taken" on WhatsApp reminder → logged). All data is already in the system — trend charts are a zero-effort byproduct. On the doctor's briefing card, the same trend data appears as a mini sparkline next to each metric so the doctor sees the trajectory at a glance, not just the latest number.</div>
+</div>
+
+<div style="background:#1E293B;text-align:center;padding:2rem;color:#64748B;font-size:.82rem">
+  <strong style="color:#F8FAFC">HealthBridge UI Mockups — File 2 of 4: Patient Journey</strong><br>
+  <div style="margin-top:.5rem">
+    <a href="mockup-01-design-systems.html" style="color:#14B8A6;text-decoration:none">← File 1: Design Systems</a> ·
+    <a href="mockup-03-doctor-screens.html" style="color:#14B8A6;text-decoration:none;margin-left:.5rem">File 3 → Doctor Experience</a> ·
+    <a href="mockup-04-clinic-admin.html" style="color:#14B8A6;text-decoration:none;margin-left:.5rem">File 4 → Clinic Admin</a>
+  </div>
+</div>
+
+</body>
+</html>

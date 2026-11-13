@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse Proxy - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html" class="active"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">API &amp; Communication &rarr; Reverse Proxy</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">API</span>
+                <span class="tag">Concept</span>
+            </div>
+            <h1>Reverse Proxy</h1>
+            <p class="hero-subtitle">A server that sits in front of your backend servers, intercepting client requests and forwarding them to the appropriate origin &mdash; providing SSL termination, caching, compression, and security without clients ever knowing the backend exists.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>receptionist who answers your company&rsquo;s phone</strong>. External callers dial one number and reach the receptionist, who then routes the call to the right employee. Callers never learn direct extension numbers, can&rsquo;t bypass the receptionist to access internal lines, and the receptionist can screen calls, take messages, or redirect to voicemail. A reverse proxy works the same way &mdash; clients see one public address, never knowing which backend server actually handles their request.</p>
+        </div>
+
+        <h2>Forward Proxy vs Reverse Proxy</h2>
+        <h3>Forward Proxy</h3>
+        <ul>
+            <li>Sits in front of <strong>clients</strong> &mdash; intercepts outgoing requests from your network</li>
+            <li>The server doesn&rsquo;t know who the real client is (client anonymity)</li>
+            <li>Used for: content filtering, bypassing geo-restrictions, corporate firewalls, caching for clients</li>
+            <li>Example: A company proxy that blocks social media sites during work hours</li>
+        </ul>
+
+        <h3>Reverse Proxy</h3>
+        <ul>
+            <li>Sits in front of <strong>servers</strong> &mdash; intercepts incoming requests from the internet</li>
+            <li>The client doesn&rsquo;t know which server actually handled the request (server anonymity)</li>
+            <li>Used for: SSL termination, caching, load balancing, security, compression</li>
+            <li>Example: nginx receiving all traffic for <code>api.company.com</code> and forwarding to internal services</li>
+        </ul>
+
+        <h2>What Reverse Proxies Do</h2>
+        <h3>SSL/TLS Termination</h3>
+        <ul>
+            <li>The proxy handles all HTTPS encryption/decryption &mdash; backend servers communicate over plain HTTP internally</li>
+            <li>Centralizes certificate management &mdash; renew certs in one place, not on every server</li>
+            <li>Offloads CPU-intensive TLS handshakes from application servers</li>
+            <li>Internal traffic can still use TLS (re-encryption) for defense-in-depth, but it&rsquo;s optional</li>
+        </ul>
+
+        <h3>Response Caching</h3>
+        <ul>
+            <li>Cache frequently-requested responses at the proxy level &mdash; backends never see repeated requests</li>
+            <li>Respects cache headers: <code>Cache-Control</code>, <code>ETag</code>, <code>Last-Modified</code></li>
+            <li>Dramatically reduces backend load for static assets and rarely-changing API responses</li>
+            <li>Cache invalidation via purge APIs when content changes</li>
+        </ul>
+
+        <h3>Compression</h3>
+        <ul>
+            <li>Compresses responses with gzip/brotli before sending to clients</li>
+            <li>Backends send uncompressed data internally (faster, less CPU), proxy compresses at the edge</li>
+            <li>Reduces bandwidth costs and improves page load times (especially for text-heavy responses)</li>
+        </ul>
+
+        <h3>Security</h3>
+        <ul>
+            <li><strong>IP hiding:</strong> Backend server IPs are never exposed to the internet</li>
+            <li><strong>DDoS protection:</strong> The proxy absorbs attack traffic before it reaches your servers</li>
+            <li><strong>WAF (Web Application Firewall):</strong> Inspect and block malicious requests (SQL injection, XSS)</li>
+            <li><strong>Rate limiting:</strong> Throttle abusive clients at the edge</li>
+            <li><strong>Header sanitization:</strong> Remove or rewrite headers that could expose internal architecture</li>
+        </ul>
+
+        <h2>Reverse Proxy vs Load Balancer vs API Gateway</h2>
+        <ul>
+            <li>These three have <strong>overlapping responsibilities</strong> &mdash; many tools do all three (nginx, Envoy, Traefik)</li>
+            <li><strong>Reverse Proxy:</strong> Core function is forwarding requests and hiding backends. Adds caching, compression, SSL</li>
+            <li><strong>Load Balancer:</strong> Core function is distributing traffic across multiple instances of the same service</li>
+            <li><strong>API Gateway:</strong> Core function is API-level concerns &mdash; auth, rate limiting, request transformation, aggregation</li>
+            <li>In practice: nginx acts as all three simultaneously for many deployments</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Reverse Proxy</th>
+                        <th>Load Balancer</th>
+                        <th>API Gateway</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SSL Termination</strong></td>
+                        <td>&#x2705; Primary role</td>
+                        <td>&#x2705; Often included</td>
+                        <td>&#x2705; Often included</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Caching</strong></td>
+                        <td>&#x2705; Primary role</td>
+                        <td>&#x26A0;&#xFE0F; Rarely</td>
+                        <td>&#x2705; Response caching</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Load Distribution</strong></td>
+                        <td>&#x26A0;&#xFE0F; Basic</td>
+                        <td>&#x2705; Primary role</td>
+                        <td>&#x2705; To service pools</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Authentication</strong></td>
+                        <td>&#x26A0;&#xFE0F; Basic auth only</td>
+                        <td>&#x274C; Not typical</td>
+                        <td>&#x2705; Primary role</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Request Aggregation</strong></td>
+                        <td>&#x274C; No</td>
+                        <td>&#x274C; No</td>
+                        <td>&#x2705; Primary role</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Compression</strong></td>
+                        <td>&#x2705; Primary role</td>
+                        <td>&#x26A0;&#xFE0F; Sometimes</td>
+                        <td>&#x26A0;&#xFE0F; Sometimes</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Implementation</h2>
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> gzip
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Dict, Optional, Tuple
+<span class="token-keyword">from</span> collections <span class="token-keyword">import</span> OrderedDict
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Request / Response models</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-class">ProxyRequest</span>:
+    method: str
+    path: str
+    headers: Dict[str, str] = field(default_factory=dict)
+    body: Optional[str] = <span class="token-keyword">None</span>
+    client_ip: str = <span class="token-string">"203.0.113.1"</span>
+
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-class">ProxyResponse</span>:
+    status: int
+    body: str
+    headers: Dict[str, str] = field(default_factory=dict)
+    cached: bool = <span class="token-keyword">False</span>
+    compressed: bool = <span class="token-keyword">False</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Response Cache (LRU)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">ResponseCache</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, max_size: int = <span class="token-number">100</span>, default_ttl: int = <span class="token-number">300</span>):
+        self.max_size = max_size
+        self.default_ttl = default_ttl
+        self._cache: OrderedDict[str, Tuple[ProxyResponse, float]] = OrderedDict()
+
+    <span class="token-keyword">def</span> <span class="token-function">_cache_key</span>(self, request: ProxyRequest) -> str:
+        <span class="token-keyword">return</span> f<span class="token-string">"{request.method}:{request.path}"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, request: ProxyRequest) -> Optional[ProxyResponse]:
+        key = self._cache_key(request)
+        <span class="token-keyword">if</span> key <span class="token-keyword">not in</span> self._cache:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        response, expires_at = self._cache[key]
+        <span class="token-keyword">if</span> time.time() > expires_at:
+            <span class="token-keyword">del</span> self._cache[key]
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        <span class="token-comment"># Move to end (most recently used)</span>
+        self._cache.move_to_end(key)
+        response.cached = <span class="token-keyword">True</span>
+        <span class="token-keyword">return</span> response
+
+    <span class="token-keyword">def</span> <span class="token-function">put</span>(self, request: ProxyRequest, response: ProxyResponse, ttl: Optional[int] = <span class="token-keyword">None</span>):
+        <span class="token-keyword">if</span> request.method != <span class="token-string">"GET"</span>:
+            <span class="token-keyword">return</span>  <span class="token-comment"># Only cache GET requests</span>
+        key = self._cache_key(request)
+        expires_at = time.time() + (ttl or self.default_ttl)
+        self._cache[key] = (response, expires_at)
+        <span class="token-keyword">if</span> len(self._cache) > self.max_size:
+            self._cache.popitem(last=<span class="token-keyword">False</span>)  <span class="token-comment"># Evict LRU</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">purge</span>(self, path: str):
+        key = f<span class="token-string">"GET:{path}"</span>
+        <span class="token-keyword">if</span> key <span class="token-keyword">in</span> self._cache:
+            <span class="token-keyword">del</span> self._cache[key]
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># SSL Termination (conceptual)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">SSLTerminator</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, cert_path: str, key_path: str):
+        self.cert_path = cert_path
+        self.key_path = key_path
+        self.handshakes_handled = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">terminate</span>(self, request: ProxyRequest) -> ProxyRequest:
+        <span class="token-string">"""Strip TLS, forward as plain HTTP internally."""</span>
+        self.handshakes_handled += <span class="token-number">1</span>
+        <span class="token-comment"># In reality: decrypt TLS, extract HTTP request</span>
+        request.headers[<span class="token-string">"X-Forwarded-Proto"</span>] = <span class="token-string">"https"</span>
+        request.headers[<span class="token-string">"X-Forwarded-For"</span>] = request.client_ip
+        <span class="token-keyword">return</span> request
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Compression Layer</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Compressor</span>:
+    MIN_SIZE = <span class="token-number">1024</span>  <span class="token-comment"># Don't compress responses smaller than 1KB</span>
+    COMPRESSIBLE_TYPES = {<span class="token-string">"text/html"</span>, <span class="token-string">"application/json"</span>, <span class="token-string">"text/css"</span>, <span class="token-string">"text/javascript"</span>}
+
+    <span class="token-keyword">def</span> <span class="token-function">should_compress</span>(self, request: ProxyRequest, response: ProxyResponse) -> bool:
+        accepts = request.headers.get(<span class="token-string">"Accept-Encoding"</span>, <span class="token-string">""</span>)
+        content_type = response.headers.get(<span class="token-string">"Content-Type"</span>, <span class="token-string">""</span>)
+        <span class="token-keyword">return</span> (
+            <span class="token-string">"gzip"</span> <span class="token-keyword">in</span> accepts
+            <span class="token-keyword">and</span> len(response.body) >= self.MIN_SIZE
+            <span class="token-keyword">and</span> content_type <span class="token-keyword">in</span> self.COMPRESSIBLE_TYPES
+        )
+
+    <span class="token-keyword">def</span> <span class="token-function">compress</span>(self, response: ProxyResponse) -> ProxyResponse:
+        original_size = len(response.body)
+        compressed = gzip.compress(response.body.encode())
+        response.headers[<span class="token-string">"Content-Encoding"</span>] = <span class="token-string">"gzip"</span>
+        response.headers[<span class="token-string">"Content-Length"</span>] = str(len(compressed))
+        response.compressed = <span class="token-keyword">True</span>
+        print(f<span class="token-string">"  Compressed: {original_size}B → {len(compressed)}B"</span>)
+        <span class="token-keyword">return</span> response
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Reverse Proxy</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">ReverseProxy</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.cache = ResponseCache(max_size=<span class="token-number">50</span>, default_ttl=<span class="token-number">60</span>)
+        self.ssl = SSLTerminator(<span class="token-string">"/etc/ssl/cert.pem"</span>, <span class="token-string">"/etc/ssl/key.pem"</span>)
+        self.compressor = Compressor()
+        self.backends: Dict[str, str] = {}
+        self.blocked_ips: set = set()
+
+    <span class="token-keyword">def</span> <span class="token-function">register_backend</span>(self, path_prefix: str, backend_url: str):
+        self.backends[path_prefix] = backend_url
+
+    <span class="token-keyword">def</span> <span class="token-function">block_ip</span>(self, ip: str):
+        self.blocked_ips.add(ip)
+
+    <span class="token-keyword">def</span> <span class="token-function">_forward_to_backend</span>(self, request: ProxyRequest) -> ProxyResponse:
+        <span class="token-string">"""Simulate forwarding request to a backend server."""</span>
+        <span class="token-keyword">for</span> prefix, backend <span class="token-keyword">in</span> sorted(
+            self.backends.items(), key=<span class="token-keyword">lambda</span> x: len(x[<span class="token-number">0</span>]), reverse=<span class="token-keyword">True</span>
+        ):
+            <span class="token-keyword">if</span> request.path.startswith(prefix):
+                <span class="token-keyword">return</span> ProxyResponse(
+                    status=<span class="token-number">200</span>,
+                    body=f<span class="token-string">'{{"backend": "{backend}", "path": "{request.path}"}}'</span>,
+                    headers={<span class="token-string">"Content-Type"</span>: <span class="token-string">"application/json"</span>}
+                )
+        <span class="token-keyword">return</span> ProxyResponse(status=<span class="token-number">502</span>, body=<span class="token-string">'{"error": "No backend available"}'</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">handle_request</span>(self, request: ProxyRequest) -> ProxyResponse:
+        <span class="token-string">"""Full reverse proxy request pipeline."""</span>
+
+        <span class="token-comment"># Step 1: Security &mdash; block banned IPs</span>
+        <span class="token-keyword">if</span> request.client_ip <span class="token-keyword">in</span> self.blocked_ips:
+            <span class="token-keyword">return</span> ProxyResponse(status=<span class="token-number">403</span>, body=<span class="token-string">'{"error": "Forbidden"}'</span>)
+
+        <span class="token-comment"># Step 2: SSL termination</span>
+        request = self.ssl.terminate(request)
+
+        <span class="token-comment"># Step 3: Check cache</span>
+        cached = self.cache.get(request)
+        <span class="token-keyword">if</span> cached:
+            print(f<span class="token-string">"  CACHE HIT: {request.path}"</span>)
+            <span class="token-keyword">return</span> cached
+
+        <span class="token-comment"># Step 4: Forward to backend</span>
+        response = self._forward_to_backend(request)
+
+        <span class="token-comment"># Step 5: Cache the response</span>
+        <span class="token-keyword">if</span> response.status == <span class="token-number">200</span>:
+            self.cache.put(request, response)
+
+        <span class="token-comment"># Step 6: Compress if supported</span>
+        <span class="token-keyword">if</span> self.compressor.should_compress(request, response):
+            response = self.compressor.compress(response)
+
+        <span class="token-comment"># Step 7: Add proxy headers</span>
+        response.headers[<span class="token-string">"X-Proxy"</span>] = <span class="token-string">"reverse-proxy-v1"</span>
+        response.headers[<span class="token-string">"X-Cache"</span>] = <span class="token-string">"MISS"</span>
+        <span class="token-keyword">return</span> response
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Reverse proxy in action</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+proxy = ReverseProxy()
+proxy.register_backend(<span class="token-string">"/api"</span>, <span class="token-string">"http://app-server:8080"</span>)
+proxy.register_backend(<span class="token-string">"/static"</span>, <span class="token-string">"http://cdn-origin:9090"</span>)
+proxy.block_ip(<span class="token-string">"10.0.0.99"</span>)
+
+print(<span class="token-string">"=== Reverse Proxy Demo ==="</span>)
+print()
+
+<span class="token-comment"># Normal request &rarr; forwarded to backend</span>
+req1 = ProxyRequest(method=<span class="token-string">"GET"</span>, path=<span class="token-string">"/api/users"</span>,
+                    headers={<span class="token-string">"Accept-Encoding"</span>: <span class="token-string">"gzip"</span>})
+resp1 = proxy.handle_request(req1)
+print(f<span class="token-string">"Request 1: status={resp1.status}, cached={resp1.cached}"</span>)
+
+<span class="token-comment"># Same request again &rarr; served from cache</span>
+resp2 = proxy.handle_request(req1)
+print(f<span class="token-string">"Request 2: status={resp2.status}, cached={resp2.cached}"</span>)
+
+<span class="token-comment"># Blocked IP &rarr; rejected</span>
+bad_req = ProxyRequest(method=<span class="token-string">"GET"</span>, path=<span class="token-string">"/api/admin"</span>, client_ip=<span class="token-string">"10.0.0.99"</span>)
+resp3 = proxy.handle_request(bad_req)
+print(f<span class="token-string">"Blocked IP: status={resp3.status}"</span>)
+
+<span class="token-comment"># Static asset &rarr; routed to CDN origin</span>
+static_req = ProxyRequest(method=<span class="token-string">"GET"</span>, path=<span class="token-string">"/static/logo.png"</span>)
+resp4 = proxy.handle_request(static_req)
+print(f<span class="token-string">"Static: backend={resp4.body}"</span>)
+
+print(f<span class="token-string">"\nSSL handshakes handled: {proxy.ssl.handshakes_handled}"</span>)</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>nginx:</strong> The de facto standard reverse proxy. Powers over 30% of all websites. Its event-driven architecture handles tens of thousands of concurrent connections with minimal memory. Configuration is declarative &mdash; define <code>upstream</code> blocks for backends, <code>location</code> blocks for routing rules, and <code>proxy_pass</code> for forwarding.</p>
+            <p><strong>Caddy:</strong> A modern reverse proxy with automatic HTTPS. It obtains and renews TLS certificates from Let&rsquo;s Encrypt without any configuration. Its Caddyfile syntax is simpler than nginx configs. Ideal for smaller deployments where zero-config TLS is the primary requirement.</p>
+            <p><strong>Cloudflare:</strong> A globally-distributed reverse proxy (CDN). All traffic flows through Cloudflare&rsquo;s edge network before reaching your origin server. Provides DDoS protection, WAF, caching, and performance optimization. Your origin server&rsquo;s IP is hidden from the internet entirely.</p>
+            <p><strong>Varnish:</strong> A reverse proxy specialized for HTTP caching. Stores responses in memory and serves them at wire speed without touching the backend. Uses VCL (Varnish Configuration Language) to define complex caching rules. Wikipedia uses Varnish to serve millions of page views from cache.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>A reverse proxy sits in front of servers (hides backends), while a forward proxy sits in front of clients (hides clients)</li>
+                <li>SSL termination at the proxy centralizes certificate management and offloads TLS overhead from application servers</li>
+                <li>Response caching at the proxy layer can eliminate 80&ndash;90% of backend requests for cacheable content</li>
+                <li>Reverse proxies provide security by hiding server IPs, blocking malicious traffic, and sanitizing headers</li>
+                <li>Reverse proxy, load balancer, and API gateway overlap significantly &mdash; tools like nginx do all three</li>
+                <li>Compression at the proxy reduces bandwidth without requiring application-level changes</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Think of a reverse proxy as a <strong>bodyguard for your servers</strong>. The public only ever interacts with the bodyguard. The bodyguard checks credentials, blocks threats, and decides whether to handle the request himself (cache hit) or pass it through to the person behind him (backend).</p>
+            <div class="model-visual">
+                <pre>
+  FORWARD PROXY vs REVERSE PROXY:
+  ══════════════════════════════════════════════════════
+
+  FORWARD PROXY (hides clients):
+  ┌────────┐     ┌───────────┐     ┌────────┐
+  │ Client │────▶│  Forward  │────▶│ Server │
+  │  (you) │     │   Proxy   │     │        │
+  └────────┘     └───────────┘     └────────┘
+  Server sees proxy IP, not your IP
+
+  REVERSE PROXY (hides servers):
+  ┌────────┐     ┌───────────┐     ┌────────┐
+  │ Client │────▶│  Reverse  │────▶│ Server │
+  │        │     │   Proxy   │     │(hidden)│
+  └────────┘     └───────────┘     └────────┘
+  Client sees proxy IP, not server IP
+
+
+  REVERSE PROXY REQUEST PIPELINE:
+  ══════════════════════════════════════════════════════
+
+  Client Request (HTTPS)
+       │
+       ▼
+  ┌──────────────┐
+  │ IP Filtering │──▶ 403 (blocked)
+  └──────┬───────┘
+         │ ✓ allowed
+         ▼
+  ┌──────────────┐
+  │ SSL Terminate│  (HTTPS → HTTP)
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │ Check Cache  │──▶ Return cached (fast!)
+  └──────┬───────┘
+         │ MISS
+         ▼
+  ┌──────────────┐
+  │ Forward to   │──▶ Backend Server
+  │ Backend      │◀── Response
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │ Store Cache  │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │ Compress     │  (gzip/brotli)
+  └──────┬───────┘
+         │
+         ▼
+  Return to Client
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Not forwarding client IP:</strong> The backend sees the proxy&rsquo;s IP instead of the real client. Always set <code>X-Forwarded-For</code> and <code>X-Real-IP</code> headers so backends can log and rate-limit based on the actual client address. Without this, all requests appear to come from one IP.</li>
+                <li><strong>Caching authenticated responses:</strong> If the proxy caches a response that contains user-specific data, other users may receive it. Never cache responses with <code>Authorization</code> headers or <code>Set-Cookie</code> unless you&rsquo;re certain they&rsquo;re safe. Respect <code>Cache-Control: private</code> and <code>no-store</code> directives.</li>
+                <li><strong>Ignoring WebSocket connections:</strong> Standard reverse proxy configs break WebSocket upgrades. You must explicitly configure <code>Upgrade</code> and <code>Connection</code> header forwarding. Without this, real-time features (chat, notifications) silently fail after the initial HTTP handshake.</li>
+                <li><strong>Timeout mismatches:</strong> The proxy times out before the backend finishes processing (e.g., proxy timeout 30s, backend needs 60s for a report). Always configure proxy timeouts to exceed your slowest backend operation, or use async processing with webhooks for long tasks.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Build a caching reverse proxy:</strong> Implement a proxy that caches GET responses, respects <code>Cache-Control: max-age=N</code> headers from backends, and supports cache purging via <code>PURGE /path</code> requests. Track hit rate metrics. Simulate 1000 requests and measure how many reach the backend vs. served from cache.</li>
+                <li><strong>Implement SSL termination with re-encryption:</strong> Build a proxy that accepts HTTPS from clients, terminates TLS, inspects/modifies the request (add headers, log it), then re-encrypts with a different certificate for the backend connection. Compare this to plain termination in terms of security posture and performance overhead.</li>
+                <li><strong>Add request/response rewriting:</strong> Create a proxy that rewrites URLs (<code>/v2/users</code> &rarr; <code>/api/users?version=2</code>), adds CORS headers to responses, strips sensitive headers (<code>X-Powered-By</code>, <code>Server</code>), and injects security headers (<code>X-Frame-Options</code>, <code>Content-Security-Policy</code>). Test with a browser.</li>
+                <li><strong>Compare proxy tools:</strong> Set up nginx, Caddy, and a simple Python proxy (using <code>http.server</code>) all proxying the same backend. Benchmark each with <code>wrk</code> or <code>ab</code> &mdash; measure requests/second, latency p99, and memory usage. Document when you&rsquo;d choose each tool and why.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="60-load-balancer.html" class="prev">&larr; Load Balancer</a>
+            <a href="62-graphql.html" class="next">GraphQL &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

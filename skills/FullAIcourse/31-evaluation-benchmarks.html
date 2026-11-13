@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarks & Evals — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 10</a> <span>›</span> Benchmarks & Evals</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Benchmarks & Evaluations</h1>
+                <p>How do you know if your model is good? Benchmarks test standard skills, but custom evals test what actually matters for YOUR use case. Both are essential.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Benchmarks = standardized tests (SAT, GRE).</strong> Everyone takes the same test so you can compare scores across students.</p>
+                <p><strong>Custom evals = job interview questions.</strong> Specific to YOUR role. A great SAT score doesn't mean they can do YOUR job well.</p>
+                <p><strong>LLM-as-judge = asking a senior employee to grade the answers.</strong> Faster than grading yourself, but you need to calibrate their standards.</p>
+            </div>
+
+            <h2 id="benchmarks">Standard Benchmarks</h2>
+
+            <table>
+                <thead><tr><th>Benchmark</th><th>Tests</th><th>Format</th><th>GPT-4o Score</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>MMLU</strong></td><td>General knowledge (57 subjects)</td><td>Multiple choice</td><td>~88%</td></tr>
+                    <tr><td><strong>HumanEval</strong></td><td>Python code generation</td><td>Write function, run tests</td><td>~92%</td></tr>
+                    <tr><td><strong>GSM8K</strong></td><td>Grade school math</td><td>Word problems</td><td>~95%</td></tr>
+                    <tr><td><strong>MATH</strong></td><td>Competition-level math</td><td>Complex problems</td><td>~76%</td></tr>
+                    <tr><td><strong>HellaSwag</strong></td><td>Common sense reasoning</td><td>Sentence completion</td><td>~96%</td></tr>
+                    <tr><td><strong>TruthfulQA</strong></td><td>Truthfulness/hallucination</td><td>Free text answers</td><td>~82%</td></tr>
+                    <tr><td><strong>MT-Bench</strong></td><td>Multi-turn conversation quality</td><td>LLM-as-judge</td><td>~9.3/10</td></tr>
+                    <tr><td><strong>MBPP</strong></td><td>Python programming (basic)</td><td>Code + unit tests</td><td>~89%</td></tr>
+                    <tr><td><strong>ARC</strong></td><td>Science questions</td><td>Multiple choice</td><td>~96%</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="custom-evals">Building Custom Evaluations</h2>
+
+            <pre><code><span class="token-comment"># Custom evaluation framework for YOUR use case</span>
+<span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Callable
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+
+@dataclass
+<span class="token-keyword">class</span> <span class="token-function">EvalCase</span>:
+    <span class="token-string">"""A single evaluation test case."""</span>
+    input: str
+    expected: str  <span class="token-comment"># Expected output or criteria</span>
+    category: str  <span class="token-comment"># e.g., "accuracy", "safety", "format"</span>
+
+<span class="token-keyword">class</span> <span class="token-function">LLMEvaluator</span>:
+    <span class="token-string">"""Evaluate LLM outputs against test cases."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, model: str = <span class="token-string">"llama3.1:8b"</span>):
+        self.client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+        self.model = model
+        self.results = []
+    
+    <span class="token-keyword">def</span> <span class="token-function">run_eval</span>(self, test_cases: list[EvalCase], system_prompt: str = <span class="token-string">""</span>) -> dict:
+        <span class="token-string">"""Run evaluation across all test cases."""</span>
+        results = {<span class="token-string">"total"</span>: <span class="token-number">0</span>, <span class="token-string">"passed"</span>: <span class="token-number">0</span>, <span class="token-string">"failed"</span>: <span class="token-number">0</span>, <span class="token-string">"details"</span>: []}
+        
+        <span class="token-keyword">for</span> case <span class="token-keyword">in</span> test_cases:
+            <span class="token-comment"># Get model response</span>
+            messages = []
+            <span class="token-keyword">if</span> system_prompt:
+                messages.append({<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system_prompt})
+            messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: case.input})
+            
+            response = self.client.chat.completions.create(
+                model=self.model, messages=messages, temperature=<span class="token-number">0</span>
+            )
+            output = response.choices[<span class="token-number">0</span>].message.content
+            
+            <span class="token-comment"># Score the response</span>
+            passed = self._score(output, case.expected, case.category)
+            
+            results[<span class="token-string">"total"</span>] += <span class="token-number">1</span>
+            results[<span class="token-string">"passed"</span> <span class="token-keyword">if</span> passed <span class="token-keyword">else</span> <span class="token-string">"failed"</span>] += <span class="token-number">1</span>
+            results[<span class="token-string">"details"</span>].append({
+                <span class="token-string">"input"</span>: case.input,
+                <span class="token-string">"expected"</span>: case.expected,
+                <span class="token-string">"actual"</span>: output,
+                <span class="token-string">"passed"</span>: passed,
+                <span class="token-string">"category"</span>: case.category,
+            })
+        
+        results[<span class="token-string">"score"</span>] = results[<span class="token-string">"passed"</span>] / results[<span class="token-string">"total"</span>] * <span class="token-number">100</span>
+        <span class="token-keyword">return</span> results
+    
+    <span class="token-keyword">def</span> <span class="token-function">_score</span>(self, output: str, expected: str, category: str) -> bool:
+        <span class="token-string">"""Score a single output against expected."""</span>
+        <span class="token-keyword">if</span> category == <span class="token-string">"exact_match"</span>:
+            <span class="token-keyword">return</span> output.strip().lower() == expected.strip().lower()
+        
+        <span class="token-keyword">elif</span> category == <span class="token-string">"contains"</span>:
+            <span class="token-keyword">return</span> expected.lower() <span class="token-keyword">in</span> output.lower()
+        
+        <span class="token-keyword">elif</span> category == <span class="token-string">"llm_judge"</span>:
+            <span class="token-keyword">return</span> self._llm_judge(output, expected)
+        
+        <span class="token-keyword">elif</span> category == <span class="token-string">"json_valid"</span>:
+            <span class="token-keyword">try</span>:
+                json.loads(output)
+                <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+            <span class="token-keyword">except</span>:
+                <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        
+        <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">_llm_judge</span>(self, output: str, criteria: str) -> bool:
+        <span class="token-string">"""Use another LLM to judge quality."""</span>
+        judge_prompt = <span class="token-string">f"""Judge if this AI response meets the criteria.
+
+Criteria: {criteria}
+
+Response to judge:
+{output}
+
+Does it meet the criteria? Answer ONLY "yes" or "no"."""</span>
+        
+        judgment = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: judge_prompt}],
+            temperature=<span class="token-number">0</span>,
+        ).choices[<span class="token-number">0</span>].message.content
+        
+        <span class="token-keyword">return</span> <span class="token-string">"yes"</span> <span class="token-keyword">in</span> judgment.lower()
+
+<span class="token-comment"># ====== Define your test cases ======</span>
+test_cases = [
+    EvalCase(
+        input=<span class="token-string">"What is the capital of France?"</span>,
+        expected=<span class="token-string">"paris"</span>,
+        category=<span class="token-string">"contains"</span>
+    ),
+    EvalCase(
+        input=<span class="token-string">"Return a JSON object with keys: name, age"</span>,
+        expected=<span class="token-string">""</span>,
+        category=<span class="token-string">"json_valid"</span>
+    ),
+    EvalCase(
+        input=<span class="token-string">"Explain quantum computing to a 5-year-old"</span>,
+        expected=<span class="token-string">"Uses simple language, no jargon, relatable analogy"</span>,
+        category=<span class="token-string">"llm_judge"</span>
+    ),
+    EvalCase(
+        input=<span class="token-string">"Write a haiku about Python programming"</span>,
+        expected=<span class="token-string">"Has exactly 3 lines with 5-7-5 syllable pattern"</span>,
+        category=<span class="token-string">"llm_judge"</span>
+    ),
+]
+
+<span class="token-comment"># Run evaluation</span>
+evaluator = LLMEvaluator(model=<span class="token-string">"llama3.1:8b"</span>)
+results = evaluator.run_eval(test_cases)
+<span class="token-builtin">print</span>(<span class="token-string">f"Score: {results['score']:.1f}% ({results['passed']}/{results['total']} passed)"</span>)
+<span class="token-keyword">for</span> d <span class="token-keyword">in</span> results[<span class="token-string">"details"</span>]:
+    status = <span class="token-string">"✅"</span> <span class="token-keyword">if</span> d[<span class="token-string">"passed"</span>] <span class="token-keyword">else</span> <span class="token-string">"❌"</span>
+    <span class="token-builtin">print</span>(<span class="token-string">f"  {status} {d['input'][:50]}"</span>)</code></pre>
+
+            <h2 id="comparison">Comparing Models</h2>
+
+            <pre><code><span class="token-comment"># Compare multiple models on the same eval set</span>
+
+<span class="token-keyword">def</span> <span class="token-function">compare_models</span>(models: list[str], test_cases: list[EvalCase]) -> dict:
+    <span class="token-string">"""Run the same eval across multiple models."""</span>
+    comparison = {}
+    
+    <span class="token-keyword">for</span> model <span class="token-keyword">in</span> models:
+        evaluator = LLMEvaluator(model=model)
+        results = evaluator.run_eval(test_cases)
+        comparison[model] = {
+            <span class="token-string">"score"</span>: results[<span class="token-string">"score"</span>],
+            <span class="token-string">"passed"</span>: results[<span class="token-string">"passed"</span>],
+            <span class="token-string">"total"</span>: results[<span class="token-string">"total"</span>],
+        }
+        <span class="token-builtin">print</span>(<span class="token-string">f"{model}: {results['score']:.1f}%"</span>)
+    
+    <span class="token-keyword">return</span> comparison
+
+<span class="token-comment"># Example: Compare models</span>
+models_to_test = [<span class="token-string">"llama3.1:8b"</span>, <span class="token-string">"mistral:7b"</span>, <span class="token-string">"qwen2.5:7b"</span>]
+comparison = compare_models(models_to_test, test_cases)
+
+<span class="token-comment"># Output:</span>
+<span class="token-comment"># llama3.1:8b: 85.0%</span>
+<span class="token-comment"># mistral:7b: 75.0%</span>
+<span class="token-comment"># qwen2.5:7b: 90.0%</span></code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Custom evals > benchmarks</strong> — MMLU score doesn't tell you if the model works for YOUR specific task.</li>
+                    <li><strong>LLM-as-judge is standard</strong> — Use GPT-4 to judge quality at scale. Cheaper than human review.</li>
+                    <li><strong>Eval before and after fine-tuning</strong> — Must prove your fine-tuned model is actually better.</li>
+                    <li><strong>Test for regressions</strong> — When you improve one thing, check you didn't break another.</li>
+                    <li><strong>Frameworks: lm-evaluation-harness, deepeval, promptfoo</strong> — Don't build from scratch for standard benchmarks.</li>
+                    <li><strong>Human eval for final judgment</strong> — LLM judges are good for screening, humans for final quality bar.</li>
+                    <li><strong>Track evals over time</strong> — Keep a leaderboard of model versions and their scores.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Standard benchmarks</strong> (MMLU, HumanEval, GSM8K) = compare across models</li>
+                    <li><strong>Custom evals</strong> = test what matters for YOUR specific use case</li>
+                    <li><strong>Scoring methods</strong>: exact match, contains, JSON valid, LLM-as-judge</li>
+                    <li><strong>LLM-as-judge</strong> = use a strong model to evaluate a weaker one</li>
+                    <li>Always eval before AND after fine-tuning to prove improvement</li>
+                    <li>Track scores over time, test for regressions</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build an Eval Suite</h4>
+                <ol>
+                    <li>Create 20 test cases for a "customer support bot" (accuracy, tone, format)</li>
+                    <li>Implement all scoring methods: exact_match, contains, json_valid, llm_judge</li>
+                    <li>Compare 3 different models on your eval set</li>
+                    <li>Fine-tune a model and prove it scores higher than the base</li>
+                    <li>Build an automated eval pipeline that runs on every model change</li>
+                    <li><strong>Bonus:</strong> Create a web dashboard showing eval scores over time</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="30-deployment.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Deployment & Serving</span>
+                </a>
+                <a href="32-building-chatbots.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Chatbots & Copilots</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

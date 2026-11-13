@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow DOM - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interop</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preconnect</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Shadow DOM
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Shadow DOM</h1>
+                <p class="subtitle">The browser's native encapsulation mechanism — how to create DOM subtrees with their own isolated scope for styles and markup, invisible to outside JavaScript and CSS.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Web Platform</span>
+                    <span class="tag tag-browser">Browser API</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: A House Within a Neighborhood</div>
+                <p>Think of the regular DOM as a neighborhood with open-plan houses — everyone can see into everyone else's house, and one person's loud paint colors (CSS) bleed into neighboring homes. <strong>Shadow DOM</strong> is like building a house with opaque walls and a private entrance. The neighborhood knows the house exists (the host element), but cannot see or modify the interior. The house has its own interior decorator (scoped styles) that doesn't affect — or get affected by — the neighborhood.</p>
+            </div>
+
+            <h2>The Problem: Why Shadow DOM Exists</h2>
+            <p>CSS has a fundamental scoping problem: <strong>everything is global</strong>. When you write <code>.button { color: red }</code>, it affects every element with class <code>button</code> on the page. This causes:</p>
+            <ul>
+                <li><strong>Style collisions</strong> — Third-party widgets (chat, analytics, ads) break your app's styles or vice versa</li>
+                <li><strong>Specificity wars</strong> — Teams resort to BEM, CSS Modules, or CSS-in-JS just to avoid conflicts</li>
+                <li><strong>DOM coupling</strong> — Scripts can accidentally query and modify internal elements of components they shouldn't touch</li>
+                <li><strong>No true encapsulation</strong> — Even with naming conventions, nothing stops external code from reaching in</li>
+            </ul>
+            <p>Shadow DOM provides <strong>browser-native encapsulation</strong>: styles don't leak in or out, and internal DOM is hidden from <code>document.querySelector()</code>.</p>
+
+            <h2>How Shadow DOM Works Internally</h2>
+
+            <h3>The DOM Tree Structure</h3>
+<pre><code><span class="token-comment">&lt;!-- What the HTML looks like --&gt;</span>
+&lt;my-card&gt;
+    <span class="token-comment">&lt;!-- #shadow-root (open) --&gt;</span>
+    <span class="token-comment">&lt;!--   &lt;style&gt;.title { color: blue; }&lt;/style&gt; --&gt;</span>
+    <span class="token-comment">&lt;!--   &lt;h2 class="title"&gt;&lt;slot&gt;&lt;/slot&gt;&lt;/h2&gt; --&gt;</span>
+    Hello World
+&lt;/my-card&gt;
+
+<span class="token-comment">&lt;!-- From outside: --&gt;</span>
+<span class="token-comment">&lt;!-- document.querySelector('.title') → null (hidden!) --&gt;</span>
+<span class="token-comment">&lt;!-- document.querySelector('my-card').shadowRoot.querySelector('.title') → works --&gt;</span>
+</code></pre>
+
+            <h3>Key Properties</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Property</th><th>Light DOM</th><th>Shadow DOM</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Style scope</td><td>Global (cascades everywhere)</td><td>Encapsulated (contained within shadow)</td></tr>
+                    <tr><td>querySelector access</td><td>Accessible from anywhere</td><td>Only via <code>element.shadowRoot</code></td></tr>
+                    <tr><td>CSS inheritance</td><td>Full cascade</td><td>Only inheritable properties (color, font) cross the boundary</td></tr>
+                    <tr><td>Events</td><td>Bubble normally</td><td>Retargeted (event.target becomes the host element)</td></tr>
+                    <tr><td>Slots</td><td>N/A</td><td>Content projection via <code>&lt;slot&gt;</code></td></tr>
+                </tbody>
+            </table>
+
+            <h2>Code: Creating and Using Shadow DOM</h2>
+<pre><code><span class="token-comment">// Creating a Shadow DOM — the foundational API</span>
+<span class="token-keyword">class</span> <span class="token-function">UserCard</span> <span class="token-keyword">extends</span> HTMLElement {
+    <span class="token-keyword">constructor</span>() {
+        <span class="token-keyword">super</span>();
+        
+        <span class="token-comment">// 'open' mode: shadowRoot is accessible via element.shadowRoot</span>
+        <span class="token-comment">// 'closed' mode: shadowRoot returns null (used by browser internals like &lt;video&gt;)</span>
+        <span class="token-keyword">const</span> shadow = <span class="token-keyword">this</span>.attachShadow({ mode: <span class="token-string">'open'</span> });
+        
+        <span class="token-comment">// Styles defined here CANNOT leak out to the page</span>
+        <span class="token-comment">// Page styles CANNOT leak in (except inherited properties)</span>
+        shadow.innerHTML = <span class="token-string">`
+            &lt;style&gt;
+                /* :host targets the custom element itself (the outer shell) */
+                :host {
+                    display: block;
+                    border: 1px solid #333;
+                    border-radius: 8px;
+                    padding: 16px;
+                    font-family: system-ui;
+                }
+                
+                /* :host() with a selector — matches when host has that attribute/class */
+                :host([variant="premium"]) {
+                    border-color: gold;
+                    background: linear-gradient(135deg, #1a1a2e, #16213e);
+                }
+                
+                /* These styles are COMPLETELY isolated */
+                h2 { color: #e0e0e0; margin: 0 0 8px; }
+                .email { color: #888; font-size: 0.9em; }
+                
+                /* ::slotted() styles projected content (light DOM children) */
+                ::slotted(span) { font-weight: bold; }
+            &lt;/style&gt;
+            
+            &lt;h2&gt;&lt;slot name="name"&gt;Anonymous&lt;/slot&gt;&lt;/h2&gt;
+            &lt;p class="email"&gt;&lt;slot name="email"&gt;&lt;/slot&gt;&lt;/p&gt;
+            &lt;div class="content"&gt;&lt;slot&gt;&lt;/slot&gt;&lt;/div&gt;
+        `</span>;
+    }
+}
+
+customElements.define(<span class="token-string">'user-card'</span>, UserCard);
+</code></pre>
+
+<pre><code><span class="token-comment">&lt;!-- Usage in HTML — slots project light DOM content into shadow DOM --&gt;</span>
+&lt;user-card variant="premium"&gt;
+    &lt;span slot="name"&gt;Akash Ranjan&lt;/span&gt;
+    &lt;span slot="email"&gt;akash@example.com&lt;/span&gt;
+    &lt;p&gt;This content goes into the default (unnamed) slot&lt;/p&gt;
+&lt;/user-card&gt;
+
+<span class="token-comment">&lt;!-- Even if the page has: h2 { color: red !important; } --&gt;</span>
+<span class="token-comment">&lt;!-- The h2 inside shadow DOM stays #e0e0e0 — the boundary blocks it --&gt;</span>
+</code></pre>
+
+            <h3>Event Retargeting</h3>
+<pre><code><span class="token-comment">// Events that originate inside shadow DOM are "retargeted"</span>
+<span class="token-comment">// When they cross the shadow boundary, event.target becomes the host element</span>
+
+document.querySelector(<span class="token-string">'user-card'</span>).addEventListener(<span class="token-string">'click'</span>, (e) => {
+    console.log(e.target);         <span class="token-comment">// → &lt;user-card&gt; (retargeted!)</span>
+    console.log(e.composedPath()); <span class="token-comment">// → [h2, shadow-root, user-card, body, html, document, window]</span>
+    <span class="token-comment">// composedPath() reveals the full path including shadow internals</span>
+});
+
+<span class="token-comment">// Inside the shadow root, events behave normally:</span>
+shadow.querySelector(<span class="token-string">'h2'</span>).addEventListener(<span class="token-string">'click'</span>, (e) => {
+    console.log(e.target); <span class="token-comment">// → &lt;h2&gt; (not retargeted within same shadow)</span>
+});
+</code></pre>
+
+            <h2>Open vs Closed Shadow DOM</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Mode</th><th>Access</th><th>Use Case</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>open</code></td><td><code>element.shadowRoot</code> works</td><td>Most components — allows testing, devtools, a11y tools</td></tr>
+                    <tr><td><code>closed</code></td><td><code>element.shadowRoot</code> returns null</td><td>Browser builtins (<code>&lt;video&gt;</code>, <code>&lt;input type="range"&gt;</code>). Rarely use in userland — breaks debugging.</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 CSS Custom Properties Cross the Boundary</div>
+                <p>While regular CSS properties are blocked by Shadow DOM, <strong>CSS custom properties (variables)</strong> inherit through the shadow boundary. This is the official theming mechanism: define <code>--primary-color</code> on the host or <code>:root</code>, and shadow DOM internals can use <code>var(--primary-color)</code>. This is by design — it's how you theme encapsulated components.</p>
+            </div>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>YouTube</strong> — The entire YouTube player UI uses Shadow DOM internally (<code>&lt;ytd-player&gt;</code>) to prevent page styles from breaking the player controls.</li>
+                <li><strong>Salesforce Lightning Web Components (LWC)</strong> — Their entire enterprise component framework is built on Shadow DOM for true encapsulation between components from different teams.</li>
+                <li><strong>GitHub</strong> — Uses custom elements with Shadow DOM for interactive widgets like <code>&lt;details-dialog&gt;</code>, <code>&lt;clipboard-copy&gt;</code>, etc.</li>
+                <li><strong>Chrome DevTools</strong> — The DevTools UI itself uses Shadow DOM extensively for its component architecture.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Expecting global styles to work inside Shadow DOM</strong> — They don't. You must include styles inside the shadow root or use CSS custom properties for theming.</li>
+                <li><strong>Using <code>document.querySelector</code> to find shadow content</strong> — It can't pierce the boundary. Use <code>element.shadowRoot.querySelector()</code>.</li>
+                <li><strong>Forgetting event retargeting</strong> — Event delegation on the document won't see the original target. Use <code>event.composedPath()</code> if needed.</li>
+                <li><strong>Over-isolating with closed mode</strong> — Closed shadow DOM breaks accessibility tools, testing libraries, and browser extensions. Almost never use it.</li>
+                <li><strong>Not using <code>&lt;slot&gt;</code> for composition</strong> — If consumers can't inject content, your component is inflexible. Use named slots for structure.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Shadow DOM When...</h3>
+                <p>You can explain why <code>document.querySelector('h2')</code> returns null when there's clearly an h2 visible on the page, and you can describe exactly which CSS properties cross the shadow boundary and why.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a <code>&lt;theme-switcher&gt;</code> component using Shadow DOM that exposes CSS custom properties for theming. External code should be able to change the component's colors by setting <code>--btn-bg</code> on the host, but no other external CSS should affect the component's internal layout.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Shadow DOM connects to: <strong>Custom Elements Lifecycle</strong> (shadow DOM lives inside custom elements), <strong>CSS Containment</strong> (similar isolation goals, different mechanism), and <strong>Web Components Interoperability</strong> (how React/Vue/Angular interact with shadow DOM boundaries).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="23-module-federation.html" class="nav-btn nav-btn-prev">← Module Federation</a>
+                <a href="25-custom-elements-lifecycle.html" class="nav-btn nav-btn-next">Custom Elements Lifecycle →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

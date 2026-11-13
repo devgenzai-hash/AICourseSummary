@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parameters & Training vs Inference — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 1</a> <span>›</span> Parameters & Training</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Parameters & Training vs Inference</h1>
+                <p>What does "7 billion parameters" actually mean? What's the difference between training a model and using it? This chapter demystifies these core concepts with simple explanations and real numbers.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Parameters = knobs on a mixing board.</strong> Imagine a music studio mixing board with 7 billion tiny knobs. Each knob is set to a specific position. Together, all those knob positions produce a particular "sound" (the model's behavior). Training = finding the right position for each knob. Inference = playing music with the knobs already set.</p>
+                <p><strong>Training vs Inference = Learning to cook vs Actually cooking.</strong> Training is the years you spend learning recipes, practicing techniques, and making mistakes. Inference is when you actually cook a meal for someone. Training is slow and expensive; cooking (inference) is relatively fast.</p>
+            </div>
+
+            <h2 id="parameters">What Are Parameters?</h2>
+
+            <p>A <strong>parameter</strong> (also called a "weight") is a single number inside the model that was adjusted during training. Think of it as one tiny piece of learned knowledge.</p>
+
+            <ul>
+                <li>Each parameter is a decimal number like: <code>0.0234</code> or <code>-1.457</code></li>
+                <li>A 7B model has 7,000,000,000 of these numbers</li>
+                <li>Together, they encode everything the model "knows"</li>
+                <li>Stored as a file on disk (typically 14-28 GB for a 7B model)</li>
+            </ul>
+
+            <h3>Model Sizes in Real Numbers:</h3>
+            <table>
+                <thead><tr><th>Model</th><th>Parameters</th><th>File Size (FP16)</th><th>VRAM Needed</th><th>Training Cost</th></tr></thead>
+                <tbody>
+                    <tr><td>Llama 3.1 8B</td><td>8 billion</td><td>~16 GB</td><td>~18 GB</td><td>~$2-5M</td></tr>
+                    <tr><td>Llama 3.1 70B</td><td>70 billion</td><td>~140 GB</td><td>~150 GB</td><td>~$20-50M</td></tr>
+                    <tr><td>Llama 3.1 405B</td><td>405 billion</td><td>~810 GB</td><td>~850 GB</td><td>~$100M+</td></tr>
+                    <tr><td>GPT-4 (rumored)</td><td>~1.8 trillion</td><td>~3.6 TB</td><td>Cluster</td><td>~$100M+</td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Size Formula</div>
+                <p><strong>File size ≈ Parameters × Bytes per parameter</strong><br>
+                FP32 (full precision): 7B × 4 bytes = 28 GB<br>
+                FP16 (half precision): 7B × 2 bytes = 14 GB<br>
+                INT4 (quantized): 7B × 0.5 bytes = 3.5 GB ← This is how you run on a laptop!</p>
+            </div>
+
+            <h2 id="where-params">Where Do Parameters Live?</h2>
+
+            <p>Parameters are organized into specific layers inside the Transformer:</p>
+
+            <table>
+                <thead><tr><th>Component</th><th>What It Stores</th><th>% of Parameters</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Embedding layer</strong></td><td>Token → vector mapping (vocabulary knowledge)</td><td>~5%</td></tr>
+                    <tr><td><strong>Attention weights</strong></td><td>Q, K, V, Output projection matrices</td><td>~33%</td></tr>
+                    <tr><td><strong>Feed-forward layers</strong></td><td>Intermediate processing (knowledge storage)</td><td>~60%</td></tr>
+                    <tr><td><strong>Layer norms</strong></td><td>Normalization parameters</td><td>~1%</td></tr>
+                    <tr><td><strong>Output head</strong></td><td>Final prediction layer</td><td>~1%</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="training">Training: How Models Learn</h2>
+
+            <p><strong>Training</strong> is the process of finding the best value for each parameter. Here's how it works:</p>
+
+            <h3>The Training Loop (Simplified):</h3>
+            <ol>
+                <li><strong>Forward pass:</strong> Feed text through the model, get a prediction</li>
+                <li><strong>Calculate loss:</strong> Measure how wrong the prediction was</li>
+                <li><strong>Backward pass:</strong> Calculate how each parameter contributed to the error</li>
+                <li><strong>Update parameters:</strong> Nudge each parameter slightly to reduce the error</li>
+                <li><strong>Repeat</strong> billions of times with different text</li>
+            </ol>
+
+            <h3>Key Training Concepts:</h3>
+            <table>
+                <thead><tr><th>Concept</th><th>What It Is</th><th>Analogy</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Loss function</strong></td><td>Measures how wrong the model is</td><td>Score on a test (lower = better)</td></tr>
+                    <tr><td><strong>Learning rate</strong></td><td>How big each adjustment step is</td><td>How fast you turn the steering wheel</td></tr>
+                    <tr><td><strong>Epoch</strong></td><td>One full pass through all training data</td><td>Reading the entire textbook once</td></tr>
+                    <tr><td><strong>Batch size</strong></td><td>How many examples per update step</td><td>How many practice problems before checking answers</td></tr>
+                    <tr><td><strong>Gradient descent</strong></td><td>The algorithm that adjusts parameters</td><td>Rolling a ball downhill to find the lowest valley</td></tr>
+                    <tr><td><strong>Overfitting</strong></td><td>Model memorizes training data instead of learning patterns</td><td>Memorizing answers without understanding</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="inference">Inference: Using the Model</h2>
+
+            <p><strong>Inference</strong> is using a trained model to generate text. It's the "easy" part — the model is frozen (parameters don't change) and just produces output.</p>
+
+            <div class="comparison-table">
+                <table>
+                    <thead><tr><th>Aspect</th><th>Training</th><th>Inference</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Goal</strong></td><td>Learn patterns from data</td><td>Generate text/predictions</td></tr>
+                        <tr><td><strong>Parameters</strong></td><td>Being updated (changing)</td><td>Frozen (fixed)</td></tr>
+                        <tr><td><strong>Direction</strong></td><td>Forward + Backward pass</td><td>Forward pass only</td></tr>
+                        <tr><td><strong>Memory needed</strong></td><td>2-4x model size (gradients, optimizer)</td><td>~1x model size</td></tr>
+                        <tr><td><strong>Speed</strong></td><td>Days to months</td><td>Milliseconds to seconds</td></tr>
+                        <tr><td><strong>Cost (7B model)</strong></td><td>$10,000 - $100,000+</td><td>$0.001 per request</td></tr>
+                        <tr><td><strong>Hardware</strong></td><td>Multiple A100/H100 GPUs</td><td>Single GPU or even CPU</td></tr>
+                        <tr><td><strong>Who does it</strong></td><td>Meta, Google, OpenAI (big companies)</td><td>Everyone (developers, users)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 id="code">Production Code</h2>
+
+            <h3>Inspecting Model Parameters</h3>
+            <pre><code><span class="token-comment"># See exactly what's inside a model</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM
+<span class="token-keyword">import</span> torch
+
+<span class="token-comment"># Load a small model</span>
+model = AutoModelForCausalLM.from_pretrained(
+    <span class="token-string">"microsoft/phi-2"</span>,
+    torch_dtype=torch.float16,
+    device_map=<span class="token-string">"cpu"</span>  <span class="token-comment"># Use CPU for inspection</span>
+)
+
+<span class="token-comment"># Count total parameters</span>
+total_params = <span class="token-builtin">sum</span>(p.numel() <span class="token-keyword">for</span> p <span class="token-keyword">in</span> model.parameters())
+<span class="token-builtin">print</span>(<span class="token-string">f"Total parameters: {total_params:,}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"That's {total_params / 1e9:.1f}B parameters"</span>)
+
+<span class="token-comment"># See parameter breakdown by layer type</span>
+<span class="token-keyword">for</span> name, param <span class="token-keyword">in</span> model.named_parameters():
+    <span class="token-keyword">if</span> <span class="token-string">"layers.0"</span> <span class="token-keyword">in</span> name:  <span class="token-comment"># Just first layer</span>
+        <span class="token-builtin">print</span>(<span class="token-string">f"  {name}: {param.shape} ({param.numel():,} params)"</span>)
+
+<span class="token-comment"># Memory calculation</span>
+bytes_per_param = <span class="token-number">2</span>  <span class="token-comment"># FP16 = 2 bytes</span>
+memory_gb = (total_params * bytes_per_param) / (<span class="token-number">1024</span>**<span class="token-number">3</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Model size on disk: {memory_gb:.1f} GB (FP16)"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"VRAM for inference: ~{memory_gb * 1.2:.1f} GB (model + overhead)"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"VRAM for training: ~{memory_gb * 4:.1f} GB (model + gradients + optimizer)"</span>)</code></pre>
+
+            <h3>Simple Training Loop (PyTorch)</h3>
+            <pre><code><span class="token-comment"># Simplified training loop — this is what happens inside Trainer</span>
+<span class="token-keyword">import</span> torch
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer
+
+<span class="token-comment"># In real production, you'd use HuggingFace Trainer or TRL</span>
+<span class="token-comment"># This is the underlying concept:</span>
+
+model = AutoModelForCausalLM.from_pretrained(<span class="token-string">"gpt2"</span>)
+tokenizer = AutoTokenizer.from_pretrained(<span class="token-string">"gpt2"</span>)
+optimizer = torch.optim.AdamW(model.parameters(), lr=<span class="token-number">5e-5</span>)
+
+<span class="token-comment"># Training data</span>
+texts = [
+    <span class="token-string">"The capital of France is Paris."</span>,
+    <span class="token-string">"Machine learning is a subset of AI."</span>,
+]
+
+model.train()  <span class="token-comment"># Enable training mode (activates dropout etc.)</span>
+
+<span class="token-keyword">for</span> epoch <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-number">3</span>):
+    total_loss = <span class="token-number">0</span>
+    <span class="token-keyword">for</span> text <span class="token-keyword">in</span> texts:
+        <span class="token-comment"># Step 1: Tokenize</span>
+        inputs = tokenizer(text, return_tensors=<span class="token-string">"pt"</span>)
+        inputs[<span class="token-string">"labels"</span>] = inputs[<span class="token-string">"input_ids"</span>].clone()
+
+        <span class="token-comment"># Step 2: Forward pass (get loss)</span>
+        outputs = model(**inputs)
+        loss = outputs.loss  <span class="token-comment"># How wrong the predictions are</span>
+
+        <span class="token-comment"># Step 3: Backward pass (calculate gradients)</span>
+        loss.backward()
+
+        <span class="token-comment"># Step 4: Update parameters</span>
+        optimizer.step()
+        optimizer.zero_grad()
+
+        total_loss += loss.item()
+
+    <span class="token-builtin">print</span>(<span class="token-string">f"Epoch {epoch+1}, Avg Loss: {total_loss/len(texts):.4f}"</span>)
+
+model.eval()  <span class="token-comment"># Switch to inference mode</span>
+<span class="token-comment"># Now use model.generate() for inference</span></code></pre>
+
+            <h3>Inference with Temperature & Sampling</h3>
+            <pre><code><span class="token-comment"># Different inference strategies affect output quality</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer
+<span class="token-keyword">import</span> torch
+
+model = AutoModelForCausalLM.from_pretrained(<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>, torch_dtype=torch.float16, device_map=<span class="token-string">"auto"</span>)
+tokenizer = AutoTokenizer.from_pretrained(<span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>)
+
+prompt = <span class="token-string">"Explain quantum computing in one sentence:"</span>
+inputs = tokenizer(prompt, return_tensors=<span class="token-string">"pt"</span>).to(model.device)
+
+<span class="token-comment"># Greedy decoding — always picks the highest probability token</span>
+<span class="token-comment"># Best for: factual Q&A, deterministic outputs</span>
+output_greedy = model.generate(**inputs, max_new_tokens=<span class="token-number">50</span>, do_sample=<span class="token-keyword">False</span>)
+
+<span class="token-comment"># Temperature sampling — adds randomness</span>
+<span class="token-comment"># Best for: creative writing, diverse outputs</span>
+output_creative = model.generate(
+    **inputs,
+    max_new_tokens=<span class="token-number">50</span>,
+    do_sample=<span class="token-keyword">True</span>,
+    temperature=<span class="token-number">0.8</span>,    <span class="token-comment"># Higher = more random (0.1-2.0)</span>
+    top_p=<span class="token-number">0.9</span>,          <span class="token-comment"># Nucleus sampling: only consider top 90% probability tokens</span>
+    top_k=<span class="token-number">50</span>,           <span class="token-comment"># Only consider top 50 tokens at each step</span>
+)
+
+<span class="token-comment"># Beam search — explores multiple paths</span>
+<span class="token-comment"># Best for: translation, summarization</span>
+output_beam = model.generate(
+    **inputs,
+    max_new_tokens=<span class="token-number">50</span>,
+    num_beams=<span class="token-number">4</span>,        <span class="token-comment"># Explore 4 candidates at each step</span>
+    do_sample=<span class="token-keyword">False</span>,
+)
+
+<span class="token-keyword">for</span> name, output <span class="token-keyword">in</span> [(<span class="token-string">"Greedy"</span>, output_greedy), (<span class="token-string">"Creative"</span>, output_creative), (<span class="token-string">"Beam"</span>, output_beam)]:
+    text = tokenizer.decode(output[<span class="token-number">0</span>][inputs[<span class="token-string">"input_ids"</span>].shape[-<span class="token-number">1</span>]:], skip_special_tokens=<span class="token-keyword">True</span>)
+    <span class="token-builtin">print</span>(<span class="token-string">f"{name}: {text}\n"</span>)</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Pre-training</strong> — Done by Meta, Google, etc. on 10-15 trillion tokens. Costs $1M-$100M+. You'll never do this.</li>
+                    <li><strong>Fine-tuning</strong> — What YOU'll do. Takes an existing model and adapts it. Costs $10-$10,000.</li>
+                    <li><strong>Inference optimization</strong> — Where most engineering time goes. Reducing latency, cost, and improving throughput.</li>
+                    <li><strong>AdamW optimizer</strong> — Standard optimizer for LLM training (uses ~3x model memory for optimizer states)</li>
+                    <li><strong>Mixed precision (BF16)</strong> — Industry standard for training. Saves memory while maintaining quality.</li>
+                    <li><strong>Learning rate schedulers</strong> — Cosine schedule with warmup is standard (start low, go high, decay).</li>
+                    <li><strong>Gradient accumulation</strong> — Simulate larger batch sizes on limited hardware.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Parameters</strong> = billions of numbers storing model knowledge (7B model = 7 billion numbers)</li>
+                    <li>File size ≈ Parameters × 2 bytes (FP16) or × 0.5 bytes (INT4 quantized)</li>
+                    <li><strong>Training</strong> = adjusting all parameters to minimize prediction errors. Expensive, slow, done once.</li>
+                    <li><strong>Inference</strong> = using the frozen model to generate text. Cheap, fast, done millions of times.</li>
+                    <li>Training needs ~4x more memory than inference (gradients + optimizer states)</li>
+                    <li>You'll almost never pre-train from scratch — you'll fine-tune existing models</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    TRAINING (expensive, one-time):<br>
+                    Data → Model → Prediction → Wrong! → Adjust parameters → Repeat 1 trillion times<br><br>
+                    INFERENCE (cheap, per-request):<br>
+                    User prompt → Frozen Model → Next token → Next token → ... → Response
+                </div>
+                <p><strong>Training = building the factory. Inference = running the factory.</strong></p>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Thinking you need to train from scratch</strong> — 99.9% of projects use pre-trained models and fine-tune them.</li>
+                    <li><strong>Ignoring memory math</strong> — A 70B model needs ~140GB VRAM just for inference. Training needs ~560GB.</li>
+                    <li><strong>Not using model.eval()</strong> — Forgetting to switch to eval mode during inference causes different behavior (dropout still active).</li>
+                    <li><strong>Using temperature=0 for everything</strong> — Greedy decoding is great for factual answers but terrible for creative tasks.</li>
+                    <li><strong>Confusing model size with intelligence</strong> — A well-fine-tuned 8B beats a raw 70B at specific tasks.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Explore Model Internals</h4>
+                <ol>
+                    <li>Load GPT-2 (small, runs on CPU): <code>from transformers import AutoModelForCausalLM; model = AutoModelForCausalLM.from_pretrained("gpt2")</code></li>
+                    <li>Count its parameters: <code>sum(p.numel() for p in model.parameters())</code> — how many billion?</li>
+                    <li>Calculate its memory footprint in GB (FP32, FP16, INT4)</li>
+                    <li>Run the training loop code above and watch the loss decrease</li>
+                    <li>Generate text with different temperature values (0.1, 0.5, 1.0, 1.5) — observe how randomness changes</li>
+                    <li><strong>Bonus:</strong> Compare generation speed: <code>time.time()</code> before and after <code>model.generate()</code> with different <code>max_new_tokens</code> values</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="04-transformers-attention.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Transformers & Attention</span>
+                </a>
+                <a href="06-open-vs-closed-models.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Open vs Closed Models</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

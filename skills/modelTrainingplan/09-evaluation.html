@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 9: Evaluation — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> Evaluation</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 9: Evaluation</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Comprehensive evaluation framework: automated metrics, domain-specific benchmarks, human evaluation protocol, and LLM-as-judge for scripture models.</p>
+
+            <h2 id="framework">📊 Evaluation Framework Overview</h2>
+            
+            <table>
+                <thead>
+                    <tr><th>Level</th><th>What It Measures</th><th>Methods</th><th>When</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>L1: Automated Metrics</strong></td>
+                        <td>Basic text quality</td>
+                        <td>Perplexity, BLEU, ROUGE, BERTScore</td>
+                        <td>Every checkpoint</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L2: Domain Benchmarks</strong></td>
+                        <td>Scripture knowledge</td>
+                        <td>Custom Q&A accuracy, citation validity</td>
+                        <td>End of each stage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L3: LLM-as-Judge</strong></td>
+                        <td>Response quality at scale</td>
+                        <td>GPT-4 evaluation, pairwise comparison</td>
+                        <td>Model comparison</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L4: Human Evaluation</strong></td>
+                        <td>Real-world usefulness</td>
+                        <td>Expert review, user studies</td>
+                        <td>Before deployment</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="automated">💻 Level 1: Automated Metrics</h2>
+            
+            <pre><code>"""
+Automated evaluation metrics for Hindu Scripture model.
+Run these after each training stage to track progress.
+
+Usage:
+    python evaluate.py --model_path ./checkpoints/sft_lora/final
+"""
+import torch
+import numpy as np
+from datasets import load_dataset
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from peft import PeftModel
+from evaluate import load as load_metric
+from tqdm import tqdm
+
+# ============================================
+# Setup
+# ============================================
+def load_model(base_model: str, adapter_path: str = None):
+    """Load model with optional LoRA adapter."""
+    tokenizer = AutoTokenizer.from_pretrained(base_model)
+    
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16,
+    )
+    
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model,
+        quantization_config=bnb_config,
+        device_map="auto",
+        torch_dtype=torch.bfloat16,
+    )
+    
+    if adapter_path:
+        model = PeftModel.from_pretrained(model, adapter_path)
+    
+    model.eval()
+    return model, tokenizer
+
+
+# ============================================
+# Perplexity (lower = better)
+# ============================================
+def compute_perplexity(model, tokenizer, texts: list[str], max_length: int = 2048) -> float:
+    """
+    Perplexity measures how 'surprised' the model is by the text.
+    Lower = model has better understanding of the domain.
+    
+    Use on held-out scripture text to measure domain adaptation.
+    """
+    total_loss = 0.0
+    total_tokens = 0
+    
+    for text in tqdm(texts, desc="Computing perplexity"):
+        inputs = tokenizer(
+            text, 
+            return_tensors="pt", 
+            truncation=True, 
+            max_length=max_length
+        ).to(model.device)
+        
+        with torch.no_grad():
+            outputs = model(**inputs, labels=inputs["input_ids"])
+            loss = outputs.loss.item()
+        
+        num_tokens = inputs["input_ids"].shape[1]
+        total_loss += loss * num_tokens
+        total_tokens += num_tokens
+    
+    avg_loss = total_loss / total_tokens
+    perplexity = np.exp(avg_loss)
+    
+    return perplexity
+
+
+# ============================================
+# BLEU & ROUGE (for translation/summarization tasks)
+# ============================================
+def compute_generation_metrics(
+    model, tokenizer,
+    test_data: list[dict],  # [{"prompt": ..., "reference": ...}]
+    max_new_tokens: int = 512,
+) -> dict:
+    """
+    BLEU: Measures n-gram overlap (good for translation tasks)
+    ROUGE: Measures recall of reference text (good for summaries)
+    BERTScore: Semantic similarity using embeddings
+    """
+    bleu_metric = load_metric("bleu")
+    rouge_metric = load_metric("rouge")
+    
+    predictions = []
+    references = []
+    
+    for item in tqdm(test_data, desc="Generating responses"):
+        messages = [
+            {"role": "system", "content": "You are a Hindu scripture scholar."},
+            {"role": "user", "content": item["prompt"]}
+        ]
+        
+        inputs = tokenizer.apply_chat_template(
+            messages, add_generation_prompt=True, return_tensors="pt"
+        ).to(model.device)
+        
+        with torch.no_grad():
+            outputs = model.generate(
+                inputs,
+                max_new_tokens=max_new_tokens,
+                temperature=0.1,  # Low temp for deterministic eval
+                do_sample=False,
+            )
+        
+        response = tokenizer.decode(
+            outputs[0][inputs.shape[-1]:], skip_special_tokens=True
+        )
+        
+        predictions.append(response)
+        references.append(item["reference"])
+    
+    # Compute metrics
+    bleu_results = bleu_metric.compute(
+        predictions=[p.split() for p in predictions],
+        references=[[r.split()] for r in references]
+    )
+    
+    rouge_results = rouge_metric.compute(
+        predictions=predictions,
+        references=references
+    )
+    
+    return {
+        "bleu": round(bleu_results["bleu"] * 100, 2),
+        "rouge1": round(rouge_results["rouge1"] * 100, 2),
+        "rouge2": round(rouge_results["rouge2"] * 100, 2),
+        "rougeL": round(rouge_results["rougeL"] * 100, 2),
+        "num_samples": len(predictions),
+    }</code></pre>
+
+            <h2 id="domain-benchmark">📚 Level 2: Domain-Specific Benchmark</h2>
+            
+            <pre><code>"""
+Custom benchmark for Hindu scripture knowledge.
+Tests factual accuracy, not just text quality.
+"""
+import json
+import re
+
+# ============================================
+# Scripture Knowledge Quiz
+# ============================================
+SCRIPTURE_BENCHMARK = [
+    {
+        "question": "Which chapter of the Bhagavad Gita is known as 'Vishvarupa Darshana Yoga'?",
+        "answer": "11",
+        "category": "factual",
+        "difficulty": "medium"
+    },
+    {
+        "question": "Complete this verse: 'कर्मण्येवाधिकारस्ते...'",
+        "answer": "मा फलेषु कदाचन",
+        "category": "completion",
+        "difficulty": "easy"
+    },
+    {
+        "question": "Who composed the Yoga Sutras?",
+        "answer": "Patanjali",
+        "category": "factual",
+        "difficulty": "easy"
+    },
+    {
+        "question": "What are the three gunas according to Samkhya philosophy?",
+        "answer": ["sattva", "rajas", "tamas"],
+        "category": "list",
+        "difficulty": "easy"
+    },
+    {
+        "question": "In which Upanishad does the dialogue between Nachiketa and Yama occur?",
+        "answer": "Katha Upanishad",
+        "category": "factual",
+        "difficulty": "medium"
+    },
+    {
+        "question": "What is the difference between Saguna Brahman and Nirguna Brahman?",
+        "answer_keywords": ["attributes", "qualities", "form", "formless", "personal", "impersonal"],
+        "category": "conceptual",
+        "difficulty": "hard"
+    },
+    # Add 100+ questions for comprehensive benchmark
+]
+
+
+def evaluate_benchmark(model, tokenizer, benchmark: list) -> dict:
+    """Run the full benchmark and compute accuracy."""
+    results = {"correct": 0, "total": 0, "by_category": {}, "by_difficulty": {}}
+    
+    for item in tqdm(benchmark, desc="Running benchmark"):
+        messages = [
+            {"role": "system", "content": "Answer the following question about Hindu scriptures concisely and accurately."},
+            {"role": "user", "content": item["question"]}
+        ]
+        
+        inputs = tokenizer.apply_chat_template(
+            messages, add_generation_prompt=True, return_tensors="pt"
+        ).to(model.device)
+        
+        with torch.no_grad():
+            outputs = model.generate(inputs, max_new_tokens=200, do_sample=False)
+        
+        response = tokenizer.decode(
+            outputs[0][inputs.shape[-1]:], skip_special_tokens=True
+        ).lower().strip()
+        
+        # Check correctness based on category
+        correct = False
+        if item["category"] == "factual":
+            correct = item["answer"].lower() in response
+        elif item["category"] == "completion":
+            correct = item["answer"].lower() in response
+        elif item["category"] == "list":
+            found = sum(1 for a in item["answer"] if a.lower() in response)
+            correct = found >= len(item["answer"]) * 0.8  # 80% threshold
+        elif item["category"] == "conceptual":
+            found = sum(1 for k in item["answer_keywords"] if k.lower() in response)
+            correct = found >= 3  # At least 3 keywords
+        
+        results["total"] += 1
+        if correct:
+            results["correct"] += 1
+        
+        # Track by category and difficulty
+        cat = item["category"]
+        diff = item["difficulty"]
+        results["by_category"].setdefault(cat, {"correct": 0, "total": 0})
+        results["by_category"][cat]["total"] += 1
+        if correct:
+            results["by_category"][cat]["correct"] += 1
+        
+        results["by_difficulty"].setdefault(diff, {"correct": 0, "total": 0})
+        results["by_difficulty"][diff]["total"] += 1
+        if correct:
+            results["by_difficulty"][diff]["correct"] += 1
+    
+    results["accuracy"] = results["correct"] / results["total"]
+    return results
+
+
+# ============================================
+# Citation Validity Check
+# ============================================
+def evaluate_citation_accuracy(model, tokenizer, test_prompts: list) -> dict:
+    """
+    Ask the model questions that should require citations,
+    then verify if the citations are real.
+    """
+    valid_citations = 0
+    invalid_citations = 0
+    total_responses = 0
+    
+    for prompt in tqdm(test_prompts, desc="Checking citations"):
+        messages = [
+            {"role": "system", "content": "Always cite specific verse references in your answers."},
+            {"role": "user", "content": prompt}
+        ]
+        
+        inputs = tokenizer.apply_chat_template(
+            messages, add_generation_prompt=True, return_tensors="pt"
+        ).to(model.device)
+        
+        with torch.no_grad():
+            outputs = model.generate(inputs, max_new_tokens=500, do_sample=False)
+        
+        response = tokenizer.decode(outputs[0][inputs.shape[-1]:], skip_special_tokens=True)
+        total_responses += 1
+        
+        # Extract Gita citations
+        citations = re.findall(r'(\d+)\.(\d+)', response)
+        for ch, v in citations:
+            ch, v = int(ch), int(v)
+            if 1 <= ch <= 18 and 1 <= v <= 78:  # Valid Gita range
+                valid_citations += 1
+            else:
+                invalid_citations += 1
+    
+    total_citations = valid_citations + invalid_citations
+    return {
+        "total_responses": total_responses,
+        "total_citations_found": total_citations,
+        "valid_citations": valid_citations,
+        "invalid_citations": invalid_citations,
+        "citation_accuracy": valid_citations / max(total_citations, 1),
+        "avg_citations_per_response": total_citations / max(total_responses, 1),
+    }</code></pre>
+
+            <h2 id="llm-judge">🤖 Level 3: LLM-as-Judge</h2>
+            
+            <pre><code>"""
+Use GPT-4 (or another strong model) to evaluate response quality.
+More nuanced than automated metrics, cheaper than human evaluation.
+"""
+import openai
+
+client = openai.OpenAI(api_key="your-key")
+
+JUDGE_PROMPT = """You are an expert evaluator of Hindu scripture knowledge. 
+Rate the following AI response on a scale of 1-10 for each criterion.
+
+Question: {question}
+Response: {response}
+
+Rate on these criteria:
+1. **Accuracy** (1-10): Are the facts, verse references, and attributions correct?
+2. **Depth** (1-10): Does the answer show deep understanding beyond surface-level?
+3. **Sanskrit** (1-10): Does it include relevant original Sanskrit/Hindi text?
+4. **Balance** (1-10): Does it present multiple viewpoints fairly?
+5. **Clarity** (1-10): Is the explanation clear and well-structured?
+6. **Respectfulness** (1-10): Is it respectful to all traditions?
+
+Respond in JSON format:
+{{"accuracy": X, "depth": X, "sanskrit": X, "balance": X, "clarity": X, "respectfulness": X, "overall": X, "explanation": "brief explanation"}}"""
+
+
+def llm_judge_evaluate(
+    test_data: list[dict],  # [{"question": ..., "response": ...}]
+    judge_model: str = "gpt-4o",
+) -> dict:
+    """Evaluate model responses using GPT-4 as judge."""
+    all_scores = []
+    
+    for item in tqdm(test_data, desc="LLM Judge evaluation"):
+        prompt = JUDGE_PROMPT.format(
+            question=item["question"],
+            response=item["response"]
+        )
+        
+        response = client.chat.completions.create(
+            model=judge_model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+            response_format={"type": "json_object"},
+        )
+        
+        scores = json.loads(response.choices[0].message.content)
+        all_scores.append(scores)
+    
+    # Aggregate
+    criteria = ["accuracy", "depth", "sanskrit", "balance", "clarity", "respectfulness", "overall"]
+    averages = {}
+    for c in criteria:
+        values = [s[c] for s in all_scores if c in s]
+        averages[c] = round(np.mean(values), 2) if values else 0
+    
+    return {
+        "averages": averages,
+        "num_evaluated": len(all_scores),
+        "detailed_scores": all_scores,
+    }
+
+
+# ============================================
+# Pairwise Comparison (A/B Testing)
+# ============================================
+COMPARISON_PROMPT = """Compare these two responses to the same question about Hindu scriptures.
+
+Question: {question}
+
+Response A: {response_a}
+
+Response B: {response_b}
+
+Which response is better overall? Consider accuracy, depth, helpfulness, and respectfulness.
+Respond with ONLY one of: "A", "B", or "TIE" followed by a brief explanation."""
+
+def pairwise_comparison(
+    questions: list[str],
+    responses_a: list[str],  # Model A outputs
+    responses_b: list[str],  # Model B outputs
+) -> dict:
+    """Compare two models head-to-head using LLM judge."""
+    wins_a, wins_b, ties = 0, 0, 0
+    
+    for q, ra, rb in zip(questions, responses_a, responses_b):
+        prompt = COMPARISON_PROMPT.format(
+            question=q, response_a=ra, response_b=rb
+        )
+        
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+        )
+        
+        verdict = response.choices[0].message.content.strip()
+        if verdict.startswith("A"):
+            wins_a += 1
+        elif verdict.startswith("B"):
+            wins_b += 1
+        else:
+            ties += 1
+    
+    total = wins_a + wins_b + ties
+    return {
+        "model_a_wins": wins_a,
+        "model_b_wins": wins_b,
+        "ties": ties,
+        "model_a_win_rate": round(wins_a / total * 100, 1),
+        "model_b_win_rate": round(wins_b / total * 100, 1),
+    }</code></pre>
+
+            <h2 id="human-eval">👥 Level 4: Human Evaluation Protocol</h2>
+            
+            <div class="callout callout-info">
+                <div class="callout-title">📋 Human Evaluation Setup</div>
+                <p>For production deployment, have domain experts evaluate the model. Here's a structured protocol:</p>
+            </div>
+            
+            <pre><code>"""
+Human Evaluation Protocol for Scripture Model
+==============================================
+Recruit 3-5 evaluators with expertise in Hindu scriptures.
+"""
+
+EVALUATION_RUBRIC = """
+## Human Evaluation Rubric
+
+### Instructions for Evaluators
+You will be shown questions and the model's responses about Hindu scriptures.
+Rate each response on the following criteria (1-5 scale):
+
+### Criteria
+
+| Score | Accuracy | Depth | Usefulness |
+|-------|----------|-------|------------|
+| 5 | Perfect — all references correct, no hallucinations | Scholarly depth with commentarial references | Would help a serious student |
+| 4 | Mostly correct — minor inaccuracies only | Good depth, mentions multiple traditions | Helpful for most users |
+| 3 | Partially correct — some errors but generally right direction | Adequate but surface-level | Somewhat helpful |
+| 2 | Significant errors — wrong attributions or misinterpretations | Very shallow, missing key points | Marginally helpful |
+| 1 | Mostly wrong — hallucinated verses, incorrect philosophy | No meaningful content | Not helpful or harmful |
+
+### Additional Flags (Yes/No)
+- [ ] Contains hallucinated verse references
+- [ ] Disrespectful to any tradition
+- [ ] Presents one interpretation as absolute truth
+- [ ] Would be harmful if a student relied on this information
+- [ ] Response is in the wrong language
+
+### Inter-Annotator Agreement
+Compute Cohen's kappa (κ) between annotators. Target κ > 0.6.
+"""
+
+# Generate evaluation spreadsheet
+def create_evaluation_sheet(model, tokenizer, test_questions: list, output_path: str):
+    """Create a spreadsheet for human evaluators."""
+    import csv
+    
+    with open(output_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "ID", "Question", "Model Response",
+            "Accuracy (1-5)", "Depth (1-5)", "Usefulness (1-5)",
+            "Hallucinated Refs?", "Disrespectful?", "Notes"
+        ])
+        
+        for i, question in enumerate(test_questions):
+            messages = [
+                {"role": "system", "content": "You are a Hindu scripture scholar."},
+                {"role": "user", "content": question}
+            ]
+            inputs = tokenizer.apply_chat_template(
+                messages, add_generation_prompt=True, return_tensors="pt"
+            ).to(model.device)
+            
+            with torch.no_grad():
+                outputs = model.generate(inputs, max_new_tokens=500, do_sample=False)
+            response = tokenizer.decode(outputs[0][inputs.shape[-1]:], skip_special_tokens=True)
+            
+            writer.writerow([i+1, question, response, "", "", "", "", "", ""])
+    
+    print(f"✅ Evaluation sheet saved to {output_path}")
+    print(f"   Send to evaluators and collect ratings.")</code></pre>
+
+            <h2 id="full-eval">🏁 Complete Evaluation Pipeline</h2>
+            <pre><code>"""
+Run the full evaluation pipeline after training.
+Generates a comprehensive report.
+"""
+
+def full_evaluation(
+    base_model: str,
+    adapter_path: str,
+    output_report: str = "evaluation_report.json"
+):
+    """Run all evaluation levels and generate report."""
+    
+    print("=" * 60)
+    print("COMPREHENSIVE MODEL EVALUATION")
+    print("=" * 60)
+    
+    # Load model
+    model, tokenizer = load_model(base_model, adapter_path)
+    
+    # Level 1: Perplexity on held-out scripture text
+    print("\n📊 Level 1: Automated Metrics")
+    scripture_texts = load_dataset("json", data_files="./datasets/eval_texts.jsonl", split="train")
+    ppl = compute_perplexity(model, tokenizer, scripture_texts["text"][:100])
+    print(f"  Perplexity: {ppl:.2f}")
+    
+    # Level 2: Domain benchmark
+    print("\n📚 Level 2: Domain Benchmark")
+    benchmark_results = evaluate_benchmark(model, tokenizer, SCRIPTURE_BENCHMARK)
+    print(f"  Accuracy: {benchmark_results['accuracy']*100:.1f}%")
+    for cat, scores in benchmark_results["by_category"].items():
+        acc = scores["correct"] / scores["total"] * 100
+        print(f"    {cat}: {acc:.1f}%")
+    
+    # Citation accuracy
+    citation_results = evaluate_citation_accuracy(
+        model, tokenizer,
+        ["Explain Bhagavad Gita's view on duty",
+         "What does Krishna say about meditation?",
+         "Describe the path of devotion in the Gita"]
+    )
+    print(f"  Citation accuracy: {citation_results['citation_accuracy']*100:.1f}%")
+    
+    # Level 3: LLM Judge (if API key available)
+    print("\n🤖 Level 3: LLM Judge")
+    # Generate responses for judge evaluation
+    test_questions = [
+        "What is the central teaching of the Bhagavad Gita?",
+        "Explain the concept of Dharma in Hinduism.",
+        "How do Advaita and Dvaita differ?",
+    ]
+    # ... (run llm_judge_evaluate)
+    
+    # Compile report
+    report = {
+        "model": base_model,
+        "adapter": adapter_path,
+        "perplexity": ppl,
+        "benchmark_accuracy": benchmark_results["accuracy"],
+        "citation_accuracy": citation_results["citation_accuracy"],
+        "by_category": benchmark_results["by_category"],
+        "by_difficulty": benchmark_results["by_difficulty"],
+    }
+    
+    with open(output_report, 'w') as f:
+        json.dump(report, f, indent=2)
+    
+    print(f"\n✅ Full report saved to {output_report}")
+    return report
+
+
+# Run evaluation
+if __name__ == "__main__":
+    report = full_evaluation(
+        base_model="google/gemma-3-27b-it",
+        adapter_path="./checkpoints/dpo_lora/final"
+    )</code></pre>
+
+            <nav class="page-nav">
+                <a href="08-hardware-infrastructure.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Hardware & Infrastructure</span>
+                </a>
+                <a href="10-deployment.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Deployment</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5: Supervised Fine-Tuning (SFT) — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> Supervised Fine-Tuning</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 5: Stage 2 — Supervised Fine-Tuning (SFT)</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Teaching Gemma to follow instructions, answer questions, and have conversations about Hindu scriptures using the TRL SFTTrainer with QLoRA.</p>
+
+            <h2 id="concept">🎯 What is Supervised Fine-Tuning?</h2>
+            
+            <h3>Non-Technical Explanation</h3>
+            <p>After CPT, the model is like a brilliant reader who has absorbed all the scriptures — but can't hold a conversation. SFT is like <strong>tutoring practice</strong>: you show it thousands of example conversations (question → answer), and it learns the pattern of responding helpfully to queries about scriptures.</p>
+
+            <h3>Technical Explanation</h3>
+            <p>SFT minimizes the cross-entropy loss on the <strong>assistant responses only</strong>. Given an input conversation, the model learns to predict the assistant's tokens while ignoring the user's tokens in the loss computation. This teaches it:</p>
+            <ul>
+                <li>How to format responses (structure, length, tone)</li>
+                <li>When to provide Sanskrit quotes vs plain explanations</li>
+                <li>How to handle multilingual queries (Hindi question → English answer)</li>
+                <li>Instruction-following behavior (summarize, explain, compare, translate)</li>
+            </ul>
+
+            <h2 id="main-code">💻 Complete SFT Training Code</h2>
+            
+            <pre><code>"""
+Supervised Fine-Tuning for Hindu Scripture Q&A
+===============================================
+Trains Gemma to follow instructions about scriptures using QLoRA.
+Builds on CPT adapter from Chapter 4 (or starts from base model).
+
+Usage:
+    python sft_train.py
+
+Hardware: 1x A100 40GB (or 1x RTX 4090 24GB for 12B model)
+Time: ~6-12 hours for 50K examples
+"""
+import torch
+from datasets import load_dataset
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
+from trl import SFTTrainer, SFTConfig
+
+# ============================================
+# CONFIGURATION
+# ============================================
+# Option A: Start from CPT model (recommended if you did CPT)
+BASE_MODEL = "google/gemma-3-27b-it"
+CPT_ADAPTER = "./checkpoints/cpt_lora/final"  # Set to None if skipping CPT
+
+# Option B: Start directly from base instruct model
+# BASE_MODEL = "google/gemma-3-27b-it"
+# CPT_ADAPTER = None
+
+DATASET_PATH = "./datasets/sft_scripture_data.jsonl"
+OUTPUT_DIR = "./checkpoints/sft_lora"
+
+# Hyperparameters
+LEARNING_RATE = 1e-4        # Higher than CPT since only training LoRA on new task
+NUM_EPOCHS = 3
+BATCH_SIZE = 2
+GRADIENT_ACCUMULATION = 8   # Effective batch = 16
+MAX_SEQ_LENGTH = 4096       # Longer for multi-turn conversations
+
+# ============================================
+# STEP 1: Load Model
+# ============================================
+print("📦 Loading model...")
+
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+# 4-bit quantization config
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_use_double_quant=True,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL,
+    quantization_config=bnb_config,
+    device_map="auto",
+    torch_dtype=torch.bfloat16,
+    attn_implementation="flash_attention_2",
+)
+
+# If we have a CPT adapter, load it first
+if CPT_ADAPTER:
+    print(f"📎 Loading CPT adapter from {CPT_ADAPTER}...")
+    model = PeftModel.from_pretrained(model, CPT_ADAPTER)
+    model = model.merge_and_unload()  # Merge CPT weights into base
+    # Now we'll add fresh LoRA adapters for SFT
+
+model = prepare_model_for_kbit_training(model)
+
+# ============================================
+# STEP 2: Configure NEW LoRA for SFT
+# ============================================
+print("🔧 Configuring LoRA for SFT...")
+
+lora_config = LoraConfig(
+    r=32,                    # Can be lower than CPT since task is simpler
+    lora_alpha=16,
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM",
+    target_modules=[
+        "q_proj", "k_proj", "v_proj", "o_proj",
+        "gate_proj", "up_proj", "down_proj",
+    ],
+)
+
+# ============================================
+# STEP 3: Load SFT Dataset
+# ============================================
+print("📊 Loading SFT dataset...")
+
+dataset = load_dataset("json", data_files=DATASET_PATH, split="train")
+
+# Split into train/eval (90/10)
+split = dataset.train_test_split(test_size=0.1, seed=42)
+train_dataset = split["train"]
+eval_dataset = split["test"]
+
+print(f"  Train: {len(train_dataset)} examples")
+print(f"  Eval:  {len(eval_dataset)} examples")
+
+# Preview an example
+print(f"\n  Example conversation:")
+example = train_dataset[0]
+for msg in example["messages"]:
+    role = msg["role"]
+    content = msg["content"][:100]
+    print(f"    [{role}] {content}...")
+
+# ============================================
+# STEP 4: Training Configuration
+# ============================================
+training_args = SFTConfig(
+    output_dir=OUTPUT_DIR,
+    
+    # Training
+    num_train_epochs=NUM_EPOCHS,
+    per_device_train_batch_size=BATCH_SIZE,
+    per_device_eval_batch_size=BATCH_SIZE,
+    gradient_accumulation_steps=GRADIENT_ACCUMULATION,
+    
+    # Optimizer
+    learning_rate=LEARNING_RATE,
+    lr_scheduler_type="cosine",
+    warmup_ratio=0.05,                  # 5% warmup
+    weight_decay=0.01,
+    optim="paged_adamw_8bit",
+    max_grad_norm=1.0,
+    
+    # Precision & Memory
+    bf16=True,
+    gradient_checkpointing=True,
+    
+    # Sequence handling
+    max_seq_length=MAX_SEQ_LENGTH,
+    packing=False,                      # Don't pack for SFT (each conv is one example)
+    
+    # CRITICAL: Only compute loss on assistant responses
+    # This ensures the model learns to RESPOND, not to mimic user queries
+    assistant_only_loss=True,
+    
+    # Logging
+    logging_steps=10,
+    logging_dir=f"{OUTPUT_DIR}/logs",
+    report_to="wandb",
+    run_name="gemma-scripture-sft",
+    
+    # Saving & Eval
+    eval_strategy="steps",
+    eval_steps=200,
+    save_strategy="steps",
+    save_steps=200,
+    save_total_limit=3,
+    load_best_model_at_end=True,
+    metric_for_best_model="eval_loss",
+    
+    seed=42,
+)
+
+# ============================================
+# STEP 5: Train!
+# ============================================
+print("\n🚀 Starting SFT training...")
+
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset,
+    processing_class=tokenizer,
+    peft_config=lora_config,
+)
+
+# Train
+result = trainer.train()
+
+# Save
+print("\n💾 Saving model...")
+trainer.save_model(f"{OUTPUT_DIR}/final")
+tokenizer.save_pretrained(f"{OUTPUT_DIR}/final")
+
+print(f"\n{'='*50}")
+print(f"✅ SFT Training Complete!")
+print(f"   Train Loss: {result.training_loss:.4f}")
+print(f"   Saved to: {OUTPUT_DIR}/final")
+print(f"{'='*50}")</code></pre>
+
+            <h2 id="system-prompt">📝 Crafting the System Prompt</h2>
+            <p>The system prompt defines the model's persona. All SFT examples should use a consistent system prompt.</p>
+            
+            <pre><code># Recommended system prompt for Hindu scripture model
+SYSTEM_PROMPT = """You are a deeply knowledgeable scholar of Hindu scriptures (शास्त्रज्ञ). 
+You have studied the Vedas, Upanishads, Bhagavad Gita, Ramayana, Mahabharata, Puranas, 
+and the philosophical traditions of Vedanta, Yoga, Samkhya, and Nyaya.
+
+Your guidelines:
+1. Always cite specific scripture references (e.g., "Bhagavad Gita 2.47", "Katha Upanishad 1.2.12")
+2. Provide original Sanskrit/Hindi text when relevant, with translations
+3. Present multiple viewpoints from different philosophical schools when applicable
+4. Be respectful of all traditions and interpretations
+5. Clearly distinguish between scriptural statements and scholarly interpretation
+6. Respond in the language the user asks in (Hindi, English, or mixed)
+7. Use proper diacritical marks for Sanskrit transliteration when writing in English
+8. If unsure about a specific reference, acknowledge the uncertainty rather than fabricating"""
+
+# For Hindi-focused interactions
+SYSTEM_PROMPT_HINDI = """आप हिंदू शास्त्रों के गहन ज्ञाता विद्वान हैं। 
+आपने वेद, उपनिषद, भगवद्गीता, रामायण, महाभारत, पुराण, 
+और वेदांत, योग, सांख्य, न्याय दर्शन का अध्ययन किया है।
+
+आपके दिशानिर्देश:
+1. हमेशा विशिष्ट शास्त्र संदर्भ दें
+2. जहाँ उचित हो मूल संस्कृत श्लोक उद्धृत करें
+3. विभिन्न दार्शनिक परंपराओं के दृष्टिकोण प्रस्तुत करें
+4. सभी परंपराओं का सम्मान करें
+5. शास्त्रीय कथन और विद्वत् व्याख्या में अंतर स्पष्ट करें"""</code></pre>
+
+            <h2 id="data-strategies">📚 Data Creation Strategies</h2>
+            
+            <h3>Strategy 1: Self-Instruct (Automated, Scalable)</h3>
+            <pre><code>"""
+Self-Instruct: Use a powerful model to generate diverse training data.
+Cost: ~$50-200 for 50K examples using GPT-4o-mini
+"""
+import json
+import random
+
+SEED_TASKS = [
+    "Explain the meaning of Bhagavad Gita Chapter {ch}, Verse {v}.",
+    "What is the concept of {concept} in Hindu philosophy?",
+    "Compare {school1} and {school2} interpretations of {topic}.",
+    "Tell the story of {character} from the {epic}.",
+    "Translate this Sanskrit verse: {verse}",
+    "How does {scripture} address the topic of {topic}?",
+    "{hindi_question}",
+]
+
+CONCEPTS = ["Dharma", "Karma", "Moksha", "Maya", "Atman", "Brahman", "Samsara", 
+            "Yoga", "Bhakti", "Jnana", "Ahimsa", "Tapas", "Vairagya"]
+
+SCHOOLS = ["Advaita", "Vishishtadvaita", "Dvaita", "Yoga", "Samkhya", "Nyaya"]
+
+def generate_diverse_prompts(n: int = 1000) -> list:
+    """Generate diverse prompts for SFT data creation."""
+    prompts = []
+    
+    for _ in range(n):
+        template = random.choice(SEED_TASKS)
+        
+        prompt = template.format(
+            ch=random.randint(1, 18),
+            v=random.randint(1, 78),
+            concept=random.choice(CONCEPTS),
+            school1=random.choice(SCHOOLS),
+            school2=random.choice(SCHOOLS),
+            topic=random.choice(CONCEPTS),
+            character=random.choice(["Rama", "Krishna", "Arjuna", "Draupadi", 
+                                      "Hanuman", "Bhishma", "Yudhishthira"]),
+            epic=random.choice(["Ramayana", "Mahabharata"]),
+            verse="कर्मण्येवाधिकारस्ते मा फलेषु कदाचन",
+            scripture=random.choice(["Bhagavad Gita", "Yoga Sutras", 
+                                      "Katha Upanishad", "Mandukya Upanishad"]),
+            hindi_question=random.choice([
+                "गीता में कर्मयोग क्या है?",
+                "उपनिषदों का मुख्य संदेश क्या है?",
+                "रामायण से हमें क्या शिक्षा मिलती है?",
+                "योग के आठ अंग कौन से हैं?",
+            ])
+        )
+        prompts.append(prompt)
+    
+    return prompts</code></pre>
+
+            <h3>Strategy 2: Distillation from Stronger Model</h3>
+            <pre><code>"""
+Distillation: Get a powerful model (GPT-4, Claude) to answer your prompts,
+then use those answers as training data for Gemma.
+This is the fastest way to get high-quality SFT data.
+"""
+import openai
+import json
+import time
+
+client = openai.OpenAI(api_key="your-key")
+
+def distill_from_teacher(
+    prompts: list,
+    output_path: str,
+    teacher_model: str = "gpt-4o",
+    system_prompt: str = SYSTEM_PROMPT,
+    batch_size: int = 10,
+    delay: float = 0.5  # Rate limiting
+):
+    """Generate training data by distilling from a stronger model."""
+    
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for i, prompt in enumerate(prompts):
+            try:
+                response = client.chat.completions.create(
+                    model=teacher_model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.7,
+                    max_tokens=2048,
+                )
+                
+                answer = response.choices[0].message.content
+                
+                # Save as SFT format
+                example = {
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt},
+                        {"role": "assistant", "content": answer}
+                    ]
+                }
+                
+                f.write(json.dumps(example, ensure_ascii=False) + '\n')
+                
+                if (i + 1) % 100 == 0:
+                    print(f"  Generated {i+1}/{len(prompts)} examples...")
+                
+                time.sleep(delay)
+                
+            except Exception as e:
+                print(f"  Error on prompt {i}: {e}")
+                continue
+    
+    print(f"✓ Generated {i+1} examples → {output_path}")</code></pre>
+
+            <h3>Strategy 3: Manual Curation (Highest Quality)</h3>
+            <div class="callout callout-info">
+                <div class="callout-title">💡 The 80/20 Rule for SFT Data</div>
+                <p>Research shows that <strong>1,000 high-quality manually curated examples</strong> can outperform 100,000 machine-generated ones. Consider this approach:</p>
+                <ul>
+                    <li>Start with 1K manually written gold-standard examples</li>
+                    <li>Use Self-Instruct to generate 49K more</li>
+                    <li>Combine for a 50K dataset with quality anchors</li>
+                </ul>
+            </div>
+
+            <h2 id="multi-turn">🔄 Multi-Turn Conversation Training</h2>
+            <pre><code>"""
+Multi-turn conversations teach the model to maintain context
+across multiple exchanges — crucial for deep philosophical discussions.
+"""
+
+# Example: Multi-turn about Karma
+multi_turn_example = {
+    "messages": [
+        {
+            "role": "system",
+            "content": SYSTEM_PROMPT
+        },
+        {
+            "role": "user",
+            "content": "What is Karma?"
+        },
+        {
+            "role": "assistant",
+            "content": "Karma (कर्म) literally means 'action' or 'deed' in Sanskrit. In Hindu philosophy, it has several interconnected meanings:\n\n1. **Action itself** — Any physical, mental, or verbal act\n2. **Law of cause and effect** — Every action has consequences that shape future experiences\n3. **Accumulated results** — The sum total of one's past actions that influence present circumstances\n\nThe Bhagavad Gita (4.17) states:\n*कर्मणो ह्यपि बोद्धव्यं बोद्धव्यं च विकर्मणः।*\n*अकर्मणश्च बोद्धव्यं गहना कर्मणो गतिः॥*\n\n'The nature of action, forbidden action, and inaction must be understood — the way of karma is profound.'"
+        },
+        {
+            "role": "user",
+            "content": "What are the different types of Karma?"
+        },
+        {
+            "role": "assistant",
+            "content": "Hindu philosophy classifies Karma into several categories:\n\n**By Time:**\n1. **संचित कर्म (Sanchita)** — Accumulated karma from all past lives. Like a storehouse of seeds waiting to sprout.\n2. **प्रारब्ध कर्म (Prarabdha)** — The portion of sanchita karma that has 'ripened' and is being experienced in this life. Often called 'destiny' or 'fate.'\n3. **क्रियमाण कर्म (Kriyamana/Agami)** — Karma being created right now through current actions. This is what we have control over.\n\n**By Nature (Gita 18.23-25):**\n1. **सात्विक कर्म (Sattvic)** — Actions done without attachment, without ego, with steadfastness\n2. **राजसिक कर्म (Rajasic)** — Actions done with ego, desire for results, with great effort\n3. **तामसिक कर्म (Tamasic)** — Actions done with delusion, disregard for consequences, causing harm\n\n**By Spiritual Path:**\n- **निष्काम कर्म (Nishkama)** — Selfless action without desire for fruits (recommended by Krishna)\n- **सकाम कर्म (Sakama)** — Action done with desire for specific results"
+        },
+        {
+            "role": "user",
+            "content": "How can one overcome bad karma?"
+        },
+        {
+            "role": "assistant",
+            "content": "The scriptures describe several paths to transcend or mitigate negative karma:\n\n**1. ज्ञान (Jnana) — Knowledge:**\nThe Gita (4.37) says: *यथैधांसि समिद्धोऽग्निर्भस्मसात्कुरुतेऽर्जुन। ज्ञानाग्निः सर्वकर्माणि भस्मसात्कुरुते तथा॥*\n'As fire reduces fuel to ashes, the fire of knowledge burns all karma to ashes.'\n\n**2. निष्काम कर्म (Nishkama Karma) — Selfless Action:**\nPerform duties without attachment to results (Gita 2.47-48). Actions done without ego don't create binding karma.\n\n**3. भक्ति (Bhakti) — Devotion:**\nGita 18.66: *सर्वधर्मान्परित्यज्य मामेकं शरणं व्रज। अहं त्वा सर्वपापेभ्यो मोक्षयिष्यामि मा शुचः॥*\n'Abandon all dharmas and surrender to Me alone. I shall liberate you from all sins.'\n\n**4. प्रायश्चित (Prayashchitta) — Atonement:**\nThe Dharma Shastras prescribe specific practices for purification.\n\n**5. योग (Yoga) — Discipline:**\nPatanjali's Yoga Sutras (2.1): Tapas (austerity), Svadhyaya (self-study), and Ishvara Pranidhana (surrender to God) constitute Kriya Yoga, which weakens the kleshas (afflictions) that drive karma.\n\n**Key Insight:** The ultimate teaching is not about 'escaping' karma but about transforming one's relationship to action — acting from wisdom and love rather than desire and ignorance."
+        }
+    ]
+}</code></pre>
+
+            <h2 id="evaluation-during">📈 Evaluating During Training</h2>
+            <pre><code>"""
+Custom evaluation metrics for SFT training.
+Beyond just loss — measure if the model is actually learning to be helpful.
+"""
+from transformers import TrainerCallback
+import torch
+
+class SFTEvaluationCallback(TrainerCallback):
+    """Periodically generate responses to test prompts during training."""
+    
+    def __init__(self, tokenizer, eval_prompts, eval_every_steps=500):
+        self.tokenizer = tokenizer
+        self.eval_prompts = eval_prompts
+        self.eval_every_steps = eval_every_steps
+    
+    def on_step_end(self, args, state, control, model=None, **kwargs):
+        if state.global_step % self.eval_every_steps != 0:
+            return
+        
+        print(f"\n{'='*40}")
+        print(f"Generation check at step {state.global_step}")
+        print(f"{'='*40}")
+        
+        model.eval()
+        for prompt in self.eval_prompts[:3]:
+            messages = [
+                {"role": "system", "content": "You are a Hindu scripture scholar."},
+                {"role": "user", "content": prompt}
+            ]
+            
+            inputs = self.tokenizer.apply_chat_template(
+                messages,
+                add_generation_prompt=True,
+                return_tensors="pt"
+            ).to(model.device)
+            
+            with torch.no_grad():
+                outputs = model.generate(
+                    inputs,
+                    max_new_tokens=200,
+                    temperature=0.7,
+                    do_sample=True,
+                )
+            
+            response = self.tokenizer.decode(
+                outputs[0][inputs.shape[-1]:],
+                skip_special_tokens=True
+            )
+            print(f"\n📝 Q: {prompt}")
+            print(f"💬 A: {response[:300]}...")
+        
+        model.train()
+
+# Usage: Add to trainer
+eval_prompts = [
+    "What is the first verse of Bhagavad Gita?",
+    "भगवद्गीता में कर्मयोग क्या है?",
+    "Explain the concept of Maya in Advaita Vedanta.",
+]
+
+# callback = SFTEvaluationCallback(tokenizer, eval_prompts)
+# trainer = SFTTrainer(..., callbacks=[callback])</code></pre>
+
+            <h2 id="tips">💡 SFT Best Practices</h2>
+            <div class="callout callout-success">
+                <div class="callout-title">✅ Do's</div>
+                <ul>
+                    <li>Use <code>assistant_only_loss=True</code> — only train on responses, not prompts</li>
+                    <li>Include diverse question types (factual, philosophical, comparative, translation)</li>
+                    <li>Mix languages in training data matching your target usage</li>
+                    <li>Include both short and long responses</li>
+                    <li>Add system prompt to every example for consistency</li>
+                    <li>Use <code>packing=False</code> for SFT (each conversation is one unit)</li>
+                </ul>
+            </div>
+            
+            <div class="callout callout-danger">
+                <div class="callout-title">❌ Don'ts</div>
+                <ul>
+                    <li>Don't train for too many epochs (3 max) — causes overfitting</li>
+                    <li>Don't use too high learning rate (>5e-4 with LoRA)</li>
+                    <li>Don't include low-quality or factually wrong examples</li>
+                    <li>Don't have all responses be the same length</li>
+                    <li>Don't skip evaluation — check model outputs every 500 steps</li>
+                </ul>
+            </div>
+
+            <nav class="page-nav">
+                <a href="04-continued-pretraining.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Continued Pre-Training</span>
+                </a>
+                <a href="06-preference-alignment.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Preference Alignment (DPO)</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

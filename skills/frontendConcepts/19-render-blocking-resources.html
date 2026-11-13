@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Render Blocking Resources - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing Complexity</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop (Macro vs Microta…</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interoperabil…</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver Internals</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver Loop Limits</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver Cost</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle Traps</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation Strategies</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preco…</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture & State Machines</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+            <li><a href="64-finite-state-modeling.html"><span class="nav-number">64</span> Finite State Modeling</a></li>
+            <li><a href="65-event-sourcing-frontend.html"><span class="nav-number">65</span> Event Sourcing in Frontend</a></li>
+            <li><a href="66-optimistic-ui-rollback.html"><span class="nav-number">66</span> Optimistic UI Rollback Strat…</a></li>
+            <li class="module-label">Offline & Collaboration</li>
+            <li><a href="67-offline-conflict-resolution.html"><span class="nav-number">67</span> Offline Conflict Resolution</a></li>
+            <li><a href="68-crdt-basics.html"><span class="nav-number">68</span> CRDT Basics for Collaboration</a></li>
+            <li><a href="69-webrtc.html"><span class="nav-number">69</span> WebRTC</a></li>
+            <li class="module-label">Streams & Async Patterns</li>
+            <li><a href="70-backpressure-streams.html"><span class="nav-number">70</span> Backpressure in Streams API</a></li>
+            <li><a href="71-abort-controller.html"><span class="nav-number">71</span> AbortController</a></li>
+            <li><a href="72-streaming-fetch.html"><span class="nav-number">72</span> Streaming Fetch Response Han…</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (I…</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async …</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/88 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Render Blocking Resources
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Render Blocking Resources</h1>
+                <p class="subtitle">Understanding which resources prevent the browser from painting pixels — and how to unblock the rendering pipeline without breaking functionality.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span> <span class="tag tag-performance">Performance</span> <span class="tag tag-browser">Browser</span>
+                </div>
+            </div>
+
+
+            <div class="analogy-box">
+                <div class="analogy-title">🚧 Analogy: Highway Roadblocks</div>
+                <p>Render-blocking resources are roadblocks on the highway to First Paint. CSS is a mandatory checkpoint (you can't paint without knowing colors and sizes). Synchronous JS is a police barricade (everything stops while it executes). The goal is to remove unnecessary roadblocks and let the essential traffic flow.</p>
+            </div>
+
+            <h2>The Problem: Invisible Pages</h2>
+            <p>Users stare at a white screen while the browser waits for resources it deems necessary before painting. The browser won't render <em>anything</em> until:</p>
+            <ul>
+                <li>All render-blocking CSS is downloaded and parsed</li>
+                <li>All parser-blocking JavaScript has executed</li>
+            </ul>
+
+            <h2>What Blocks What</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Resource</th><th>Blocks</th><th>Why</th></tr></thead>
+                <tbody>
+                    <tr><td><code>&lt;link rel="stylesheet"&gt;</code></td><td>Rendering</td><td>Browser needs CSSOM to build render tree</td></tr>
+                    <tr><td><code>&lt;script&gt;</code> (no defer/async)</td><td>HTML Parsing</td><td>Script might call document.write() or modify DOM</td></tr>
+                    <tr><td><code>&lt;script defer&gt;</code></td><td>Nothing</td><td>Downloads parallel, executes after parsing</td></tr>
+                    <tr><td><code>&lt;script async&gt;</code></td><td>Parsing (briefly)</td><td>Downloads parallel, blocks parsing only during execution</td></tr>
+                    <tr><td><code>@import</code> in CSS</td><td>Rendering (chained)</td><td>Sequential download — parent must load before child starts</td></tr>
+                    <tr><td><code>@font-face</code></td><td>Text rendering</td><td>Text invisible until font downloads (without font-display: swap)</td></tr>
+                </tbody>
+            </table>
+
+<pre><code><span class="token-comment">&lt;!-- BEFORE: Everything blocks rendering --&gt;</span>
+&lt;head&gt;
+    &lt;link rel="stylesheet" href="all-styles.css"&gt; <span class="token-comment">&lt;!-- 200KB, blocks render --&gt;</span>
+    &lt;script src="vendor.js"&gt;&lt;/script&gt; <span class="token-comment">&lt;!-- 500KB, blocks parsing --&gt;</span>
+    &lt;script src="app.js"&gt;&lt;/script&gt; <span class="token-comment">&lt;!-- 300KB, blocks parsing --&gt;</span>
+&lt;/head&gt;
+
+<span class="token-comment">&lt;!-- AFTER: Minimal blocking, fast first paint --&gt;</span>
+&lt;head&gt;
+    <span class="token-comment">&lt;!-- Critical CSS inlined — no network request needed --&gt;</span>
+    &lt;style&gt;
+        /* Only above-the-fold styles: ~5KB */
+        body { font-family: system-ui; margin: 0; }
+        .hero { padding: 2rem; background: #1a1a2e; color: white; }
+    &lt;/style&gt;
+    
+    <span class="token-comment">&lt;!-- Non-critical CSS loaded asynchronously --&gt;</span>
+    &lt;link rel="preload" href="full-styles.css" as="style" 
+          onload="this.onload=null;this.rel='stylesheet'"&gt;
+    &lt;noscript&gt;&lt;link rel="stylesheet" href="full-styles.css"&gt;&lt;/noscript&gt;
+    
+    <span class="token-comment">&lt;!-- Scripts deferred — don't block parsing or rendering --&gt;</span>
+    &lt;script src="vendor.js" defer&gt;&lt;/script&gt;
+    &lt;script src="app.js" defer&gt;&lt;/script&gt;
+    
+    <span class="token-comment">&lt;!-- Preconnect to domains we'll need soon --&gt;</span>
+    &lt;link rel="preconnect" href="https://api.example.com"&gt;
+&lt;/head&gt;
+</code></pre>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Google's Critters</strong> — Webpack plugin that automatically inlines critical CSS and defers the rest.</li>
+                <li><strong>Next.js</strong> — Automatically code-splits CSS per page, inlines critical styles, and adds <code>defer</code> to scripts.</li>
+                <li><strong>Cloudflare Zaraz</strong> — Moves third-party scripts off the critical path by loading them via Web Workers.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Using <code>async</code> for scripts that depend on DOM</strong> — Async scripts can execute before DOM is ready. Use <code>defer</code> for DOM-dependent code.</li>
+                <li><strong>Preloading everything</strong> — Too many preloads compete for bandwidth, delaying truly critical resources.</li>
+                <li><strong>Inlining too much CSS</strong> — Inline CSS isn't cacheable. Keep it to critical above-the-fold styles only (~14KB max for first RTT).</li>
+                <li><strong>Third-party scripts in &lt;head&gt;</strong> — Analytics, chat widgets, and ad scripts should be async or deferred.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Render Blocking When...</h3>
+                <p>You can look at a page's HTML source, identify every render-blocking resource, and predict the time-to-first-paint relative to those resources' download times.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Take a page scoring 40 on Lighthouse Performance. Without changing any functionality, improve it to 90+ by only modifying how resources are loaded (inline critical CSS, defer scripts, preload key assets).</p>
+                <h3>🔗 Connect It</h3>
+                <p>Render Blocking connects to: <strong>Critical Rendering Path</strong> (the pipeline being blocked), <strong>Preload vs Prefetch vs Preconnect</strong> (resource hints to speed up loading), and <strong>Priority Hints</strong> (telling the browser what matters most).</p>
+            </div>
+
+
+            <div class="nav-footer">
+                <a href="18-critical-rendering-path.html" class="nav-btn nav-btn-prev">← Critical Rendering Path</a>
+                <a href="20-tree-shaking-internals.html" class="nav-btn nav-btn-next">Tree Shaking Internals →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

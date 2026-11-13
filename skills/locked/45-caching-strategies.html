@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caching Strategies - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Database Engineering &rarr; Caching Strategies</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Database</span>
+                <span class="tag">Pattern</span>
+            </div>
+            <h1>Caching Strategies</h1>
+            <p class="hero-subtitle">Patterns for storing frequently accessed data in fast storage layers &mdash; choosing between cache-aside, read-through, write-through, and write-behind strategies based on your consistency, latency, and durability requirements.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of caching like organizing your <strong>kitchen spices</strong>. Spices you use daily (salt, pepper, garlic) stay on the counter &mdash; instant access. Spices used weekly go in the front of the cabinet. Exotic spices used once a year sit in the back of the pantry. You don&rsquo;t keep everything on the counter (limited space), and you promote items based on usage frequency. That&rsquo;s exactly how caching works: <strong>hot data near the CPU/application</strong>, warm data in a cache layer, cold data on disk. The &ldquo;strategy&rdquo; is how you decide what goes where and when to update it.</p>
+        </div>
+
+        <h2>Why Cache? The Latency Hierarchy</h2>
+        <ul>
+            <li><strong>L1 CPU Cache:</strong> ~1 ns (reference from register)</li>
+            <li><strong>L2 CPU Cache:</strong> ~4 ns</li>
+            <li><strong>L3 CPU Cache:</strong> ~12 ns</li>
+            <li><strong>RAM (main memory):</strong> ~100 ns</li>
+            <li><strong>Redis/Memcached (in-memory over network):</strong> ~0.5&ndash;1 ms</li>
+            <li><strong>SSD random read:</strong> ~0.1 ms</li>
+            <li><strong>Database query (indexed):</strong> ~1&ndash;10 ms</li>
+            <li><strong>Database query (complex join):</strong> ~50&ndash;500 ms</li>
+            <li><strong>Cross-region network call:</strong> ~50&ndash;150 ms</li>
+        </ul>
+
+        <h2>Cache-Aside (Lazy Loading)</h2>
+        <p>The application manages the cache explicitly. On read: check cache first, on miss load from DB and populate cache. On write: update DB, then invalidate/delete cache entry.</p>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Cache-Aside</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Who manages cache?</td>
+                        <td>Application code</td>
+                    </tr>
+                    <tr>
+                        <td>Read miss penalty</td>
+                        <td>One extra round-trip to DB</td>
+                    </tr>
+                    <tr>
+                        <td>Consistency</td>
+                        <td>Eventual (stale reads possible between write and invalidation)</td>
+                    </tr>
+                    <tr>
+                        <td>Best for</td>
+                        <td>Read-heavy workloads, tolerance for brief staleness</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Read-Through &amp; Write-Through</h2>
+        <p><strong>Read-through:</strong> The cache itself loads data from the DB on a miss (cache acts as abstraction layer). <strong>Write-through:</strong> Every write goes to cache AND database synchronously before returning success.</p>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Read Path</th>
+                        <th>Write Path</th>
+                        <th>Consistency</th>
+                        <th>Latency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Cache-Aside</strong></td>
+                        <td>App &rarr; Cache? Miss &rarr; DB &rarr; populate cache</td>
+                        <td>App &rarr; DB &rarr; delete cache</td>
+                        <td>Eventual</td>
+                        <td>Low reads, low writes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read-Through</strong></td>
+                        <td>App &rarr; Cache (auto-loads from DB on miss)</td>
+                        <td>App &rarr; DB (cache updated on next read)</td>
+                        <td>Eventual</td>
+                        <td>Low reads after warm-up</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Write-Through</strong></td>
+                        <td>App &rarr; Cache (always fresh)</td>
+                        <td>App &rarr; Cache + DB (synchronous)</td>
+                        <td>Strong</td>
+                        <td>Higher write latency</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Write-Behind</strong></td>
+                        <td>App &rarr; Cache (always fresh)</td>
+                        <td>App &rarr; Cache (async flush to DB)</td>
+                        <td>Eventual</td>
+                        <td>Lowest write latency</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Write-Behind (Write-Back)</h2>
+        <p>Writes go only to the cache initially, and are flushed to the database asynchronously in batches. Offers the lowest write latency but risks data loss if the cache crashes before flushing:</p>
+        <ul>
+            <li><strong>Advantage:</strong> Absorbs write bursts, batches DB writes, reduces DB load</li>
+            <li><strong>Risk:</strong> Data loss window between cache write and DB flush</li>
+            <li><strong>Mitigation:</strong> Replicated cache (Redis Cluster), write-ahead log in cache, short flush intervals</li>
+        </ul>
+
+        <h2>TTL Strategies &amp; Cache Hit Ratio</h2>
+        <p>Time-to-live (TTL) determines when cached entries expire. The <strong>cache hit ratio</strong> = hits / (hits + misses) &mdash; aim for &gt;95% in production:</p>
+        <ul>
+            <li><strong>Fixed TTL:</strong> Every entry expires after N seconds &mdash; simple but may cause stampedes</li>
+            <li><strong>Jittered TTL:</strong> TTL + random(0, jitter) &mdash; prevents synchronized expiration</li>
+            <li><strong>Sliding TTL:</strong> Resets on every access &mdash; keeps hot data alive indefinitely</li>
+            <li><strong>Adaptive TTL:</strong> Longer TTL for stable data, shorter for frequently-changing data</li>
+        </ul>
+
+        <h2>Cache Warming</h2>
+        <p>Pre-loading the cache with expected hot data before traffic hits &mdash; critical after deployments or cache restarts:</p>
+        <ul>
+            <li>Load top-N most accessed keys from access logs</li>
+            <li>Replay recent queries against the new cache instance</li>
+            <li>Gradual traffic shift: route 10% &rarr; 50% &rarr; 100% to new cache while it warms</li>
+        </ul>
+
+        <h2>Python Implementations</h2>
+        <pre><code><span class="token-keyword">import</span> time
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> random
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Any, Optional, Callable
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+
+
+<span class="token-comment"># --- Simulated Redis client for demonstration ---</span>
+
+<span class="token-keyword">class</span> <span class="token-class">FakeRedis</span>:
+    <span class="token-string">"""In-memory Redis simulator for demonstrating caching patterns."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._store: dict = {}
+        self._expiry: dict = {}
+        self.stats = {<span class="token-string">"hits"</span>: <span class="token-number">0</span>, <span class="token-string">"misses"</span>: <span class="token-number">0</span>}
+
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, key: str) -> Optional[str]:
+        <span class="token-keyword">if</span> key <span class="token-keyword">in</span> self._expiry:
+            <span class="token-keyword">if</span> time.time() > self._expiry[key]:
+                <span class="token-keyword">del</span> self._store[key]
+                <span class="token-keyword">del</span> self._expiry[key]
+                self.stats[<span class="token-string">"misses"</span>] += <span class="token-number">1</span>
+                <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        <span class="token-keyword">if</span> key <span class="token-keyword">in</span> self._store:
+            self.stats[<span class="token-string">"hits"</span>] += <span class="token-number">1</span>
+            <span class="token-keyword">return</span> self._store[key]
+        self.stats[<span class="token-string">"misses"</span>] += <span class="token-number">1</span>
+        <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">set</span>(self, key: str, value: str, ex: int = <span class="token-keyword">None</span>):
+        self._store[key] = value
+        <span class="token-keyword">if</span> ex:
+            self._expiry[key] = time.time() + ex
+
+    <span class="token-keyword">def</span> <span class="token-function">delete</span>(self, key: str):
+        self._store.pop(key, <span class="token-keyword">None</span>)
+        self._expiry.pop(key, <span class="token-keyword">None</span>)
+
+    @property
+    <span class="token-keyword">def</span> <span class="token-function">hit_ratio</span>(self) -> float:
+        total = self.stats[<span class="token-string">"hits"</span>] + self.stats[<span class="token-string">"misses"</span>]
+        <span class="token-keyword">return</span> self.stats[<span class="token-string">"hits"</span>] / total <span class="token-keyword">if</span> total > <span class="token-number">0</span> <span class="token-keyword">else</span> <span class="token-number">0.0</span>
+
+
+<span class="token-comment"># --- Simulated Database ---</span>
+
+<span class="token-keyword">class</span> <span class="token-class">FakeDatabase</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._data = {
+            <span class="token-string">"user:1"</span>: {<span class="token-string">"name"</span>: <span class="token-string">"Alice"</span>, <span class="token-string">"email"</span>: <span class="token-string">"alice@example.com"</span>},
+            <span class="token-string">"user:2"</span>: {<span class="token-string">"name"</span>: <span class="token-string">"Bob"</span>, <span class="token-string">"email"</span>: <span class="token-string">"bob@example.com"</span>},
+            <span class="token-string">"user:3"</span>: {<span class="token-string">"name"</span>: <span class="token-string">"Charlie"</span>, <span class="token-string">"email"</span>: <span class="token-string">"charlie@example.com"</span>},
+        }
+        self.query_count = <span class="token-number">0</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">read</span>(self, key: str) -> Optional[dict]:
+        self.query_count += <span class="token-number">1</span>
+        time.sleep(<span class="token-number">0.001</span>)  <span class="token-comment"># Simulate DB latency</span>
+        <span class="token-keyword">return</span> self._data.get(key)
+
+    <span class="token-keyword">def</span> <span class="token-function">write</span>(self, key: str, value: dict):
+        self.query_count += <span class="token-number">1</span>
+        time.sleep(<span class="token-number">0.002</span>)  <span class="token-comment"># Simulate write latency</span>
+        self._data[key] = value
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># STRATEGY 1: Cache-Aside (Lazy Loading)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">CacheAside</span>:
+    <span class="token-string">"""Cache-Aside pattern: application manages cache explicitly.
+
+    Read: check cache → miss → load from DB → store in cache
+    Write: update DB → delete from cache (invalidate)
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, cache: FakeRedis, db: FakeDatabase, ttl: int = <span class="token-number">300</span>):
+        self.cache = cache
+        self.db = db
+        self.ttl = ttl
+
+    <span class="token-keyword">def</span> <span class="token-function">read</span>(self, key: str) -> Optional[dict]:
+        <span class="token-comment"># Step 1: Check cache first</span>
+        cached = self.cache.get(key)
+        <span class="token-keyword">if</span> cached:
+            <span class="token-keyword">return</span> json.loads(cached)  <span class="token-comment"># Cache HIT</span>
+
+        <span class="token-comment"># Step 2: Cache MISS → load from database</span>
+        data = self.db.read(key)
+        <span class="token-keyword">if</span> data:
+            <span class="token-comment"># Step 3: Populate cache for next time</span>
+            self.cache.set(key, json.dumps(data), ex=self.ttl)
+        <span class="token-keyword">return</span> data
+
+    <span class="token-keyword">def</span> <span class="token-function">write</span>(self, key: str, value: dict):
+        <span class="token-comment"># Step 1: Write to database (source of truth)</span>
+        self.db.write(key, value)
+        <span class="token-comment"># Step 2: Invalidate cache (delete, don't update)</span>
+        self.cache.delete(key)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># STRATEGY 2: Read-Through</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">ReadThrough</span>:
+    <span class="token-string">"""Read-Through: cache itself handles DB loading on miss.
+
+    The application only talks to the cache layer.
+    On miss, the cache transparently loads from DB.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, cache: FakeRedis, db: FakeDatabase, ttl: int = <span class="token-number">300</span>):
+        self.cache = cache
+        self.db = db
+        self.ttl = ttl
+
+    <span class="token-keyword">def</span> <span class="token-function">read</span>(self, key: str) -> Optional[dict]:
+        <span class="token-comment"># Cache handles everything — acts as the data source</span>
+        cached = self.cache.get(key)
+        <span class="token-keyword">if</span> cached:
+            <span class="token-keyword">return</span> json.loads(cached)
+
+        <span class="token-comment"># Cache auto-loads from DB (transparent to caller)</span>
+        data = self.db.read(key)
+        <span class="token-keyword">if</span> data:
+            self.cache.set(key, json.dumps(data), ex=self.ttl)
+        <span class="token-keyword">return</span> data
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># STRATEGY 3: Write-Through</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">WriteThrough</span>:
+    <span class="token-string">"""Write-Through: every write updates BOTH cache and DB synchronously.
+
+    Guarantees cache is always consistent with DB.
+    Trade-off: higher write latency (two writes per operation).
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, cache: FakeRedis, db: FakeDatabase, ttl: int = <span class="token-number">300</span>):
+        self.cache = cache
+        self.db = db
+        self.ttl = ttl
+
+    <span class="token-keyword">def</span> <span class="token-function">read</span>(self, key: str) -> Optional[dict]:
+        cached = self.cache.get(key)
+        <span class="token-keyword">if</span> cached:
+            <span class="token-keyword">return</span> json.loads(cached)
+        <span class="token-comment"># Miss: load from DB and cache it</span>
+        data = self.db.read(key)
+        <span class="token-keyword">if</span> data:
+            self.cache.set(key, json.dumps(data), ex=self.ttl)
+        <span class="token-keyword">return</span> data
+
+    <span class="token-keyword">def</span> <span class="token-function">write</span>(self, key: str, value: dict):
+        <span class="token-comment"># Write to BOTH synchronously</span>
+        self.db.write(key, value)         <span class="token-comment"># DB first (source of truth)</span>
+        self.cache.set(key, json.dumps(value), ex=self.ttl)  <span class="token-comment"># Then cache</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># STRATEGY 4: Write-Behind (Write-Back)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">WriteBehind</span>:
+    <span class="token-string">"""Write-Behind: writes go to cache, flushed to DB asynchronously.
+
+    Lowest write latency but risk of data loss if cache crashes.
+    Batches writes for efficiency.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, cache: FakeRedis, db: FakeDatabase, ttl: int = <span class="token-number">300</span>):
+        self.cache = cache
+        self.db = db
+        self.ttl = ttl
+        self._write_buffer: list = []  <span class="token-comment"># Pending DB writes</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">read</span>(self, key: str) -> Optional[dict]:
+        cached = self.cache.get(key)
+        <span class="token-keyword">if</span> cached:
+            <span class="token-keyword">return</span> json.loads(cached)
+        data = self.db.read(key)
+        <span class="token-keyword">if</span> data:
+            self.cache.set(key, json.dumps(data), ex=self.ttl)
+        <span class="token-keyword">return</span> data
+
+    <span class="token-keyword">def</span> <span class="token-function">write</span>(self, key: str, value: dict):
+        <span class="token-comment"># Write ONLY to cache (fast return)</span>
+        self.cache.set(key, json.dumps(value), ex=self.ttl)
+        <span class="token-comment"># Buffer for async DB flush</span>
+        self._write_buffer.append((key, value))
+
+    <span class="token-keyword">def</span> <span class="token-function">flush_to_db</span>(self):
+        <span class="token-string">"""Flush buffered writes to database (called by background worker)."""</span>
+        flushed = <span class="token-number">0</span>
+        <span class="token-keyword">while</span> self._write_buffer:
+            key, value = self._write_buffer.pop(<span class="token-number">0</span>)
+            self.db.write(key, value)
+            flushed += <span class="token-number">1</span>
+        <span class="token-keyword">return</span> flushed
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Demo: Compare all strategies</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+print(<span class="token-string">"=== Caching Strategies Comparison ==="</span>)
+print()
+
+strategies = {
+    <span class="token-string">"Cache-Aside"</span>: CacheAside(FakeRedis(), FakeDatabase()),
+    <span class="token-string">"Read-Through"</span>: ReadThrough(FakeRedis(), FakeDatabase()),
+    <span class="token-string">"Write-Through"</span>: WriteThrough(FakeRedis(), FakeDatabase()),
+    <span class="token-string">"Write-Behind"</span>: WriteBehind(FakeRedis(), FakeDatabase()),
+}
+
+<span class="token-keyword">for</span> name, strategy <span class="token-keyword">in</span> strategies.items():
+    print(f<span class="token-string">"--- {name} ---"</span>)
+
+    <span class="token-comment"># Simulate: 3 reads of same key (1 miss + 2 hits)</span>
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(<span class="token-number">3</span>):
+        result = strategy.read(<span class="token-string">"user:1"</span>)
+
+    <span class="token-comment"># Write update</span>
+    strategy.write(<span class="token-string">"user:1"</span>, {<span class="token-string">"name"</span>: <span class="token-string">"Alice Updated"</span>, <span class="token-string">"email"</span>: <span class="token-string">"alice@new.com"</span>})
+
+    <span class="token-comment"># Read after write</span>
+    result = strategy.read(<span class="token-string">"user:1"</span>)
+    print(f<span class="token-string">"  After write-read: {result['name']}"</span>)
+    print(f<span class="token-string">"  DB queries: {strategy.db.query_count}"</span>)
+    print(f<span class="token-string">"  Cache hit ratio: {strategy.cache.hit_ratio:.1%}"</span>)
+
+    <span class="token-comment"># Flush for write-behind</span>
+    <span class="token-keyword">if</span> hasattr(strategy, <span class="token-string">"flush_to_db"</span>):
+        flushed = strategy.flush_to_db()
+        print(f<span class="token-string">"  Flushed {flushed} buffered write(s) to DB"</span>)
+    print()</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>Redis:</strong> The dominant caching layer in production. Supports TTL with <code>EXPIRE</code>, atomic operations with <code>SETNX</code>/<code>SET NX EX</code>, and pub/sub for cache invalidation across instances. Redis Cluster provides automatic sharding across nodes with 16,384 hash slots.</p>
+            <p><strong>Memcached:</strong> Simpler than Redis &mdash; pure key-value with LRU eviction. No persistence, no data structures. Best for simple cache-aside patterns where you need maximum throughput and don&rsquo;t need Redis&rsquo;s advanced features. Facebook runs Memcached at massive scale for user session and feed caching.</p>
+            <p><strong>CDN Caching:</strong> Cloudflare, CloudFront, and Fastly cache HTTP responses at edge locations worldwide. Cache-Control headers (<code>max-age</code>, <code>s-maxage</code>, <code>stale-while-revalidate</code>) control TTL. Purge APIs handle invalidation. Edge caching reduces origin load by 90%+ for static content.</p>
+            <p><strong>CPU L1/L2/L3 Caches:</strong> Hardware implements write-back (write-behind) caching with MESI protocol for coherence across cores. The same principles &mdash; spatial locality, temporal locality, cache lines, eviction policies &mdash; apply at every layer from CPU to CDN.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Cache-aside gives the application full control &mdash; most flexible but requires careful invalidation logic</li>
+                <li>Write-through guarantees consistency but doubles write latency</li>
+                <li>Write-behind provides the lowest write latency but risks data loss on cache failure</li>
+                <li>TTL with jitter prevents cache stampedes caused by synchronized mass expiration</li>
+                <li>Aim for &gt;95% cache hit ratio in production &mdash; below 90% indicates poor key design or TTL strategy</li>
+                <li>Cache warming is critical after deployments &mdash; cold caches under full traffic cause cascading failures</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>Caching strategies represent a spectrum from full application control (cache-aside) to full cache autonomy (write-behind). The further right you go, the lower your latency but the higher your consistency risk.</p>
+            <div class="model-visual">
+                <pre>
+  CACHING STRATEGY SPECTRUM:
+  ══════════════════════════════════════════════════════
+
+  More Control                              Less Control
+  More Consistency                     Less Consistency
+  Higher Latency                         Lower Latency
+  ◄─────────────────────────────────────────────────────►
+
+  Cache-Aside    Read-Through   Write-Through   Write-Behind
+      │               │              │               │
+      │  App manages  │  Cache auto- │  Sync write   │  Async write
+      │  both read    │  loads on    │  to cache +   │  to cache only,
+      │  and write    │  miss        │  DB together  │  batch flush DB
+      │               │              │               │
+      └───────────────┴──────────────┴───────────────┘
+
+  READ PATH (all strategies):
+  ┌─────────┐  HIT   ┌───────┐
+  │  App    │───────→│ Cache │──→ return data (fast!)
+  └─────────┘        └───────┘
+       │ MISS            │
+       ▼                 │ populate
+  ┌─────────┐           │
+  │   DB    │───────────┘
+  └─────────┘
+
+  WRITE PATH comparison:
+  ┌────────────────────────────────────────────────────┐
+  │ Cache-Aside:   App → DB → delete cache key         │
+  │ Write-Through: App → DB + Cache (synchronous)      │
+  │ Write-Behind:  App → Cache → [async] → DB          │
+  └────────────────────────────────────────────────────┘
+
+  TTL STRATEGIES:
+  Fixed:    ████████████████|expire|████████████████|expire
+  Jittered: ████████████████████|expire|██████████████|expire
+  Sliding:  ████|access|████|access|████|access|████...
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Caching mutable data without invalidation strategy:</strong> Storing user profiles in cache with a 1-hour TTL means users won&rsquo;t see their own updates for up to an hour. Always pair caching with explicit invalidation on writes, or use write-through for data that users expect to see immediately after updating.</li>
+                <li><strong>No TTL (caching forever):</strong> Entries without TTL accumulate until memory is exhausted, then random eviction kicks in. Always set a TTL &mdash; even a generous 24-hour TTL provides a safety net against stale data and unbounded memory growth.</li>
+                <li><strong>Cache-aside with update instead of delete:</strong> On write, some developers update the cache instead of deleting it. This creates a race condition: if two concurrent writes occur, the cache may end up with the older value. <strong>Delete on write</strong> is safer &mdash; the next read will reload fresh data.</li>
+                <li><strong>Ignoring cold-start performance:</strong> After a deployment or cache restart, hit ratio drops to 0% and all traffic hits the database simultaneously. Without cache warming or gradual traffic ramp-up, this causes a &ldquo;thundering herd&rdquo; that can crash the database under load.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Implement cache-aside with Redis:</strong> Build a REST API endpoint that reads user profiles using cache-aside with Redis. Measure the hit ratio after 1000 requests with a Zipfian access pattern (80% of requests hit 20% of keys). Experiment with TTL values and observe the ratio change.</li>
+                <li><strong>Write-through consistency test:</strong> Implement write-through caching and run a concurrent test: 10 writers updating the same key simultaneously while 100 readers observe. Verify that readers never see stale data (no inconsistency window).</li>
+                <li><strong>Write-behind durability analysis:</strong> Implement write-behind with a 5-second flush interval. Simulate a crash (kill the process) at random points. Measure how many writes are lost on average. Then add a write-ahead log and repeat the test.</li>
+                <li><strong>TTL jitter experiment:</strong> Cache 10,000 entries with identical TTL. Measure the &ldquo;miss spike&rdquo; when they all expire simultaneously. Then add random jitter (TTL &plusmn; 20%) and compare the miss pattern &mdash; graph the results.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="44-query-optimization.html" class="prev">&larr; Query Optimization</a>
+            <a href="46-cache-invalidation.html" class="next">Cache Invalidation &rarr;</a>
+        </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

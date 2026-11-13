@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Confidence Scoring - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/10 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Source Confidence
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Stage 4: Source Confidence Scoring</h1>
+                <p class="subtitle">Not all retrieved information is equally trustworthy. Score every chunk before letting it influence the AI's answer.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-production">Production</span>
+                </div>
+            </div>
+
+            <!-- ===== ANALOGY ===== -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏠 Daily-Life Analogy: Trusting News Sources</div>
+                <p>Imagine you need to know today's weather forecast. You check 5 sources:</p>
+                <ul>
+                    <li>✅ The national weather service (official, updated hourly) — <strong>HIGH confidence</strong></li>
+                    <li>✅ A reliable weather app (verified data, updated recently) — <strong>HIGH confidence</strong></li>
+                    <li>⚠️ A tweet from a stranger (no credentials, posted 2 hours ago) — <strong>MEDIUM confidence</strong></li>
+                    <li>❌ A blog post from 2019 (old, no recent data) — <strong>LOW confidence</strong></li>
+                    <li>❌ A random forum comment with no source — <strong>VERY LOW confidence</strong></li>
+                </ul>
+                <p>You wouldn't trust all 5 equally. You'd weight the official sources heavily and mostly ignore the forum comment. <strong>Source confidence scoring does exactly this for your RAG system.</strong></p>
+            </div>
+
+            <!-- ===== WHAT IS IT ===== -->
+            <h2>What Is Source Confidence Scoring?</h2>
+            <p>After retrieval gives you the top 10-20 relevant chunks, you don't just blindly feed them all to the AI. Instead, you <strong>score each chunk's trustworthiness</strong> based on multiple signals:</p>
+
+            <ul>
+                <li><strong>Freshness:</strong> How recent is this information?</li>
+                <li><strong>Trust level:</strong> How reliable is the source?</li>
+                <li><strong>Overlap/Agreement:</strong> Do multiple sources say the same thing?</li>
+                <li><strong>Retrieval consistency:</strong> Does this chunk keep appearing for similar queries?</li>
+            </ul>
+
+            <p><strong>The key principle:</strong> Low-confidence context should NEVER heavily influence generation. If you're not sure a source is reliable, don't let the AI treat it as gospel truth.</p>
+
+            <!-- ===== SCORING DIMENSIONS ===== -->
+            <h2>The 4 Scoring Dimensions</h2>
+
+            <h3>1. Freshness Score</h3>
+            <p><strong>Simple:</strong> Newer information is usually more accurate than old information. A policy from 2024 beats a policy from 2019.</p>
+            <p><strong>Technical:</strong> Exponential decay function based on document age. More recent = higher score.</p>
+
+<pre><code><span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">import</span> math
+
+<span class="token-keyword">def</span> <span class="token-function">freshness_score</span>(
+    doc_date: datetime,
+    half_life_days: <span class="token-builtin">int</span> = <span class="token-number">180</span>
+) -> <span class="token-builtin">float</span>:
+    <span class="token-string">"""
+    Score document freshness using exponential decay.
+    
+    half_life_days: after this many days, score drops to 0.5
+    A 6-month half-life means:
+      - Today's doc: 1.0
+      - 6 months old: 0.5
+      - 1 year old: 0.25
+      - 2 years old: 0.0625
+    """</span>
+    age_days = (datetime.now() - doc_date).days
+    
+    <span class="token-keyword">if</span> age_days <= <span class="token-number">0</span>:
+        <span class="token-keyword">return</span> <span class="token-number">1.0</span>
+    
+    <span class="token-comment"># Exponential decay: score = 0.5^(age/half_life)</span>
+    score = math.pow(<span class="token-number">0.5</span>, age_days / half_life_days)
+    
+    <span class="token-keyword">return</span> <span class="token-builtin">round</span>(score, <span class="token-number">4</span>)
+
+<span class="token-comment"># Examples:</span>
+<span class="token-comment"># Document from today → 1.0</span>
+<span class="token-comment"># Document from 6 months ago → 0.5</span>
+<span class="token-comment"># Document from 2 years ago → 0.0625</span></code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Freshness Isn't Always King</div>
+                <p>Some documents DON'T decay: legal contracts, scientific constants, historical facts. Adjust half-life by document type. A company policy should decay (policies change). A math formula should not.</p>
+            </div>
+
+            <h3>2. Trust Level Score</h3>
+            <p><strong>Simple:</strong> Some sources are more authoritative than others. An official company policy beats a Slack message.</p>
+
+<pre><code><span class="token-comment"># Trust levels mapped to scores</span>
+TRUST_SCORES = {
+    <span class="token-string">"official_policy"</span>: <span class="token-number">1.0</span>,      <span class="token-comment"># Approved company documents</span>
+    <span class="token-string">"verified_kb"</span>: <span class="token-number">0.95</span>,        <span class="token-comment"># Knowledge base articles (reviewed)</span>
+    <span class="token-string">"published_doc"</span>: <span class="token-number">0.9</span>,       <span class="token-comment"># Published documentation</span>
+    <span class="token-string">"meeting_notes"</span>: <span class="token-number">0.7</span>,       <span class="token-comment"># Meeting minutes (context-dependent)</span>
+    <span class="token-string">"email"</span>: <span class="token-number">0.6</span>,              <span class="token-comment"># Email threads (informal)</span>
+    <span class="token-string">"slack_message"</span>: <span class="token-number">0.5</span>,       <span class="token-comment"># Chat messages (casual, may be wrong)</span>
+    <span class="token-string">"draft"</span>: <span class="token-number">0.3</span>,              <span class="token-comment"># Draft documents (not finalized)</span>
+    <span class="token-string">"user_comment"</span>: <span class="token-number">0.2</span>,        <span class="token-comment"># User-generated comments (unverified)</span>
+    <span class="token-string">"unknown"</span>: <span class="token-number">0.1</span>,            <span class="token-comment"># Source unknown (dangerous)</span>
+}
+
+<span class="token-keyword">def</span> <span class="token-function">trust_score</span>(source_type: <span class="token-builtin">str</span>, is_verified: <span class="token-builtin">bool</span> = <span class="token-keyword">False</span>) -> <span class="token-builtin">float</span>:
+    <span class="token-string">"""Get trust score based on source type."""</span>
+    base_score = TRUST_SCORES.get(source_type, <span class="token-number">0.1</span>)
+    
+    <span class="token-comment"># Verified sources get a boost</span>
+    <span class="token-keyword">if</span> is_verified:
+        base_score = <span class="token-builtin">min</span>(<span class="token-number">1.0</span>, base_score + <span class="token-number">0.1</span>)
+    
+    <span class="token-keyword">return</span> base_score</code></pre>
+
+            <h3>3. Overlap/Agreement Score</h3>
+            <p><strong>Simple:</strong> If 4 out of 5 retrieved chunks say the same thing, that information is probably correct. If only 1 chunk says something and the others disagree, be careful.</p>
+
+<pre><code><span class="token-keyword">from</span> collections <span class="token-keyword">import</span> Counter
+
+<span class="token-keyword">def</span> <span class="token-function">overlap_score</span>(
+    chunk: Dict,
+    all_retrieved_chunks: List[Dict],
+    similarity_threshold: <span class="token-builtin">float</span> = <span class="token-number">0.8</span>
+) -> <span class="token-builtin">float</span>:
+    <span class="token-string">"""
+    Score based on how many other chunks agree with this one.
+    
+    If multiple independent sources say the same thing,
+    confidence goes UP. If a chunk contradicts others,
+    confidence goes DOWN.
+    """</span>
+    agreeing_chunks = <span class="token-number">0</span>
+    total_other_chunks = <span class="token-builtin">len</span>(all_retrieved_chunks) - <span class="token-number">1</span>
+    
+    <span class="token-keyword">if</span> total_other_chunks == <span class="token-number">0</span>:
+        <span class="token-keyword">return</span> <span class="token-number">0.5</span>  <span class="token-comment"># Can't assess overlap with one chunk</span>
+    
+    <span class="token-keyword">for</span> other_chunk <span class="token-keyword">in</span> all_retrieved_chunks:
+        <span class="token-keyword">if</span> other_chunk[<span class="token-string">"chunk_id"</span>] == chunk[<span class="token-string">"chunk_id"</span>]:
+            <span class="token-keyword">continue</span>
+        
+        <span class="token-comment"># Check semantic similarity between chunks</span>
+        similarity = cosine_similarity(
+            chunk[<span class="token-string">"embedding"</span>], other_chunk[<span class="token-string">"embedding"</span>]
+        )
+        
+        <span class="token-keyword">if</span> similarity >= similarity_threshold:
+            agreeing_chunks += <span class="token-number">1</span>
+    
+    <span class="token-comment"># More agreement = higher score</span>
+    <span class="token-keyword">return</span> agreeing_chunks / total_other_chunks</code></pre>
+
+            <h3>4. Retrieval Consistency Score</h3>
+            <p><strong>Simple:</strong> If a chunk keeps appearing as relevant for similar queries over time, it's probably genuinely useful. If it only appears once for a weird query, it might be a fluke.</p>
+
+<pre><code><span class="token-keyword">class</span> <span class="token-class">ConsistencyTracker</span>:
+    <span class="token-string">"""Track how consistently chunks are retrieved over time."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.retrieval_history = {}  <span class="token-comment"># chunk_id → list of (query, timestamp, rank)</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">record_retrieval</span>(self, chunk_id: <span class="token-builtin">str</span>, query: <span class="token-builtin">str</span>, rank: <span class="token-builtin">int</span>):
+        <span class="token-string">"""Record that this chunk was retrieved for this query."""</span>
+        <span class="token-keyword">if</span> chunk_id <span class="token-keyword">not in</span> self.retrieval_history:
+            self.retrieval_history[chunk_id] = []
+        self.retrieval_history[chunk_id].append({
+            <span class="token-string">"query"</span>: query,
+            <span class="token-string">"timestamp"</span>: datetime.now(),
+            <span class="token-string">"rank"</span>: rank
+        })
+    
+    <span class="token-keyword">def</span> <span class="token-function">consistency_score</span>(self, chunk_id: <span class="token-builtin">str</span>) -> <span class="token-builtin">float</span>:
+        <span class="token-string">"""
+        Higher score if chunk is consistently retrieved 
+        (not just a one-time fluke).
+        """</span>
+        history = self.retrieval_history.get(chunk_id, [])
+        
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(history) == <span class="token-number">0</span>:
+            <span class="token-keyword">return</span> <span class="token-number">0.5</span>  <span class="token-comment"># No history, neutral</span>
+        
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(history) == <span class="token-number">1</span>:
+            <span class="token-keyword">return</span> <span class="token-number">0.6</span>  <span class="token-comment"># First time, slightly positive</span>
+        
+        <span class="token-comment"># Average rank position (lower rank = more relevant)</span>
+        avg_rank = sum(h[<span class="token-string">"rank"</span>] <span class="token-keyword">for</span> h <span class="token-keyword">in</span> history) / <span class="token-builtin">len</span>(history)
+        
+        <span class="token-comment"># More retrievals + better ranks = higher consistency</span>
+        retrieval_count_factor = <span class="token-builtin">min</span>(<span class="token-number">1.0</span>, <span class="token-builtin">len</span>(history) / <span class="token-number">10</span>)
+        rank_factor = <span class="token-number">1.0</span> / (<span class="token-number">1</span> + avg_rank / <span class="token-number">10</span>)
+        
+        <span class="token-keyword">return</span> <span class="token-number">0.5</span> * retrieval_count_factor + <span class="token-number">0.5</span> * rank_factor</code></pre>
+
+            <!-- ===== COMBINED SCORING ===== -->
+            <h2>Combining All Scores</h2>
+
+<pre><code><span class="token-keyword">def</span> <span class="token-function">compute_confidence_score</span>(
+    chunk: Dict,
+    all_chunks: List[Dict],
+    consistency_tracker: ConsistencyTracker,
+    weights: Dict = <span class="token-keyword">None</span>
+) -> <span class="token-builtin">float</span>:
+    <span class="token-string">"""
+    Compute final confidence score for a retrieved chunk.
+    
+    Combines freshness, trust, overlap, and consistency
+    into a single 0-1 score.
+    
+    Returns:
+        float: confidence score between 0.0 (don't trust) and 1.0 (fully trust)
+    """</span>
+    <span class="token-keyword">if</span> weights <span class="token-keyword">is</span> <span class="token-keyword">None</span>:
+        weights = {
+            <span class="token-string">"freshness"</span>: <span class="token-number">0.25</span>,
+            <span class="token-string">"trust"</span>: <span class="token-number">0.35</span>,
+            <span class="token-string">"overlap"</span>: <span class="token-number">0.20</span>,
+            <span class="token-string">"consistency"</span>: <span class="token-number">0.20</span>
+        }
+    
+    <span class="token-comment"># Calculate each dimension</span>
+    scores = {
+        <span class="token-string">"freshness"</span>: freshness_score(chunk[<span class="token-string">"metadata"</span>][<span class="token-string">"updated_at"</span>]),
+        <span class="token-string">"trust"</span>: trust_score(chunk[<span class="token-string">"metadata"</span>][<span class="token-string">"source_type"</span>]),
+        <span class="token-string">"overlap"</span>: overlap_score(chunk, all_chunks),
+        <span class="token-string">"consistency"</span>: consistency_tracker.consistency_score(chunk[<span class="token-string">"chunk_id"</span>])
+    }
+    
+    <span class="token-comment"># Weighted combination</span>
+    final_score = sum(
+        scores[dim] * weights[dim] 
+        <span class="token-keyword">for</span> dim <span class="token-keyword">in</span> weights
+    )
+    
+    <span class="token-comment"># Attach detailed scores for observability</span>
+    chunk[<span class="token-string">"confidence"</span>] = {
+        <span class="token-string">"overall"</span>: <span class="token-builtin">round</span>(final_score, <span class="token-number">4</span>),
+        <span class="token-string">"breakdown"</span>: scores
+    }
+    
+    <span class="token-keyword">return</span> final_score
+
+
+<span class="token-comment"># Usage in the pipeline:</span>
+<span class="token-keyword">def</span> <span class="token-function">score_and_filter_chunks</span>(
+    chunks: List[Dict],
+    min_confidence: <span class="token-builtin">float</span> = <span class="token-number">0.4</span>
+) -> List[Dict]:
+    <span class="token-string">"""Score all chunks and remove low-confidence ones."""</span>
+    scored_chunks = []
+    
+    <span class="token-keyword">for</span> chunk <span class="token-keyword">in</span> chunks:
+        score = compute_confidence_score(chunk, chunks, tracker)
+        
+        <span class="token-keyword">if</span> score >= min_confidence:
+            scored_chunks.append(chunk)
+        <span class="token-keyword">else</span>:
+            <span class="token-comment"># Log that we're dropping a low-confidence chunk</span>
+            log_dropped_chunk(chunk, score, reason=<span class="token-string">"below_threshold"</span>)
+    
+    <span class="token-comment"># Sort by confidence (highest first)</span>
+    scored_chunks.sort(
+        key=<span class="token-keyword">lambda</span> x: x[<span class="token-string">"confidence"</span>][<span class="token-string">"overall"</span>], 
+        reverse=<span class="token-keyword">True</span>
+    )
+    
+    <span class="token-keyword">return</span> scored_chunks</code></pre>
+
+            <!-- ===== SCALE NOTE ===== -->
+            <div class="scale-note">
+                <div class="scale-title">📊 At 10M Documents Scale</div>
+                <p><strong>Why confidence scoring is critical at scale:</strong></p>
+                <ul>
+                    <li>With 10M docs, you'll inevitably have outdated, conflicting, or low-quality content in your retrieval results</li>
+                    <li>Without confidence scoring, the LLM treats a 5-year-old draft the same as today's official policy</li>
+                    <li>At scale, contradictions are common — confidence scoring helps resolve them by trusting authoritative sources</li>
+                    <li>Low-confidence chunks waste precious context window tokens — remove them to make room for better content</li>
+                </ul>
+            </div>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">🚨 Critical Rule</div>
+                <p><strong>Low-confidence context should NEVER heavily influence generation.</strong> If a chunk scores below your threshold (e.g., 0.4), either remove it from the context entirely or explicitly mark it as "unverified" in the prompt to the LLM.</p>
+            </div>
+
+            <!-- ===== INDUSTRY BOX ===== -->
+            <div class="industry-box">
+                <h4>🏢 What Production Systems Actually Do</h4>
+                <ul>
+                    <li><strong>Enterprise RAG systems</strong> — Assign trust tiers at ingestion time (Gold/Silver/Bronze sources)</li>
+                    <li><strong>Google's approach</strong> — PageRank-style authority scoring for internal documents</li>
+                    <li><strong>Financial systems</strong> — Only allow "verified" sources to influence answers about regulations</li>
+                    <li><strong>Common threshold:</strong> Drop chunks below 0.3-0.5 confidence, weight remaining chunks by their score</li>
+                    <li><strong>Audit trail:</strong> Log every confidence decision for compliance and debugging</li>
+                </ul>
+            </div>
+
+            <!-- ===== SUMMARY ===== -->
+            <div class="summary-box">
+                <h3>📋 Summary</h3>
+                <ul>
+                    <li>Not all retrieved chunks are equally trustworthy — score them before feeding to the LLM</li>
+                    <li>Four dimensions: freshness (how new), trust (how authoritative), overlap (do others agree), consistency (reliable over time)</li>
+                    <li>Combine dimensions with weighted scoring into a single 0-1 confidence value</li>
+                    <li>Drop chunks below your confidence threshold — they're more likely to cause hallucination</li>
+                    <li>This stage is the bridge between "good retrieval" and "safe generation"</li>
+                </ul>
+            </div>
+
+            <!-- ===== MENTAL MODEL ===== -->
+            <div class="mental-model">
+                <h3>🧠 Mental Model</h3>
+                <div class="model-visual">
+Retrieved Chunks (from Stage 3):
+
+Chunk A: Official policy, updated today     → Confidence: 0.95 ✅ USE
+Chunk B: KB article, 3 months old           → Confidence: 0.82 ✅ USE
+Chunk C: Slack message, 1 year old          → Confidence: 0.45 ⚠️ USE WITH CAUTION
+Chunk D: Draft doc, 2 years old, unverified → Confidence: 0.18 ❌ DROP
+Chunk E: Unknown source, contradicts others → Confidence: 0.12 ❌ DROP
+
+After scoring: Only A, B, C go to the LLM.
+C gets marked as "lower confidence" in the prompt.
+D and E are removed — they'd cause hallucination.
+                </div>
+                <p><strong>Think of it as:</strong> A fact-checker sitting between retrieval and the AI. They verify sources before the AI writes its answer.</p>
+            </div>
+
+            <!-- ===== MISTAKES ===== -->
+            <div class="mistakes-box">
+                <h3>❌ Beginner Mistakes to Avoid</h3>
+                <ul>
+                    <li><strong>Treating all sources equally:</strong> "It was retrieved so it must be good" — NO. Retrieval finds relevant content, not necessarily trustworthy content.</li>
+                    <li><strong>Only using freshness:</strong> A new document from an unverified source isn't automatically trustworthy. Balance all 4 dimensions.</li>
+                    <li><strong>Too aggressive filtering:</strong> Setting threshold too high (0.9) might drop useful context. Start at 0.3-0.4 and tune based on results.</li>
+                    <li><strong>Not logging dropped chunks:</strong> Always log what you drop and why. It's crucial for debugging when users say "the system should have known X."</li>
+                    <li><strong>Static scores:</strong> Confidence should be dynamic. A document's trust score might change if it gets verified or flagged as outdated.</li>
+                </ul>
+            </div>
+
+            <!-- ===== EXERCISE ===== -->
+            <div class="exercise-box">
+                <h3>🏋️ Exercise: Build a Confidence Scorer</h3>
+                <ol>
+                    <li>Create 10 mock retrieved chunks with varied metadata (different dates, sources, trust levels)</li>
+                    <li>Implement the freshness_score function with configurable half-life</li>
+                    <li>Implement the trust_score function with your own trust hierarchy</li>
+                    <li>Implement a simple overlap detector (use cosine similarity on TF-IDF vectors)</li>
+                    <li>Combine all scores with weighted averaging</li>
+                    <li>Apply a threshold (0.4) and filter out low-confidence chunks</li>
+                    <li>Print a report showing each chunk's score breakdown and whether it passed the threshold</li>
+                    <li><strong>Bonus:</strong> Visualize how changing weights affects which chunks pass/fail</li>
+                </ol>
+                <p><strong>Success criteria:</strong> Your scorer correctly ranks an official recent document higher than an old unverified draft, and drops chunks below threshold.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="03-ann-reranking.html" class="prev">ANN &amp; Reranking</a>
+                <a href="05-constrained-generation.html" class="next">Constrained Generation</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

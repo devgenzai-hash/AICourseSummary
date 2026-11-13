@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html" class="active"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Design Patterns &rarr; Strategy</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Pattern</span>
+                <span class="tag">Design Pattern</span>
+            </div>
+            <h1>Strategy</h1>
+            <p class="hero-subtitle">Defining a <strong>family of interchangeable algorithms</strong> &mdash; encapsulate each one, and let the client swap them at runtime without changing the code that uses them.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of <strong>choosing a route to work</strong> &mdash; you can drive, take the bus, ride a bike, or walk. The destination is the same, but the <em>algorithm</em> for getting there differs. On a sunny day you bike; when it rains you drive; if traffic is jammed you take the metro. You swap strategies based on conditions &mdash; your &ldquo;commute context&rdquo; doesn&rsquo;t change, only the strategy plugged into it. That&rsquo;s the Strategy pattern: same goal, interchangeable approaches.</p>
+        </div>
+
+        <h2>What Is the Strategy Pattern?</h2>
+        <ul>
+            <li><strong>Intent:</strong> Define a family of algorithms, encapsulate each one, and make them interchangeable &mdash; the algorithm varies independently from clients that use it</li>
+            <li><strong>Classification:</strong> Behavioral pattern (GoF) &mdash; controls <em>which</em> algorithm an object uses</li>
+            <li><strong>Also known as:</strong> Policy pattern</li>
+            <li><strong>Core idea:</strong> Composition over inheritance &mdash; instead of subclassing to change behavior, inject a strategy object</li>
+            <li><strong>Open/Closed Principle:</strong> Add new algorithms without modifying existing code &mdash; just create a new strategy class</li>
+        </ul>
+
+        <h2>Eliminating Conditional Chains</h2>
+        <ul>
+            <li><strong>Problem:</strong> Code littered with <code>if/elif/else</code> chains that select behavior based on a type or mode</li>
+            <li><strong>Symptom:</strong> Every new variant requires modifying the same function &mdash; violates Open/Closed Principle</li>
+            <li><strong>Solution:</strong> Replace conditionals with a strategy interface &mdash; each branch becomes its own strategy class</li>
+            <li><strong>Result:</strong> The context delegates to whichever strategy is injected &mdash; no conditionals needed</li>
+            <li><strong>Testing:</strong> Each strategy is independently unit-testable without instantiating the full context</li>
+        </ul>
+
+        <h2>Context + Strategy Interface</h2>
+        <ul>
+            <li><strong>Context:</strong> The class that uses a strategy &mdash; holds a reference to the strategy interface, delegates work to it</li>
+            <li><strong>Strategy interface:</strong> Defines the contract (method signature) that all concrete strategies must implement</li>
+            <li><strong>Concrete strategies:</strong> Each implements the interface with a different algorithm</li>
+            <li><strong>Client:</strong> Creates the appropriate strategy and injects it into the context</li>
+            <li><strong>Runtime swap:</strong> The context can switch strategies at any point via a setter or constructor</li>
+        </ul>
+
+        <h3>First-Class Functions as Strategies</h3>
+        <ul>
+            <li>In Python, functions are objects &mdash; you can pass a function directly instead of wrapping it in a class</li>
+            <li>For simple strategies (single method), a callable replaces the entire class hierarchy</li>
+            <li><code>sorted(data, key=strategy_func)</code> is the Strategy pattern with zero boilerplate</li>
+            <li>Use classes when strategies have state or multiple methods; use functions for stateless single-method strategies</li>
+        </ul>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Strategy</th>
+                        <th>State</th>
+                        <th>Template Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Varies</strong></td>
+                        <td>Entire algorithm</td>
+                        <td>Behavior based on state</td>
+                        <td>Steps within an algorithm</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Who decides</strong></td>
+                        <td>Client injects strategy</td>
+                        <td>Object transitions itself</td>
+                        <td>Subclass overrides steps</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mechanism</strong></td>
+                        <td>Composition (has-a)</td>
+                        <td>Composition (has-a)</td>
+                        <td>Inheritance (is-a)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Swap timing</strong></td>
+                        <td>Anytime at runtime</td>
+                        <td>On state transitions</td>
+                        <td>Fixed at compile time</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Example</strong></td>
+                        <td>Sorting comparator</td>
+                        <td>TCP connection states</td>
+                        <td>Abstract test framework</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Python Sorting Strategies</h2>
+        <pre><code><span class="token-keyword">from</span> abc <span class="token-keyword">import</span> ABC, abstractmethod
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Protocol
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Strategy interface using Protocol (structural typing)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">SortStrategy</span>(Protocol):
+    <span class="token-string">"""Any callable that sorts a list in-place."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">sort</span>(self, data: List[<span class="token-keyword">int</span>]) -> List[<span class="token-keyword">int</span>]:
+        ...
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Concrete strategies</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">BubbleSort</span>:
+    <span class="token-string">"""O(n²) — simple but slow for large datasets."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">sort</span>(self, data: List[<span class="token-keyword">int</span>]) -> List[<span class="token-keyword">int</span>]:
+        arr = data[:]
+        n = len(arr)
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> range(n):
+            <span class="token-keyword">for</span> j <span class="token-keyword">in</span> range(n - i - <span class="token-number">1</span>):
+                <span class="token-keyword">if</span> arr[j] > arr[j + <span class="token-number">1</span>]:
+                    arr[j], arr[j + <span class="token-number">1</span>] = arr[j + <span class="token-number">1</span>], arr[j]
+        <span class="token-keyword">return</span> arr
+
+
+<span class="token-keyword">class</span> <span class="token-class">QuickSort</span>:
+    <span class="token-string">"""O(n log n) average — fast, general-purpose."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">sort</span>(self, data: List[<span class="token-keyword">int</span>]) -> List[<span class="token-keyword">int</span>]:
+        <span class="token-keyword">if</span> len(data) <= <span class="token-number">1</span>:
+            <span class="token-keyword">return</span> data
+        pivot = data[len(data) // <span class="token-number">2</span>]
+        left = [x <span class="token-keyword">for</span> x <span class="token-keyword">in</span> data <span class="token-keyword">if</span> x < pivot]
+        middle = [x <span class="token-keyword">for</span> x <span class="token-keyword">in</span> data <span class="token-keyword">if</span> x == pivot]
+        right = [x <span class="token-keyword">for</span> x <span class="token-keyword">in</span> data <span class="token-keyword">if</span> x > pivot]
+        <span class="token-keyword">return</span> self.sort(left) + middle + self.sort(right)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Context — delegates sorting to the injected strategy</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Sorter</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, strategy: SortStrategy):
+        self._strategy = strategy
+
+    <span class="token-keyword">def</span> <span class="token-function">set_strategy</span>(self, strategy: SortStrategy) -> <span class="token-keyword">None</span>:
+        <span class="token-string">"""Swap algorithm at runtime."""</span>
+        self._strategy = strategy
+
+    <span class="token-keyword">def</span> <span class="token-function">sort</span>(self, data: List[<span class="token-keyword">int</span>]) -> List[<span class="token-keyword">int</span>]:
+        <span class="token-keyword">return</span> self._strategy.sort(data)
+
+
+<span class="token-comment"># Usage — swap strategies without changing Sorter code</span>
+sorter = Sorter(BubbleSort())
+<span class="token-keyword">print</span>(sorter.sort([<span class="token-number">5</span>, <span class="token-number">2</span>, <span class="token-number">8</span>, <span class="token-number">1</span>]))  <span class="token-comment"># [1, 2, 5, 8]</span>
+
+sorter.set_strategy(QuickSort())
+<span class="token-keyword">print</span>(sorter.sort([<span class="token-number">5</span>, <span class="token-number">2</span>, <span class="token-number">8</span>, <span class="token-number">1</span>]))  <span class="token-comment"># [1, 2, 5, 8]</span></code></pre>
+
+        <h2>Payment Processing Strategies</h2>
+        <pre><code><span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Protocol
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Strategy interface for payment processing</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">PaymentStrategy</span>(Protocol):
+    <span class="token-keyword">def</span> <span class="token-function">pay</span>(self, amount: <span class="token-keyword">float</span>) -> str:
+        ...
+
+
+<span class="token-keyword">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">CreditCardPayment</span>:
+    card_number: str
+    cvv: str
+
+    <span class="token-keyword">def</span> <span class="token-function">pay</span>(self, amount: <span class="token-keyword">float</span>) -> str:
+        masked = <span class="token-string">"****"</span> + self.card_number[-<span class="token-number">4</span>:]
+        <span class="token-keyword">return</span> <span class="token-string">f"Charged ${amount:.2f} to card {masked}"</span>
+
+
+<span class="token-keyword">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">PayPalPayment</span>:
+    email: str
+
+    <span class="token-keyword">def</span> <span class="token-function">pay</span>(self, amount: <span class="token-keyword">float</span>) -> str:
+        <span class="token-keyword">return</span> <span class="token-string">f"Sent ${amount:.2f} via PayPal to {self.email}"</span>
+
+
+<span class="token-keyword">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">CryptoPayment</span>:
+    wallet_address: str
+
+    <span class="token-keyword">def</span> <span class="token-function">pay</span>(self, amount: <span class="token-keyword">float</span>) -> str:
+        <span class="token-keyword">return</span> <span class="token-string">f"Transferred ${amount:.2f} in crypto to {self.wallet_address[:8]}..."</span>
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Context — checkout uses whatever payment is injected</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">Checkout</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, payment: PaymentStrategy):
+        self._payment = payment
+
+    <span class="token-keyword">def</span> <span class="token-function">process</span>(self, amount: <span class="token-keyword">float</span>) -> str:
+        <span class="token-keyword">return</span> self._payment.pay(amount)
+
+
+<span class="token-comment"># Client picks strategy based on user choice</span>
+checkout = Checkout(CreditCardPayment(<span class="token-string">"4111111111111234"</span>, <span class="token-string">"123"</span>))
+<span class="token-keyword">print</span>(checkout.process(<span class="token-number">99.99</span>))
+<span class="token-comment"># → Charged $99.99 to card ****1234</span></code></pre>
+
+        <h2>Compression Strategy &mdash; gzip / lz4 / zstd</h2>
+        <pre><code><span class="token-keyword">import</span> gzip
+<span class="token-keyword">import</span> zlib
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Callable
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Function-based strategies (no class needed)</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">def</span> <span class="token-function">gzip_compress</span>(data: bytes) -> bytes:
+    <span class="token-string">"""High ratio, slower speed."""</span>
+    <span class="token-keyword">return</span> gzip.compress(data, compresslevel=<span class="token-number">9</span>)
+
+
+<span class="token-keyword">def</span> <span class="token-function">zlib_compress</span>(data: bytes) -> bytes:
+    <span class="token-string">"""Balanced ratio and speed."""</span>
+    <span class="token-keyword">return</span> zlib.compress(data, level=<span class="token-number">6</span>)
+
+
+<span class="token-keyword">def</span> <span class="token-function">fast_compress</span>(data: bytes) -> bytes:
+    <span class="token-string">"""Minimal compression, maximum speed."""</span>
+    <span class="token-keyword">return</span> zlib.compress(data, level=<span class="token-number">1</span>)
+
+
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+<span class="token-comment"># Context accepts any Callable[[bytes], bytes]</span>
+<span class="token-comment"># ═══════════════════════════════════════════════════</span>
+
+<span class="token-keyword">class</span> <span class="token-class">FileArchiver</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, compress: Callable[[bytes], bytes]):
+        self._compress = compress
+
+    <span class="token-keyword">def</span> <span class="token-function">archive</span>(self, data: bytes) -> bytes:
+        compressed = self._compress(data)
+        ratio = len(compressed) / len(data) * <span class="token-number">100</span>
+        <span class="token-keyword">print</span>(<span class="token-string">f"Compressed: {len(data)}B → {len(compressed)}B ({ratio:.1f}%)"</span>)
+        <span class="token-keyword">return</span> compressed
+
+
+<span class="token-comment"># Swap compression strategy with a single argument</span>
+archiver = FileArchiver(gzip_compress)
+archiver.archive(<span class="token-string">b"Hello world! "</span> * <span class="token-number">1000</span>)
+
+archiver = FileArchiver(fast_compress)
+archiver.archive(<span class="token-string">b"Hello world! "</span> * <span class="token-number">1000</span>)</code></pre>
+
+        <h2>Route Planning Strategy</h2>
+        <pre><code><span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Protocol
+
+
+<span class="token-keyword">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">Route</span>:
+    path: str
+    duration_min: <span class="token-keyword">int</span>
+    cost: <span class="token-keyword">float</span>
+
+
+<span class="token-keyword">class</span> <span class="token-class">RouteStrategy</span>(Protocol):
+    <span class="token-keyword">def</span> <span class="token-function">calculate</span>(self, origin: str, dest: str) -> Route:
+        ...
+
+
+<span class="token-keyword">class</span> <span class="token-class">FastestRoute</span>:
+    <span class="token-keyword">def</span> <span class="token-function">calculate</span>(self, origin: str, dest: str) -> Route:
+        <span class="token-keyword">return</span> Route(
+            path=<span class="token-string">f"{origin} → Highway → {dest}"</span>,
+            duration_min=<span class="token-number">20</span>, cost=<span class="token-number">5.00</span>
+        )
+
+
+<span class="token-keyword">class</span> <span class="token-class">CheapestRoute</span>:
+    <span class="token-keyword">def</span> <span class="token-function">calculate</span>(self, origin: str, dest: str) -> Route:
+        <span class="token-keyword">return</span> Route(
+            path=<span class="token-string">f"{origin} → Local roads → {dest}"</span>,
+            duration_min=<span class="token-number">45</span>, cost=<span class="token-number">0.00</span>
+        )
+
+
+<span class="token-keyword">class</span> <span class="token-class">ScenicRoute</span>:
+    <span class="token-keyword">def</span> <span class="token-function">calculate</span>(self, origin: str, dest: str) -> Route:
+        <span class="token-keyword">return</span> Route(
+            path=<span class="token-string">f"{origin} → Coast road → Park → {dest}"</span>,
+            duration_min=<span class="token-number">60</span>, cost=<span class="token-number">2.50</span>
+        )
+
+
+<span class="token-comment"># Navigator context — strategy is swappable</span>
+<span class="token-keyword">class</span> <span class="token-class">Navigator</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, strategy: RouteStrategy):
+        self._strategy = strategy
+
+    <span class="token-keyword">def</span> <span class="token-function">navigate</span>(self, origin: str, dest: str) -> Route:
+        <span class="token-keyword">return</span> self._strategy.calculate(origin, dest)
+
+
+nav = Navigator(FastestRoute())
+<span class="token-keyword">print</span>(nav.navigate(<span class="token-string">"Home"</span>, <span class="token-string">"Office"</span>))
+<span class="token-comment"># → Route(path='Home → Highway → Office', duration_min=20, cost=5.0)</span></code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Applications</h3>
+            <ul>
+                <li><strong>Python <code>sorted(key=...)</code>:</strong> The <code>key</code> parameter is a strategy function &mdash; you pass different key extractors to change sort behavior without modifying the sorting algorithm</li>
+                <li><strong>Java Comparator:</strong> <code>Collections.sort(list, comparator)</code> &mdash; the Comparator is a strategy object that defines ordering</li>
+                <li><strong>Passport.js:</strong> Authentication strategies (LocalStrategy, GoogleStrategy, JWTStrategy) &mdash; swap auth mechanisms without changing route handlers</li>
+                <li><strong>E-commerce pricing:</strong> Different pricing strategies (bulk discount, loyalty tier, seasonal sale) injected into the checkout pipeline at runtime</li>
+                <li><strong>Serialization:</strong> JSON, MessagePack, Protobuf &mdash; serialize the same object differently by swapping the serializer strategy</li>
+            </ul>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Summary</h3>
+            <ul>
+                <li>Strategy encapsulates interchangeable algorithms behind a common interface</li>
+                <li>The context delegates work to a strategy &mdash; it doesn&rsquo;t know which concrete algorithm runs</li>
+                <li>Eliminates conditional logic &mdash; each branch becomes its own strategy class or function</li>
+                <li>In Python, first-class functions often replace the full class hierarchy for simple strategies</li>
+                <li>Follows Open/Closed Principle &mdash; add new strategies without modifying existing code</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <div class="model-visual">
+                <pre>
+┌─────────────────────────────────────────┐
+│             CLIENT                      │
+│  "I need to sort / pay / compress"      │
+└──────────────────┬──────────────────────┘
+                   │ injects strategy
+                   ▼
+┌─────────────────────────────────────────┐
+│           CONTEXT (Sorter)              │
+│  strategy.execute(data) ──────────┐     │
+└───────────────────────────────────┼─────┘
+                                    │
+          ┌─────────────────────────┼──────────────┐
+          ▼                         ▼              ▼
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  BubbleSort  │  │  QuickSort   │  │  MergeSort   │
+│  .execute()  │  │  .execute()  │  │  .execute()  │
+└──────────────┘  └──────────────┘  └──────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Over-engineering:</strong> Using the pattern for a single algorithm that will never change &mdash; only use Strategy when you genuinely have multiple interchangeable behaviors</li>
+                <li><strong>Leaking strategy details:</strong> The context should not know which specific strategy is running &mdash; if it checks the strategy type, you&rsquo;ve broken the abstraction</li>
+                <li><strong>Ignoring first-class functions:</strong> In Python/JavaScript, wrapping a single function in a class just to satisfy the pattern adds unnecessary complexity</li>
+                <li><strong>Forgetting shared state:</strong> If strategies need access to context state, you must pass it explicitly &mdash; strategies should not reach into the context&rsquo;s internals</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Discount engine:</strong> Create a pricing context with strategies: PercentDiscount, FlatDiscount, BuyOneGetOneFree. Apply them to a shopping cart.</li>
+                <li><strong>Validation strategies:</strong> Build a form validator that accepts different validation strategies (email, phone, postal code) and validates user input.</li>
+                <li><strong>Logging strategy:</strong> Implement a Logger context with strategies for ConsoleLog, FileLog, and RemoteLog. Swap at runtime based on environment.</li>
+                <li><strong>Function-based refactor:</strong> Take an existing class with a long if/elif chain and refactor it to use a dictionary mapping keys to strategy functions.</li>
+            </ol>
+        </div>
+
+        <nav class="page-nav">
+            <a href="56-observer.html" class="prev">&larr; Observer</a>
+            <a href="58-command.html" class="next">Command &rarr;</a>
+        </nav>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

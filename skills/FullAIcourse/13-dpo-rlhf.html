@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPO & RLHF — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 3</a> <span>›</span> DPO & RLHF</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>DPO & RLHF: Preference Alignment</h1>
+                <p>SFT teaches a model WHAT to say. DPO/RLHF teaches it which answers are BETTER. This is how models go from "can follow instructions" to "gives actually good, safe, helpful responses" — the secret sauce of ChatGPT, Claude, and Gemini.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>SFT = Teaching a student to write essays.</strong> "Here's a good essay. Write like this."</p>
+                <p><strong>DPO/RLHF = A writing contest with judges.</strong> "Here are two essays on the same topic. Essay A is better because it's clearer and more accurate. Learn to write like A, not like B."</p>
+                <p><strong>RLHF = Hiring a writing coach first.</strong> Train a "judge" (reward model) to score essays, then have the student practice and get scored repeatedly.</p>
+                <p><strong>DPO = Skip the coach, learn directly from examples.</strong> "Just look at which essays won in past contests and learn the pattern directly."</p>
+            </div>
+
+            <h2 id="why">Why Alignment After SFT?</h2>
+
+            <p>After SFT, a model can follow instructions. But it might:</p>
+            <ul>
+                <li>Give technically correct but unhelpful answers</li>
+                <li>Be too verbose or too brief</li>
+                <li>Not refuse dangerous requests</li>
+                <li>Not admit when it doesn't know something</li>
+                <li>Produce inconsistent quality</li>
+            </ul>
+
+            <p><strong>Alignment</strong> teaches the model: "Of all the possible correct answers, here's what a GOOD answer looks like vs a BAD one."</p>
+
+            <h2 id="rlhf">RLHF (Reinforcement Learning from Human Feedback)</h2>
+
+            <p>The original alignment method (used by ChatGPT). Complex but powerful.</p>
+
+            <h3>RLHF Pipeline:</h3>
+            <ol>
+                <li><strong>Step 1: Collect preferences.</strong> Humans rank model outputs (A better than B)</li>
+                <li><strong>Step 2: Train a reward model.</strong> Learns to predict which outputs humans prefer</li>
+                <li><strong>Step 3: RL optimization.</strong> Use PPO to optimize the model to get high reward scores</li>
+            </ol>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ RLHF is Complex</div>
+                <p>RLHF requires training 3 models simultaneously (policy, reward, reference). It's unstable, expensive, and hard to debug. That's why DPO was invented as a simpler alternative.</p>
+            </div>
+
+            <h2 id="dpo">DPO (Direct Preference Optimization)</h2>
+
+            <p><strong>DPO</strong> is the modern, simpler alternative to RLHF. Same results, much easier to implement. It skips the reward model entirely.</p>
+
+            <div class="comparison-table">
+                <table>
+                    <thead><tr><th>Aspect</th><th>RLHF</th><th>DPO</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Models needed</strong></td><td>3 (policy + reward + reference)</td><td>2 (policy + reference)</td></tr>
+                        <tr><td><strong>Training stability</strong></td><td>Unstable (RL is finicky)</td><td>Stable (simple loss function)</td></tr>
+                        <tr><td><strong>Implementation</strong></td><td>Complex (PPO algorithm)</td><td>Simple (one training loop)</td></tr>
+                        <tr><td><strong>Quality</strong></td><td>Slightly higher ceiling</td><td>95-100% of RLHF quality</td></tr>
+                        <tr><td><strong>Industry usage</strong></td><td>OpenAI, Anthropic (big labs)</td><td>Everyone else (practical choice)</td></tr>
+                        <tr><td><strong>VRAM needed</strong></td><td>Very high (3 models in memory)</td><td>High (2 models)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>DPO Data Format:</h3>
+            <pre><code><span class="token-comment"># Each example: a prompt + chosen (good) response + rejected (bad) response</span>
+{
+    <span class="token-string">"prompt"</span>: <span class="token-string">"Explain machine learning to a 5-year-old."</span>,
+    <span class="token-string">"chosen"</span>: <span class="token-string">"Imagine you have a robot friend who loves to play a guessing game. You show it pictures of cats and dogs, and every time it guesses right, you say 'Yes!' After seeing lots and lots of pictures, your robot friend gets really good at telling cats from dogs — even new ones it's never seen before! That's machine learning — teaching computers by showing them examples."</span>,
+    <span class="token-string">"rejected"</span>: <span class="token-string">"Machine learning is a subset of artificial intelligence that utilizes statistical methods to enable computational systems to improve their performance on a given task through iterative exposure to data without being explicitly programmed."</span>
+}</code></pre>
+
+            <h2 id="code">Production DPO Training</h2>
+
+            <pre><code><span class="token-comment"># Complete DPO training with TRL</span>
+<span class="token-keyword">import</span> torch
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+<span class="token-keyword">from</span> trl <span class="token-keyword">import</span> DPOTrainer, DPOConfig
+<span class="token-keyword">from</span> peft <span class="token-keyword">import</span> LoraConfig
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> load_dataset
+
+<span class="token-comment"># ===== 1. Load Model (start from your SFT model!) =====</span>
+model_name = <span class="token-string">"./my-sft-model"</span>  <span class="token-comment"># Or a public SFT model</span>
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=<span class="token-keyword">True</span>,
+    bnb_4bit_quant_type=<span class="token-string">"nf4"</span>,
+    bnb_4bit_compute_dtype=torch.bfloat16,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_name, quantization_config=bnb_config, device_map=<span class="token-string">"auto"</span>
+)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer.pad_token = tokenizer.eos_token
+
+<span class="token-comment"># ===== 2. LoRA Config for DPO =====</span>
+peft_config = LoraConfig(
+    r=<span class="token-number">16</span>,
+    lora_alpha=<span class="token-number">32</span>,
+    lora_dropout=<span class="token-number">0.05</span>,
+    target_modules=[<span class="token-string">"q_proj"</span>, <span class="token-string">"k_proj"</span>, <span class="token-string">"v_proj"</span>, <span class="token-string">"o_proj"</span>],
+    task_type=<span class="token-string">"CAUSAL_LM"</span>,
+)
+
+<span class="token-comment"># ===== 3. Load Preference Dataset =====</span>
+<span class="token-comment"># Must have columns: "prompt", "chosen", "rejected"</span>
+dataset = load_dataset(<span class="token-string">"json"</span>, data_files=<span class="token-string">"dpo_data.jsonl"</span>, split=<span class="token-string">"train"</span>)
+
+<span class="token-comment"># ===== 4. DPO Training Config =====</span>
+dpo_config = DPOConfig(
+    output_dir=<span class="token-string">"./dpo-output"</span>,
+    num_train_epochs=<span class="token-number">2</span>,
+    per_device_train_batch_size=<span class="token-number">2</span>,
+    gradient_accumulation_steps=<span class="token-number">8</span>,
+    learning_rate=<span class="token-number">5e-5</span>,      <span class="token-comment"># Lower than SFT!</span>
+    beta=<span class="token-number">0.1</span>,                <span class="token-comment"># DPO temperature (how much to deviate from reference)</span>
+    lr_scheduler_type=<span class="token-string">"cosine"</span>,
+    warmup_ratio=<span class="token-number">0.1</span>,
+    bf16=<span class="token-keyword">True</span>,
+    logging_steps=<span class="token-number">10</span>,
+    save_strategy=<span class="token-string">"epoch"</span>,
+    max_length=<span class="token-number">1024</span>,
+    max_prompt_length=<span class="token-number">512</span>,
+)
+
+<span class="token-comment"># ===== 5. Train! =====</span>
+trainer = DPOTrainer(
+    model=model,
+    args=dpo_config,
+    train_dataset=dataset,
+    processing_class=tokenizer,
+    peft_config=peft_config,
+)
+
+trainer.train()
+trainer.save_model(<span class="token-string">"./my-dpo-model"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">"✅ DPO training complete!"</span>)</code></pre>
+
+            <h2 id="grpo">GRPO (Group Relative Policy Optimization)</h2>
+
+            <p>The newest technique (2024), used by DeepSeek. Instead of paired preferences, it generates multiple responses and ranks them as a group.</p>
+
+            <pre><code><span class="token-comment"># GRPO — simpler than DPO, no need for pre-paired data</span>
+<span class="token-keyword">from</span> trl <span class="token-keyword">import</span> GRPOTrainer, GRPOConfig
+
+<span class="token-comment"># GRPO generates responses itself, then ranks them</span>
+<span class="token-comment"># You just provide prompts + a reward function!</span>
+
+<span class="token-keyword">def</span> <span class="token-function">reward_function</span>(completions: list[str], prompts: list[str]) -> list[float]:
+    <span class="token-string">"""Score responses (higher = better)."""</span>
+    scores = []
+    <span class="token-keyword">for</span> completion <span class="token-keyword">in</span> completions:
+        score = <span class="token-number">0.0</span>
+        <span class="token-comment"># Example reward criteria:</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(completion) > <span class="token-number">100</span>: score += <span class="token-number">1.0</span>  <span class="token-comment"># Not too short</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(completion) < <span class="token-number">2000</span>: score += <span class="token-number">1.0</span>  <span class="token-comment"># Not too long</span>
+        <span class="token-keyword">if</span> <span class="token-string">"```"</span> <span class="token-keyword">in</span> completion: score += <span class="token-number">0.5</span>  <span class="token-comment"># Has code examples</span>
+        <span class="token-keyword">if</span> <span class="token-string">"I don't know"</span> <span class="token-keyword">not</span> <span class="token-keyword">in</span> completion: score += <span class="token-number">0.5</span>
+        scores.append(score)
+    <span class="token-keyword">return</span> scores
+
+grpo_config = GRPOConfig(
+    output_dir=<span class="token-string">"./grpo-output"</span>,
+    num_train_epochs=<span class="token-number">1</span>,
+    per_device_train_batch_size=<span class="token-number">2</span>,
+    num_generations=<span class="token-number">4</span>,  <span class="token-comment"># Generate 4 responses per prompt, rank them</span>
+    learning_rate=<span class="token-number">1e-5</span>,
+    bf16=<span class="token-keyword">True</span>,
+)
+
+<span class="token-comment"># Dataset just needs prompts!</span>
+<span class="token-comment"># dataset = [{"prompt": "Explain X..."}, {"prompt": "How do I..."}, ...]</span>
+
+trainer = GRPOTrainer(
+    model=model,
+    args=grpo_config,
+    train_dataset=dataset,
+    reward_funcs=reward_function,
+    processing_class=tokenizer,
+)
+trainer.train()</code></pre>
+
+            <h2 id="comparison">When to Use Which Method</h2>
+
+            <table>
+                <thead><tr><th>Method</th><th>Best For</th><th>Data Needed</th><th>Complexity</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>SFT only</strong></td><td>Teaching format/behavior</td><td>Instruction-response pairs</td><td>Low</td></tr>
+                    <tr><td><strong>SFT → DPO</strong></td><td>Improving response quality after SFT</td><td>SFT data + preference pairs</td><td>Medium</td></tr>
+                    <tr><td><strong>SFT → GRPO</strong></td><td>When you have a reward signal but no paired data</td><td>SFT data + reward function</td><td>Medium</td></tr>
+                    <tr><td><strong>SFT → RLHF</strong></td><td>Highest quality alignment (big labs)</td><td>SFT data + human rankings</td><td>Very High</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>DPO has replaced RLHF for most teams</strong> — Simpler, more stable, nearly same quality.</li>
+                    <li><strong>Always do SFT before DPO</strong> — DPO improves a model that already works. It can't fix a model that can't follow instructions.</li>
+                    <li><strong>Beta = 0.1</strong> — Standard DPO beta. Lower = stronger preference learning. Higher = stays closer to SFT model.</li>
+                    <li><strong>Learning rate for DPO: 5e-6 to 5e-5</strong> — Lower than SFT to avoid catastrophic forgetting.</li>
+                    <li><strong>GRPO is the future</strong> — Used by DeepSeek-R1. Doesn't need pre-paired preferences.</li>
+                    <li><strong>Iterative DPO</strong> — Generate new responses after each DPO round and create new preference pairs. Repeat.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Alignment</strong> = teaching models which responses are better (not just what to say, but HOW)</li>
+                    <li><strong>RLHF</strong> = complex (3 models, PPO), used by big labs</li>
+                    <li><strong>DPO</strong> = simple alternative (just chosen/rejected pairs), same quality, your go-to choice</li>
+                    <li><strong>GRPO</strong> = newest method, only needs prompts + reward function</li>
+                    <li>Pipeline: Pre-train → SFT → DPO/RLHF (each stage builds on the previous)</li>
+                    <li>Use TRL library's DPOTrainer for implementation</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    SFT: "Here's a good answer" → Model learns to generate acceptable answers<br>
+                    DPO: "Answer A is better than B" → Model learns what makes answers GREAT<br>
+                    GRPO: "Score these 4 answers" → Model learns from its own ranked outputs<br><br>
+                    Quality progression: Base → SFT (good) → DPO (great) → RLHF (best)
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Doing DPO without SFT first</strong> — DPO assumes the model already follows instructions. Always SFT first.</li>
+                    <li><strong>Using too high a learning rate for DPO</strong> — DPO is a refinement step. Use 5-10x lower learning rate than SFT.</li>
+                    <li><strong>Low-quality preference pairs</strong> — If "chosen" and "rejected" are too similar, the model learns nothing.</li>
+                    <li><strong>Trying RLHF as a beginner</strong> — Start with DPO. RLHF requires expertise in RL training (reward hacking, mode collapse).</li>
+                    <li><strong>Not evaluating alignment</strong> — After DPO, test with adversarial prompts to verify the model actually improved.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: DPO Training</h4>
+                <ol>
+                    <li>Create 30 preference pairs for a domain (prompt + good response + bad response)</li>
+                    <li>Make the difference clear: good = detailed, helpful; bad = vague, unhelpful</li>
+                    <li>Use the DPO code above with a small model (Phi-2 or GPT-2)</li>
+                    <li>Compare outputs before and after DPO on the same prompts</li>
+                    <li>Try different beta values (0.05, 0.1, 0.5) — observe how they affect output</li>
+                    <li><strong>Bonus:</strong> Implement a simple GRPO reward function for your domain</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="12-lora-qlora.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">LoRA & QLoRA</span>
+                </a>
+                <a href="14-quantization.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Quantization & GGUF</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

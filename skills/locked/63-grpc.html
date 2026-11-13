@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gRPC - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>System Design</h2>
+            <p class="sidebar-subtitle">Beginner &rarr; Advanced &bull; 68 Topics</p>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-module">
+                <h3>Concurrency Foundations</h3>
+                <ul>
+                    <li><a href="01-threads-vs-processes.html">01 &mdash; Threads vs Processes</a></li>
+                    <li><a href="02-context-switching.html">02 &mdash; Context Switching</a></li>
+                    <li><a href="03-race-conditions.html">03 &mdash; Race Conditions</a></li>
+                    <li><a href="04-critical-sections.html">04 &mdash; Critical Sections</a></li>
+                    <li><a href="05-mutex-locks.html">05 &mdash; Mutex Locks</a></li>
+                    <li><a href="06-deadlocks.html">06 &mdash; Deadlocks</a></li>
+                    <li><a href="07-livelocks-starvation.html">07 &mdash; Livelocks &amp; Starvation</a></li>
+                    <li><a href="08-thread-safety.html">08 &mdash; Thread Safety</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Low-Level Concurrency</h3>
+                <ul>
+                    <li><a href="09-atomic-operations-cas.html">09 &mdash; Atomic Operations &amp; CAS</a></li>
+                    <li><a href="10-memory-visibility.html">10 &mdash; Memory Visibility</a></li>
+                    <li><a href="11-happens-before.html">11 &mdash; Happens-Before</a></li>
+                    <li><a href="12-volatile-vs-synchronized.html">12 &mdash; Volatile vs Synchronized</a></li>
+                    <li><a href="13-false-sharing.html">13 &mdash; False Sharing</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Concurrency Patterns</h3>
+                <ul>
+                    <li><a href="14-thread-pools.html">14 &mdash; Thread Pools</a></li>
+                    <li><a href="15-futures-promises-async.html">15 &mdash; Futures, Promises &amp; Async</a></li>
+                    <li><a href="16-producer-consumer.html">16 &mdash; Producer-Consumer</a></li>
+                    <li><a href="17-blocking-vs-nonblocking.html">17 &mdash; Blocking vs Non-Blocking</a></li>
+                    <li><a href="18-event-loops.html">18 &mdash; Event Loops</a></li>
+                    <li><a href="19-actor-model.html">19 &mdash; Actor Model</a></li>
+                    <li><a href="20-csp-channels.html">20 &mdash; CSP &amp; Channels</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Distributed Systems Core</h3>
+                <ul>
+                    <li><a href="21-fallacies-distributed.html">21 &mdash; Fallacies of Distributed Computing</a></li>
+                    <li><a href="22-cap-theorem.html">22 &mdash; CAP Theorem</a></li>
+                    <li><a href="23-consistency-models.html">23 &mdash; Consistency Models</a></li>
+                    <li><a href="24-replication.html">24 &mdash; Replication</a></li>
+                    <li><a href="25-partitioning-sharding.html">25 &mdash; Partitioning &amp; Sharding</a></li>
+                    <li><a href="26-consistent-hashing.html">26 &mdash; Consistent Hashing</a></li>
+                    <li><a href="27-vector-clocks.html">27 &mdash; Vector Clocks</a></li>
+                    <li><a href="28-consensus-algorithms.html">28 &mdash; Consensus Algorithms</a></li>
+                    <li><a href="29-raft.html">29 &mdash; Raft</a></li>
+                    <li><a href="30-gossip-protocols.html">30 &mdash; Gossip Protocols</a></li>
+                    <li><a href="31-distributed-transactions.html">31 &mdash; Distributed Transactions</a></li>
+                    <li><a href="32-saga-pattern.html">32 &mdash; Saga Pattern</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Resilience Patterns</h3>
+                <ul>
+                    <li><a href="33-circuit-breaker.html">33 &mdash; Circuit Breaker</a></li>
+                    <li><a href="34-retry-backoff.html">34 &mdash; Retry &amp; Backoff</a></li>
+                    <li><a href="35-bulkhead-pattern.html">35 &mdash; Bulkhead Pattern</a></li>
+                    <li><a href="36-timeout-pattern.html">36 &mdash; Timeout Pattern</a></li>
+                    <li><a href="37-health-checks.html">37 &mdash; Health Checks</a></li>
+                    <li><a href="38-graceful-degradation.html">38 &mdash; Graceful Degradation</a></li>
+                    <li><a href="39-chaos-engineering.html">39 &mdash; Chaos Engineering</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Database Engineering</h3>
+                <ul>
+                    <li><a href="40-acid-properties.html">40 &mdash; ACID Properties</a></li>
+                    <li><a href="41-isolation-levels.html">41 &mdash; Isolation Levels</a></li>
+                    <li><a href="42-indexing-strategies.html">42 &mdash; Indexing Strategies</a></li>
+                    <li><a href="43-query-optimization.html">43 &mdash; Query Optimization</a></li>
+                    <li><a href="44-connection-pooling.html">44 &mdash; Connection Pooling</a></li>
+                    <li><a href="45-nosql-patterns.html">45 &mdash; NoSQL Patterns</a></li>
+                    <li><a href="46-caching-strategies.html">46 &mdash; Caching Strategies</a></li>
+                    <li><a href="47-change-data-capture.html">47 &mdash; Change Data Capture</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Architecture Patterns</h3>
+                <ul>
+                    <li><a href="48-monolith-vs-microservices.html">48 &mdash; Monolith vs Microservices</a></li>
+                    <li><a href="49-event-driven-architecture.html">49 &mdash; Event-Driven Architecture</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Design Patterns</h3>
+                <ul>
+                    <li><a href="50-api-gateway.html">50 &mdash; API Gateway</a></li>
+                    <li><a href="51-service-mesh.html">51 &mdash; Service Mesh</a></li>
+                    <li><a href="52-sidecar-pattern.html">52 &mdash; Sidecar Pattern</a></li>
+                    <li><a href="53-cqrs.html">53 &mdash; CQRS</a></li>
+                    <li><a href="54-event-sourcing.html">54 &mdash; Event Sourcing</a></li>
+                    <li><a href="55-strangler-fig.html">55 &mdash; Strangler Fig</a></li>
+                    <li><a href="56-backends-for-frontends.html">56 &mdash; Backends for Frontends</a></li>
+                    <li><a href="57-load-balancing.html">57 &mdash; Load Balancing</a></li>
+                    <li><a href="58-rate-limiting.html">58 &mdash; Rate Limiting</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>API &amp; Communication</h3>
+                <ul>
+                    <li><a href="59-rest-api-design.html">59 &mdash; REST API Design</a></li>
+                    <li><a href="60-http2-http3.html">60 &mdash; HTTP/2 &amp; HTTP/3</a></li>
+                    <li><a href="61-websockets.html">61 &mdash; WebSockets</a></li>
+                    <li><a href="62-graphql.html">62 &mdash; GraphQL</a></li>
+                    <li><a href="63-grpc.html" class="active">63 &mdash; gRPC</a></li>
+                    <li><a href="64-webhooks.html">64 &mdash; Webhooks</a></li>
+                </ul>
+            </div>
+            <div class="nav-module">
+                <h3>Security</h3>
+                <ul>
+                    <li><a href="65-authentication-authorization.html">65 &mdash; Authentication &amp; Authorization</a></li>
+                    <li><a href="66-oauth2-openid.html">66 &mdash; OAuth2 &amp; OpenID</a></li>
+                    <li><a href="67-tls-mtls.html">67 &mdash; TLS &amp; mTLS</a></li>
+                    <li><a href="68-zero-trust.html">68 &mdash; Zero Trust</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="sidebar-progress">
+            <div class="progress-bar"><div class="progress-fill" style="width: 92%"></div></div>
+            <span class="progress-text">63 / 68 complete</span>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">&#9776;</button>
+        <h1 class="topbar-title">System Design Course</h1>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag tag-intermediate">Intermediate</span>
+                <span class="tag tag-api">API</span>
+                <span class="tag tag-concept">Concept</span>
+            </div>
+            <h1>gRPC</h1>
+            <p class="hero-subtitle">High-performance, language-agnostic remote procedure calls &mdash; built on Protocol Buffers and HTTP/2 for blazing-fast inter-service communication.</p>
+        </section>
+
+        <section class="analogy-box">
+            <h2>&#128161; Analogy</h2>
+            <p>Imagine two computers communicating. REST is like writing full English letters &mdash; verbose, readable by anyone, but slow to compose and deliver. gRPC is like speaking <strong>efficient shorthand</strong> &mdash; both sides agree on a compact vocabulary beforehand (the <code>.proto</code> file), then exchange tiny coded messages at lightning speed over a dedicated phone line (HTTP/2). The conversation is faster, but you need the shared codebook to understand it.</p>
+        </section>
+
+        <h2>What Is gRPC?</h2>
+        <p>gRPC (gRPC Remote Procedure Calls) is an open-source framework developed by Google that enables efficient communication between distributed services. It uses <strong>Protocol Buffers</strong> (protobuf) as the interface definition language and serialization format, and runs over <strong>HTTP/2</strong> for multiplexed, bidirectional streaming.</p>
+
+        <h3>Core Components</h3>
+        <ul>
+            <li><strong>Protocol Buffers</strong> &mdash; A language-neutral, platform-neutral mechanism for serializing structured data. Messages are defined in <code>.proto</code> files and compiled into language-specific code.</li>
+            <li><strong>HTTP/2 Transport</strong> &mdash; Provides multiplexing (multiple requests over one connection), header compression, and server push capabilities.</li>
+            <li><strong>Code Generation</strong> &mdash; The <code>protoc</code> compiler generates client stubs and server skeletons in 10+ languages from a single <code>.proto</code> definition.</li>
+            <li><strong>Interceptors</strong> &mdash; Middleware for logging, auth, retries, and metrics &mdash; similar to HTTP middleware in REST frameworks.</li>
+        </ul>
+
+        <h2>Streaming Types</h2>
+        <p>gRPC supports four communication patterns, each suited to different use cases:</p>
+
+        <h3>1. Unary RPC</h3>
+        <p>The simplest pattern &mdash; client sends one request, server returns one response. Equivalent to a traditional function call.</p>
+
+        <h3>2. Server-Streaming RPC</h3>
+        <p>Client sends one request, server returns a stream of responses. Ideal for large result sets or real-time feeds.</p>
+
+        <h3>3. Client-Streaming RPC</h3>
+        <p>Client sends a stream of messages, server returns one response after processing all messages. Great for file uploads or batch ingestion.</p>
+
+        <h3>4. Bidirectional Streaming</h3>
+        <p>Both sides send streams of messages independently. The ultimate pattern for real-time collaboration, chat systems, or multiplayer games.</p>
+
+        <h2>Protocol Buffer Definition</h2>
+        <div class="code-block">
+            <div class="code-header">user_service.proto</div>
+            <pre><code><span class="token-comment">// Define the service contract</span>
+<span class="token-keyword">syntax</span> = <span class="token-string">"proto3"</span>;
+
+<span class="token-keyword">package</span> userservice;
+
+<span class="token-comment">// Message definitions</span>
+<span class="token-keyword">message</span> <span class="token-class">GetUserRequest</span> {
+    <span class="token-keyword">string</span> user_id = <span class="token-number">1</span>;
+}
+
+<span class="token-keyword">message</span> <span class="token-class">User</span> {
+    <span class="token-keyword">string</span> id = <span class="token-number">1</span>;
+    <span class="token-keyword">string</span> name = <span class="token-number">2</span>;
+    <span class="token-keyword">string</span> email = <span class="token-number">3</span>;
+    <span class="token-keyword">int32</span> age = <span class="token-number">4</span>;
+    <span class="token-keyword">repeated</span> <span class="token-keyword">string</span> roles = <span class="token-number">5</span>;
+}
+
+<span class="token-keyword">message</span> <span class="token-class">UserList</span> {
+    <span class="token-keyword">repeated</span> <span class="token-class">User</span> users = <span class="token-number">1</span>;
+}
+
+<span class="token-comment">// Service definition with all streaming types</span>
+<span class="token-keyword">service</span> <span class="token-class">UserService</span> {
+    <span class="token-comment">// Unary &mdash; single request, single response</span>
+    <span class="token-keyword">rpc</span> <span class="token-function">GetUser</span>(<span class="token-class">GetUserRequest</span>) <span class="token-keyword">returns</span> (<span class="token-class">User</span>);
+
+    <span class="token-comment">// Server streaming &mdash; one request, stream of responses</span>
+    <span class="token-keyword">rpc</span> <span class="token-function">ListUsers</span>(<span class="token-class">GetUserRequest</span>) <span class="token-keyword">returns</span> (<span class="token-keyword">stream</span> <span class="token-class">User</span>);
+
+    <span class="token-comment">// Client streaming &mdash; stream of requests, one response</span>
+    <span class="token-keyword">rpc</span> <span class="token-function">UploadUsers</span>(<span class="token-keyword">stream</span> <span class="token-class">User</span>) <span class="token-keyword">returns</span> (<span class="token-class">UserList</span>);
+
+    <span class="token-comment">// Bidirectional streaming</span>
+    <span class="token-keyword">rpc</span> <span class="token-function">SyncUsers</span>(<span class="token-keyword">stream</span> <span class="token-class">User</span>) <span class="token-keyword">returns</span> (<span class="token-keyword">stream</span> <span class="token-class">User</span>);
+}</code></pre>
+        </div>
+
+        <h2>gRPC Server Implementation</h2>
+        <div class="code-block">
+            <div class="code-header">server.py</div>
+            <pre><code><span class="token-keyword">import</span> grpc
+<span class="token-keyword">from</span> concurrent <span class="token-keyword">import</span> futures
+<span class="token-keyword">import</span> user_service_pb2
+<span class="token-keyword">import</span> user_service_pb2_grpc
+
+<span class="token-keyword">class</span> <span class="token-class">UserServiceServicer</span>(user_service_pb2_grpc.UserServiceServicer):
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(<span class="token-keyword">self</span>):
+        <span class="token-keyword">self</span>.users = {
+            <span class="token-string">"1"</span>: user_service_pb2.User(
+                id=<span class="token-string">"1"</span>, name=<span class="token-string">"Alice"</span>,
+                email=<span class="token-string">"alice@example.com"</span>, age=<span class="token-number">30</span>
+            ),
+            <span class="token-string">"2"</span>: user_service_pb2.User(
+                id=<span class="token-string">"2"</span>, name=<span class="token-string">"Bob"</span>,
+                email=<span class="token-string">"bob@example.com"</span>, age=<span class="token-number">25</span>
+            ),
+        }
+
+    <span class="token-keyword">def</span> <span class="token-function">GetUser</span>(<span class="token-keyword">self</span>, request, context):
+        <span class="token-comment"># Unary RPC &mdash; return single user</span>
+        user = <span class="token-keyword">self</span>.users.get(request.user_id)
+        <span class="token-keyword">if not</span> user:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details(<span class="token-string">f"User {request.user_id} not found"</span>)
+            <span class="token-keyword">return</span> user_service_pb2.User()
+        <span class="token-keyword">return</span> user
+
+    <span class="token-keyword">def</span> <span class="token-function">ListUsers</span>(<span class="token-keyword">self</span>, request, context):
+        <span class="token-comment"># Server streaming &mdash; yield users one by one</span>
+        <span class="token-keyword">for</span> user <span class="token-keyword">in</span> <span class="token-keyword">self</span>.users.values():
+            <span class="token-keyword">yield</span> user
+
+    <span class="token-keyword">def</span> <span class="token-function">UploadUsers</span>(<span class="token-keyword">self</span>, request_iterator, context):
+        <span class="token-comment"># Client streaming &mdash; collect all users</span>
+        uploaded = []
+        <span class="token-keyword">for</span> user <span class="token-keyword">in</span> request_iterator:
+            <span class="token-keyword">self</span>.users[user.id] = user
+            uploaded.append(user)
+        <span class="token-keyword">return</span> user_service_pb2.UserList(users=uploaded)
+
+    <span class="token-keyword">def</span> <span class="token-function">SyncUsers</span>(<span class="token-keyword">self</span>, request_iterator, context):
+        <span class="token-comment"># Bidirectional streaming &mdash; echo back with confirmation</span>
+        <span class="token-keyword">for</span> user <span class="token-keyword">in</span> request_iterator:
+            <span class="token-keyword">self</span>.users[user.id] = user
+            user.name = <span class="token-string">f"[synced] {user.name}"</span>
+            <span class="token-keyword">yield</span> user
+
+
+<span class="token-keyword">def</span> <span class="token-function">serve</span>():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=<span class="token-number">10</span>))
+    user_service_pb2_grpc.add_UserServiceServicer_to_server(
+        <span class="token-class">UserServiceServicer</span>(), server
+    )
+    server.add_insecure_port(<span class="token-string">"[::]:50051"</span>)
+    server.start()
+    <span class="token-keyword">print</span>(<span class="token-string">"gRPC server running on port 50051"</span>)
+    server.wait_for_termination()
+
+<span class="token-keyword">if</span> __name__ == <span class="token-string">"__main__"</span>:
+    <span class="token-function">serve</span>()</code></pre>
+        </div>
+
+        <h2>gRPC Client with Streaming</h2>
+        <div class="code-block">
+            <div class="code-header">client.py</div>
+            <pre><code><span class="token-keyword">import</span> grpc
+<span class="token-keyword">import</span> user_service_pb2
+<span class="token-keyword">import</span> user_service_pb2_grpc
+
+<span class="token-keyword">def</span> <span class="token-function">run_client</span>():
+    channel = grpc.insecure_channel(<span class="token-string">"localhost:50051"</span>)
+    stub = user_service_pb2_grpc.UserServiceStub(channel)
+
+    <span class="token-comment"># Unary call</span>
+    user = stub.GetUser(
+        user_service_pb2.GetUserRequest(user_id=<span class="token-string">"1"</span>)
+    )
+    <span class="token-keyword">print</span>(<span class="token-string">f"Got user: {user.name}"</span>)
+
+    <span class="token-comment"># Server streaming &mdash; iterate over response stream</span>
+    <span class="token-keyword">for</span> user <span class="token-keyword">in</span> stub.ListUsers(
+        user_service_pb2.GetUserRequest(user_id=<span class="token-string">""</span>)
+    ):
+        <span class="token-keyword">print</span>(<span class="token-string">f"Streamed: {user.name} ({user.email})"</span>)
+
+    <span class="token-comment"># Client streaming &mdash; send batch of users</span>
+    <span class="token-keyword">def</span> <span class="token-function">user_generator</span>():
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(<span class="token-number">3</span>, <span class="token-number">6</span>):
+            <span class="token-keyword">yield</span> user_service_pb2.User(
+                id=<span class="token-function">str</span>(i),
+                name=<span class="token-string">f"User_{i}"</span>,
+                email=<span class="token-string">f"user{i}@example.com"</span>,
+                age=<span class="token-number">20</span> + i
+            )
+
+    result = stub.UploadUsers(<span class="token-function">user_generator</span>())
+    <span class="token-keyword">print</span>(<span class="token-string">f"Uploaded {len(result.users)} users"</span>)
+
+    <span class="token-comment"># Bidirectional streaming</span>
+    responses = stub.SyncUsers(<span class="token-function">user_generator</span>())
+    <span class="token-keyword">for</span> resp <span class="token-keyword">in</span> responses:
+        <span class="token-keyword">print</span>(<span class="token-string">f"Synced: {resp.name}"</span>)
+
+<span class="token-keyword">if</span> __name__ == <span class="token-string">"__main__"</span>:
+    <span class="token-function">run_client</span>()</code></pre>
+        </div>
+
+        <h2>gRPC vs REST vs GraphQL</h2>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>gRPC</th>
+                        <th>REST</th>
+                        <th>GraphQL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Protocol</td>
+                        <td>HTTP/2</td>
+                        <td>HTTP/1.1 or HTTP/2</td>
+                        <td>HTTP/1.1 or HTTP/2</td>
+                    </tr>
+                    <tr>
+                        <td>Serialization</td>
+                        <td>Protocol Buffers (binary)</td>
+                        <td>JSON (text)</td>
+                        <td>JSON (text)</td>
+                    </tr>
+                    <tr>
+                        <td>Streaming</td>
+                        <td>Bidirectional native</td>
+                        <td>Not built-in</td>
+                        <td>Subscriptions only</td>
+                    </tr>
+                    <tr>
+                        <td>Code Generation</td>
+                        <td>Built-in (10+ languages)</td>
+                        <td>OpenAPI/Swagger</td>
+                        <td>Schema-based tools</td>
+                    </tr>
+                    <tr>
+                        <td>Browser Support</td>
+                        <td>Limited (gRPC-Web)</td>
+                        <td>Native</td>
+                        <td>Native</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>Fastest (binary + HTTP/2)</td>
+                        <td>Moderate</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td>Best For</td>
+                        <td>Microservices, real-time</td>
+                        <td>Public APIs, CRUD</td>
+                        <td>Flexible queries, frontends</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>When to Use gRPC</h2>
+        <h3>Ideal Use Cases</h3>
+        <ul>
+            <li><strong>Microservice-to-microservice</strong> &mdash; Internal service communication where performance matters and browser support is not needed.</li>
+            <li><strong>Real-time streaming</strong> &mdash; Live data feeds, telemetry, IoT sensor data where bidirectional communication is essential.</li>
+            <li><strong>Polyglot environments</strong> &mdash; Teams using different languages benefit from generated stubs and shared contracts.</li>
+            <li><strong>Low-latency systems</strong> &mdash; Financial trading, gaming, and any system where microseconds matter.</li>
+        </ul>
+
+        <h3>When NOT to Use gRPC</h3>
+        <ul>
+            <li><strong>Public-facing APIs</strong> &mdash; REST remains easier for third-party developers and browser clients.</li>
+            <li><strong>Simple CRUD</strong> &mdash; The overhead of protobuf definitions is not worth it for basic operations.</li>
+            <li><strong>Human-readable debugging</strong> &mdash; Binary serialization makes it harder to inspect traffic without tooling.</li>
+        </ul>
+
+        <section class="industry-box">
+            <h2>&#127981; Industry Usage</h2>
+            <ul>
+                <li><strong>Google</strong> &mdash; Created gRPC; uses it for internal services handling billions of RPCs per second.</li>
+                <li><strong>Kubernetes</strong> &mdash; All internal component communication (kubelet &rarr; API server) uses gRPC.</li>
+                <li><strong>Envoy Proxy</strong> &mdash; Native gRPC support for service mesh communication and load balancing.</li>
+                <li><strong>Netflix</strong> &mdash; Migrated inter-service communication from REST to gRPC for performance gains.</li>
+                <li><strong>Dropbox</strong> &mdash; Uses gRPC for internal APIs, replacing a custom RPC framework &mdash; reduced latency by 50%.</li>
+            </ul>
+        </section>
+
+        <section class="summary-box">
+            <h2>&#128203; Summary</h2>
+            <ul>
+                <li>gRPC uses Protocol Buffers for compact, strongly-typed binary serialization.</li>
+                <li>HTTP/2 enables multiplexing, header compression, and native streaming.</li>
+                <li>Four streaming patterns &mdash; unary, server-streaming, client-streaming, bidirectional.</li>
+                <li>Code generation produces type-safe client/server code in 10+ languages.</li>
+                <li>Best for internal microservice communication &mdash; not ideal for browser-facing APIs.</li>
+                <li>Performance advantage of 2&ndash;10x over REST/JSON for serialization and transport.</li>
+            </ul>
+        </section>
+
+        <section class="mental-model">
+            <h2>&#129504; Mental Model</h2>
+            <div class="model-visual">
+                <pre>
+┌─────────────────────────────────────────────────────┐
+│                   .proto file                        │
+│         (shared contract between services)           │
+└───────────────────────┬─────────────────────────────┘
+                        │ protoc compiler
+              ┌─────────┴─────────┐
+              ▼                   ▼
+┌──────────────────┐   ┌──────────────────┐
+│   Client Stub    │   │  Server Skeleton │
+│   (generated)    │   │   (generated)    │
+└────────┬─────────┘   └────────┬─────────┘
+         │                      │
+         │    HTTP/2 + Protobuf │
+         │  ◄─────────────────► │
+         │   Binary frames      │
+         │   Multiplexed        │
+         │   Bidirectional      │
+└────────┴──────────────────────┴─────────┘
+                </pre>
+            </div>
+        </section>
+
+        <section class="mistakes-box">
+            <h2>&#9888;&#65039; Common Mistakes</h2>
+            <ul>
+                <li><strong>Exposing gRPC directly to browsers</strong> &mdash; Use gRPC-Web or a REST gateway (like Envoy) for browser clients. Native gRPC requires HTTP/2 trailers which browsers don't fully support.</li>
+                <li><strong>Ignoring backward compatibility in .proto files</strong> &mdash; Never change field numbers or remove fields. Use <code>reserved</code> to retire fields and always add new fields with new numbers.</li>
+                <li><strong>Not handling streaming errors</strong> &mdash; Streams can fail mid-transfer. Always implement proper error handling and reconnection logic for long-lived streams.</li>
+                <li><strong>Skipping deadlines/timeouts</strong> &mdash; Every gRPC call should have a deadline. Without one, a failed downstream service can cause resource leaks and cascading failures.</li>
+            </ul>
+        </section>
+
+        <section class="exercise-box">
+            <h2>&#128187; Exercises</h2>
+            <ol>
+                <li><strong>Define a proto</strong> &mdash; Create a <code>.proto</code> file for a chat service with <code>SendMessage</code> (unary), <code>GetHistory</code> (server streaming), and <code>LiveChat</code> (bidirectional streaming). Include appropriate message types with timestamps.</li>
+                <li><strong>Implement server streaming</strong> &mdash; Build a stock price ticker service that streams price updates every second using server-streaming RPC. Handle client cancellation gracefully.</li>
+                <li><strong>Add interceptors</strong> &mdash; Write a gRPC interceptor that logs the method name, request duration, and status code for every RPC call. Add a second interceptor for authentication via metadata.</li>
+                <li><strong>Build a gateway</strong> &mdash; Create a REST-to-gRPC gateway using <code>grpc-gateway</code> or a simple Flask wrapper that translates JSON requests into protobuf calls and back. Compare latency with direct gRPC.</li>
+            </ol>
+        </section>
+
+        <nav class="page-nav">
+            <a href="62-graphql.html" class="nav-prev">&larr; GraphQL</a>
+            <a href="64-webhooks.html" class="nav-next">Webhooks &rarr;</a>
+        </nav>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

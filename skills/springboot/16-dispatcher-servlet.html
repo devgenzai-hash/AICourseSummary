@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DispatcherServlet Internals - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Web Layer (Spring MVC)</li>
+            <li><a href="16-dispatcher-servlet.html" class="active"><span class="nav-number">16</span> DispatcherServlet Internals</a></li>
+            <li><a href="17-handler-mapping.html"><span class="nav-number">17</span> Handler Mapping & Adapters</a></li>
+            <li><a href="18-request-lifecycle.html"><span class="nav-number">18</span> Request Lifecycle</a></li>
+            <li><a href="19-content-negotiation.html"><span class="nav-number">19</span> Content Negotiation</a></li>
+            <li><a href="20-exception-handling.html"><span class="nav-number">20</span> Exception Handling</a></li>
+            <li><a href="21-validation.html"><span class="nav-number">21</span> Validation Framework</a></li>
+            <li><a href="22-filters-interceptors.html"><span class="nav-number">22</span> Filters vs Interceptors</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Web Layer (Spring MVC) → DispatcherServlet Internals</div>
+        <div class="topic-number">Topic 16 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>DispatcherServlet Internals</h1>
+            <p class="subtitle-description">The Front Controller that routes every HTTP request in Spring MVC — how it initializes, what strategies it delegates to, and the complete dispatch algorithm.</p>
+
+            <div class="tags">
+                <span class="tag tag-advanced">advanced</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-internal">internal</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏢 The Airport Control Tower Analogy</div>
+                <p>DispatcherServlet is like an airport control tower. Every plane (HTTP request) entering the airspace must check in with the tower first — no direct runway access allowed. The tower doesn't fly planes itself; it delegates: it checks the flight registry (HandlerMapping) to find the right gate, assigns a ground crew (HandlerAdapter) to handle the plane, runs security checks (Interceptors), and coordinates the departure (View rendering). If something goes wrong, it routes to emergency services (ExceptionResolver). One tower coordinates everything — that's the Front Controller pattern.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: What is DispatcherServlet -->
+            <!-- ============================================ -->
+            <h2>1. DispatcherServlet: A Regular Servlet</h2>
+
+            <p>DispatcherServlet extends <code>HttpServlet</code> — it's just a standard Jakarta Servlet registered with the Servlet container. The entire Spring MVC framework operates within this single servlet.</p>
+
+            <pre><code><span class="token-comment">// ═══ Inheritance hierarchy ═══</span>
+<span class="token-comment">// HttpServlet (Jakarta Servlet API)</span>
+<span class="token-comment">//   └── HttpServletBean (Spring: property binding)</span>
+<span class="token-comment">//       └── FrameworkServlet (Spring: WebApplicationContext management)</span>
+<span class="token-comment">//           └── DispatcherServlet (Spring: request dispatching)</span>
+
+<span class="token-comment">// In Spring Boot, DispatcherServletAutoConfiguration registers it:</span>
+<span class="token-annotation">@AutoConfiguration</span>(after = <span class="token-class">ServletWebServerFactoryAutoConfiguration</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@ConditionalOnClass</span>(<span class="token-type">DispatcherServlet</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@ConditionalOnWebApplication</span>(type = <span class="token-type">Type</span>.SERVLET)
+<span class="token-keyword">public class</span> <span class="token-class">DispatcherServletAutoConfiguration</span> {
+
+    <span class="token-annotation">@Bean</span>(name = <span class="token-string">"dispatcherServlet"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">DispatcherServlet</span> <span class="token-function">dispatcherServlet</span>(
+            <span class="token-type">WebMvcProperties</span> webMvcProperties) {
+        <span class="token-type">DispatcherServlet</span> dispatcherServlet = <span class="token-keyword">new</span> <span class="token-type">DispatcherServlet</span>();
+        dispatcherServlet.<span class="token-function">setDispatchOptionsRequest</span>(
+            webMvcProperties.<span class="token-function">isDispatchOptionsRequest</span>());
+        dispatcherServlet.<span class="token-function">setDispatchTraceRequest</span>(
+            webMvcProperties.<span class="token-function">isDispatchTraceRequest</span>());
+        dispatcherServlet.<span class="token-function">setThrowExceptionIfNoHandlerFound</span>(
+            webMvcProperties.<span class="token-function">isThrowExceptionIfNoHandlerFound</span>());
+        <span class="token-keyword">return</span> dispatcherServlet;
+    }
+
+    <span class="token-comment">// Registered to "/" by default via DispatcherServletRegistrationBean</span>
+    <span class="token-annotation">@Bean</span>
+    <span class="token-keyword">public</span> <span class="token-type">DispatcherServletRegistrationBean</span> <span class="token-function">dispatcherServletRegistration</span>(
+            <span class="token-type">DispatcherServlet</span> dispatcherServlet,
+            <span class="token-type">WebMvcProperties</span> webMvcProperties) {
+        <span class="token-type">DispatcherServletRegistrationBean</span> registration =
+            <span class="token-keyword">new</span> <span class="token-type">DispatcherServletRegistrationBean</span>(
+                dispatcherServlet, webMvcProperties.<span class="token-function">getServlet</span>().<span class="token-function">getPath</span>());
+        registration.<span class="token-function">setName</span>(<span class="token-string">"dispatcherServlet"</span>);
+        registration.<span class="token-function">setLoadOnStartup</span>(-<span class="token-number">1</span>);
+        <span class="token-keyword">return</span> registration;
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Default URL Mapping</div>
+                <p>Spring Boot maps DispatcherServlet to <code>"/"</code> by default (<code>spring.mvc.servlet.path=/</code>). This means ALL requests go through it. You can change this (e.g., <code>spring.mvc.servlet.path=/api</code>) to have it handle only a subset of URLs, leaving room for other servlets or static resources served directly by the container.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: Initialization — The 9 Strategies -->
+            <!-- ============================================ -->
+            <h2>2. Initialization: The 9 Strategy Beans</h2>
+
+            <p>When the <code>WebApplicationContext</code> refreshes, <code>DispatcherServlet.onRefresh()</code> initializes 9 infrastructure strategies by looking up beans from the context:</p>
+
+            <pre><code><span class="token-comment">// ═══ DispatcherServlet.onRefresh() — called once at startup ═══</span>
+<span class="token-annotation">@Override</span>
+<span class="token-keyword">protected void</span> <span class="token-function">onRefresh</span>(<span class="token-type">ApplicationContext</span> context) {
+    <span class="token-function">initStrategies</span>(context);
+}
+
+<span class="token-keyword">protected void</span> <span class="token-function">initStrategies</span>(<span class="token-type">ApplicationContext</span> context) {
+    <span class="token-function">initMultipartResolver</span>(context);       <span class="token-comment">// 1. File upload handling</span>
+    <span class="token-function">initLocaleResolver</span>(context);         <span class="token-comment">// 2. Locale/i18n determination</span>
+    <span class="token-function">initThemeResolver</span>(context);          <span class="token-comment">// 3. Theme resolution (deprecated)</span>
+    <span class="token-function">initHandlerMappings</span>(context);        <span class="token-comment">// 4. URL → Handler mapping</span>
+    <span class="token-function">initHandlerAdapters</span>(context);        <span class="token-comment">// 5. Handler invocation adapters</span>
+    <span class="token-function">initHandlerExceptionResolvers</span>(context); <span class="token-comment">// 6. Exception handling</span>
+    <span class="token-function">initRequestToViewNameTranslator</span>(context); <span class="token-comment">// 7. Default view name</span>
+    <span class="token-function">initViewResolvers</span>(context);          <span class="token-comment">// 8. View resolution</span>
+    <span class="token-function">initFlashMapManager</span>(context);        <span class="token-comment">// 9. Flash attributes for redirects</span>
+}</code></pre>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Interface</th>
+                        <th>Default Implementation</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MultipartResolver</td>
+                        <td><code>MultipartResolver</code></td>
+                        <td>StandardServletMultipartResolver</td>
+                        <td>Parses multipart/form-data file uploads</td>
+                    </tr>
+                    <tr>
+                        <td>LocaleResolver</td>
+                        <td><code>LocaleResolver</code></td>
+                        <td>AcceptHeaderLocaleResolver</td>
+                        <td>Determines client locale for i18n</td>
+                    </tr>
+                    <tr>
+                        <td>ThemeResolver</td>
+                        <td><code>ThemeResolver</code></td>
+                        <td>FixedThemeResolver (deprecated in 6.0)</td>
+                        <td>Theme selection (legacy)</td>
+                    </tr>
+                    <tr>
+                        <td>HandlerMapping</td>
+                        <td><code>HandlerMapping</code></td>
+                        <td>RequestMappingHandlerMapping</td>
+                        <td>Maps URL to handler method</td>
+                    </tr>
+                    <tr>
+                        <td>HandlerAdapter</td>
+                        <td><code>HandlerAdapter</code></td>
+                        <td>RequestMappingHandlerAdapter</td>
+                        <td>Invokes the handler via unified interface</td>
+                    </tr>
+                    <tr>
+                        <td>HandlerExceptionResolver</td>
+                        <td><code>HandlerExceptionResolver</code></td>
+                        <td>ExceptionHandlerExceptionResolver</td>
+                        <td>Handles exceptions from handlers</td>
+                    </tr>
+                    <tr>
+                        <td>RequestToViewNameTranslator</td>
+                        <td><code>RequestToViewNameTranslator</code></td>
+                        <td>DefaultRequestToViewNameTranslator</td>
+                        <td>Derives view name from request URL</td>
+                    </tr>
+                    <tr>
+                        <td>ViewResolver</td>
+                        <td><code>ViewResolver</code></td>
+                        <td>InternalResourceViewResolver</td>
+                        <td>Resolves view name to View object</td>
+                    </tr>
+                    <tr>
+                        <td>FlashMapManager</td>
+                        <td><code>FlashMapManager</code></td>
+                        <td>SessionFlashMapManager</td>
+                        <td>Stores flash attributes across redirects</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: The Dispatch Algorithm -->
+            <!-- ============================================ -->
+            <h2>3. The doDispatch() Algorithm</h2>
+
+            <p>Every request flows through <code>doDispatch()</code> — the heart of Spring MVC. Here's the complete algorithm with the actual internal logic:</p>
+
+            <pre><code><span class="token-comment">// ═══ Simplified view of DispatcherServlet.doDispatch() ═══</span>
+<span class="token-keyword">protected void</span> <span class="token-function">doDispatch</span>(<span class="token-type">HttpServletRequest</span> request,
+                           <span class="token-type">HttpServletResponse</span> response) <span class="token-keyword">throws</span> <span class="token-type">Exception</span> {
+
+    <span class="token-type">HttpServletRequest</span> processedRequest = request;
+    <span class="token-type">HandlerExecutionChain</span> mappedHandler = <span class="token-keyword">null</span>;
+    <span class="token-keyword">boolean</span> multipartRequestParsed = <span class="token-keyword">false</span>;
+    <span class="token-type">ModelAndView</span> mv = <span class="token-keyword">null</span>;
+    <span class="token-type">Exception</span> dispatchException = <span class="token-keyword">null</span>;
+
+    <span class="token-keyword">try</span> {
+        <span class="token-comment">// ─── Step 1: Check for multipart (file upload) ───</span>
+        processedRequest = <span class="token-function">checkMultipart</span>(request);
+        multipartRequestParsed = (processedRequest != request);
+
+        <span class="token-comment">// ─── Step 2: Find HandlerExecutionChain ───</span>
+        <span class="token-comment">// (handler + interceptors for this request)</span>
+        mappedHandler = <span class="token-function">getHandler</span>(processedRequest);
+        <span class="token-keyword">if</span> (mappedHandler == <span class="token-keyword">null</span>) {
+            <span class="token-function">noHandlerFound</span>(processedRequest, response);
+            <span class="token-keyword">return</span>;
+        }
+
+        <span class="token-comment">// ─── Step 3: Find the HandlerAdapter ───</span>
+        <span class="token-type">HandlerAdapter</span> ha = <span class="token-function">getHandlerAdapter</span>(mappedHandler.<span class="token-function">getHandler</span>());
+
+        <span class="token-comment">// ─── Step 4: Handle Last-Modified (GET/HEAD only) ───</span>
+        <span class="token-type">String</span> method = request.<span class="token-function">getMethod</span>();
+        <span class="token-keyword">boolean</span> isGet = <span class="token-type">HttpMethod</span>.GET.<span class="token-function">matches</span>(method);
+        <span class="token-keyword">if</span> (isGet || <span class="token-type">HttpMethod</span>.HEAD.<span class="token-function">matches</span>(method)) {
+            <span class="token-keyword">long</span> lastModified = ha.<span class="token-function">getLastModified</span>(request, mappedHandler.<span class="token-function">getHandler</span>());
+            <span class="token-keyword">if</span> (<span class="token-keyword">new</span> <span class="token-type">ServletWebRequest</span>(request, response)
+                    .<span class="token-function">checkNotModified</span>(lastModified) && isGet) {
+                <span class="token-keyword">return</span>;
+            }
+        }
+
+        <span class="token-comment">// ─── Step 5: Execute pre-handle interceptors ───</span>
+        <span class="token-keyword">if</span> (!mappedHandler.<span class="token-function">applyPreHandle</span>(processedRequest, response)) {
+            <span class="token-keyword">return</span>; <span class="token-comment">// Interceptor vetoed — stop processing</span>
+        }
+
+        <span class="token-comment">// ─── Step 6: INVOKE THE HANDLER ───</span>
+        mv = ha.<span class="token-function">handle</span>(processedRequest, response, mappedHandler.<span class="token-function">getHandler</span>());
+
+        <span class="token-comment">// ─── Step 7: Apply default view name if needed ───</span>
+        <span class="token-function">applyDefaultViewName</span>(processedRequest, mv);
+
+        <span class="token-comment">// ─── Step 8: Execute post-handle interceptors ───</span>
+        mappedHandler.<span class="token-function">applyPostHandle</span>(processedRequest, response, mv);
+
+    } <span class="token-keyword">catch</span> (<span class="token-type">Exception</span> ex) {
+        dispatchException = ex;
+    }
+
+    <span class="token-comment">// ─── Step 9: Process result (render view or handle exception) ───</span>
+    <span class="token-function">processDispatchResult</span>(processedRequest, response,
+        mappedHandler, mv, dispatchException);
+}</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ The "No Handler Found" Scenario</div>
+                <p>When no handler matches a request, behavior depends on <code>throwExceptionIfNoHandlerFound</code>. If <strong>false</strong> (default in Boot 2.x): sends a 404 response directly, bypassing @ControllerAdvice. If <strong>true</strong> (default in Boot 3.x): throws <code>NoHandlerFoundException</code>, which CAN be caught by @ControllerAdvice. This was a common source of confusion — "Why doesn't my global exception handler catch 404s?"</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: Strategy Deep Dives -->
+            <!-- ============================================ -->
+            <h2>4. Key Strategy Deep Dives</h2>
+
+            <h3>MultipartResolver</h3>
+            <pre><code><span class="token-comment">// ═══ MultipartResolver: file upload handling ═══</span>
+<span class="token-comment">// Spring Boot auto-configures StandardServletMultipartResolver</span>
+<span class="token-comment">// Configuration properties:</span>
+<span class="token-comment">//   spring.servlet.multipart.enabled=true</span>
+<span class="token-comment">//   spring.servlet.multipart.max-file-size=1MB</span>
+<span class="token-comment">//   spring.servlet.multipart.max-request-size=10MB</span>
+<span class="token-comment">//   spring.servlet.multipart.file-size-threshold=0</span>
+
+<span class="token-comment">// The checkMultipart() call in doDispatch wraps the request:</span>
+<span class="token-keyword">protected</span> <span class="token-type">HttpServletRequest</span> <span class="token-function">checkMultipart</span>(<span class="token-type">HttpServletRequest</span> request) {
+    <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.multipartResolver != <span class="token-keyword">null</span>
+            && <span class="token-keyword">this</span>.multipartResolver.<span class="token-function">isMultipart</span>(request)) {
+        <span class="token-keyword">return</span> <span class="token-keyword">this</span>.multipartResolver.<span class="token-function">resolveMultipart</span>(request);
+        <span class="token-comment">// Returns a MultipartHttpServletRequest with file access</span>
+    }
+    <span class="token-keyword">return</span> request;
+}</code></pre>
+
+            <h3>LocaleResolver</h3>
+            <pre><code><span class="token-comment">// ═══ LocaleResolver strategies ═══</span>
+<span class="token-comment">// AcceptHeaderLocaleResolver — uses Accept-Language header (default)</span>
+<span class="token-comment">// SessionLocaleResolver — stores locale in HTTP session</span>
+<span class="token-comment">// CookieLocaleResolver — stores locale in a cookie</span>
+<span class="token-comment">// FixedLocaleResolver — always returns configured locale</span>
+
+<span class="token-comment">// DispatcherServlet uses it at the start of EVERY request:</span>
+<span class="token-type">LocaleContext</span> localeContext = <span class="token-function">buildLocaleContext</span>(request);
+<span class="token-type">RequestContextHolder</span>.<span class="token-function">setRequestAttributes</span>(requestAttributes);
+<span class="token-type">LocaleContextHolder</span>.<span class="token-function">setLocaleContext</span>(localeContext);
+<span class="token-comment">// Now any code can call LocaleContextHolder.getLocale()</span></code></pre>
+
+            <h3>FlashMapManager</h3>
+            <pre><code><span class="token-comment">// ═══ FlashMapManager: data survival across redirects ═══</span>
+<span class="token-comment">// Problem: POST → redirect → GET loses POST data</span>
+<span class="token-comment">// Solution: Flash attributes stored in session, removed after use</span>
+
+<span class="token-annotation">@PostMapping</span>(<span class="token-string">"/orders"</span>)
+<span class="token-keyword">public</span> <span class="token-type">String</span> <span class="token-function">createOrder</span>(<span class="token-type">RedirectAttributes</span> redirectAttributes) {
+    <span class="token-comment">// Flash attributes survive ONE redirect</span>
+    redirectAttributes.<span class="token-function">addFlashAttribute</span>(<span class="token-string">"message"</span>, <span class="token-string">"Order created!"</span>);
+    <span class="token-keyword">return</span> <span class="token-string">"redirect:/orders/confirmation"</span>;
+}
+
+<span class="token-comment">// DispatcherServlet retrieves flash maps BEFORE handler execution:</span>
+<span class="token-comment">// FlashMap inputFlashMap = this.flashMapManager</span>
+<span class="token-comment">//     .retrieveAndUpdate(request, response);</span>
+<span class="token-comment">// request.setAttribute(INPUT_FLASH_MAP_ATTRIBUTE, inputFlashMap);</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: HandlerExecutionChain -->
+            <!-- ============================================ -->
+            <h2>5. HandlerExecutionChain: Handler + Interceptors</h2>
+
+            <pre><code><span class="token-comment">// ═══ HandlerExecutionChain bundles handler with its interceptors ═══</span>
+<span class="token-keyword">public class</span> <span class="token-class">HandlerExecutionChain</span> {
+    <span class="token-keyword">private final</span> <span class="token-type">Object</span> handler;  <span class="token-comment">// The controller method (HandlerMethod)</span>
+    <span class="token-keyword">private final</span> <span class="token-type">List</span>&lt;<span class="token-type">HandlerInterceptor</span>&gt; interceptorList;
+
+    <span class="token-keyword">boolean</span> <span class="token-function">applyPreHandle</span>(<span class="token-type">HttpServletRequest</span> request,
+                           <span class="token-type">HttpServletResponse</span> response) {
+        <span class="token-keyword">for</span> (<span class="token-keyword">int</span> i = <span class="token-number">0</span>; i &lt; <span class="token-keyword">this</span>.interceptorList.<span class="token-function">size</span>(); i++) {
+            <span class="token-type">HandlerInterceptor</span> interceptor = <span class="token-keyword">this</span>.interceptorList.<span class="token-function">get</span>(i);
+            <span class="token-keyword">if</span> (!interceptor.<span class="token-function">preHandle</span>(request, response, <span class="token-keyword">this</span>.handler)) {
+                <span class="token-comment">// Interceptor vetoed! Trigger afterCompletion for</span>
+                <span class="token-comment">// all interceptors that already passed preHandle</span>
+                <span class="token-function">triggerAfterCompletion</span>(request, response, <span class="token-keyword">null</span>);
+                <span class="token-keyword">return false</span>;
+            }
+            <span class="token-keyword">this</span>.interceptorIndex = i;
+        }
+        <span class="token-keyword">return true</span>;
+    }
+}
+
+<span class="token-comment">// ═══ getHandler() iterates through all HandlerMappings ═══</span>
+<span class="token-keyword">protected</span> <span class="token-type">HandlerExecutionChain</span> <span class="token-function">getHandler</span>(<span class="token-type">HttpServletRequest</span> request) {
+    <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.handlerMappings != <span class="token-keyword">null</span>) {
+        <span class="token-keyword">for</span> (<span class="token-type">HandlerMapping</span> mapping : <span class="token-keyword">this</span>.handlerMappings) {
+            <span class="token-type">HandlerExecutionChain</span> handler = mapping.<span class="token-function">getHandler</span>(request);
+            <span class="token-keyword">if</span> (handler != <span class="token-keyword">null</span>) {
+                <span class="token-keyword">return</span> handler;  <span class="token-comment">// First match wins!</span>
+            }
+        }
+    }
+    <span class="token-keyword">return null</span>;  <span class="token-comment">// No handler found → 404</span>
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Handler Exception Resolvers -->
+            <!-- ============================================ -->
+            <h2>6. Exception Handling in doDispatch</h2>
+
+            <pre><code><span class="token-comment">// ═══ processDispatchResult handles exceptions ═══</span>
+<span class="token-keyword">private void</span> <span class="token-function">processDispatchResult</span>(
+        <span class="token-type">HttpServletRequest</span> request,
+        <span class="token-type">HttpServletResponse</span> response,
+        <span class="token-type">HandlerExecutionChain</span> mappedHandler,
+        <span class="token-type">ModelAndView</span> mv,
+        <span class="token-type">Exception</span> exception) <span class="token-keyword">throws</span> <span class="token-type">Exception</span> {
+
+    <span class="token-keyword">if</span> (exception != <span class="token-keyword">null</span>) {
+        <span class="token-comment">// Try each HandlerExceptionResolver in order</span>
+        mv = <span class="token-function">processHandlerException</span>(request, response,
+            mappedHandler.<span class="token-function">getHandler</span>(), exception);
+    }
+
+    <span class="token-keyword">if</span> (mv != <span class="token-keyword">null</span> && !mv.<span class="token-function">wasCleared</span>()) {
+        <span class="token-function">render</span>(mv, request, response);  <span class="token-comment">// Render view</span>
+    }
+
+    <span class="token-comment">// Always call afterCompletion on interceptors</span>
+    <span class="token-keyword">if</span> (mappedHandler != <span class="token-keyword">null</span>) {
+        mappedHandler.<span class="token-function">triggerAfterCompletion</span>(request, response, exception);
+    }
+}
+
+<span class="token-comment">// ═══ Exception resolver chain ═══</span>
+<span class="token-comment">// 1. ExceptionHandlerExceptionResolver → @ExceptionHandler methods</span>
+<span class="token-comment">// 2. ResponseStatusExceptionResolver → @ResponseStatus annotations</span>
+<span class="token-comment">// 3. DefaultHandlerExceptionResolver → Spring MVC built-in exceptions</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Order Matters</div>
+                <p>HandlerMappings and HandlerExceptionResolvers are <strong>ordered</strong>. DispatcherServlet iterates through them sequentially — the first one that returns a non-null result wins. This is why <code>@Order</code> annotations on your custom <code>HandlerExceptionResolver</code> beans matter. <code>ExceptionHandlerExceptionResolver</code> (which processes @ControllerAdvice) is typically registered with the highest priority.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Comparison Table -->
+            <!-- ============================================ -->
+            <h2>7. DispatcherServlet vs Traditional Servlet Architecture</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Traditional (Multiple Servlets)</th>
+                        <th>DispatcherServlet (Front Controller)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Request routing</td>
+                        <td>web.xml maps URLs to individual servlets</td>
+                        <td>Single entry point delegates to handlers</td>
+                    </tr>
+                    <tr>
+                        <td>Cross-cutting concerns</td>
+                        <td>Duplicated across each servlet or via filters only</td>
+                        <td>Centralized via interceptors and strategy beans</td>
+                    </tr>
+                    <tr>
+                        <td>Configuration</td>
+                        <td>Per-servlet init-params</td>
+                        <td>Spring beans — injectable, testable, conditional</td>
+                    </tr>
+                    <tr>
+                        <td>Handler types</td>
+                        <td>Must extend HttpServlet</td>
+                        <td>Any object (POJO controllers, functional endpoints)</td>
+                    </tr>
+                    <tr>
+                        <td>View technology</td>
+                        <td>Each servlet manages its own rendering</td>
+                        <td>Pluggable ViewResolvers (Thymeleaf, JSON, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td>Testability</td>
+                        <td>Requires servlet container</td>
+                        <td>MockMvc tests without a server</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>DispatcherServlet is a standard HttpServlet</strong> — registered by DispatcherServletAutoConfiguration and mapped to "/" in Spring Boot</li>
+                    <li><strong>onRefresh() initializes 9 strategies:</strong> MultipartResolver, LocaleResolver, ThemeResolver, HandlerMapping, HandlerAdapter, HandlerExceptionResolver, RequestToViewNameTranslator, ViewResolver, FlashMapManager</li>
+                    <li><strong>doDispatch() is the heart:</strong> find handler → find adapter → pre-interceptors → invoke → post-interceptors → render/write</li>
+                    <li><strong>HandlerExecutionChain</strong> bundles the handler with its applicable interceptors</li>
+                    <li><strong>First match wins:</strong> HandlerMappings are iterated in order; the first returning non-null wins</li>
+                    <li><strong>Exception handling is a strategy:</strong> exception resolvers are tried in order until one handles the exception</li>
+                    <li><strong>Boot 3.x throws on 404:</strong> NoHandlerFoundException can now be caught by @ControllerAdvice</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>What happens if you define two beans of type <code>HandlerMapping</code>? How does DispatcherServlet decide which to try first?</li>
+                    <li>Explain why <code>afterCompletion()</code> on interceptors runs even when an exception occurs, but <code>postHandle()</code> does not.</li>
+                    <li>A file upload endpoint fails silently — the handler receives null files. Where in the dispatch algorithm should you debug first?</li>
+                    <li>Why does DispatcherServlet call <code>getHandlerAdapter()</code> separately instead of having HandlerMapping return an adapter?</li>
+                    <li>Trace what happens when a request arrives for a URL with no handler and <code>throwExceptionIfNoHandlerFound</code> is both true vs false.</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"Walk me through exactly what happens inside Spring MVC from the moment an HTTP request hits Tomcat until the response is sent back. Be specific about class names."</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Tomcat layer:</strong> NioEndpoint → Http11Processor → CoyoteAdapter → Container pipeline → FilterChain</li>
+                    <li><strong>DispatcherServlet.doDispatch():</strong> checkMultipart → getHandler (iterates HandlerMappings) → getHandlerAdapter → applyPreHandle → ha.handle() → applyPostHandle → processDispatchResult</li>
+                    <li><strong>Handler invocation detail:</strong> HandlerAdapter resolves arguments (@RequestBody via Jackson, @PathVariable from URI template), invokes method via reflection, processes return value (@ResponseBody via HttpMessageConverter)</li>
+                    <li><strong>Error path:</strong> Exception caught → processHandlerException iterates HandlerExceptionResolvers → ExceptionHandlerExceptionResolver finds @ExceptionHandler → renders error response</li>
+                    <li><strong>Always:</strong> triggerAfterCompletion on interceptors, cleanup multipart if parsed</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 17 (Handler Mapping)</strong> — How HandlerMapping implementations resolve URLs to handlers</li>
+                    <li><strong>Topic 18 (Request Lifecycle)</strong> — The full picture including Tomcat, filters, and async support</li>
+                    <li><strong>Topic 22 (Filters vs Interceptors)</strong> — Where filters (Servlet spec) end and interceptors (Spring spec) begin in the dispatch flow</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="15-custom-starters.html" class="nav-btn nav-btn-prev">← Custom Starters</a>
+                <a href="17-handler-mapping.html" class="nav-btn nav-btn-next">Handler Mapping & Adapters →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

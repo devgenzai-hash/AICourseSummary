@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Memory Leak Detection - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing Complexity</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop (Macro vs Microta…</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interoperabil…</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver Internals</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver Loop Limits</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver Cost</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle Traps</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation Strategies</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preco…</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture & State Machines</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+            <li><a href="64-finite-state-modeling.html"><span class="nav-number">64</span> Finite State Modeling</a></li>
+            <li><a href="65-event-sourcing-frontend.html"><span class="nav-number">65</span> Event Sourcing in Frontend</a></li>
+            <li><a href="66-optimistic-ui-rollback.html"><span class="nav-number">66</span> Optimistic UI Rollback Strat…</a></li>
+            <li class="module-label">Offline & Collaboration</li>
+            <li><a href="67-offline-conflict-resolution.html"><span class="nav-number">67</span> Offline Conflict Resolution</a></li>
+            <li><a href="68-crdt-basics.html"><span class="nav-number">68</span> CRDT Basics for Collaboration</a></li>
+            <li><a href="69-webrtc.html"><span class="nav-number">69</span> WebRTC</a></li>
+            <li class="module-label">Streams & Async Patterns</li>
+            <li><a href="70-backpressure-streams.html"><span class="nav-number">70</span> Backpressure in Streams API</a></li>
+            <li><a href="71-abort-controller.html"><span class="nav-number">71</span> AbortController</a></li>
+            <li><a href="72-streaming-fetch.html"><span class="nav-number">72</span> Streaming Fetch Response Han…</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (I…</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async …</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/88 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Browser Memory Leak Detection
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Browser Memory Leak Detection</h1>
+                <p class="subtitle">Memory leaks in web apps cause tabs to slow down, freeze, and eventually crash — consuming gigabytes of RAM that should have been freed. Detection requires understanding the GC's reachability model, heap snapshots, and the specific patterns that prevent garbage collection in JavaScript.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span> <span class="tag tag-concept">Memory & GC</span> <span class="tag tag-performance">Debugging</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📚 Analogy: A Hotel That Never Checks Guests Out</div>
+                <p>Imagine a hotel where guests check in but the front desk never marks rooms as "available" when they leave. Even though the guests are long gone, the hotel thinks every room is occupied. Over time, the hotel reports "full capacity" and turns away new guests (OOM crash). A <strong>heap snapshot</strong> is like an auditor walking through every room to see which ones are actually empty. The <strong>retainer path</strong> is tracing back to find which desk clerk still has the room key (the reference preventing GC).</p>
+            </div>
+
+            <h2>The Problem: Silent Growth Until Crash</h2>
+<pre><code><span class="token-comment">// Memory leaks are SILENT — no errors, no warnings</span>
+<span class="token-comment">// The tab just gets slower over minutes/hours until it crashes</span>
+
+<span class="token-comment">// Classic leak: event listener never removed</span>
+<span class="token-keyword">function</span> <span class="token-function">ChatWidget</span>() {
+  <span class="token-keyword">const</span> [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    <span class="token-comment">// BUG: No cleanup function! This listener is never removed.</span>
+    <span class="token-comment">// Every time ChatWidget mounts/unmounts (e.g., tab switching),</span>
+    <span class="token-comment">// another listener is added. Each listener holds a closure over</span>
+    <span class="token-comment">// the component's state, preventing GC of the entire component tree.</span>
+    window.addEventListener(<span class="token-string">'message'</span>, (e) => {
+      setMessages(prev => [...prev, e.data]);
+    });
+  }, []);
+
+  <span class="token-keyword">return</span> &lt;div&gt;{messages.map(m => &lt;p&gt;{m}&lt;/p&gt;)}&lt;/div&gt;;
+}
+
+<span class="token-comment">// After 50 mount/unmount cycles: 50 event listeners,</span>
+<span class="token-comment">// 50 closure references, 50 component trees in memory</span>
+<span class="token-comment">// Memory: 5MB → 50MB → 200MB → OOM crash</span>
+
+<span class="token-comment">// Classic leak: timer never cleared</span>
+<span class="token-keyword">function</span> <span class="token-function">Dashboard</span>() {
+  useEffect(() => {
+    <span class="token-keyword">const</span> id = setInterval(() => {
+      fetchMetrics(); <span class="token-comment">// Closure holds reference to component scope</span>
+    }, 1000);
+    <span class="token-comment">// BUG: No return () => clearInterval(id);</span>
+  }, []);
+}
+</code></pre>
+
+            <h2>Detection Method 1: DevTools Heap Snapshots</h2>
+<pre><code><span class="token-comment">// Chrome DevTools → Memory tab → Heap Snapshot</span>
+<span class="token-comment">// The three-snapshot technique for finding leaks:</span>
+
+<span class="token-comment">// Step 1: Take Snapshot 1 (baseline — page just loaded)</span>
+<span class="token-comment">// Step 2: Perform the action that might leak (open/close modal, navigate)</span>
+<span class="token-comment">// Step 3: Take Snapshot 2 (should be similar to Snapshot 1)</span>
+<span class="token-comment">// Step 4: Repeat the action many times (10x)</span>
+<span class="token-comment">// Step 5: Take Snapshot 3</span>
+
+<span class="token-comment">// Compare Snapshot 1 vs 3:</span>
+<span class="token-comment">// - If memory grew linearly: LEAK CONFIRMED</span>
+<span class="token-comment">// - Use "Objects allocated between Snapshot 1 and Snapshot 3"</span>
+<span class="token-comment">// - Sort by "Retained Size" descending</span>
+<span class="token-comment">// - Look for unexpected objects (detached DOM trees, closures, arrays)</span>
+
+<span class="token-comment">// Key DevTools columns:</span>
+<span class="token-comment">// - Shallow Size: memory of the object itself (bytes)</span>
+<span class="token-comment">// - Retained Size: memory freed if this object were GC'd (includes children)</span>
+<span class="token-comment">// - Distance: edges from GC root to this object</span>
+<span class="token-comment">// - Retainers: WHO is keeping this object alive (the reference chain)</span>
+
+<span class="token-comment">// Programmatic detection with performance.measureUserAgentSpecificMemory()</span>
+<span class="token-keyword">async function</span> <span class="token-function">measureMemory</span>() {
+  <span class="token-comment">// Requires cross-origin isolation (COOP/COEP headers)</span>
+  <span class="token-keyword">if</span> (!performance.measureUserAgentSpecificMemory) <span class="token-keyword">return</span>;
+
+  <span class="token-keyword">const</span> result = <span class="token-keyword">await</span> performance.measureUserAgentSpecificMemory();
+  console.log(<span class="token-string">`Total JS memory: ${(result.bytes / 1024 / 1024).toFixed(2)} MB`</span>);
+
+  <span class="token-comment">// result.breakdown shows per-frame memory usage</span>
+  <span class="token-keyword">for</span> (<span class="token-keyword">const</span> entry <span class="token-keyword">of</span> result.breakdown) {
+    console.log(entry.attribution, entry.bytes);
+  }
+}
+
+<span class="token-comment">// Periodic leak detection in production</span>
+setInterval(<span class="token-keyword">async</span> () => {
+  <span class="token-keyword">const</span> { bytes } = <span class="token-keyword">await</span> performance.measureUserAgentSpecificMemory();
+  <span class="token-keyword">if</span> (bytes > 500 * 1024 * 1024) { <span class="token-comment">// Over 500MB</span>
+    reportMemoryLeak({ bytes, url: location.href });
+  }
+}, 60000);
+</code></pre>
+
+            <h2>Detection Method 2: WeakRef and FinalizationRegistry</h2>
+<pre><code><span class="token-comment">// WeakRef: holds a reference that DOESN'T prevent GC</span>
+<span class="token-comment">// FinalizationRegistry: callback when an object IS GC'd</span>
+<span class="token-comment">// Together: detect if objects that SHOULD be GC'd actually ARE</span>
+
+<span class="token-comment">// === Leak detector for React components ===</span>
+<span class="token-keyword">const</span> leakDetector = <span class="token-keyword">new</span> FinalizationRegistry((label) => {
+  console.log(<span class="token-string">`✅ [GC] ${label} was properly garbage collected`</span>);
+});
+
+<span class="token-keyword">const</span> tracked = <span class="token-keyword">new</span> Map(); <span class="token-comment">// label → WeakRef</span>
+
+<span class="token-keyword">function</span> <span class="token-function">trackForLeaks</span>(obj, label) {
+  <span class="token-keyword">const</span> ref = <span class="token-keyword">new</span> WeakRef(obj);
+  tracked.set(label, ref);
+  leakDetector.register(obj, label);
+}
+
+<span class="token-keyword">function</span> <span class="token-function">checkLeaks</span>() {
+  <span class="token-keyword">for</span> (<span class="token-keyword">const</span> [label, ref] <span class="token-keyword">of</span> tracked) {
+    <span class="token-keyword">if</span> (ref.deref() !== undefined) {
+      console.warn(<span class="token-string">`⚠️ [LEAK] ${label} is still alive and should have been GC'd`</span>);
+    } <span class="token-keyword">else</span> {
+      tracked.delete(label); <span class="token-comment">// Already collected, stop tracking</span>
+    }
+  }
+}
+
+<span class="token-comment">// Usage in a React component (development only)</span>
+<span class="token-keyword">function</span> <span class="token-function">Modal</span>({ onClose }) {
+  <span class="token-keyword">const</span> instanceRef = useRef({});
+
+  useEffect(() => {
+    <span class="token-keyword">if</span> (process.env.NODE_ENV === <span class="token-string">'development'</span>) {
+      trackForLeaks(instanceRef.current, <span class="token-string">`Modal-${Date.now()}`</span>);
+    }
+  }, []);
+
+  <span class="token-comment">// When this Modal unmounts, instanceRef.current should be GC'd</span>
+  <span class="token-comment">// If it's NOT collected after a few GC cycles → LEAK</span>
+}
+
+<span class="token-comment">// Check after user interaction (give GC time to run)</span>
+setTimeout(checkLeaks, 5000);
+</code></pre>
+
+            <h2>The 5 Most Common Leak Patterns</h2>
+<pre><code><span class="token-comment">// === PATTERN 1: Forgotten event listeners ===</span>
+<span class="token-keyword">class</span> <span class="token-function">InfiniteScroll</span> {
+  <span class="token-function">constructor</span>() {
+    <span class="token-comment">// LEAK: 'this' reference keeps entire class alive</span>
+    window.addEventListener(<span class="token-string">'scroll'</span>, <span class="token-keyword">this</span>.onScroll);
+  }
+  <span class="token-function">destroy</span>() {
+    <span class="token-comment">// FIX: Must remove with same function reference</span>
+    window.removeEventListener(<span class="token-string">'scroll'</span>, <span class="token-keyword">this</span>.onScroll);
+  }
+  <span class="token-comment">// BETTER FIX: Use AbortController</span>
+  <span class="token-function">constructor2</span>() {
+    <span class="token-keyword">this</span>.controller = <span class="token-keyword">new</span> AbortController();
+    window.addEventListener(<span class="token-string">'scroll'</span>, <span class="token-keyword">this</span>.onScroll, {
+      signal: <span class="token-keyword">this</span>.controller.signal
+    });
+  }
+  <span class="token-function">destroy2</span>() { <span class="token-keyword">this</span>.controller.abort(); }
+}
+
+<span class="token-comment">// === PATTERN 2: Closures capturing large scopes ===</span>
+<span class="token-keyword">function</span> <span class="token-function">processData</span>() {
+  <span class="token-keyword">const</span> hugeArray = <span class="token-keyword">new</span> Array(1_000_000).fill(<span class="token-string">'x'</span>); <span class="token-comment">// 10MB</span>
+  <span class="token-keyword">const</span> result = hugeArray.reduce((a, b) => a + b);
+
+  <span class="token-comment">// LEAK: returned function's closure captures hugeArray</span>
+  <span class="token-comment">// even though it only uses 'result'</span>
+  <span class="token-keyword">return</span> () => console.log(result);
+  <span class="token-comment">// FIX: null out hugeArray before returning</span>
+  <span class="token-comment">// hugeArray = null; // Breaks reference, allows GC</span>
+}
+
+<span class="token-comment">// === PATTERN 3: Growing collections (Maps, Sets, Arrays) ===</span>
+<span class="token-keyword">const</span> cache = <span class="token-keyword">new</span> Map(); <span class="token-comment">// Never evicted!</span>
+<span class="token-keyword">function</span> <span class="token-function">getCachedData</span>(key) {
+  <span class="token-keyword">if</span> (!cache.has(key)) {
+    cache.set(key, expensiveComputation(key));
+  }
+  <span class="token-keyword">return</span> cache.get(key);
+}
+<span class="token-comment">// After 10,000 unique keys: cache holds 10,000 entries forever</span>
+<span class="token-comment">// FIX: Use WeakMap (if keys are objects) or LRU cache with max size</span>
+
+<span class="token-comment">// === PATTERN 4: Detached DOM trees (covered in next topic) ===</span>
+<span class="token-keyword">let</span> detachedTree;
+<span class="token-keyword">function</span> <span class="token-function">removeModal</span>() {
+  detachedTree = document.getElementById(<span class="token-string">'modal'</span>);
+  detachedTree.remove(); <span class="token-comment">// Removed from DOM but JS reference keeps it alive</span>
+}
+<span class="token-comment">// detachedTree holds entire DOM subtree in memory</span>
+
+<span class="token-comment">// === PATTERN 5: Uncleared timers/intervals ===</span>
+<span class="token-keyword">function</span> <span class="token-function">startPolling</span>() {
+  setInterval(() => {
+    <span class="token-comment">// This closure + everything it references stays forever</span>
+    updateDashboard(getState());
+  }, 1000);
+  <span class="token-comment">// No reference to interval ID = can never clear it</span>
+}
+</code></pre>
+
+            <h2>Real-World Usage</h2>
+            <ul>
+                <li><strong>Gmail</strong> — Notoriously fought memory leaks in their SPA. Opening/closing emails accumulated detached DOM trees. They built internal tools to track retained sizes and auto-warn when thresholds were exceeded.</li>
+                <li><strong>VS Code (web)</strong> — Uses <code>DisposableStore</code> pattern: every resource (listener, timer, subscription) is registered as a disposable. On component teardown, <code>dispose()</code> cleans up all registered resources atomically.</li>
+                <li><strong>React DevTools Profiler</strong> — Shows component mount/unmount pairs. If a component mounts N times but only unmounts N-1 times, you have a potential leak.</li>
+                <li><strong>Production monitoring (Sentry, DataDog)</strong> — Track <code>performance.memory.usedJSHeapSize</code> over time. Alert when it grows monotonically without plateauing (strong leak signal).</li>
+                <li><strong>SPAs with client-side routing</strong> — The #1 source of leaks. Each route change should fully tear down the previous view. Event listeners and timers from old routes are the most common leak source.</li>
+            </ul>
+
+            <h2>Trade-offs & Alternatives</h2>
+            <table>
+                <thead><tr><th>Detection Method</th><th>Strengths</th><th>Weaknesses</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Heap Snapshots (DevTools)</td>
+                        <td>Exact object-level detail; retainer paths; definitive proof</td>
+                        <td>Manual; requires reproducing the leak; slow for large heaps</td>
+                    </tr>
+                    <tr>
+                        <td>performance.measureUserAgentSpecificMemory()</td>
+                        <td>Programmatic; works in production; per-frame breakdown</td>
+                        <td>Requires COOP/COEP headers; approximate; no object details</td>
+                    </tr>
+                    <tr>
+                        <td>WeakRef + FinalizationRegistry</td>
+                        <td>Automated detection; can run in CI; proves GC behavior</td>
+                        <td>GC timing is non-deterministic; false negatives possible; dev-only</td>
+                    </tr>
+                    <tr>
+                        <td>Allocation Timeline (DevTools)</td>
+                        <td>Shows what's being allocated in real-time; correlates with actions</td>
+                        <td>High overhead; slows the page; hard to use for intermittent leaks</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Confusing retained size with shallow size</strong> — An object with 100 bytes shallow size might retain 50MB if it references a large tree. Always sort by retained size when hunting leaks.</li>
+                <li><strong>Not forcing GC before snapshot</strong> — Memory that looks like a leak might just be pending GC. Click the trash icon (Force GC) in DevTools before taking snapshots. Otherwise you get false positives.</li>
+                <li><strong>Using Map where WeakMap suffices</strong> — If your cache keys are objects (DOM nodes, class instances), <code>WeakMap</code> automatically drops entries when keys are GC'd. Regular <code>Map</code> holds keys alive forever.</li>
+                <li><strong>Assuming GC runs immediately</strong> — <code>FinalizationRegistry</code> callbacks may fire seconds or minutes after the object becomes unreachable. Don't rely on timely GC for correctness — only use it for detection/debugging.</li>
+                <li><strong>Only testing with small data</strong> — A leak of 100 bytes per action is invisible in development. In production with 10,000 users clicking 500 times per session, it's 50MB. Always test with realistic iteration counts (100+ cycles of the suspect action).</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Memory Leak Detection When...</h3>
+                <p>Given a heap snapshot, you can trace the retainer path from a suspected leaked object all the way back to the GC root, identify exactly which reference is preventing collection, determine whether it's a genuine leak or expected retention, and implement the minimal fix (removing one reference) that allows the entire retained tree to be collected.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a single-page app with 5 tabs (Home, Dashboard, Settings, Profile, Notifications). Each tab mounts/unmounts a complex component tree. Intentionally introduce one leak per tab (different patterns: event listener, timer, closure, Map cache, detached DOM). Then use DevTools heap snapshots to identify and fix each one. Verify that switching between all 5 tabs 100 times results in zero memory growth beyond the baseline.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Memory Leak Detection connects to: <strong>Detached DOM Nodes</strong> (the most visual type of leak — entire DOM trees retained in memory), <strong>AbortController</strong> (the modern pattern for bulk event listener cleanup that prevents listener leaks), and <strong>Garbage Collection Timing</strong> (understanding when GC runs helps distinguish leaks from delayed collection).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="72-streaming-fetch.html" class="nav-btn nav-btn-prev">← Streaming Fetch Response Handling</a>
+                <a href="74-detached-dom-nodes.html" class="nav-btn nav-btn-next">Detached DOM Nodes →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

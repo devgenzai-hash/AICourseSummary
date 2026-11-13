@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Tree - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li class="active"><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Accessibility Tree
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Accessibility Tree</h1>
+                <p class="subtitle">The parallel DOM that assistive technologies actually read — a stripped-down semantic representation of your page where visual styling is irrelevant and only roles, names, states, and relationships matter.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-a11y">Accessibility</span>
+                    <span class="tag tag-browser">Browser Internals</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🗺️ Analogy: Building Floor Plan vs Photo</div>
+                <p>The DOM is like a photograph of a building — every visual detail is captured. The accessibility tree is like the floor plan — it shows rooms (landmarks), doors (links/buttons), labels on rooms, and how to navigate between them. A blind person can navigate the building perfectly with the floor plan; they don't need the photo.</p>
+            </div>
+
+            <h2>The Problem: Screen Readers Don't See Pixels</h2>
+<pre><code><span class="token-comment">// Screen readers CANNOT see your beautifully styled CSS</span>
+<span class="token-comment">// They read the ACCESSIBILITY TREE — a semantic abstraction</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// What a sighted user sees:</span>
+<span class="token-comment">// ┌─────────────────────────┐</span>
+<span class="token-comment">// │ 🛒 My Store   [Search]  │  (visually styled navbar)</span>
+<span class="token-comment">// │─────────────────────────│</span>
+<span class="token-comment">// │ Welcome back, Alice!    │  (greeting with avatar)</span>
+<span class="token-comment">// │ [Buy Now ▶]             │  (fancy animated button)</span>
+<span class="token-comment">// └─────────────────────────┘</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// What a screen reader "sees" (the accessibility tree):</span>
+<span class="token-comment">// navigation "Main"</span>
+<span class="token-comment">//   link "My Store" (href="/home")</span>
+<span class="token-comment">//   search</span>
+<span class="token-comment">//     textbox "Search products" (role=searchbox)</span>
+<span class="token-comment">// main</span>
+<span class="token-comment">//   heading level 1 "Welcome back, Alice!"</span>
+<span class="token-comment">//   button "Buy Now" (state: enabled)</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// If your HTML doesn't map to meaningful tree nodes,</span>
+<span class="token-comment">// screen reader users get: "div div div div clickable div"</span>
+</code></pre>
+
+            <h2>How the Accessibility Tree Is Built</h2>
+<pre><code><span class="token-comment">// The browser builds the accessibility tree from the DOM by:</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 1. Starting with the DOM tree</span>
+<span class="token-comment">// 2. Pruning nodes that are semantically irrelevant:</span>
+<span class="token-comment">//    - display:none or visibility:hidden elements (pruned entirely)</span>
+<span class="token-comment">//    - &lt;div&gt; and &lt;span&gt; without roles (may be pruned or flattened)</span>
+<span class="token-comment">//    - Decorative images (role="presentation" or empty alt="")</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// 3. Computing accessible properties for each remaining node:</span>
+<span class="token-comment">//    - Role: what IS this element? (button, link, heading, etc.)</span>
+<span class="token-comment">//    - Name: what is it CALLED? (text content, label, aria-label)</span>
+<span class="token-comment">//    - State: what CONDITION is it in? (expanded, checked, disabled)</span>
+<span class="token-comment">//    - Properties: additional info (required, haspopup, controls)</span>
+<span class="token-comment">//    - Relations: what is it CONNECTED to? (labelledby, describedby)</span>
+
+<span class="token-comment">// DOM → Accessibility Tree mapping example:</span>
+
+<span class="token-comment">// DOM:</span>
+&lt;nav aria-label=<span class="token-string">"Main navigation"</span>&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;a href=<span class="token-string">"/home"</span>&gt;Home&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=<span class="token-string">"/products"</span> aria-current=<span class="token-string">"page"</span>&gt;Products&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/nav&gt;
+
+<span class="token-comment">// Accessibility Tree (what AT reads):</span>
+<span class="token-comment">// navigation "Main navigation"</span>
+<span class="token-comment">//   list (2 items)</span>
+<span class="token-comment">//     listitem</span>
+<span class="token-comment">//       link "Home" (href=/home)</span>
+<span class="token-comment">//     listitem</span>
+<span class="token-comment">//       link "Products" (href=/products, current=page)</span>
+</code></pre>
+
+            <h3>Accessible Name Computation Algorithm</h3>
+<pre><code><span class="token-comment">// The browser follows a PRIORITY ORDER to determine an element's name:</span>
+<span class="token-comment">// (defined in the Accessible Name and Description Computation spec)</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Priority 1: aria-labelledby (references another element's text)</span>
+&lt;button aria-labelledby=<span class="token-string">"btn-label"</span>&gt;X&lt;/button&gt;
+&lt;span id=<span class="token-string">"btn-label"</span>&gt;Close dialog&lt;/span&gt;
+<span class="token-comment">// Accessible name: "Close dialog" (NOT "X")</span>
+
+<span class="token-comment">// Priority 2: aria-label (explicit string)</span>
+&lt;button aria-label=<span class="token-string">"Close dialog"</span>&gt;X&lt;/button&gt;
+<span class="token-comment">// Accessible name: "Close dialog"</span>
+
+<span class="token-comment">// Priority 3: Native labeling mechanism</span>
+&lt;label for=<span class="token-string">"email"</span>&gt;Email address&lt;/label&gt;
+&lt;input id=<span class="token-string">"email"</span> type=<span class="token-string">"email"</span>&gt;
+<span class="token-comment">// Accessible name of input: "Email address"</span>
+
+<span class="token-comment">// Priority 4: Text content (for elements that allow naming from content)</span>
+&lt;button&gt;Submit Form&lt;/button&gt;
+<span class="token-comment">// Accessible name: "Submit Form"</span>
+
+<span class="token-comment">// Priority 5: title attribute (fallback, least preferred)</span>
+&lt;button title=<span class="token-string">"Submit"</span>&gt;&lt;svg&gt;...&lt;/svg&gt;&lt;/button&gt;
+<span class="token-comment">// Accessible name: "Submit" (only because nothing else is available)</span>
+
+<span class="token-comment">// Priority 6: placeholder (for inputs, even LOWER priority)</span>
+&lt;input type=<span class="token-string">"text"</span> placeholder=<span class="token-string">"Enter email"</span>&gt;
+<span class="token-comment">// Accessible name: "Enter email" (BAD — use a real label!)</span>
+</code></pre>
+
+            <h2>Inspecting the Accessibility Tree</h2>
+<pre><code><span class="token-comment">// Method 1: Chrome DevTools → Elements → Accessibility pane</span>
+<span class="token-comment">// Shows computed role, name, and full property tree for selected element</span>
+
+<span class="token-comment">// Method 2: Chrome DevTools → Full Accessibility Tree toggle</span>
+<span class="token-comment">// Elements panel → ☰ → Full-page accessibility tree</span>
+<span class="token-comment">// Shows the ENTIRE page as screen readers perceive it</span>
+
+<span class="token-comment">// Method 3: Programmatic access (testing)</span>
+<span class="token-comment">// Using Playwright or Puppeteer:</span>
+<span class="token-keyword">const</span> snapshot = <span class="token-keyword">await</span> page.accessibility.snapshot();
+console.log(JSON.stringify(snapshot, <span class="token-keyword">null</span>, 2));
+<span class="token-comment">// Returns: { role: 'WebArea', name: 'Page Title', children: [...] }</span>
+
+<span class="token-comment">// Method 4: aria-hidden inspector</span>
+<span class="token-comment">// Find elements hidden from accessibility tree:</span>
+document.querySelectorAll(<span class="token-string">'[aria-hidden="true"]'</span>).forEach(el =&gt; {
+    <span class="token-comment">// These are invisible to screen readers</span>
+    <span class="token-comment">// Make sure they don't contain focusable elements!</span>
+    <span class="token-keyword">const</span> focusable = el.querySelectorAll(
+        <span class="token-string">'a, button, input, select, textarea, [tabindex]'</span>
+    );
+    <span class="token-keyword">if</span> (focusable.length &gt; 0) {
+        console.error(<span class="token-string">'Focusable element inside aria-hidden!'</span>, el);
+    }
+});
+</code></pre>
+
+            <h2>Common Accessibility Tree Patterns</h2>
+<pre><code><span class="token-comment">// PATTERN: Custom component with proper tree representation</span>
+
+<span class="token-comment">// BAD: Looks like a tab panel visually, tree says "div div div"</span>
+&lt;div class=<span class="token-string">"tabs"</span>&gt;
+    &lt;div class=<span class="token-string">"tab active"</span> onclick=<span class="token-string">"..."</span>&gt;Tab 1&lt;/div&gt;
+    &lt;div class=<span class="token-string">"tab"</span> onclick=<span class="token-string">"..."</span>&gt;Tab 2&lt;/div&gt;
+    &lt;div class=<span class="token-string">"panel"</span>&gt;Content for tab 1&lt;/div&gt;
+&lt;/div&gt;
+
+<span class="token-comment">// GOOD: Proper accessibility tree representation</span>
+&lt;div role=<span class="token-string">"tablist"</span> aria-label=<span class="token-string">"Product information"</span>&gt;
+    &lt;button role=<span class="token-string">"tab"</span> 
+            aria-selected=<span class="token-string">"true"</span> 
+            aria-controls=<span class="token-string">"panel-1"</span>
+            id=<span class="token-string">"tab-1"</span>&gt;
+        Description
+    &lt;/button&gt;
+    &lt;button role=<span class="token-string">"tab"</span> 
+            aria-selected=<span class="token-string">"false"</span> 
+            aria-controls=<span class="token-string">"panel-2"</span>
+            id=<span class="token-string">"tab-2"</span>
+            tabindex=<span class="token-string">"-1"</span>&gt;
+        Reviews
+    &lt;/button&gt;
+&lt;/div&gt;
+&lt;div role=<span class="token-string">"tabpanel"</span> 
+     id=<span class="token-string">"panel-1"</span> 
+     aria-labelledby=<span class="token-string">"tab-1"</span>&gt;
+    Product description content...
+&lt;/div&gt;
+
+<span class="token-comment">// Tree result:</span>
+<span class="token-comment">// tablist "Product information"</span>
+<span class="token-comment">//   tab "Description" (selected, controls=panel-1)</span>
+<span class="token-comment">//   tab "Reviews" (controls=panel-2)</span>
+<span class="token-comment">// tabpanel "Description"</span>
+<span class="token-comment">//   statictext "Product description content..."</span>
+
+
+<span class="token-comment">// PATTERN: Removing from accessibility tree intentionally</span>
+
+<span class="token-comment">// Decorative elements that add no information:</span>
+&lt;img src=<span class="token-string">"decorative-swirl.svg"</span> alt=<span class="token-string">""</span> role=<span class="token-string">"presentation"</span>&gt;
+<span class="token-comment">// ↑ Completely hidden from accessibility tree</span>
+
+<span class="token-comment">// Visually redundant icons next to text:</span>
+&lt;button&gt;
+    &lt;svg aria-hidden=<span class="token-string">"true"</span>&gt;...&lt;/svg&gt; <span class="token-comment">&lt;!-- Icon hidden from tree --&gt;</span>
+    Delete item <span class="token-comment">&lt;!-- This is the accessible name --&gt;</span>
+&lt;/button&gt;
+<span class="token-comment">// Tree: button "Delete item" (no duplicate icon announcement)</span>
+
+<span class="token-comment">// Hiding entire sections during animations/transitions:</span>
+&lt;div aria-hidden=<span class="token-string">"true"</span> class=<span class="token-string">"modal-backdrop"</span>&gt;
+    <span class="token-comment">&lt;!-- Everything inside is removed from accessibility tree --&gt;</span>
+    <span class="token-comment">&lt;!-- WARNING: Must NOT contain focusable elements! --&gt;</span>
+&lt;/div&gt;
+</code></pre>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Chrome DevTools</strong> — Full-page accessibility tree view (since Chrome 90) lets developers see exactly what screen readers read.</li>
+                <li><strong>Playwright / Testing Library</strong> — <code>getByRole()</code> queries the accessibility tree directly, encouraging developers to write tests that match screen reader behavior.</li>
+                <li><strong>macOS VoiceOver / NVDA / JAWS</strong> — All screen readers consume the platform accessibility API (MSAA/UIA on Windows, NSAccessibility on macOS) which browsers populate from the accessibility tree.</li>
+                <li><strong>React Aria (Adobe)</strong> — A library that generates correct accessibility tree semantics for custom components (combobox, datepicker, etc.).</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Using <code>&lt;div onclick&gt;</code> instead of <code>&lt;button&gt;</code></strong> — Divs have no implicit role. Screen reader announces "clickable" (or nothing). Buttons announce "button, Submit Form".</li>
+                <li><strong>Icon-only buttons without accessible names</strong> — A button with only an SVG and no aria-label/text is announced as "button" with no name.</li>
+                <li><strong>Focusable elements inside <code>aria-hidden="true"</code></strong> — Creates a "ghost" that keyboard users can tab to but screen readers can't announce. The worst of both worlds.</li>
+                <li><strong>Redundant ARIA on semantic HTML</strong> — <code>&lt;nav role="navigation"&gt;</code> is redundant. <code>&lt;nav&gt;</code> already has implicit role="navigation". Adds no value, just noise.</li>
+                <li><strong>Missing accessible names on landmarks</strong> — Two <code>&lt;nav&gt;</code> elements without aria-label are both "navigation" to screen readers — indistinguishable.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand the Accessibility Tree When...</h3>
+                <p>You can look at any HTML structure and predict exactly what the accessibility tree output will be — the role, name, state, and relationships of each node — and identify which elements will be pruned, which will be exposed, and how a screen reader will announce the component.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a custom dropdown/combobox component using only <code>&lt;div&gt;</code>s, then add proper ARIA roles, states, and properties until Chrome's accessibility tree view shows the same structure as a native <code>&lt;select&gt;</code>. Compare the two trees.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Accessibility Tree connects to: <strong>ARIA Live Regions</strong> (dynamic updates to the tree that get announced), <strong>Shadow DOM</strong> (shadow roots create boundaries in the accessibility tree), and <strong>Custom Elements Lifecycle</strong> (when roles/states must be set for proper tree representation).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="85-idempotent-ui-actions.html" class="nav-btn nav-btn-prev">← Idempotent UI Actions</a>
+                <a href="87-aria-live-regions.html" class="nav-btn nav-btn-next">ARIA Live Regions Internals →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

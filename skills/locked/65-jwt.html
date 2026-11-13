@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="sidebar-overlay"></div>
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h2>System Design</h2>
+        <p class="sidebar-subtitle">Beginner &rarr; Advanced &bull; 68 Topics</p>
+    </div>
+    <nav>
+        <ul>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html">01 &mdash; Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html">02 &mdash; Context Switching</a></li>
+            <li><a href="03-race-conditions.html">03 &mdash; Race Conditions</a></li>
+            <li><a href="04-critical-sections.html">04 &mdash; Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html">05 &mdash; Mutex Locks</a></li>
+            <li><a href="06-deadlocks.html">06 &mdash; Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html">07 &mdash; Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html">08 &mdash; Thread Safety</a></li>
+
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html">09 &mdash; Atomic Operations &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html">10 &mdash; Memory Visibility</a></li>
+            <li><a href="11-happens-before.html">11 &mdash; Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html">12 &mdash; Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html">13 &mdash; False Sharing</a></li>
+
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html">14 &mdash; Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html">15 &mdash; Futures, Promises &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html">16 &mdash; Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html">17 &mdash; Blocking vs Non-Blocking</a></li>
+            <li><a href="18-semaphores.html">18 &mdash; Semaphores</a></li>
+            <li><a href="19-barriers-latches.html">19 &mdash; Barriers &amp; Latches</a></li>
+            <li><a href="20-actor-model.html">20 &mdash; Actor Model</a></li>
+
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html">21 &mdash; CAP Theorem</a></li>
+            <li><a href="22-consistency-models.html">22 &mdash; Consistency Models</a></li>
+            <li><a href="23-replication.html">23 &mdash; Replication</a></li>
+            <li><a href="24-partitioning-sharding.html">24 &mdash; Partitioning &amp; Sharding</a></li>
+            <li><a href="25-consistent-hashing.html">25 &mdash; Consistent Hashing</a></li>
+            <li><a href="26-vector-clocks.html">26 &mdash; Vector Clocks</a></li>
+            <li><a href="27-gossip-protocol.html">27 &mdash; Gossip Protocol</a></li>
+            <li><a href="28-raft-consensus.html">28 &mdash; Raft Consensus</a></li>
+            <li><a href="29-paxos.html">29 &mdash; Paxos</a></li>
+            <li><a href="30-distributed-transactions.html">30 &mdash; Distributed Transactions</a></li>
+            <li><a href="31-saga-pattern.html">31 &mdash; Saga Pattern</a></li>
+            <li><a href="32-crdt.html">32 &mdash; CRDTs</a></li>
+
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-circuit-breaker.html">33 &mdash; Circuit Breaker</a></li>
+            <li><a href="34-retry-backoff.html">34 &mdash; Retry &amp; Backoff</a></li>
+            <li><a href="35-bulkhead.html">35 &mdash; Bulkhead</a></li>
+            <li><a href="36-timeout-patterns.html">36 &mdash; Timeout Patterns</a></li>
+            <li><a href="37-health-checks.html">37 &mdash; Health Checks</a></li>
+            <li><a href="38-load-shedding.html">38 &mdash; Load Shedding</a></li>
+            <li><a href="39-chaos-engineering.html">39 &mdash; Chaos Engineering</a></li>
+
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-indexing.html">40 &mdash; Indexing</a></li>
+            <li><a href="41-b-trees.html">41 &mdash; B-Trees</a></li>
+            <li><a href="42-lsm-trees.html">42 &mdash; LSM Trees</a></li>
+            <li><a href="43-write-ahead-log.html">43 &mdash; Write-Ahead Log</a></li>
+            <li><a href="44-mvcc.html">44 &mdash; MVCC</a></li>
+            <li><a href="45-connection-pooling.html">45 &mdash; Connection Pooling</a></li>
+            <li><a href="46-query-optimization.html">46 &mdash; Query Optimization</a></li>
+            <li><a href="47-materialized-views.html">47 &mdash; Materialized Views</a></li>
+
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-microservices.html">48 &mdash; Microservices</a></li>
+            <li><a href="49-event-driven-architecture.html">49 &mdash; Event-Driven Architecture</a></li>
+
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-cqrs.html">50 &mdash; CQRS</a></li>
+            <li><a href="51-event-sourcing.html">51 &mdash; Event Sourcing</a></li>
+            <li><a href="52-outbox-pattern.html">52 &mdash; Outbox Pattern</a></li>
+            <li><a href="53-sidecar-pattern.html">53 &mdash; Sidecar Pattern</a></li>
+            <li><a href="54-strangler-fig.html">54 &mdash; Strangler Fig</a></li>
+            <li><a href="55-backpressure.html">55 &mdash; Backpressure</a></li>
+            <li><a href="56-idempotency.html">56 &mdash; Idempotency</a></li>
+            <li><a href="57-rate-limiting.html">57 &mdash; Rate Limiting</a></li>
+            <li><a href="58-cache-patterns.html">58 &mdash; Cache Patterns</a></li>
+
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-rest-design.html">59 &mdash; REST Design</a></li>
+            <li><a href="60-grpc.html">60 &mdash; gRPC</a></li>
+            <li><a href="61-graphql.html">61 &mdash; GraphQL</a></li>
+            <li><a href="62-websockets.html">62 &mdash; WebSockets</a></li>
+            <li><a href="63-message-queues.html">63 &mdash; Message Queues</a></li>
+            <li><a href="64-webhooks.html">64 &mdash; Webhooks</a></li>
+
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html" class="active">65 &mdash; JWT</a></li>
+            <li><a href="66-oauth.html">66 &mdash; OAuth 2.0</a></li>
+            <li><a href="67-csrf.html">67 &mdash; CSRF Protection</a></li>
+            <li><a href="68-mtls.html">68 &mdash; mTLS</a></li>
+        </ul>
+    </nav>
+    <div class="progress-tracker">
+        <span class="progress-label">Progress</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: 95%"></div></div>
+        <span class="progress-text">65 / 68 topics</span>
+    </div>
+</aside>
+
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Toggle sidebar">&#9776;</button>
+    <h1>System Design Course</h1>
+    <span class="topic-badge">Topic 65 of 68</span>
+</header>
+
+<main class="main-content">
+    <section class="hero">
+        <h1>JWT (JSON Web Tokens)</h1>
+        <p class="hero-subtitle">Stateless, self-contained tokens for secure authentication and authorization</p>
+        <div class="tags">
+            <span class="tag">Intermediate</span>
+            <span class="tag">Security</span>
+            <span class="tag">Concept</span>
+        </div>
+    </section>
+
+    <div class="analogy-box">
+        <h3>&#128161; Analogy</h3>
+        <p>A passport &mdash; it contains your identity info, is signed by an authority (the government), and can be verified by any border agent without calling back to the authority. The stamp and watermarks prove authenticity, the expiry date limits validity, and anyone can read the name but nobody can forge the signature.</p>
+    </div>
+
+    <h2>What Is a JWT?</h2>
+    <p>A JSON Web Token is a compact, URL-safe means of representing claims between two parties. It enables <strong>stateless authentication</strong> &mdash; the server doesn&rsquo;t need to store session state because all the information lives inside the token itself.</p>
+
+    <h3>Token Structure</h3>
+    <p>Every JWT consists of three Base64url-encoded parts separated by dots:</p>
+
+    <pre><code><span class="token-string">header</span>.<span class="token-string">payload</span>.<span class="token-string">signature</span></code></pre>
+
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Part</th>
+                    <th>Purpose</th>
+                    <th>Example Content</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Header</strong></td>
+                    <td>Declares token type and signing algorithm</td>
+                    <td><code>{"alg": "HS256", "typ": "JWT"}</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Payload</strong></td>
+                    <td>Contains claims (user data, permissions, metadata)</td>
+                    <td><code>{"sub": "user123", "exp": 1717200000}</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Signature</strong></td>
+                    <td>Verifies integrity &mdash; proves the token wasn&rsquo;t tampered with</td>
+                    <td>HMAC-SHA256 of header + payload + secret</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Signing Algorithms</h2>
+    <h3>HS256 vs RS256</h3>
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>HS256 (Symmetric)</th>
+                    <th>RS256 (Asymmetric)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Key type</td>
+                    <td>Shared secret</td>
+                    <td>Public/private key pair</td>
+                </tr>
+                <tr>
+                    <td>Sign &amp; verify</td>
+                    <td>Same key for both</td>
+                    <td>Private signs, public verifies</td>
+                </tr>
+                <tr>
+                    <td>Use case</td>
+                    <td>Single service, internal APIs</td>
+                    <td>Distributed systems, third-party consumers</td>
+                </tr>
+                <tr>
+                    <td>Performance</td>
+                    <td>Faster</td>
+                    <td>Slower (RSA operations)</td>
+                </tr>
+                <tr>
+                    <td>Security trade-off</td>
+                    <td>Secret must be shared with verifiers</td>
+                    <td>Only public key is distributed</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Registered Claims</h2>
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Claim</th>
+                    <th>Name</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>iss</code></td>
+                    <td>Issuer</td>
+                    <td>Who created and signed the token</td>
+                </tr>
+                <tr>
+                    <td><code>sub</code></td>
+                    <td>Subject</td>
+                    <td>The user or entity the token represents</td>
+                </tr>
+                <tr>
+                    <td><code>exp</code></td>
+                    <td>Expiration Time</td>
+                    <td>Unix timestamp after which the token is invalid</td>
+                </tr>
+                <tr>
+                    <td><code>iat</code></td>
+                    <td>Issued At</td>
+                    <td>When the token was created</td>
+                </tr>
+                <tr>
+                    <td><code>aud</code></td>
+                    <td>Audience</td>
+                    <td>Intended recipient(s) of the token</td>
+                </tr>
+                <tr>
+                    <td><code>nbf</code></td>
+                    <td>Not Before</td>
+                    <td>Token is not valid before this time</td>
+                </tr>
+                <tr>
+                    <td><code>jti</code></td>
+                    <td>JWT ID</td>
+                    <td>Unique identifier to prevent replay attacks</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Access Tokens vs Refresh Tokens</h2>
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Access Token</th>
+                    <th>Refresh Token</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Lifetime</td>
+                    <td>Short (5&ndash;15 minutes)</td>
+                    <td>Long (days to weeks)</td>
+                </tr>
+                <tr>
+                    <td>Purpose</td>
+                    <td>Authorize API requests</td>
+                    <td>Obtain new access tokens</td>
+                </tr>
+                <tr>
+                    <td>Storage</td>
+                    <td>Memory or short-lived cookie</td>
+                    <td>Secure HTTP-only cookie or server-side</td>
+                </tr>
+                <tr>
+                    <td>Sent to</td>
+                    <td>Resource servers</td>
+                    <td>Auth server only</td>
+                </tr>
+                <tr>
+                    <td>Revocation</td>
+                    <td>Difficult (stateless)</td>
+                    <td>Easier (stored server-side)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Token Revocation Challenge</h2>
+    <p>Since JWTs are <strong>stateless</strong>, the server doesn&rsquo;t track issued tokens. This creates a fundamental challenge &mdash; you can&rsquo;t invalidate a token before its expiry without introducing state. Common strategies:</p>
+    <ul>
+        <li><strong>Short expiry times</strong> &mdash; limit the damage window</li>
+        <li><strong>Token blocklist</strong> &mdash; store revoked token IDs (jti) in a fast cache like Redis</li>
+        <li><strong>Token versioning</strong> &mdash; increment a user&rsquo;s token version on logout, reject old versions</li>
+        <li><strong>Refresh token rotation</strong> &mdash; issue a new refresh token on each use, detect reuse as theft</li>
+    </ul>
+
+    <h2>Implementation &mdash; Python</h2>
+    <h3>Creating a JWT</h3>
+    <pre><code><span class="token-keyword">import</span> hmac
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">import</span> base64
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> time
+
+<span class="token-keyword">def</span> <span class="token-function">base64url_encode</span>(data: <span class="token-class">bytes</span>) -> <span class="token-class">str</span>:
+    <span class="token-comment"># URL-safe Base64 without padding</span>
+    <span class="token-keyword">return</span> base64.urlsafe_b64encode(data).rstrip(<span class="token-string">b"="</span>).decode(<span class="token-string">"ascii"</span>)
+
+<span class="token-keyword">def</span> <span class="token-function">create_jwt</span>(payload: <span class="token-class">dict</span>, secret: <span class="token-class">str</span>, algorithm: <span class="token-class">str</span> = <span class="token-string">"HS256"</span>) -> <span class="token-class">str</span>:
+    <span class="token-comment"># 1. Build the header</span>
+    header = {<span class="token-string">"alg"</span>: algorithm, <span class="token-string">"typ"</span>: <span class="token-string">"JWT"</span>}
+    header_encoded = base64url_encode(json.dumps(header).encode())
+
+    <span class="token-comment"># 2. Add standard claims to payload</span>
+    payload.setdefault(<span class="token-string">"iat"</span>, <span class="token-function">int</span>(time.time()))
+    payload.setdefault(<span class="token-string">"exp"</span>, payload[<span class="token-string">"iat"</span>] + <span class="token-number">900</span>)  <span class="token-comment"># 15 min default</span>
+    payload_encoded = base64url_encode(json.dumps(payload).encode())
+
+    <span class="token-comment"># 3. Create the signature</span>
+    signing_input = <span class="token-string">f"<span class="token-keyword">{</span>header_encoded<span class="token-keyword">}</span>.<span class="token-keyword">{</span>payload_encoded<span class="token-keyword">}</span>"</span>
+    signature = hmac.new(
+        secret.encode(),
+        signing_input.encode(),
+        hashlib.sha256
+    ).digest()
+    signature_encoded = base64url_encode(signature)
+
+    <span class="token-comment"># 4. Combine all three parts</span>
+    <span class="token-keyword">return</span> <span class="token-string">f"<span class="token-keyword">{</span>header_encoded<span class="token-keyword">}</span>.<span class="token-keyword">{</span>payload_encoded<span class="token-keyword">}</span>.<span class="token-keyword">{</span>signature_encoded<span class="token-keyword">}</span>"</span>
+
+<span class="token-comment"># Usage</span>
+token = create_jwt(
+    payload={<span class="token-string">"sub"</span>: <span class="token-string">"user_42"</span>, <span class="token-string">"role"</span>: <span class="token-string">"admin"</span>},
+    secret=<span class="token-string">"super-secret-key-do-not-hardcode"</span>
+)
+<span class="token-function">print</span>(token)
+<span class="token-comment"># eyJhbGciOiJIUzI1NiIs...&lt;payload&gt;...&lt;signature&gt;</span></code></pre>
+
+    <h3>Verifying a JWT</h3>
+    <pre><code><span class="token-keyword">def</span> <span class="token-function">verify_jwt</span>(token: <span class="token-class">str</span>, secret: <span class="token-class">str</span>) -> <span class="token-class">dict</span>:
+    <span class="token-comment"># 1. Split the token</span>
+    parts = token.split(<span class="token-string">"."</span>)
+    <span class="token-keyword">if</span> <span class="token-function">len</span>(parts) != <span class="token-number">3</span>:
+        <span class="token-keyword">raise</span> <span class="token-class">ValueError</span>(<span class="token-string">"Invalid token format"</span>)
+
+    header_encoded, payload_encoded, signature_encoded = parts
+
+    <span class="token-comment"># 2. Recompute the signature</span>
+    signing_input = <span class="token-string">f"<span class="token-keyword">{</span>header_encoded<span class="token-keyword">}</span>.<span class="token-keyword">{</span>payload_encoded<span class="token-keyword">}</span>"</span>
+    expected_sig = hmac.new(
+        secret.encode(),
+        signing_input.encode(),
+        hashlib.sha256
+    ).digest()
+    expected_encoded = base64url_encode(expected_sig)
+
+    <span class="token-comment"># 3. Constant-time comparison prevents timing attacks</span>
+    <span class="token-keyword">if not</span> hmac.compare_digest(signature_encoded, expected_encoded):
+        <span class="token-keyword">raise</span> <span class="token-class">ValueError</span>(<span class="token-string">"Invalid signature"</span>)
+
+    <span class="token-comment"># 4. Decode and validate claims</span>
+    padding = <span class="token-string">"="</span> * (<span class="token-number">4</span> - <span class="token-function">len</span>(payload_encoded) % <span class="token-number">4</span>)
+    payload = json.loads(base64.urlsafe_b64decode(payload_encoded + padding))
+
+    <span class="token-comment"># 5. Check expiration</span>
+    <span class="token-keyword">if</span> payload.get(<span class="token-string">"exp"</span>, <span class="token-number">0</span>) < time.time():
+        <span class="token-keyword">raise</span> <span class="token-class">ValueError</span>(<span class="token-string">"Token has expired"</span>)
+
+    <span class="token-keyword">return</span> payload</code></pre>
+
+    <h3>Token Refresh Flow</h3>
+    <pre><code><span class="token-keyword">import</span> uuid
+
+<span class="token-keyword">class</span> <span class="token-class">TokenService</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, secret: <span class="token-class">str</span>):
+        self.secret = secret
+        self.refresh_tokens = {}  <span class="token-comment"># In production: use Redis or a DB</span>
+        self.revoked_jtis = <span class="token-function">set</span>()
+
+    <span class="token-keyword">def</span> <span class="token-function">issue_token_pair</span>(self, user_id: <span class="token-class">str</span>, role: <span class="token-class">str</span>) -> <span class="token-class">dict</span>:
+        <span class="token-comment"># Short-lived access token</span>
+        access_token = create_jwt(
+            payload={
+                <span class="token-string">"sub"</span>: user_id,
+                <span class="token-string">"role"</span>: role,
+                <span class="token-string">"jti"</span>: <span class="token-function">str</span>(uuid.uuid4()),
+                <span class="token-string">"exp"</span>: <span class="token-function">int</span>(time.time()) + <span class="token-number">900</span>,   <span class="token-comment"># 15 minutes</span>
+            },
+            secret=self.secret
+        )
+
+        <span class="token-comment"># Long-lived refresh token</span>
+        refresh_id = <span class="token-function">str</span>(uuid.uuid4())
+        self.refresh_tokens[refresh_id] = {
+            <span class="token-string">"user_id"</span>: user_id,
+            <span class="token-string">"role"</span>: role,
+            <span class="token-string">"expires"</span>: time.time() + <span class="token-number">604800</span>,  <span class="token-comment"># 7 days</span>
+        }
+
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"access_token"</span>: access_token,
+            <span class="token-string">"refresh_token"</span>: refresh_id,
+            <span class="token-string">"expires_in"</span>: <span class="token-number">900</span>,
+        }
+
+    <span class="token-keyword">def</span> <span class="token-function">refresh</span>(self, refresh_token: <span class="token-class">str</span>) -> <span class="token-class">dict</span>:
+        <span class="token-comment"># Validate the refresh token</span>
+        token_data = self.refresh_tokens.get(refresh_token)
+        <span class="token-keyword">if not</span> token_data:
+            <span class="token-keyword">raise</span> <span class="token-class">ValueError</span>(<span class="token-string">"Invalid refresh token"</span>)
+        <span class="token-keyword">if</span> token_data[<span class="token-string">"expires"</span>] < time.time():
+            <span class="token-keyword">del</span> self.refresh_tokens[refresh_token]
+            <span class="token-keyword">raise</span> <span class="token-class">ValueError</span>(<span class="token-string">"Refresh token expired"</span>)
+
+        <span class="token-comment"># Rotate: delete old, issue new pair</span>
+        <span class="token-keyword">del</span> self.refresh_tokens[refresh_token]
+        <span class="token-keyword">return</span> self.issue_token_pair(
+            token_data[<span class="token-string">"user_id"</span>], token_data[<span class="token-string">"role"</span>]
+        )
+
+    <span class="token-keyword">def</span> <span class="token-function">revoke</span>(self, token: <span class="token-class">str</span>):
+        <span class="token-comment"># Add the jti to the blocklist</span>
+        payload = verify_jwt(token, self.secret)
+        self.revoked_jtis.add(payload[<span class="token-string">"jti"</span>])
+
+    <span class="token-keyword">def</span> <span class="token-function">is_revoked</span>(self, token: <span class="token-class">str</span>) -> <span class="token-class">bool</span>:
+        payload = verify_jwt(token, self.secret)
+        <span class="token-keyword">return</span> payload.get(<span class="token-string">"jti"</span>) <span class="token-keyword">in</span> self.revoked_jtis</code></pre>
+
+    <div class="industry-box">
+        <h3>&#127981; Industry Usage</h3>
+        <ul>
+            <li><strong>Auth0</strong> &mdash; Issues JWTs as access tokens, supports RS256 with JWKS endpoints for key rotation</li>
+            <li><strong>Firebase Auth</strong> &mdash; Returns signed JWTs that can be verified client-side or server-side</li>
+            <li><strong>AWS Cognito</strong> &mdash; Issues JWT-based ID tokens and access tokens for user pool authentication</li>
+            <li><strong>Okta</strong> &mdash; Enterprise identity platform using JWTs with custom claims for RBAC</li>
+            <li><strong>Modern APIs</strong> &mdash; GitHub, Stripe, Twilio, and most SaaS APIs accept Bearer JWT tokens</li>
+        </ul>
+    </div>
+
+    <div class="summary-box">
+        <h3>&#128203; Summary</h3>
+        <ul>
+            <li>JWTs are self-contained tokens with three parts: header, payload, and signature</li>
+            <li>They enable <strong>stateless authentication</strong> &mdash; no server-side session storage needed</li>
+            <li>HS256 uses a shared secret; RS256 uses a public/private key pair for distributed verification</li>
+            <li>Short-lived access tokens + long-lived refresh tokens balance security and UX</li>
+            <li>Token revocation requires trade-offs &mdash; blocklists, versioning, or short expiry windows</li>
+            <li>Always validate: signature, expiration, issuer, and audience claims</li>
+        </ul>
+    </div>
+
+    <div class="mental-model">
+        <h3>&#129504; Mental Model</h3>
+        <div class="model-visual">
+            <pre>
+  ┌─────────────────────────────────────────────────────────┐
+  │                    JWT Token Flow                        │
+  └─────────────────────────────────────────────────────────┘
+
+  Client                   Auth Server              Resource Server
+    │                          │                          │
+    │─── 1. Login ───────────▶│                          │
+    │    (credentials)         │                          │
+    │                          │                          │
+    │◀── 2. Token Pair ────────│                          │
+    │    (access + refresh)    │                          │
+    │                          │                          │
+    │─── 3. API Request ──────────────────────────────────▶│
+    │    (Bearer: access_token)                           │
+    │                          │                          │
+    │                          │    4. Verify signature    │
+    │                          │       Check exp claim     │
+    │                          │       Extract claims      │
+    │                          │                          │
+    │◀── 5. Response ─────────────────────────────────────│
+    │                          │                          │
+    │─── 6. Refresh ──────────▶│  (when access expires)   │
+    │    (refresh_token)       │                          │
+    │                          │                          │
+    │◀── 7. New Token Pair ────│                          │
+    │                          │                          │
+
+  ┌──────────────────────────────────────────────────┐
+  │  Token Structure:                                 │
+  │  eyJhbGciOi... . eyJzdWIiOi... . SflKxwRJSM...  │
+  │  └── Header ──┘   └── Payload ─┘   └─ Signature │
+  └──────────────────────────────────────────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <div class="mistakes-box">
+        <h3>&#9888;&#65039; Common Mistakes</h3>
+        <ul>
+            <li><strong>Storing secrets in the token</strong> &mdash; JWTs are encoded, not encrypted. Anyone can decode the payload with Base64. Never put passwords, credit card numbers, or sensitive PII in claims.</li>
+            <li><strong>Using long expiry times</strong> &mdash; A 24-hour access token means a stolen token grants 24 hours of access. Keep access tokens short (5&ndash;15 min) and use refresh tokens for continuity.</li>
+            <li><strong>Not validating all claims</strong> &mdash; Checking the signature alone is insufficient. Always verify <code>exp</code>, <code>iss</code>, <code>aud</code>, and <code>nbf</code> to prevent token reuse across services.</li>
+            <li><strong>Accepting the algorithm from the header</strong> &mdash; The &ldquo;alg: none&rdquo; attack tricks servers into accepting unsigned tokens. Always enforce the expected algorithm server-side, never trust the token&rsquo;s header.</li>
+        </ul>
+    </div>
+
+    <div class="exercise-box">
+        <h3>&#128187; Exercises</h3>
+        <ol>
+            <li><strong>Build from scratch</strong> &mdash; Implement JWT creation and verification without any library. Manually Base64url-encode the header and payload, sign with HMAC-SHA256, and verify by recomputing the signature.</li>
+            <li><strong>Token refresh service</strong> &mdash; Build a FastAPI endpoint that issues token pairs, implements refresh token rotation, and detects token reuse (issue a new refresh token each time, invalidate the family if an old one is reused).</li>
+            <li><strong>Revocation system</strong> &mdash; Design a Redis-backed token blocklist. Store revoked JTIs with TTL matching the token&rsquo;s remaining lifetime. Measure the latency overhead of checking the blocklist on every request.</li>
+            <li><strong>RS256 migration</strong> &mdash; Convert an HS256-based auth system to RS256. Set up a JWKS endpoint that serves the public key, implement key rotation with overlapping validity periods, and verify tokens using the <code>kid</code> header claim.</li>
+        </ol>
+    </div>
+
+    <nav class="page-nav">
+        <a href="64-webhooks.html" class="prev">&larr; Webhooks</a>
+        <a href="66-oauth.html" class="next">OAuth 2.0 &rarr;</a>
+    </nav>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

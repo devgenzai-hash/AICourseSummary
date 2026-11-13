@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livelocks &amp; Starvation - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner → Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">&#9776;</button>
+            <div class="breadcrumb"><a href="index.html">System Design</a><span>/</span> Livelocks &amp; Starvation</div>
+        </div>
+        <div class="topbar-right"><button class="theme-toggle">&#127769;</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="hero">
+                <h1>Livelocks &amp; Starvation</h1>
+                <p class="subtitle">Deadlock's sneaky cousins. In a livelock, threads are active but make no progress. In starvation, one thread never gets a turn.</p>
+                <div class="tag-row">
+                    <span class="tag tag-beginner">Beginner</span>
+                    <span class="tag tag-concept">Concept</span>
+                    <span class="tag tag-code">Code</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">The Hallway Dance &amp; the Polite Person</div>
+                <p><strong>Livelock</strong>: Two people meet in a narrow hallway. Both step left to let the other pass. Then both step right. Then left again. They keep "dancing" but neither passes. They are active (moving) but make ZERO progress.</p>
+<p><strong>Starvation</strong>: A polite person at a buffet who always says "after you." Everyone else keeps going first. The polite person never gets food — starved out by others.</p>
+            </div>
+
+
+            <h2>Livelock: Active but No Progress</h2>
+            <p>Unlike deadlock (threads frozen), in a <strong>livelock</strong> threads are running, consuming CPU, responding to each other — but no useful work gets done.</p>
+
+<pre><code><span class="token-keyword">import</span> threading, time
+
+<span class="token-keyword">class</span> <span class="token-class">Worker</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, name, partner=<span class="token-keyword">None</span>):
+        self.name = name
+        self.working = <span class="token-keyword">False</span>
+        self.partner = partner
+
+    <span class="token-keyword">def</span> <span class="token-function">work</span>(self):
+        <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+            <span class="token-keyword">if</span> self.partner.working:
+                <span class="token-comment"># "Politely" wait — but partner does the same!</span>
+                print(<span class="token-string">f"{self.name}: Partner busy, backing off"</span>)
+                time.sleep(<span class="token-number">0.01</span>)
+                <span class="token-keyword">continue</span>
+            self.working = <span class="token-keyword">True</span>
+            print(<span class="token-string">f"{self.name}: Working!"</span>)
+            time.sleep(<span class="token-number">0.01</span>)
+            self.working = <span class="token-keyword">False</span>
+            <span class="token-keyword">break</span>
+
+<span class="token-comment"># Both see the other as "working" and back off forever</span>
+alice = Worker(<span class="token-string">"Alice"</span>)
+bob = Worker(<span class="token-string">"Bob"</span>)
+alice.partner = bob
+bob.partner = alice</code></pre>
+
+            <h2>Starvation: Never Getting a Turn</h2>
+<pre><code><span class="token-keyword">import</span> threading, time, random
+
+resource_lock = threading.Lock()
+access_count = {<span class="token-string">"high_priority"</span>: <span class="token-number">0</span>, <span class="token-string">"low_priority"</span>: <span class="token-number">0</span>}
+
+<span class="token-keyword">def</span> <span class="token-function">high_priority_worker</span>():
+    <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">1000</span>):
+        <span class="token-keyword">with</span> resource_lock:
+            access_count[<span class="token-string">"high_priority"</span>] += <span class="token-number">1</span>
+        time.sleep(<span class="token-number">0.0001</span>)  <span class="token-comment"># Tiny gap — grabs lock again quickly</span>
+
+<span class="token-keyword">def</span> <span class="token-function">low_priority_worker</span>():
+    <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">10</span>):
+        <span class="token-keyword">with</span> resource_lock:
+            access_count[<span class="token-string">"low_priority"</span>] += <span class="token-number">1</span>
+
+<span class="token-comment"># With many high-priority threads, low-priority gets starved</span>
+threads = [threading.Thread(target=high_priority_worker) <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">10</span>)]
+threads.append(threading.Thread(target=low_priority_worker))
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.start()
+<span class="token-keyword">for</span> t <span class="token-keyword">in</span> threads: t.join()
+print(access_count)  <span class="token-comment"># low_priority might be way behind</span></code></pre>
+
+            <h2>Deadlock vs Livelock vs Starvation</h2>
+            <table class="comparison-table">
+                <thead><tr><th>Problem</th><th>Threads Active?</th><th>Progress?</th><th>Fix</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Deadlock</strong></td><td>No (blocked)</td><td>None</td><td>Lock ordering, timeouts</td></tr>
+                    <tr><td><strong>Livelock</strong></td><td>Yes (running)</td><td>None</td><td>Random backoff, priority</td></tr>
+                    <tr><td><strong>Starvation</strong></td><td>Some yes, victim no</td><td>Others progress, victim does not</td><td>Fair locks, aging</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Solutions</h2>
+<pre><code><span class="token-comment"># Fix Livelock: Random backoff (like Ethernet CSMA/CD)</span>
+<span class="token-keyword">import</span> random
+
+<span class="token-keyword">def</span> <span class="token-function">work_with_backoff</span>(worker):
+    retries = <span class="token-number">0</span>
+    <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+        <span class="token-keyword">if</span> worker.partner.working:
+            <span class="token-comment"># Random backoff breaks the symmetry!</span>
+            time.sleep(random.uniform(<span class="token-number">0.001</span>, <span class="token-number">0.01</span>) * (<span class="token-number">2</span> ** retries))
+            retries += <span class="token-number">1</span>
+            <span class="token-keyword">continue</span>
+        worker.working = <span class="token-keyword">True</span>
+        <span class="token-keyword">break</span>
+
+<span class="token-comment"># Fix Starvation: Fair lock (FIFO ordering)</span>
+<span class="token-keyword">import</span> queue
+
+<span class="token-keyword">class</span> <span class="token-class">FairLock</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self._queue = queue.Queue()
+        self._lock = threading.Lock()
+
+    <span class="token-keyword">def</span> <span class="token-function">acquire</span>(self):
+        event = threading.Event()
+        self._queue.put(event)
+        <span class="token-keyword">while</span> <span class="token-keyword">True</span>:
+            <span class="token-keyword">with</span> self._lock:
+                <span class="token-keyword">if</span> self._queue.queue[<span class="token-number">0</span>] <span class="token-keyword">is</span> event:
+                    <span class="token-keyword">return</span>
+            event.wait(timeout=<span class="token-number">0.01</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">release</span>(self):
+        self._queue.get()</code></pre>
+
+            <div class="industry-box">
+                <h4>Industry Examples</h4>
+                <ul>
+                    <li><strong>Ethernet (CSMA/CD)</strong> — Random exponential backoff prevents livelock when multiple devices transmit simultaneously.</li>
+                    <li><strong>Java ReentrantLock(fair=true)</strong> — FIFO ordering prevents starvation.</li>
+                    <li><strong>OS schedulers</strong> — Priority aging: low-priority processes slowly gain priority to prevent starvation.</li>
+                    <li><strong>Database write-starved readers</strong> — Too many readers can starve writers. Fixed with write-preferring locks.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>&#128221; Summary</h3>
+                <ul>
+<li>Livelock: threads are active but make no progress (hallway dance)</li>
+<li>Starvation: one thread never gets access to a resource</li>
+<li>Fix livelock: random backoff breaks symmetry between competing threads</li>
+<li>Fix starvation: fair/FIFO locks, priority aging</li>
+<li>Unlike deadlock, livelocked threads consume CPU doing nothing useful</li>
+</ul>
+            </div>
+
+            <div class="mental-model">
+                <h3>&#129504; Mental Model</h3>
+                <div class="model-visual">DEADLOCK:   T1 blocked, T2 blocked. Neither moves.
+LIVELOCK:   T1 backs off, T2 backs off, T1 backs off... (infinite loop)
+STARVATION: T1 gets lock, T2 gets lock, T3 gets lock... T4 NEVER gets lock.
+
+Random backoff fix:
+    T1 waits 3ms, T2 waits 7ms --> T1 goes first, T2 follows. Progress!</div>
+            </div>
+
+            <div class="mistakes-box">
+                <h3>&#10060; Common Beginner Mistakes</h3>
+                <ul>
+<li><strong>Confusing livelock with deadlock</strong> — In livelock, threads ARE running (check CPU usage).</li>
+<li><strong>Symmetric retry logic</strong> — If all threads retry identically, they stay synchronized. Add randomness!</li>
+<li><strong>Ignoring fairness</strong> — Default locks are not fair. Under contention, some threads may starve.</li>
+<li><strong>Priority inversion</strong> — High-priority thread starved because low-priority thread holds a lock it needs.</li>
+</ul>
+            </div>
+
+            <div class="exercise-box">
+                <h3>&#127947; Hands-On Exercise</h3>
+                <ol>
+<li>Create a livelock: two threads that back off when they see the other working (both stay stuck).</li>
+<li>Fix it with random exponential backoff.</li>
+<li>Demonstrate starvation: 10 aggressive threads vs 1 that rarely gets the lock.</li>
+<li>Implement a fair lock using a queue and show it prevents starvation.</li>
+</ol>
+            </div>
+
+            <nav class="page-nav">
+                <a href="06-deadlocks.html" class="prev">Deadlocks</a>
+                <a href="08-thread-safety.html" class="next">Thread Safety</a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

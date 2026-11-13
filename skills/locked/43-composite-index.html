@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Composite Index - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>System Design</h2><div class="subtitle">Beginner &rarr; Advanced &bull; 68 Topics</div></div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">&#x1F3E0;</span> Course Overview</a></li>
+            <li class="module-label">Concurrency Foundations</li>
+            <li><a href="01-threads-vs-processes.html"><span class="nav-number">1</span> Threads vs Processes</a></li>
+            <li><a href="02-context-switching.html"><span class="nav-number">2</span> Context Switching</a></li>
+            <li><a href="03-race-conditions.html"><span class="nav-number">3</span> Race Conditions</a></li>
+            <li><a href="04-critical-sections.html"><span class="nav-number">4</span> Critical Sections</a></li>
+            <li><a href="05-mutex-locks.html"><span class="nav-number">5</span> Mutex &amp; Locks</a></li>
+            <li><a href="06-deadlocks.html"><span class="nav-number">6</span> Deadlocks</a></li>
+            <li><a href="07-livelocks-starvation.html"><span class="nav-number">7</span> Livelocks &amp; Starvation</a></li>
+            <li><a href="08-thread-safety.html"><span class="nav-number">8</span> Thread Safety</a></li>
+            <li class="module-label">Low-Level Concurrency</li>
+            <li><a href="09-atomic-operations-cas.html"><span class="nav-number">9</span> Atomic Ops &amp; CAS</a></li>
+            <li><a href="10-memory-visibility.html"><span class="nav-number">10</span> Memory Visibility</a></li>
+            <li><a href="11-happens-before.html"><span class="nav-number">11</span> Happens-Before</a></li>
+            <li><a href="12-volatile-vs-synchronized.html"><span class="nav-number">12</span> Volatile vs Synchronized</a></li>
+            <li><a href="13-false-sharing.html"><span class="nav-number">13</span> False Sharing</a></li>
+            <li class="module-label">Concurrency Patterns</li>
+            <li><a href="14-thread-pools.html"><span class="nav-number">14</span> Thread Pools</a></li>
+            <li><a href="15-futures-promises-async.html"><span class="nav-number">15</span> Futures &amp; Async</a></li>
+            <li><a href="16-producer-consumer.html"><span class="nav-number">16</span> Producer-Consumer</a></li>
+            <li><a href="17-blocking-vs-nonblocking.html"><span class="nav-number">17</span> Blocking vs Non-Blocking</a></li>
+            <li><a href="18-lock-free-wait-free.html"><span class="nav-number">18</span> Lock-Free Algorithms</a></li>
+            <li><a href="19-read-write-locks.html"><span class="nav-number">19</span> Read-Write Locks</a></li>
+            <li><a href="20-semaphore-latch-barrier.html"><span class="nav-number">20</span> Semaphore/Latch/Barrier</a></li>
+            <li class="module-label">Distributed Systems Core</li>
+            <li><a href="21-cap-theorem.html"><span class="nav-number">21</span> CAP Theorem</a></li>
+            <li><a href="22-acid-properties.html"><span class="nav-number">22</span> ACID Properties</a></li>
+            <li><a href="23-consistent-hashing.html"><span class="nav-number">23</span> Consistent Hashing</a></li>
+            <li><a href="24-leader-election.html"><span class="nav-number">24</span> Leader Election</a></li>
+            <li><a href="25-distributed-consensus.html"><span class="nav-number">25</span> Distributed Consensus</a></li>
+            <li><a href="26-replication.html"><span class="nav-number">26</span> Replication</a></li>
+            <li><a href="27-partitioning-sharding.html"><span class="nav-number">27</span> Partitioning &amp; Sharding</a></li>
+            <li><a href="28-quorum-reads-writes.html"><span class="nav-number">28</span> Quorum Reads/Writes</a></li>
+            <li><a href="29-gossip-protocol.html"><span class="nav-number">29</span> Gossip Protocol</a></li>
+            <li><a href="30-failure-detection.html"><span class="nav-number">30</span> Failure Detection</a></li>
+            <li><a href="31-distributed-locking.html"><span class="nav-number">31</span> Distributed Locking</a></li>
+            <li><a href="32-saga-pattern.html"><span class="nav-number">32</span> Saga Pattern</a></li>
+            <li class="module-label">Resilience Patterns</li>
+            <li><a href="33-idempotency.html"><span class="nav-number">33</span> Idempotency</a></li>
+            <li><a href="34-delivery-guarantees.html"><span class="nav-number">34</span> Delivery Guarantees</a></li>
+            <li><a href="35-backpressure.html"><span class="nav-number">35</span> Backpressure</a></li>
+            <li><a href="36-circuit-breaker.html"><span class="nav-number">36</span> Circuit Breaker</a></li>
+            <li><a href="37-rate-limiting.html"><span class="nav-number">37</span> Rate Limiting</a></li>
+            <li><a href="38-throttling.html"><span class="nav-number">38</span> Throttling</a></li>
+            <li><a href="39-retry-backoff.html"><span class="nav-number">39</span> Retry with Backoff</a></li>
+            <li class="module-label">Database Engineering</li>
+            <li><a href="40-isolation-levels.html"><span class="nav-number">40</span> Isolation Levels</a></li>
+            <li><a href="41-indexing-internals.html"><span class="nav-number">41</span> Indexing Internals</a></li>
+            <li><a href="42-write-read-amplification.html"><span class="nav-number">42</span> Write/Read Amplification</a></li>
+            <li><a href="43-composite-index.html"><span class="nav-number">43</span> Composite Index</a></li>
+            <li><a href="44-query-optimization.html"><span class="nav-number">44</span> Query Optimization</a></li>
+            <li><a href="45-caching-strategies.html"><span class="nav-number">45</span> Caching Strategies</a></li>
+            <li><a href="46-cache-invalidation.html"><span class="nav-number">46</span> Cache Invalidation</a></li>
+            <li><a href="47-cache-stampede.html"><span class="nav-number">47</span> Cache Stampede</a></li>
+            <li class="module-label">Architecture Patterns</li>
+            <li><a href="48-event-driven-vs-request-response.html"><span class="nav-number">48</span> Event-Driven vs Req/Res</a></li>
+            <li><a href="49-pagination.html"><span class="nav-number">49</span> Pagination</a></li>
+            <li class="module-label">Design Patterns</li>
+            <li><a href="50-singleton.html"><span class="nav-number">50</span> Singleton</a></li>
+            <li><a href="51-factory-method.html"><span class="nav-number">51</span> Factory Method</a></li>
+            <li><a href="52-builder.html"><span class="nav-number">52</span> Builder</a></li>
+            <li><a href="53-adapter.html"><span class="nav-number">53</span> Adapter</a></li>
+            <li><a href="54-decorator.html"><span class="nav-number">54</span> Decorator</a></li>
+            <li><a href="55-facade.html"><span class="nav-number">55</span> Facade</a></li>
+            <li><a href="56-observer.html"><span class="nav-number">56</span> Observer</a></li>
+            <li><a href="57-strategy.html"><span class="nav-number">57</span> Strategy</a></li>
+            <li><a href="58-command.html"><span class="nav-number">58</span> Command</a></li>
+            <li class="module-label">API &amp; Communication</li>
+            <li><a href="59-api-gateway.html"><span class="nav-number">59</span> API Gateway</a></li>
+            <li><a href="60-load-balancer.html"><span class="nav-number">60</span> Load Balancer</a></li>
+            <li><a href="61-reverse-proxy.html"><span class="nav-number">61</span> Reverse Proxy</a></li>
+            <li><a href="62-graphql.html"><span class="nav-number">62</span> GraphQL</a></li>
+            <li><a href="63-grpc.html"><span class="nav-number">63</span> gRPC</a></li>
+            <li><a href="64-webhooks.html"><span class="nav-number">64</span> Webhooks</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="65-jwt.html"><span class="nav-number">65</span> JWT</a></li>
+            <li><a href="66-oauth.html"><span class="nav-number">66</span> OAuth</a></li>
+            <li><a href="67-csrf.html"><span class="nav-number">67</span> CSRF</a></li>
+            <li><a href="68-mtls.html"><span class="nav-number">68</span> mTLS</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/68 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger" aria-label="Toggle sidebar">&#9776;</button>
+        <div class="breadcrumb">Database Engineering &rarr; Composite Index</div>
+        <button class="theme-toggle" aria-label="Toggle dark mode">&#9790;</button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-tags">
+                <span class="tag">Intermediate</span>
+                <span class="tag">Database</span>
+                <span class="tag">Concept</span>
+            </div>
+            <h1>Composite Index</h1>
+            <p class="hero-subtitle">Multi-column indexes that accelerate queries filtering on multiple columns &mdash; but only when you understand the leftmost prefix rule and column ordering strategy that determines whether the index is used or ignored entirely.</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#x1F4A1; Real-World Analogy</h3>
+            <p>Think of a <strong>phone book</strong> sorted by <strong>last name, then first name</strong>. You can quickly find all &ldquo;Smith&rdquo; entries (using the first column). You can find &ldquo;Smith, John&rdquo; even faster (using both columns). But if you only know the first name &ldquo;John&rdquo; &mdash; the phone book is useless because it&rsquo;s not sorted by first name alone. That&rsquo;s the <strong>leftmost prefix rule</strong>: a composite index on (last_name, first_name) helps queries on last_name or (last_name + first_name), but NOT first_name alone. <strong>Order matters!</strong></p>
+        </div>
+
+        <h2>What is a Composite Index?</h2>
+        <p>A composite (multi-column) index is a single B-Tree index built on the <strong>concatenation of multiple columns</strong>. The tree is sorted by column 1, then within equal values of column 1, sorted by column 2, and so on:</p>
+        <ul>
+            <li>Also called: multi-column index, compound index, concatenated index</li>
+            <li>Stored as a single B-Tree with composite sort keys</li>
+            <li>Maximum columns: 16 (PostgreSQL), 16 (MySQL), 32 (SQL Server)</li>
+            <li>Key insight: the index is a <strong>sorted structure on the combined key</strong></li>
+        </ul>
+
+        <h2>The Leftmost Prefix Rule</h2>
+        <p>For an index on <code>(a, b, c)</code>, the database can use the index for queries that filter on:</p>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Query Filter</th>
+                        <th>Uses Index?</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>WHERE a = ?</code></td>
+                        <td>&#x2705; Yes</td>
+                        <td>Matches leftmost prefix (a)</td>
+                    </tr>
+                    <tr>
+                        <td><code>WHERE a = ? AND b = ?</code></td>
+                        <td>&#x2705; Yes</td>
+                        <td>Matches prefix (a, b)</td>
+                    </tr>
+                    <tr>
+                        <td><code>WHERE a = ? AND b = ? AND c = ?</code></td>
+                        <td>&#x2705; Yes (full)</td>
+                        <td>Matches full index</td>
+                    </tr>
+                    <tr>
+                        <td><code>WHERE a = ? AND c = ?</code></td>
+                        <td>&#x26A0;&#xFE0F; Partial</td>
+                        <td>Uses (a) only, c filtered after</td>
+                    </tr>
+                    <tr>
+                        <td><code>WHERE b = ?</code></td>
+                        <td>&#x274C; No</td>
+                        <td>Skips leftmost column &mdash; cannot use index</td>
+                    </tr>
+                    <tr>
+                        <td><code>WHERE b = ? AND c = ?</code></td>
+                        <td>&#x274C; No</td>
+                        <td>Skips leftmost column</td>
+                    </tr>
+                    <tr>
+                        <td><code>WHERE c = ?</code></td>
+                        <td>&#x274C; No</td>
+                        <td>Skips leftmost columns</td>
+                    </tr>
+                    <tr>
+                        <td><code>WHERE a = ? ORDER BY b</code></td>
+                        <td>&#x2705; Yes</td>
+                        <td>Prefix (a) + sort on next column (b)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Column Ordering Strategy</h2>
+        <p>The order of columns in a composite index dramatically affects performance. General rules:</p>
+        <ul>
+            <li><strong>Equality columns first:</strong> Columns used with <code>=</code> should come before range columns</li>
+            <li><strong>Range column last:</strong> Only one column can use a range scan per index lookup</li>
+            <li><strong>High selectivity first:</strong> Among equality columns, put the most selective (most unique values) first to narrow results fastest</li>
+            <li><strong>ORDER BY alignment:</strong> If the query sorts, align the index tail with the sort order</li>
+        </ul>
+
+        <h3>Example: Optimizing Column Order</h3>
+        <pre><code><span class="token-comment">-- Query: Find active users in a city, ordered by signup date</span>
+<span class="token-keyword">SELECT</span> * <span class="token-keyword">FROM</span> users
+<span class="token-keyword">WHERE</span> status = <span class="token-string">'active'</span>       <span class="token-comment">-- equality (low selectivity: 2 values)</span>
+  <span class="token-keyword">AND</span> city = <span class="token-string">'New York'</span>       <span class="token-comment">-- equality (medium selectivity: ~1000 cities)</span>
+  <span class="token-keyword">AND</span> age <span class="token-keyword">BETWEEN</span> <span class="token-number">25</span> <span class="token-keyword">AND</span> <span class="token-number">35</span>  <span class="token-comment">-- range</span>
+<span class="token-keyword">ORDER BY</span> created_at <span class="token-keyword">DESC</span>;
+
+<span class="token-comment">-- BAD index: (status, age, city) -- range on age stops prefix matching</span>
+<span class="token-comment">-- GOOD index: (city, status, age) -- equalities first, range last</span>
+<span class="token-comment">-- BEST index: (city, status, age, created_at) -- covers ORDER BY too</span>
+
+<span class="token-keyword">CREATE INDEX</span> idx_users_composite
+  <span class="token-keyword">ON</span> users(city, status, age, created_at);</code></pre>
+
+        <h2>Covering Indexes &amp; Index-Only Scans</h2>
+        <p>A <strong>covering index</strong> contains all columns needed by a query, eliminating the need to fetch the actual table row. PostgreSQL calls this an &ldquo;Index Only Scan&rdquo;:</p>
+        <pre><code><span class="token-comment">-- Query only needs columns in the index itself</span>
+<span class="token-keyword">SELECT</span> city, status, count(*)
+<span class="token-keyword">FROM</span> users
+<span class="token-keyword">WHERE</span> city = <span class="token-string">'London'</span> <span class="token-keyword">AND</span> status = <span class="token-string">'active'</span>
+<span class="token-keyword">GROUP BY</span> city, status;
+
+<span class="token-comment">-- Index (city, status) covers this query completely</span>
+<span class="token-comment">-- No heap/table access needed → Index Only Scan</span>
+
+<span class="token-comment">-- PostgreSQL INCLUDE: add columns without affecting sort order</span>
+<span class="token-keyword">CREATE INDEX</span> idx_covering <span class="token-keyword">ON</span> users(city, status)
+  <span class="token-keyword">INCLUDE</span> (email, name);
+
+<span class="token-comment">-- Now this query is also covered (no heap fetch):</span>
+<span class="token-keyword">SELECT</span> email, name <span class="token-keyword">FROM</span> users
+<span class="token-keyword">WHERE</span> city = <span class="token-string">'London'</span> <span class="token-keyword">AND</span> status = <span class="token-string">'active'</span>;</code></pre>
+
+        <h2>Selectivity &amp; Column Order</h2>
+        <p>Selectivity measures how well a column narrows results. Higher selectivity (more unique values) means the index eliminates more rows per level:</p>
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Cardinality</th>
+                        <th>Selectivity</th>
+                        <th>Position in Index</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>user_id</code></td>
+                        <td>1,000,000 (unique)</td>
+                        <td>1 / 1,000,000</td>
+                        <td>First (most selective)</td>
+                    </tr>
+                    <tr>
+                        <td><code>email</code></td>
+                        <td>999,500 (near-unique)</td>
+                        <td>~1 / 999,500</td>
+                        <td>First or second</td>
+                    </tr>
+                    <tr>
+                        <td><code>city</code></td>
+                        <td>1,000</td>
+                        <td>1 / 1,000</td>
+                        <td>Middle</td>
+                    </tr>
+                    <tr>
+                        <td><code>status</code></td>
+                        <td>3 (active/inactive/banned)</td>
+                        <td>1 / 3</td>
+                        <td>Last (least selective)</td>
+                    </tr>
+                    <tr>
+                        <td><code>is_deleted</code></td>
+                        <td>2 (true/false)</td>
+                        <td>1 / 2</td>
+                        <td>Last or use partial index</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>EXPLAIN Output: Seeing Index Usage</h2>
+        <pre><code><span class="token-comment">-- Create table and composite index</span>
+<span class="token-keyword">CREATE TABLE</span> orders (
+    id <span class="token-keyword">SERIAL PRIMARY KEY</span>,
+    customer_id <span class="token-keyword">INT</span>,
+    status <span class="token-keyword">VARCHAR</span>(<span class="token-number">20</span>),
+    created_at <span class="token-keyword">TIMESTAMP</span>,
+    total <span class="token-keyword">DECIMAL</span>(<span class="token-number">10</span>,<span class="token-number">2</span>)
+);
+
+<span class="token-keyword">CREATE INDEX</span> idx_orders_composite
+  <span class="token-keyword">ON</span> orders(customer_id, status, created_at);
+
+<span class="token-comment">-- ✅ Uses full index (all 3 prefix columns)</span>
+<span class="token-keyword">EXPLAIN ANALYZE SELECT</span> * <span class="token-keyword">FROM</span> orders
+<span class="token-keyword">WHERE</span> customer_id = <span class="token-number">42</span>
+  <span class="token-keyword">AND</span> status = <span class="token-string">'shipped'</span>
+  <span class="token-keyword">AND</span> created_at > <span class="token-string">'2024-01-01'</span>;
+<span class="token-comment">-- → Index Scan using idx_orders_composite</span>
+<span class="token-comment">--   Index Cond: (customer_id=42 AND status='shipped' AND created_at > ...)</span>
+
+<span class="token-comment">-- ⚠️ Partial index use (skips created_at in index cond)</span>
+<span class="token-keyword">EXPLAIN ANALYZE SELECT</span> * <span class="token-keyword">FROM</span> orders
+<span class="token-keyword">WHERE</span> customer_id = <span class="token-number">42</span>
+  <span class="token-keyword">AND</span> created_at > <span class="token-string">'2024-01-01'</span>;
+<span class="token-comment">-- → Index Scan using idx_orders_composite</span>
+<span class="token-comment">--   Index Cond: (customer_id = 42)</span>
+<span class="token-comment">--   Filter: (created_at > '2024-01-01')  ← filtered AFTER index</span>
+
+<span class="token-comment">-- ❌ Cannot use index (skips leftmost column)</span>
+<span class="token-keyword">EXPLAIN ANALYZE SELECT</span> * <span class="token-keyword">FROM</span> orders
+<span class="token-keyword">WHERE</span> status = <span class="token-string">'shipped'</span>;
+<span class="token-comment">-- → Seq Scan on orders</span>
+<span class="token-comment">--   Filter: (status = 'shipped')  ← full table scan!</span></code></pre>
+
+        <h2>Python Demo: Prefix Matching Simulation</h2>
+        <pre><code><span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Tuple, Optional
+<span class="token-keyword">import</span> bisect
+
+<span class="token-keyword">class</span> <span class="token-class">CompositeIndex</span>:
+    <span class="token-string">"""Simulates a composite B-Tree index on multiple columns.
+
+    Demonstrates the leftmost prefix rule by storing sorted
+    tuples and performing prefix-based binary search.
+    """</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, columns: List[str]):
+        self.columns = columns
+        self.entries: List[Tuple] = []  <span class="token-comment"># Sorted composite keys</span>
+        self.name = f<span class="token-string">"idx_({'_'.join(columns)})"</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">insert</span>(self, values: Tuple):
+        <span class="token-string">"""Insert a composite key maintaining sorted order."""</span>
+        bisect.insort(self.entries, values)
+
+    <span class="token-keyword">def</span> <span class="token-function">lookup</span>(self, prefix: dict) -> dict:
+        <span class="token-string">"""Lookup using leftmost prefix rule.
+
+        Returns which columns were used as index conditions
+        vs. which required post-filtering.
+        """</span>
+        index_cols_used = []
+        filter_cols = []
+
+        <span class="token-comment"># Check leftmost prefix rule</span>
+        <span class="token-keyword">for</span> col <span class="token-keyword">in</span> self.columns:
+            <span class="token-keyword">if</span> col <span class="token-keyword">in</span> prefix:
+                <span class="token-keyword">if</span> <span class="token-keyword">not</span> filter_cols:  <span class="token-comment"># Still in prefix</span>
+                    index_cols_used.append(col)
+                <span class="token-keyword">else</span>:
+                    filter_cols.append(col)
+            <span class="token-keyword">else</span>:
+                <span class="token-comment"># Gap breaks the prefix</span>
+                filter_cols.extend(
+                    c <span class="token-keyword">for</span> c <span class="token-keyword">in</span> self.columns[len(index_cols_used):]
+                    <span class="token-keyword">if</span> c <span class="token-keyword">in</span> prefix <span class="token-keyword">and</span> c <span class="token-keyword">not in</span> filter_cols
+                )
+                <span class="token-keyword">break</span>
+
+        <span class="token-comment"># Count matching entries using prefix</span>
+        prefix_key = tuple(prefix.get(c) <span class="token-keyword">for</span> c <span class="token-keyword">in</span> index_cols_used)
+        matches = <span class="token-number">0</span>
+        scanned = <span class="token-number">0</span>
+
+        <span class="token-keyword">for</span> entry <span class="token-keyword">in</span> self.entries:
+            entry_prefix = entry[:len(prefix_key)]
+            <span class="token-keyword">if</span> entry_prefix == prefix_key:
+                scanned += <span class="token-number">1</span>
+                <span class="token-comment"># Apply remaining filters</span>
+                match = <span class="token-keyword">True</span>
+                <span class="token-keyword">for</span> fc <span class="token-keyword">in</span> filter_cols:
+                    col_idx = self.columns.index(fc)
+                    <span class="token-keyword">if</span> entry[col_idx] != prefix[fc]:
+                        match = <span class="token-keyword">False</span>
+                        <span class="token-keyword">break</span>
+                <span class="token-keyword">if</span> match:
+                    matches += <span class="token-number">1</span>
+
+        used_index = len(index_cols_used) > <span class="token-number">0</span>
+        <span class="token-keyword">return</span> {
+            <span class="token-string">"index"</span>: self.name,
+            <span class="token-string">"used_index"</span>: used_index,
+            <span class="token-string">"index_cond"</span>: index_cols_used,
+            <span class="token-string">"filter_cond"</span>: filter_cols,
+            <span class="token-string">"rows_scanned"</span>: scanned <span class="token-keyword">if</span> used_index <span class="token-keyword">else</span> len(self.entries),
+            <span class="token-string">"rows_matched"</span>: matches,
+            <span class="token-string">"scan_type"</span>: <span class="token-string">"Index Scan"</span> <span class="token-keyword">if</span> used_index <span class="token-keyword">else</span> <span class="token-string">"Seq Scan"</span>,
+        }
+
+
+<span class="token-comment"># --- Demo: leftmost prefix rule in action ---</span>
+
+<span class="token-keyword">import</span> random
+
+<span class="token-comment"># Create index on (city, status, age)</span>
+idx = CompositeIndex([<span class="token-string">"city"</span>, <span class="token-string">"status"</span>, <span class="token-string">"age"</span>])
+
+cities = [<span class="token-string">"NYC"</span>, <span class="token-string">"London"</span>, <span class="token-string">"Tokyo"</span>, <span class="token-string">"Berlin"</span>, <span class="token-string">"Paris"</span>]
+statuses = [<span class="token-string">"active"</span>, <span class="token-string">"inactive"</span>, <span class="token-string">"banned"</span>]
+
+<span class="token-comment"># Insert 10000 rows</span>
+<span class="token-keyword">for</span> _ <span class="token-keyword">in</span> range(<span class="token-number">10000</span>):
+    idx.insert((
+        random.choice(cities),
+        random.choice(statuses),
+        random.randint(<span class="token-number">18</span>, <span class="token-number">65</span>)
+    ))
+
+<span class="token-comment"># Test various query patterns</span>
+queries = [
+    {<span class="token-string">"city"</span>: <span class="token-string">"NYC"</span>},                                    <span class="token-comment"># ✅ prefix (city)</span>
+    {<span class="token-string">"city"</span>: <span class="token-string">"NYC"</span>, <span class="token-string">"status"</span>: <span class="token-string">"active"</span>},               <span class="token-comment"># ✅ prefix (city, status)</span>
+    {<span class="token-string">"city"</span>: <span class="token-string">"NYC"</span>, <span class="token-string">"status"</span>: <span class="token-string">"active"</span>, <span class="token-string">"age"</span>: <span class="token-number">30</span>}, <span class="token-comment"># ✅ full index</span>
+    {<span class="token-string">"city"</span>: <span class="token-string">"NYC"</span>, <span class="token-string">"age"</span>: <span class="token-number">30</span>},                       <span class="token-comment"># ⚠️ partial (city only)</span>
+    {<span class="token-string">"status"</span>: <span class="token-string">"active"</span>},                              <span class="token-comment"># ❌ skips leftmost</span>
+    {<span class="token-string">"age"</span>: <span class="token-number">30</span>},                                        <span class="token-comment"># ❌ skips leftmost</span>
+]
+
+print(<span class="token-string">"=== Composite Index: Leftmost Prefix Rule ==="</span>)
+print(f<span class="token-string">"Index: {idx.name} on {idx.columns}"</span>)
+print(f<span class="token-string">"Total rows: {len(idx.entries):,}\n"</span>)
+
+<span class="token-keyword">for</span> q <span class="token-keyword">in</span> queries:
+    result = idx.lookup(q)
+    status = <span class="token-string">"✅"</span> <span class="token-keyword">if</span> result[<span class="token-string">"used_index"</span>] <span class="token-keyword">else</span> <span class="token-string">"❌"</span>
+    print(f<span class="token-string">"{status} WHERE {q}"</span>)
+    print(f<span class="token-string">"   Scan: {result['scan_type']}"</span>)
+    print(f<span class="token-string">"   Index Cond: {result['index_cond']}"</span>)
+    print(f<span class="token-string">"   Filter: {result['filter_cond']}"</span>)
+    print(f<span class="token-string">"   Rows scanned: {result['rows_scanned']:,}"</span>)
+    print()</code></pre>
+
+        <div class="industry-box">
+            <h3>&#x1F3ED; Industry Practice</h3>
+            <p><strong>MySQL InnoDB:</strong> Composite indexes are stored as a single B+Tree with concatenated key values. InnoDB always appends the primary key to secondary indexes, so an index on (city, status) is actually stored as (city, status, id). This means the PK is implicitly included &mdash; queries ordering by PK after the index columns get it &ldquo;for free.&rdquo;</p>
+            <p><strong>PostgreSQL INCLUDE:</strong> Since v11, PostgreSQL supports <code>INCLUDE</code> columns that are stored in the index leaf pages but not part of the sort key. This creates covering indexes without bloating the internal nodes. Use <code>INCLUDE</code> for columns you SELECT but don&rsquo;t filter on.</p>
+            <p><strong>Index Advisor Tools:</strong> Tools like <code>pg_qualstats</code> + <code>hypopg</code> (PostgreSQL), MySQL&rsquo;s <code>sys.schema_unused_indexes</code>, and cloud-native advisors (AWS RDS Performance Insights, Azure Index Advisor) analyze query patterns and recommend optimal composite indexes automatically.</p>
+            <p><strong>MongoDB Compound Indexes:</strong> Follow the ESR rule &mdash; Equality, Sort, Range. Put equality-match fields first, then sort fields, then range fields last. The <code>.explain("executionStats")</code> output shows <code>indexBounds</code> revealing exactly which portions of the compound index were used.</p>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#x1F4CB; Key Takeaways</h3>
+            <ul>
+                <li>Composite indexes sort by column 1, then column 2, then column 3 &mdash; order determines usability</li>
+                <li>The leftmost prefix rule: index (a,b,c) only helps queries starting from (a), (a,b), or (a,b,c)</li>
+                <li>Put equality columns first, range columns last, and the most selective equality column first among equals</li>
+                <li>Covering indexes (with INCLUDE) eliminate heap lookups entirely &mdash; fastest possible reads</li>
+                <li>One composite index often replaces 2&ndash;3 single-column indexes with better performance</li>
+                <li>Always verify with EXPLAIN ANALYZE that your index is actually being used as intended</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#x1F9E0; Mental Model</h3>
+            <p>A composite index is a sorted phone book. The sort order determines what lookups are fast. You can jump to &ldquo;S&rdquo; instantly (first column), then within &ldquo;S&rdquo; find &ldquo;Smith&rdquo; (second column), but you cannot jump to all &ldquo;Johns&rdquo; without scanning the entire book.</p>
+            <div class="model-visual">
+                <pre>
+  COMPOSITE INDEX on (city, status, age):
+
+  Sorted like a multi-level phone book:
+  ┌─────────────────────────────────────────────┐
+  │ Berlin, active, 22  │ ← B-Tree leaf entries │
+  │ Berlin, active, 35  │   sorted by all 3     │
+  │ Berlin, banned, 19  │   columns combined    │
+  │ London, active, 28  │                       │
+  │ London, active, 41  │                       │
+  │ London, inactive, 30│                       │
+  │ NYC, active, 25     │                       │
+  │ NYC, active, 30     │                       │
+  │ NYC, inactive, 22   │                       │
+  │ Tokyo, active, 33   │                       │
+  └─────────────────────────────────────────────┘
+
+  QUERY: WHERE city='NYC' AND status='active'
+  ─────────────────────────────────────────────
+  Jump to 'NYC' section → narrow to 'active'
+  ✅ Uses index: (city, status) prefix
+
+  QUERY: WHERE status='active'
+  ─────────────────────────────────────────────
+  'active' entries are SCATTERED across cities!
+  ❌ Cannot use index: must scan everything
+
+  COVERING INDEX:
+  ┌──────────────────────────────────────────────┐
+  │ Index Key (sorted)  │  INCLUDE columns       │
+  │ (city, status)      │  (email, name)         │
+  ├─────────────────────┼────────────────────────┤
+  │ Berlin, active      │  alice@x.com, Alice    │
+  │ London, active      │  bob@y.com, Bob        │
+  │ NYC, inactive       │  eve@z.com, Eve        │
+  └─────────────────────┴────────────────────────┘
+  SELECT email, name WHERE city='NYC' → Index Only Scan!
+  No need to visit the actual table at all.
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#x26A0;&#xFE0F; Common Mistakes</h3>
+            <ul>
+                <li><strong>Creating separate indexes instead of one composite:</strong> Three single-column indexes on (a), (b), (c) are NOT equivalent to one composite index on (a, b, c). The database can only use one index per table access (bitmap index scan aside). A composite index handles multi-column WHERE clauses in a single B-Tree traversal.</li>
+                <li><strong>Wrong column order:</strong> Putting the range column before equality columns wastes the index. Index (age, city) cannot efficiently handle <code>WHERE city='NYC' AND age BETWEEN 25 AND 35</code> because the city filter requires a full scan within each age bucket. Reverse the order: (city, age).</li>
+                <li><strong>Too many columns in the index:</strong> A 6-column composite index is expensive to maintain and only benefits the exact query pattern it was designed for. Wide indexes slow every INSERT/UPDATE. Prefer 2&ndash;4 columns targeted at your top queries, with INCLUDE for coverage.</li>
+                <li><strong>Not checking EXPLAIN output:</strong> Developers assume their index is being used without verifying. The planner may choose a sequential scan if statistics are stale (<code>ANALYZE</code> the table), the selectivity is too low, or the query pattern doesn&rsquo;t match the leftmost prefix. Always validate with <code>EXPLAIN (ANALYZE, BUFFERS)</code>.</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#x1F3AF; Exercises</h3>
+            <ol>
+                <li><strong>Prefix rule verification:</strong> Create a table with 1M rows and a composite index on (country, city, zip_code). Write 6 queries testing each prefix combination and use EXPLAIN ANALYZE to verify which ones use the index and which fall back to sequential scan.</li>
+                <li><strong>Column ordering experiment:</strong> For the query <code>WHERE status='active' AND created_at > '2024-01-01' AND country='US'</code>, create indexes with different column orders: (status, created_at, country), (country, status, created_at), (country, created_at, status). Benchmark all three and explain why one wins.</li>
+                <li><strong>Covering index optimization:</strong> Find a query in your application that performs an index scan followed by a heap fetch (look for &ldquo;Index Scan&rdquo; without &ldquo;Index Only Scan&rdquo; in EXPLAIN). Add INCLUDE columns to make it covering and measure the buffer hit reduction.</li>
+                <li><strong>Index consolidation:</strong> Audit a table with 5+ single-column indexes. Identify which queries hit multiple columns and design 1&ndash;2 composite indexes that replace 3&ndash;4 single-column indexes while maintaining or improving query performance.</li>
+            </ol>
+        </div>
+
+        <div class="page-nav">
+            <a href="42-write-read-amplification.html" class="prev">&larr; Write/Read Amplification</a>
+            <a href="44-query-optimization.html" class="next">Query Optimization &rarr;</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

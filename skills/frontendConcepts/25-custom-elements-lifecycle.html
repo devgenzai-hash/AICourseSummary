@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Elements Lifecycle - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interop</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Custom Elements Lifecycle
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Custom Elements Lifecycle</h1>
+                <p class="subtitle">The precise sequence of callbacks the browser invokes as a custom element is created, connected, updated, and destroyed — and the subtle timing traps that catch most developers.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Intermediate</span>
+                    <span class="tag tag-concept">Web Platform</span>
+                    <span class="tag tag-browser">Browser API</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🎭 Daily-Life Analogy: An Actor's Career</div>
+                <p>Think of a custom element as an actor. <strong>constructor()</strong> is when they're born and given a name. <strong>connectedCallback()</strong> is when they step onto the stage (the DOM). <strong>attributeChangedCallback()</strong> is when the director gives them a new costume mid-performance. <strong>disconnectedCallback()</strong> is when they exit the stage. And <strong>adoptedCallback()</strong> is the rare case where they transfer to a different theater (document).</p>
+            </div>
+
+            <h2>The Problem: Why Lifecycle Callbacks Exist</h2>
+            <p>Custom elements need to respond to changes in their environment:</p>
+            <ul>
+                <li><strong>When is it safe to access the DOM?</strong> — In the constructor, children may not exist yet</li>
+                <li><strong>When should event listeners be added/removed?</strong> — Add on connect, remove on disconnect (prevents memory leaks)</li>
+                <li><strong>How to react to attribute changes?</strong> — The browser needs a way to notify you when HTML attributes change</li>
+                <li><strong>How to clean up resources?</strong> — Timers, WebSocket connections, observers need explicit teardown</li>
+            </ul>
+
+            <h2>The Complete Lifecycle</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Callback</th><th>When Called</th><th>Safe Operations</th><th>Unsafe Operations</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>constructor()</code></td>
+                        <td>Element is created (before DOM insertion)</td>
+                        <td>Attach shadow root, set default state, set up internal data</td>
+                        <td>Read attributes, access children, add to DOM, dispatch events</td>
+                    </tr>
+                    <tr>
+                        <td><code>connectedCallback()</code></td>
+                        <td>Element is inserted into DOM</td>
+                        <td>Read attributes, access children, fetch data, add listeners, start timers</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td><code>disconnectedCallback()</code></td>
+                        <td>Element is removed from DOM</td>
+                        <td>Remove listeners, cancel timers, close connections, cleanup</td>
+                        <td>Assume element is gone forever (it might be re-inserted)</td>
+                    </tr>
+                    <tr>
+                        <td><code>attributeChangedCallback(name, old, new)</code></td>
+                        <td>An observed attribute changes</td>
+                        <td>Update internal state, re-render affected parts</td>
+                        <td>Trigger synchronous attribute changes on self (infinite loop)</td>
+                    </tr>
+                    <tr>
+                        <td><code>adoptedCallback()</code></td>
+                        <td>Element moves to a new document (rare)</td>
+                        <td>Re-initialize document-specific references</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Code: Full Lifecycle Implementation</h2>
+<pre><code><span class="token-keyword">class</span> <span class="token-function">DataFetcher</span> <span class="token-keyword">extends</span> HTMLElement {
+    <span class="token-comment">// CRITICAL: You MUST declare which attributes to observe</span>
+    <span class="token-comment">// Without this, attributeChangedCallback will NEVER fire</span>
+    <span class="token-keyword">static</span> <span class="token-keyword">get</span> observedAttributes() {
+        <span class="token-keyword">return</span> [<span class="token-string">'src'</span>, <span class="token-string">'interval'</span>];
+    }
+
+    <span class="token-keyword">constructor</span>() {
+        <span class="token-keyword">super</span>(); <span class="token-comment">// MUST be first line — spec requirement</span>
+        
+        <span class="token-comment">// Safe: set up shadow DOM and internal state</span>
+        <span class="token-keyword">this</span>.attachShadow({ mode: <span class="token-string">'open'</span> });
+        <span class="token-keyword">this</span>._pollTimer = <span class="token-keyword">null</span>;
+        <span class="token-keyword">this</span>._abortController = <span class="token-keyword">null</span>;
+        
+        <span class="token-comment">// Safe: set up shadow DOM template (no attribute reads!)</span>
+        <span class="token-keyword">this</span>.shadowRoot.innerHTML = <span class="token-string">`
+            &lt;style&gt;
+                :host { display: block; padding: 1rem; }
+                .loading { opacity: 0.5; }
+                .error { color: #ff4444; }
+            &lt;/style&gt;
+            &lt;div id="content"&gt;&lt;slot&gt;Loading...&lt;/slot&gt;&lt;/div&gt;
+        `</span>;
+        
+        <span class="token-comment">// UNSAFE here: this.getAttribute('src') — might not be set yet!</span>
+        <span class="token-comment">// UNSAFE here: this.querySelector('...') — no children exist yet!</span>
+    }
+
+    <span class="token-function">connectedCallback</span>() {
+        <span class="token-comment">// NOW it's safe to read attributes — element is in the DOM</span>
+        console.log(<span class="token-string">'Connected! src='</span>, <span class="token-keyword">this</span>.getAttribute(<span class="token-string">'src'</span>));
+        
+        <span class="token-comment">// Start fetching data — only when actually in the document</span>
+        <span class="token-keyword">this</span>._startPolling();
+        
+        <span class="token-comment">// IMPORTANT: connectedCallback can fire MULTIPLE times</span>
+        <span class="token-comment">// (element removed then re-inserted). Guard against double-init.</span>
+    }
+
+    <span class="token-function">disconnectedCallback</span>() {
+        <span class="token-comment">// CLEANUP: prevent memory leaks and orphaned network requests</span>
+        <span class="token-keyword">this</span>._stopPolling();
+        
+        <span class="token-comment">// Cancel any in-flight fetch requests</span>
+        <span class="token-keyword">if</span> (<span class="token-keyword">this</span>._abortController) {
+            <span class="token-keyword">this</span>._abortController.abort();
+        }
+        
+        <span class="token-comment">// NOTE: Element might be re-connected later (moved in DOM)</span>
+        <span class="token-comment">// Don't null out state that's needed for re-connection</span>
+    }
+
+    <span class="token-function">attributeChangedCallback</span>(name, oldValue, newValue) {
+        <span class="token-comment">// Only fires for attributes listed in observedAttributes</span>
+        <span class="token-comment">// TIMING TRAP: This fires BEFORE connectedCallback during parsing!</span>
+        <span class="token-comment">// The parser sets attributes before connecting the element.</span>
+        
+        <span class="token-keyword">if</span> (oldValue === newValue) <span class="token-keyword">return</span>; <span class="token-comment">// No-op on same value</span>
+        
+        <span class="token-keyword">switch</span> (name) {
+            <span class="token-keyword">case</span> <span class="token-string">'src'</span>:
+                <span class="token-comment">// Only fetch if we're connected (in the DOM)</span>
+                <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.isConnected) {
+                    <span class="token-keyword">this</span>._fetchData(newValue);
+                }
+                <span class="token-keyword">break</span>;
+            <span class="token-keyword">case</span> <span class="token-string">'interval'</span>:
+                <span class="token-keyword">if</span> (<span class="token-keyword">this</span>.isConnected) {
+                    <span class="token-keyword">this</span>._stopPolling();
+                    <span class="token-keyword">this</span>._startPolling();
+                }
+                <span class="token-keyword">break</span>;
+        }
+    }
+
+    <span class="token-function">adoptedCallback</span>() {
+        <span class="token-comment">// Rare: fired when document.adoptNode() moves this to another document</span>
+        <span class="token-comment">// Relevant for iframe communication or document fragments</span>
+        console.log(<span class="token-string">'Moved to new document'</span>);
+    }
+
+    <span class="token-comment">// --- Private methods ---</span>
+    _startPolling() {
+        <span class="token-keyword">const</span> interval = parseInt(<span class="token-keyword">this</span>.getAttribute(<span class="token-string">'interval'</span>)) || 30000;
+        <span class="token-keyword">this</span>._fetchData(<span class="token-keyword">this</span>.getAttribute(<span class="token-string">'src'</span>));
+        <span class="token-keyword">this</span>._pollTimer = setInterval(() => {
+            <span class="token-keyword">this</span>._fetchData(<span class="token-keyword">this</span>.getAttribute(<span class="token-string">'src'</span>));
+        }, interval);
+    }
+
+    _stopPolling() {
+        <span class="token-keyword">if</span> (<span class="token-keyword">this</span>._pollTimer) {
+            clearInterval(<span class="token-keyword">this</span>._pollTimer);
+            <span class="token-keyword">this</span>._pollTimer = <span class="token-keyword">null</span>;
+        }
+    }
+
+    <span class="token-keyword">async</span> _fetchData(url) {
+        <span class="token-keyword">if</span> (!url) <span class="token-keyword">return</span>;
+        <span class="token-keyword">this</span>._abortController = <span class="token-keyword">new</span> AbortController();
+        <span class="token-keyword">const</span> content = <span class="token-keyword">this</span>.shadowRoot.getElementById(<span class="token-string">'content'</span>);
+        
+        <span class="token-keyword">try</span> {
+            content.classList.add(<span class="token-string">'loading'</span>);
+            <span class="token-keyword">const</span> res = <span class="token-keyword">await</span> fetch(url, { signal: <span class="token-keyword">this</span>._abortController.signal });
+            <span class="token-keyword">const</span> data = <span class="token-keyword">await</span> res.json();
+            content.textContent = JSON.stringify(data, <span class="token-keyword">null</span>, 2);
+            content.classList.remove(<span class="token-string">'loading'</span>, <span class="token-string">'error'</span>);
+        } <span class="token-keyword">catch</span> (err) {
+            <span class="token-keyword">if</span> (err.name !== <span class="token-string">'AbortError'</span>) {
+                content.textContent = <span class="token-string">`Error: ${err.message}`</span>;
+                content.classList.add(<span class="token-string">'error'</span>);
+            }
+        }
+    }
+}
+
+customElements.define(<span class="token-string">'data-fetcher'</span>, DataFetcher);
+</code></pre>
+
+            <h2>The Critical Timing Trap</h2>
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ attributeChangedCallback Fires BEFORE connectedCallback</div>
+                <p>When the HTML parser encounters <code>&lt;data-fetcher src="/api/data"&gt;</code>, the sequence is:</p>
+                <ol>
+                    <li><code>constructor()</code> — element created</li>
+                    <li><code>attributeChangedCallback('src', null, '/api/data')</code> — parser sets attributes</li>
+                    <li><code>connectedCallback()</code> — element inserted into DOM</li>
+                </ol>
+                <p>If your <code>attributeChangedCallback</code> tries to access DOM context or sibling elements, it will fail. Always check <code>this.isConnected</code> before doing work that requires DOM context.</p>
+            </div>
+
+            <h2>Where This Is Used in Production</h2>
+            <ul>
+                <li><strong>Lit (Google)</strong> — Builds on these lifecycle callbacks to add reactive properties, batched updates, and a declarative template system. Every Lit component is a custom element.</li>
+                <li><strong>Stencil (Ionic)</strong> — Compiles JSX components down to custom elements, mapping React-like lifecycle methods to the native callbacks.</li>
+                <li><strong>GitHub's ViewComponent</strong> — Custom elements for interactive widgets, relying on connectedCallback for progressive enhancement of server-rendered HTML.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Forgetting <code>static get observedAttributes()</code></strong> — Without it, attributeChangedCallback never fires. This is the #1 "why isn't my component updating" bug.</li>
+                <li><strong>Doing work in constructor that needs attributes</strong> — Attributes aren't reliable in constructor. Defer to connectedCallback.</li>
+                <li><strong>Not cleaning up in disconnectedCallback</strong> — Timers, observers, event listeners on window/document — all leak if not removed.</li>
+                <li><strong>Assuming disconnectedCallback means destruction</strong> — Elements can be re-connected. Don't destroy state you'll need if re-inserted.</li>
+                <li><strong>Not calling <code>super()</code> first</strong> — Spec requires it. Accessing <code>this</code> before <code>super()</code> throws.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Custom Elements Lifecycle When...</h3>
+                <p>You can predict the exact sequence of lifecycle callbacks when a custom element is created via <code>innerHTML</code>, moved with <code>appendChild</code>, has an attribute changed, and is then removed — and explain why <code>attributeChangedCallback</code> fires before <code>connectedCallback</code> during parsing.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a <code>&lt;lazy-image&gt;</code> custom element that: uses IntersectionObserver (started in connectedCallback, cleaned up in disconnectedCallback), loads <code>src</code> only when visible, and handles the <code>src</code> attribute changing mid-lifecycle via attributeChangedCallback.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Custom Elements Lifecycle connects to: <strong>Shadow DOM</strong> (where you attach it in the lifecycle), <strong>Web Components Interoperability</strong> (how frameworks map their lifecycle to these callbacks), and <strong>MutationObserver</strong> (watching for attribute changes externally).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="24-shadow-dom.html" class="nav-btn nav-btn-prev">← Shadow DOM</a>
+                <a href="26-web-components-interop.html" class="nav-btn nav-btn-next">Web Components Interop →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

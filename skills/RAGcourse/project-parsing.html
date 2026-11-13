@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone: Document Parsing - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/16 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Capstone: Document Parsing
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>P2: Document Parsing — All 9 Types</h1>
+                <p class="subtitle">Parse every document type the enterprise has: PDFs, Word, emails, web pages, databases, Slack, code repos, scanned papers, and bills. One unified output format.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-code">Full Code</span>
+                    <span class="tag tag-production">Production</span>
+                </div>
+            </div>
+
+            <!-- ===== BASE SCHEMA ===== -->
+            <h2>Unified Document Schema</h2>
+            <p>Every parser — regardless of input format — produces the same output structure. This is critical for the downstream pipeline.</p>
+
+<pre><code><span class="token-comment"># src/parsers/base.py</span>
+
+<span class="token-keyword">from</span> dataclasses <span class="token-keyword">import</span> dataclass, field
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict, Optional
+<span class="token-keyword">from</span> enum <span class="token-keyword">import</span> Enum
+<span class="token-keyword">from</span> abc <span class="token-keyword">import</span> ABC, abstractmethod
+<span class="token-keyword">from</span> pathlib <span class="token-keyword">import</span> Path
+
+<span class="token-keyword">class</span> <span class="token-class">SourceType</span>(Enum):
+    PDF = <span class="token-string">"pdf"</span>
+    DOCX = <span class="token-string">"docx"</span>
+    EMAIL = <span class="token-string">"email"</span>
+    WEB = <span class="token-string">"web"</span>
+    DATABASE = <span class="token-string">"database"</span>
+    SLACK = <span class="token-string">"slack"</span>
+    CODE = <span class="token-string">"code"</span>
+    OCR = <span class="token-string">"ocr"</span>
+    BILL = <span class="token-string">"bill"</span>
+
+<span class="token-decorator">@dataclass</span>
+<span class="token-keyword">class</span> <span class="token-class">ParsedDocument</span>:
+    <span class="token-string">"""Universal document output from any parser."""</span>
+    id: <span class="token-builtin">str</span>                          <span class="token-comment"># Unique identifier</span>
+    content: <span class="token-builtin">str</span>                     <span class="token-comment"># Full text content (cleaned)</span>
+    source_type: SourceType          <span class="token-comment"># Which parser produced it</span>
+    source_path: <span class="token-builtin">str</span>                 <span class="token-comment"># Original file path or URL</span>
+    title: Optional[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>     <span class="token-comment"># Document title</span>
+    author: Optional[<span class="token-builtin">str</span>] = <span class="token-keyword">None</span>    <span class="token-comment"># Author/sender</span>
+    created_at: Optional[datetime] = <span class="token-keyword">None</span>
+    updated_at: Optional[datetime] = <span class="token-keyword">None</span>
+    language: <span class="token-builtin">str</span> = <span class="token-string">"en"</span>
+    page_count: Optional[<span class="token-builtin">int</span>] = <span class="token-keyword">None</span>
+    tables: List[Dict] = field(default_factory=<span class="token-builtin">list</span>)  <span class="token-comment"># Extracted tables</span>
+    metadata: Dict = field(default_factory=<span class="token-builtin">dict</span>)     <span class="token-comment"># Extra metadata</span>
+    sections: List[Dict] = field(default_factory=<span class="token-builtin">list</span>) <span class="token-comment"># Structural sections</span>
+    confidence: <span class="token-builtin">float</span> = <span class="token-number">1.0</span>          <span class="token-comment"># Parse confidence (OCR may be lower)</span>
+
+<span class="token-keyword">class</span> <span class="token-class">BaseParser</span>(ABC):
+    <span class="token-string">"""Abstract base class for all document parsers."""</span>
+    
+    <span class="token-decorator">@abstractmethod</span>
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        <span class="token-string">"""Parse a source into one or more ParsedDocument objects."""</span>
+        ...
+    
+    <span class="token-decorator">@abstractmethod</span>
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        <span class="token-string">"""Return True if this parser can handle the given source."""</span>
+        ...
+    
+    <span class="token-keyword">def</span> <span class="token-function">_generate_id</span>(self, source: <span class="token-builtin">str</span>, content: <span class="token-builtin">str</span>) -> <span class="token-builtin">str</span>:
+        <span class="token-string">"""Generate a deterministic document ID."""</span>
+        <span class="token-keyword">import</span> hashlib
+        raw = <span class="token-string">f"{source}:{content[:500]}"</span>
+        <span class="token-keyword">return</span> hashlib.sha256(raw.encode()).hexdigest()[:16]</code></pre>
+
+            <!-- ===== DOCUMENT ROUTER ===== -->
+            <h2>Document Router (Auto-Detection)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/router.py</span>
+
+<span class="token-keyword">import</span> mimetypes
+<span class="token-keyword">from</span> pathlib <span class="token-keyword">import</span> Path
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument
+
+<span class="token-keyword">class</span> <span class="token-class">DocumentRouter</span>:
+    <span class="token-string">"""
+    Auto-detects document type and routes to the correct parser.
+    Handles: PDF, DOCX, Email, Web, DB, Slack, Code, OCR, Bills.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        <span class="token-comment"># Lazy imports to avoid loading all parsers at startup</span>
+        <span class="token-keyword">from</span> .pdf_parser <span class="token-keyword">import</span> PDFParser
+        <span class="token-keyword">from</span> .docx_parser <span class="token-keyword">import</span> DocxParser
+        <span class="token-keyword">from</span> .email_parser <span class="token-keyword">import</span> EmailParser
+        <span class="token-keyword">from</span> .web_parser <span class="token-keyword">import</span> WebParser
+        <span class="token-keyword">from</span> .db_parser <span class="token-keyword">import</span> DatabaseParser
+        <span class="token-keyword">from</span> .slack_parser <span class="token-keyword">import</span> SlackParser
+        <span class="token-keyword">from</span> .code_parser <span class="token-keyword">import</span> CodeParser
+        <span class="token-keyword">from</span> .ocr_parser <span class="token-keyword">import</span> OCRParser
+        <span class="token-keyword">from</span> .bill_parser <span class="token-keyword">import</span> BillParser
+        
+        self.parsers: List[BaseParser] = [
+            PDFParser(),
+            DocxParser(),
+            EmailParser(),
+            WebParser(),
+            DatabaseParser(),
+            SlackParser(),
+            CodeParser(),
+            BillParser(),    <span class="token-comment"># Before OCR (bills are structured PDFs)</span>
+            OCRParser(),     <span class="token-comment"># Fallback for image-based docs</span>
+        ]
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        <span class="token-string">"""
+        Route a source to the appropriate parser.
+        
+        Args:
+            source: File path, URL, or connection string
+        
+        Returns:
+            List of ParsedDocument objects
+        """</span>
+        <span class="token-keyword">for</span> parser <span class="token-keyword">in</span> self.parsers:
+            <span class="token-keyword">if</span> parser.can_handle(source):
+                <span class="token-keyword">try</span>:
+                    docs = parser.parse(source)
+                    print(<span class="token-string">f"✅ Parsed {source} → {len(docs)} docs via {parser.__class__.__name__}"</span>)
+                    <span class="token-keyword">return</span> docs
+                <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+                    print(<span class="token-string">f"⚠️ {parser.__class__.__name__} failed on {source}: {e}"</span>)
+                    <span class="token-keyword">continue</span>
+        
+        <span class="token-keyword">raise</span> ValueError(<span class="token-string">f"No parser found for: {source}"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse_directory</span>(self, directory: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        <span class="token-string">"""Parse all files in a directory recursively."""</span>
+        all_docs = []
+        dir_path = Path(directory)
+        
+        <span class="token-keyword">for</span> file_path <span class="token-keyword">in</span> dir_path.rglob(<span class="token-string">"*"</span>):
+            <span class="token-keyword">if</span> file_path.is_file():
+                <span class="token-keyword">try</span>:
+                    docs = self.parse(<span class="token-builtin">str</span>(file_path))
+                    all_docs.extend(docs)
+                <span class="token-keyword">except</span> ValueError:
+                    print(<span class="token-string">f"⏭️ Skipping unsupported file: {file_path}"</span>)
+        
+        print(<span class="token-string">f"\n📊 Total: Parsed {len(all_docs)} documents from {directory}"</span>)
+        <span class="token-keyword">return</span> all_docs</code></pre>
+
+            <!-- ===== PDF PARSER ===== -->
+            <h2>1. PDF Parser (Company Reports, Research Papers, Manuals)</h2>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Why pymupdf4llm?</div>
+                <p>pymupdf4llm converts PDFs to markdown format — preserving headings, tables, bold/italic, and page structure. Perfect for LLM consumption. 10x faster than pdfplumber for large documents.</p>
+            </div>
+
+<pre><code><span class="token-comment"># src/parsers/pdf_parser.py</span>
+
+<span class="token-keyword">import</span> pymupdf4llm
+<span class="token-keyword">import</span> fitz  <span class="token-comment"># PyMuPDF</span>
+<span class="token-keyword">from</span> pathlib <span class="token-keyword">import</span> Path
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">PDFParser</span>(BaseParser):
+    <span class="token-string">"""
+    Parse PDF documents: reports, papers, manuals, contracts.
+    Uses pymupdf4llm for markdown extraction with structure preservation.
+    Falls back to OCR for image-based PDFs.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        <span class="token-keyword">return</span> Path(source).suffix.lower() == <span class="token-string">".pdf"</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        path = Path(source)
+        doc = fitz.open(source)
+        
+        <span class="token-comment"># Extract metadata from PDF</span>
+        meta = doc.metadata
+        
+        <span class="token-comment"># Check if PDF is image-based (scanned)</span>
+        <span class="token-keyword">if</span> self._is_scanned_pdf(doc):
+            <span class="token-comment"># Delegate to OCR parser</span>
+            <span class="token-keyword">return</span> []  <span class="token-comment"># Router will fall through to OCRParser</span>
+        
+        <span class="token-comment"># Extract content as markdown (preserves structure)</span>
+        md_content = pymupdf4llm.to_markdown(
+            source,
+            page_chunks=<span class="token-keyword">True</span>,    <span class="token-comment"># Split by page for large docs</span>
+            write_images=<span class="token-keyword">False</span>,  <span class="token-comment"># Skip embedded images</span>
+            show_progress=<span class="token-keyword">False</span>
+        )
+        
+        <span class="token-comment"># pymupdf4llm returns list of page dicts when page_chunks=True</span>
+        full_text = <span class="token-string">"\n\n"</span>.join(
+            page[<span class="token-string">"text"</span>] <span class="token-keyword">for</span> page <span class="token-keyword">in</span> md_content
+        )
+        
+        <span class="token-comment"># Extract tables separately for structured data</span>
+        tables = self._extract_tables(doc)
+        
+        <span class="token-comment"># Build sections from markdown headings</span>
+        sections = self._extract_sections(full_text)
+        
+        parsed = ParsedDocument(
+            id=self._generate_id(source, full_text),
+            content=full_text,
+            source_type=SourceType.PDF,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=meta.get(<span class="token-string">"title"</span>) <span class="token-keyword">or</span> path.stem,
+            author=meta.get(<span class="token-string">"author"</span>),
+            created_at=self._parse_pdf_date(meta.get(<span class="token-string">"creationDate"</span>)),
+            updated_at=self._parse_pdf_date(meta.get(<span class="token-string">"modDate"</span>)),
+            page_count=<span class="token-builtin">len</span>(doc),
+            tables=tables,
+            sections=sections,
+            metadata={
+                <span class="token-string">"producer"</span>: meta.get(<span class="token-string">"producer"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"subject"</span>: meta.get(<span class="token-string">"subject"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"keywords"</span>: meta.get(<span class="token-string">"keywords"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"file_size_mb"</span>: path.stat().st_size / (1024 * 1024)
+            }
+        )
+        
+        doc.close()
+        <span class="token-keyword">return</span> [parsed]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_is_scanned_pdf</span>(self, doc) -> <span class="token-builtin">bool</span>:
+        <span class="token-string">"""Detect if PDF is image-based (no extractable text)."""</span>
+        <span class="token-comment"># Check first 3 pages for text</span>
+        <span class="token-keyword">for</span> page_num <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-builtin">min</span>(<span class="token-number">3</span>, <span class="token-builtin">len</span>(doc))):
+            text = doc[page_num].get_text().strip()
+            <span class="token-keyword">if</span> <span class="token-builtin">len</span>(text) > <span class="token-number">50</span>:
+                <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">_extract_tables</span>(self, doc) -> List[Dict]:
+        <span class="token-string">"""Extract tables from PDF pages."""</span>
+        tables = []
+        <span class="token-keyword">for</span> page_num <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-builtin">len</span>(doc)):
+            page = doc[page_num]
+            page_tables = page.find_tables()
+            <span class="token-keyword">for</span> table <span class="token-keyword">in</span> page_tables:
+                tables.append({
+                    <span class="token-string">"page"</span>: page_num + <span class="token-number">1</span>,
+                    <span class="token-string">"data"</span>: table.extract(),
+                    <span class="token-string">"headers"</span>: table.header.names <span class="token-keyword">if</span> table.header <span class="token-keyword">else</span> []
+                })
+        <span class="token-keyword">return</span> tables
+    
+    <span class="token-keyword">def</span> <span class="token-function">_extract_sections</span>(self, markdown: <span class="token-builtin">str</span>) -> List[Dict]:
+        <span class="token-string">"""Parse markdown headings into sections."""</span>
+        sections = []
+        current_section = <span class="token-keyword">None</span>
+        
+        <span class="token-keyword">for</span> line <span class="token-keyword">in</span> markdown.split(<span class="token-string">"\n"</span>):
+            <span class="token-keyword">if</span> line.startswith(<span class="token-string">"# "</span>):
+                <span class="token-keyword">if</span> current_section:
+                    sections.append(current_section)
+                current_section = {<span class="token-string">"heading"</span>: line[<span class="token-number">2</span>:], <span class="token-string">"level"</span>: <span class="token-number">1</span>, <span class="token-string">"content"</span>: <span class="token-string">""</span>}
+            <span class="token-keyword">elif</span> line.startswith(<span class="token-string">"## "</span>):
+                <span class="token-keyword">if</span> current_section:
+                    sections.append(current_section)
+                current_section = {<span class="token-string">"heading"</span>: line[<span class="token-number">3</span>:], <span class="token-string">"level"</span>: <span class="token-number">2</span>, <span class="token-string">"content"</span>: <span class="token-string">""</span>}
+            <span class="token-keyword">elif</span> current_section:
+                current_section[<span class="token-string">"content"</span>] += line + <span class="token-string">"\n"</span>
+        
+        <span class="token-keyword">if</span> current_section:
+            sections.append(current_section)
+        <span class="token-keyword">return</span> sections
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_pdf_date</span>(self, date_str) -> Optional[datetime]:
+        <span class="token-string">"""Parse PDF date format (D:20240101120000)."""</span>
+        <span class="token-keyword">if not</span> date_str:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span>
+        <span class="token-keyword">try</span>:
+            clean = date_str.replace(<span class="token-string">"D:"</span>, <span class="token-string">""</span>)[:<span class="token-number">14</span>]
+            <span class="token-keyword">return</span> datetime.strptime(clean, <span class="token-string">"%Y%m%d%H%M%S"</span>)
+        <span class="token-keyword">except</span>:
+            <span class="token-keyword">return</span> <span class="token-keyword">None</span></code></pre>
+
+            <!-- ===== WORD PARSER ===== -->
+            <h2>2. Word/DOCX Parser (Memos, Proposals, Meeting Notes)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/docx_parser.py</span>
+
+<span class="token-keyword">from</span> docx <span class="token-keyword">import</span> Document
+<span class="token-keyword">from</span> docx.enum.text <span class="token-keyword">import</span> WD_PARAGRAPH_ALIGNMENT
+<span class="token-keyword">from</span> pathlib <span class="token-keyword">import</span> Path
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">DocxParser</span>(BaseParser):
+    <span class="token-string">"""
+    Parse Word documents: memos, proposals, meeting notes.
+    Preserves headings, tables, and document structure.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        <span class="token-keyword">return</span> Path(source).suffix.lower() <span class="token-keyword">in</span> (<span class="token-string">".docx"</span>, <span class="token-string">".doc"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        path = Path(source)
+        doc = Document(source)
+        
+        <span class="token-comment"># Extract all paragraphs with structure</span>
+        content_parts = []
+        sections = []
+        current_section = {<span class="token-string">"heading"</span>: <span class="token-string">"Introduction"</span>, <span class="token-string">"level"</span>: <span class="token-number">1</span>, <span class="token-string">"content"</span>: <span class="token-string">""</span>}
+        
+        <span class="token-keyword">for</span> para <span class="token-keyword">in</span> doc.paragraphs:
+            <span class="token-keyword">if</span> para.style.name.startswith(<span class="token-string">"Heading"</span>):
+                <span class="token-comment"># Save previous section</span>
+                <span class="token-keyword">if</span> current_section[<span class="token-string">"content"</span>].strip():
+                    sections.append(current_section)
+                
+                level = <span class="token-builtin">int</span>(para.style.name.replace(<span class="token-string">"Heading "</span>, <span class="token-string">""</span>) <span class="token-keyword">or</span> <span class="token-string">"1"</span>)
+                current_section = {
+                    <span class="token-string">"heading"</span>: para.text,
+                    <span class="token-string">"level"</span>: level,
+                    <span class="token-string">"content"</span>: <span class="token-string">""</span>
+                }
+                content_parts.append(<span class="token-string">f"\n{'#' * level} {para.text}\n"</span>)
+            <span class="token-keyword">else</span>:
+                content_parts.append(para.text)
+                current_section[<span class="token-string">"content"</span>] += para.text + <span class="token-string">"\n"</span>
+        
+        <span class="token-keyword">if</span> current_section[<span class="token-string">"content"</span>].strip():
+            sections.append(current_section)
+        
+        <span class="token-comment"># Extract tables</span>
+        tables = []
+        <span class="token-keyword">for</span> table <span class="token-keyword">in</span> doc.tables:
+            rows = []
+            <span class="token-keyword">for</span> row <span class="token-keyword">in</span> table.rows:
+                rows.append([cell.text <span class="token-keyword">for</span> cell <span class="token-keyword">in</span> row.cells])
+            tables.append({
+                <span class="token-string">"headers"</span>: rows[<span class="token-number">0</span>] <span class="token-keyword">if</span> rows <span class="token-keyword">else</span> [],
+                <span class="token-string">"data"</span>: rows[<span class="token-number">1</span>:] <span class="token-keyword">if</span> <span class="token-builtin">len</span>(rows) > <span class="token-number">1</span> <span class="token-keyword">else</span> rows
+            })
+        
+        <span class="token-comment"># Get core properties</span>
+        props = doc.core_properties
+        full_text = <span class="token-string">"\n"</span>.join(content_parts)
+        
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(source, full_text),
+            content=full_text,
+            source_type=SourceType.DOCX,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=props.title <span class="token-keyword">or</span> path.stem,
+            author=props.author,
+            created_at=props.created,
+            updated_at=props.modified,
+            tables=tables,
+            sections=sections,
+            metadata={
+                <span class="token-string">"category"</span>: props.category <span class="token-keyword">or</span> <span class="token-string">""</span>,
+                <span class="token-string">"comments"</span>: props.comments <span class="token-keyword">or</span> <span class="token-string">""</span>,
+                <span class="token-string">"revision"</span>: props.revision
+            }
+        )]</code></pre>
+
+            <!-- ===== EMAIL PARSER ===== -->
+            <h2>3. Email Parser (Customer Conversations, Internal Communications)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/email_parser.py</span>
+
+<span class="token-keyword">import</span> email
+<span class="token-keyword">from</span> email <span class="token-keyword">import</span> policy
+<span class="token-keyword">from</span> pathlib <span class="token-keyword">import</span> Path
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">import</span> extract_msg
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">EmailParser</span>(BaseParser):
+    <span class="token-string">"""
+    Parse email files: .eml (standard) and .msg (Outlook).
+    Extracts subject, sender, recipients, body, and attachments list.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        <span class="token-keyword">return</span> Path(source).suffix.lower() <span class="token-keyword">in</span> (<span class="token-string">".eml"</span>, <span class="token-string">".msg"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        path = Path(source)
+        
+        <span class="token-keyword">if</span> path.suffix.lower() == <span class="token-string">".msg"</span>:
+            <span class="token-keyword">return</span> self._parse_msg(path)
+        <span class="token-keyword">else</span>:
+            <span class="token-keyword">return</span> self._parse_eml(path)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_eml</span>(self, path: Path) -> List[ParsedDocument]:
+        <span class="token-string">"""Parse standard .eml email files."""</span>
+        <span class="token-keyword">with</span> <span class="token-builtin">open</span>(path, <span class="token-string">"rb"</span>) <span class="token-keyword">as</span> f:
+            msg = email.message_from_binary_file(f, policy=policy.default)
+        
+        <span class="token-comment"># Extract body text</span>
+        body = msg.get_body(preferencelist=(<span class="token-string">"plain"</span>, <span class="token-string">"html"</span>))
+        content = body.get_content() <span class="token-keyword">if</span> body <span class="token-keyword">else</span> <span class="token-string">""</span>
+        
+        <span class="token-comment"># Clean HTML if needed</span>
+        <span class="token-keyword">if</span> <span class="token-string">"&lt;"</span> <span class="token-keyword">in</span> content <span class="token-keyword">and</span> <span class="token-string">"&gt;"</span> <span class="token-keyword">in</span> content:
+            <span class="token-keyword">from</span> bs4 <span class="token-keyword">import</span> BeautifulSoup
+            content = BeautifulSoup(content, <span class="token-string">"html.parser"</span>).get_text(separator=<span class="token-string">"\n"</span>)
+        
+        <span class="token-comment"># Get attachment names</span>
+        attachments = [
+            part.get_filename()
+            <span class="token-keyword">for</span> part <span class="token-keyword">in</span> msg.walk()
+            <span class="token-keyword">if</span> part.get_content_disposition() == <span class="token-string">"attachment"</span>
+        ]
+        
+        <span class="token-comment"># Build structured content</span>
+        structured = <span class="token-string">f"""From: {msg['from']}
+To: {msg['to']}
+Subject: {msg['subject']}
+Date: {msg['date']}
+
+{content}"""</span>
+        
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(<span class="token-builtin">str</span>(path), content),
+            content=structured,
+            source_type=SourceType.EMAIL,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=msg[<span class="token-string">"subject"</span>] <span class="token-keyword">or</span> <span class="token-string">"(No Subject)"</span>,
+            author=msg[<span class="token-string">"from"</span>],
+            created_at=self._parse_email_date(msg[<span class="token-string">"date"</span>]),
+            metadata={
+                <span class="token-string">"to"</span>: msg[<span class="token-string">"to"</span>],
+                <span class="token-string">"cc"</span>: msg.get(<span class="token-string">"cc"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"message_id"</span>: msg[<span class="token-string">"message-id"</span>],
+                <span class="token-string">"in_reply_to"</span>: msg.get(<span class="token-string">"in-reply-to"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"attachments"</span>: attachments,
+                <span class="token-string">"thread_id"</span>: msg.get(<span class="token-string">"references"</span>, <span class="token-string">""</span>)
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_msg</span>(self, path: Path) -> List[ParsedDocument]:
+        <span class="token-string">"""Parse Outlook .msg files."""</span>
+        msg = extract_msg.Message(<span class="token-builtin">str</span>(path))
+        
+        structured = <span class="token-string">f"""From: {msg.sender}
+To: {msg.to}
+Subject: {msg.subject}
+Date: {msg.date}
+
+{msg.body}"""</span>
+        
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(<span class="token-builtin">str</span>(path), msg.body <span class="token-keyword">or</span> <span class="token-string">""</span>),
+            content=structured,
+            source_type=SourceType.EMAIL,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=msg.subject <span class="token-keyword">or</span> <span class="token-string">"(No Subject)"</span>,
+            author=msg.sender,
+            created_at=msg.date,
+            metadata={
+                <span class="token-string">"to"</span>: msg.to,
+                <span class="token-string">"cc"</span>: msg.cc <span class="token-keyword">or</span> <span class="token-string">""</span>,
+                <span class="token-string">"attachments"</span>: [a.longFilename <span class="token-keyword">for</span> a <span class="token-keyword">in</span> msg.attachments]
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_email_date</span>(self, date_str) -> datetime:
+        <span class="token-keyword">from</span> email.utils <span class="token-keyword">import</span> parsedate_to_datetime
+        <span class="token-keyword">try</span>:
+            <span class="token-keyword">return</span> parsedate_to_datetime(date_str)
+        <span class="token-keyword">except</span>:
+            <span class="token-keyword">return</span> datetime.now()</code></pre>
+
+            <!-- ===== WEB PARSER ===== -->
+            <h2>4. Web Page Parser (Knowledge Bases, Documentation Sites)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/web_parser.py</span>
+
+<span class="token-keyword">import</span> httpx
+<span class="token-keyword">import</span> trafilatura
+<span class="token-keyword">from</span> urllib.parse <span class="token-keyword">import</span> urlparse
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">WebParser</span>(BaseParser):
+    <span class="token-string">"""
+    Parse web pages: documentation, knowledge bases, articles.
+    Uses trafilatura for clean content extraction (removes nav, ads, etc).
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        <span class="token-keyword">return</span> source.startswith((<span class="token-string">"http://"</span>, <span class="token-string">"https://"</span>))
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        <span class="token-comment"># Fetch the page</span>
+        response = httpx.get(
+            source, 
+            follow_redirects=<span class="token-keyword">True</span>,
+            timeout=<span class="token-number">30</span>,
+            headers={<span class="token-string">"User-Agent"</span>: <span class="token-string">"EnterpriseRAG/1.0 (internal indexing)"</span>}
+        )
+        response.raise_for_status()
+        
+        <span class="token-comment"># Extract clean content using trafilatura</span>
+        content = trafilatura.extract(
+            response.text,
+            include_tables=<span class="token-keyword">True</span>,
+            include_links=<span class="token-keyword">False</span>,
+            include_comments=<span class="token-keyword">False</span>,
+            output_format=<span class="token-string">"txt"</span>,
+            favor_precision=<span class="token-keyword">True</span>  <span class="token-comment"># Prefer precision over recall</span>
+        )
+        
+        <span class="token-keyword">if not</span> content:
+            <span class="token-keyword">return</span> []
+        
+        <span class="token-comment"># Extract metadata</span>
+        metadata = trafilatura.extract(
+            response.text,
+            output_format=<span class="token-string">"xmltei"</span>,  <span class="token-comment"># Rich metadata format</span>
+            only_with_metadata=<span class="token-keyword">True</span>
+        )
+        
+        parsed = urlparse(source)
+        
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(source, content),
+            content=content,
+            source_type=SourceType.WEB,
+            source_path=source,
+            title=self._extract_title(response.text) <span class="token-keyword">or</span> parsed.path,
+            created_at=datetime.now(),  <span class="token-comment"># Use fetch time</span>
+            metadata={
+                <span class="token-string">"domain"</span>: parsed.netloc,
+                <span class="token-string">"url"</span>: source,
+                <span class="token-string">"status_code"</span>: response.status_code,
+                <span class="token-string">"content_type"</span>: response.headers.get(<span class="token-string">"content-type"</span>, <span class="token-string">""</span>)
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_extract_title</span>(self, html: <span class="token-builtin">str</span>) -> <span class="token-builtin">str</span>:
+        <span class="token-keyword">from</span> bs4 <span class="token-keyword">import</span> BeautifulSoup
+        soup = BeautifulSoup(html, <span class="token-string">"html.parser"</span>)
+        title_tag = soup.find(<span class="token-string">"title"</span>)
+        <span class="token-keyword">return</span> title_tag.text.strip() <span class="token-keyword">if</span> title_tag <span class="token-keyword">else</span> <span class="token-string">""</span></code></pre>
+
+            <!-- ===== DATABASE PARSER ===== -->
+            <h2>5. Database Parser (Product Catalogs, Customer Records)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/db_parser.py</span>
+
+<span class="token-keyword">from</span> sqlalchemy <span class="token-keyword">import</span> create_engine, text, inspect
+<span class="token-keyword">import</span> pandas <span class="token-keyword">as</span> pd
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">DatabaseParser</span>(BaseParser):
+    <span class="token-string">"""
+    Parse database records into documents.
+    Each row becomes a document (or grouped by a key).
+    Handles: PostgreSQL, MySQL, SQLite, SQL Server.
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        <span class="token-comment"># Connection strings: postgresql://, mysql://, sqlite:///</span>
+        db_prefixes = (<span class="token-string">"postgresql://"</span>, <span class="token-string">"mysql://"</span>, <span class="token-string">"sqlite:///"</span>, <span class="token-string">"mssql://"</span>)
+        <span class="token-keyword">return</span> source.startswith(db_prefixes)
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        <span class="token-string">"""
+        Parse all tables in a database into documents.
+        Each row → one ParsedDocument.
+        """</span>
+        engine = create_engine(source)
+        inspector = inspect(engine)
+        all_docs = []
+        
+        <span class="token-keyword">for</span> table_name <span class="token-keyword">in</span> inspector.get_table_names():
+            docs = self._parse_table(engine, table_name, source)
+            all_docs.extend(docs)
+        
+        <span class="token-keyword">return</span> all_docs
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_table</span>(self, engine, table_name: <span class="token-builtin">str</span>, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        <span class="token-string">"""Convert each row of a table into a document."""</span>
+        df = pd.read_sql_table(table_name, engine)
+        docs = []
+        
+        <span class="token-keyword">for</span> idx, row <span class="token-keyword">in</span> df.iterrows():
+            <span class="token-comment"># Convert row to natural language description</span>
+            content_parts = [<span class="token-string">f"Record from table '{table_name}':"</span>]
+            <span class="token-keyword">for</span> col, val <span class="token-keyword">in</span> row.items():
+                <span class="token-keyword">if</span> pd.notna(val) <span class="token-keyword">and</span> <span class="token-builtin">str</span>(val).strip():
+                    content_parts.append(<span class="token-string">f"- {col}: {val}"</span>)
+            
+            content = <span class="token-string">"\n"</span>.join(content_parts)
+            
+            docs.append(ParsedDocument(
+                id=self._generate_id(<span class="token-string">f"{source}:{table_name}:{idx}"</span>, content),
+                content=content,
+                source_type=SourceType.DATABASE,
+                source_path=source,
+                title=<span class="token-string">f"{table_name} record #{idx}"</span>,
+                created_at=datetime.now(),
+                metadata={
+                    <span class="token-string">"table"</span>: table_name,
+                    <span class="token-string">"row_index"</span>: idx,
+                    <span class="token-string">"columns"</span>: <span class="token-builtin">list</span>(row.index)
+                }
+            ))
+        
+        <span class="token-keyword">return</span> docs</code></pre>
+
+            <!-- ===== SLACK PARSER ===== -->
+            <h2>6. Slack/Teams Parser (Discussions, Decisions)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/slack_parser.py</span>
+
+<span class="token-keyword">from</span> slack_sdk <span class="token-keyword">import</span> WebClient
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">SlackParser</span>(BaseParser):
+    <span class="token-string">"""
+    Parse Slack conversations into documents.
+    Groups messages by thread for context preservation.
+    Source format: "slack://CHANNEL_ID" or "slack://CHANNEL_ID/THREAD_TS"
+    """</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, bot_token: <span class="token-builtin">str</span> = <span class="token-keyword">None</span>):
+        <span class="token-keyword">import</span> os
+        self.client = WebClient(token=bot_token <span class="token-keyword">or</span> os.getenv(<span class="token-string">"SLACK_BOT_TOKEN"</span>))
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        <span class="token-keyword">return</span> source.startswith(<span class="token-string">"slack://"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        <span class="token-comment"># Parse source: slack://CHANNEL_ID</span>
+        channel_id = source.replace(<span class="token-string">"slack://"</span>, <span class="token-string">""</span>).split(<span class="token-string">"/"</span>)[<span class="token-number">0</span>]
+        
+        <span class="token-comment"># Fetch channel messages</span>
+        result = self.client.conversations_history(
+            channel=channel_id,
+            limit=<span class="token-number">1000</span>
+        )
+        
+        messages = result[<span class="token-string">"messages"</span>]
+        
+        <span class="token-comment"># Group messages by thread</span>
+        threads = self._group_by_thread(channel_id, messages)
+        
+        <span class="token-comment"># Convert each thread to a document</span>
+        docs = []
+        <span class="token-keyword">for</span> thread <span class="token-keyword">in</span> threads:
+            doc = self._thread_to_document(thread, channel_id, source)
+            docs.append(doc)
+        
+        <span class="token-keyword">return</span> docs
+    
+    <span class="token-keyword">def</span> <span class="token-function">_group_by_thread</span>(self, channel_id: <span class="token-builtin">str</span>, messages: List[Dict]) -> List[List[Dict]]:
+        <span class="token-string">"""Group messages into threads (parent + replies)."""</span>
+        threads = {}
+        standalone = []
+        
+        <span class="token-keyword">for</span> msg <span class="token-keyword">in</span> messages:
+            thread_ts = msg.get(<span class="token-string">"thread_ts"</span>)
+            
+            <span class="token-keyword">if</span> thread_ts <span class="token-keyword">and</span> thread_ts != msg.get(<span class="token-string">"ts"</span>):
+                <span class="token-comment"># This is a reply</span>
+                <span class="token-keyword">continue</span>  <span class="token-comment"># We'll fetch full threads below</span>
+            <span class="token-keyword">elif</span> msg.get(<span class="token-string">"reply_count"</span>, <span class="token-number">0</span>) > <span class="token-number">0</span>:
+                <span class="token-comment"># This is a thread parent — fetch replies</span>
+                replies = self.client.conversations_replies(
+                    channel=channel_id,
+                    ts=msg[<span class="token-string">"ts"</span>]
+                )
+                threads[msg[<span class="token-string">"ts"</span>]] = replies[<span class="token-string">"messages"</span>]
+            <span class="token-keyword">else</span>:
+                standalone.append([msg])
+        
+        <span class="token-keyword">return</span> <span class="token-builtin">list</span>(threads.values()) + standalone
+    
+    <span class="token-keyword">def</span> <span class="token-function">_thread_to_document</span>(self, thread: List[Dict], channel_id: <span class="token-builtin">str</span>, source: <span class="token-builtin">str</span>) -> ParsedDocument:
+        <span class="token-string">"""Convert a thread (list of messages) to a document."""</span>
+        parts = []
+        <span class="token-keyword">for</span> msg <span class="token-keyword">in</span> thread:
+            user = msg.get(<span class="token-string">"user"</span>, <span class="token-string">"unknown"</span>)
+            text = msg.get(<span class="token-string">"text"</span>, <span class="token-string">""</span>)
+            ts = datetime.fromtimestamp(<span class="token-builtin">float</span>(msg[<span class="token-string">"ts"</span>]))
+            parts.append(<span class="token-string">f"[{ts.strftime('%Y-%m-%d %H:%M')}] {user}: {text}"</span>)
+        
+        content = <span class="token-string">"\n"</span>.join(parts)
+        first_msg = thread[<span class="token-number">0</span>]
+        
+        <span class="token-keyword">return</span> ParsedDocument(
+            id=self._generate_id(source, content),
+            content=content,
+            source_type=SourceType.SLACK,
+            source_path=source,
+            title=first_msg.get(<span class="token-string">"text"</span>, <span class="token-string">""</span>)[:<span class="token-number">80</span>],
+            author=first_msg.get(<span class="token-string">"user"</span>),
+            created_at=datetime.fromtimestamp(<span class="token-builtin">float</span>(first_msg[<span class="token-string">"ts"</span>])),
+            metadata={
+                <span class="token-string">"channel_id"</span>: channel_id,
+                <span class="token-string">"thread_ts"</span>: first_msg.get(<span class="token-string">"ts"</span>),
+                <span class="token-string">"reply_count"</span>: <span class="token-builtin">len</span>(thread) - <span class="token-number">1</span>,
+                <span class="token-string">"participants"</span>: <span class="token-builtin">list</span>(<span class="token-builtin">set</span>(m.get(<span class="token-string">"user"</span>, <span class="token-string">""</span>) <span class="token-keyword">for</span> m <span class="token-keyword">in</span> thread))
+            }
+        )</code></pre>
+
+            <!-- ===== CODE PARSER ===== -->
+            <h2>7. Code Repository Parser (Documentation, READMEs, Code)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/code_parser.py</span>
+
+<span class="token-keyword">import</span> os
+<span class="token-keyword">from</span> pathlib <span class="token-keyword">import</span> Path
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">CodeParser</span>(BaseParser):
+    <span class="token-string">"""
+    Parse code repositories: READMEs, documentation, source code.
+    Extracts function signatures, docstrings, and comments.
+    """</span>
+    
+    CODE_EXTENSIONS = {
+        <span class="token-string">".py"</span>, <span class="token-string">".js"</span>, <span class="token-string">".ts"</span>, <span class="token-string">".java"</span>, <span class="token-string">".go"</span>, <span class="token-string">".rs"</span>,
+        <span class="token-string">".cpp"</span>, <span class="token-string">".c"</span>, <span class="token-string">".rb"</span>, <span class="token-string">".php"</span>, <span class="token-string">".swift"</span>, <span class="token-string">".kt"</span>
+    }
+    DOC_EXTENSIONS = {<span class="token-string">".md"</span>, <span class="token-string">".rst"</span>, <span class="token-string">".txt"</span>, <span class="token-string">".adoc"</span>}
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        path = Path(source)
+        <span class="token-keyword">return</span> (
+            path.suffix.lower() <span class="token-keyword">in</span> self.CODE_EXTENSIONS | self.DOC_EXTENSIONS
+            <span class="token-keyword">or</span> path.name.lower() <span class="token-keyword">in</span> (<span class="token-string">"readme"</span>, <span class="token-string">"readme.md"</span>, <span class="token-string">"contributing.md"</span>)
+        )
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        path = Path(source)
+        
+        <span class="token-keyword">if</span> path.suffix.lower() <span class="token-keyword">in</span> self.DOC_EXTENSIONS:
+            <span class="token-keyword">return</span> self._parse_documentation(path)
+        <span class="token-keyword">else</span>:
+            <span class="token-keyword">return</span> self._parse_source_code(path)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_documentation</span>(self, path: Path) -> List[ParsedDocument]:
+        <span class="token-string">"""Parse markdown/text documentation files."""</span>
+        content = path.read_text(encoding=<span class="token-string">"utf-8"</span>, errors=<span class="token-string">"ignore"</span>)
+        
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(<span class="token-builtin">str</span>(path), content),
+            content=content,
+            source_type=SourceType.CODE,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=path.name,
+            metadata={
+                <span class="token-string">"file_type"</span>: <span class="token-string">"documentation"</span>,
+                <span class="token-string">"extension"</span>: path.suffix,
+                <span class="token-string">"repo_path"</span>: <span class="token-builtin">str</span>(path)
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_source_code</span>(self, path: Path) -> List[ParsedDocument]:
+        <span class="token-string">"""
+        Parse source code: extract functions with docstrings.
+        Each function/class with a docstring → one document.
+        """</span>
+        content = path.read_text(encoding=<span class="token-string">"utf-8"</span>, errors=<span class="token-string">"ignore"</span>)
+        
+        <span class="token-keyword">if</span> path.suffix == <span class="token-string">".py"</span>:
+            <span class="token-keyword">return</span> self._parse_python_code(path, content)
+        
+        <span class="token-comment"># For non-Python: treat entire file as one document</span>
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(<span class="token-builtin">str</span>(path), content),
+            content=<span class="token-string">f"File: {path.name}\nLanguage: {path.suffix[1:]}\n\n{content}"</span>,
+            source_type=SourceType.CODE,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=path.name,
+            metadata={
+                <span class="token-string">"file_type"</span>: <span class="token-string">"source_code"</span>,
+                <span class="token-string">"language"</span>: path.suffix[<span class="token-number">1</span>:],
+                <span class="token-string">"line_count"</span>: content.count(<span class="token-string">"\n"</span>)
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_python_code</span>(self, path: Path, content: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        <span class="token-string">"""Extract Python functions/classes with docstrings."""</span>
+        <span class="token-keyword">import</span> ast
+        
+        <span class="token-keyword">try</span>:
+            tree = ast.parse(content)
+        <span class="token-keyword">except</span> SyntaxError:
+            <span class="token-keyword">return</span> [ParsedDocument(
+                id=self._generate_id(<span class="token-builtin">str</span>(path), content),
+                content=content,
+                source_type=SourceType.CODE,
+                source_path=<span class="token-builtin">str</span>(path.absolute()),
+                title=path.name,
+                metadata={<span class="token-string">"file_type"</span>: <span class="token-string">"source_code"</span>, <span class="token-string">"language"</span>: <span class="token-string">"python"</span>}
+            )]
+        
+        docs = []
+        <span class="token-keyword">for</span> node <span class="token-keyword">in</span> ast.walk(tree):
+            <span class="token-keyword">if</span> <span class="token-builtin">isinstance</span>(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                docstring = ast.get_docstring(node)
+                <span class="token-keyword">if</span> docstring:
+                    <span class="token-comment"># Get the source code of this function/class</span>
+                    source_lines = content.split(<span class="token-string">"\n"</span>)
+                    func_source = <span class="token-string">"\n"</span>.join(
+                        source_lines[node.lineno - <span class="token-number">1</span>:node.end_lineno]
+                    )
+                    
+                    doc_content = <span class="token-string">f"""Function: {node.name}
+File: {path.name}
+Docstring: {docstring}
+
+Source Code:
+{func_source}"""</span>
+                    
+                    docs.append(ParsedDocument(
+                        id=self._generate_id(<span class="token-string">f"{path}:{node.name}"</span>, doc_content),
+                        content=doc_content,
+                        source_type=SourceType.CODE,
+                        source_path=<span class="token-builtin">str</span>(path.absolute()),
+                        title=<span class="token-string">f"{path.name}::{node.name}"</span>,
+                        metadata={
+                            <span class="token-string">"file_type"</span>: <span class="token-string">"source_code"</span>,
+                            <span class="token-string">"language"</span>: <span class="token-string">"python"</span>,
+                            <span class="token-string">"symbol_type"</span>: type(node).__name__,
+                            <span class="token-string">"line_number"</span>: node.lineno
+                        }
+                    ))
+        
+        <span class="token-comment"># If no documented functions, return whole file</span>
+        <span class="token-keyword">if not</span> docs:
+            docs.append(ParsedDocument(
+                id=self._generate_id(<span class="token-builtin">str</span>(path), content),
+                content=content,
+                source_type=SourceType.CODE,
+                source_path=<span class="token-builtin">str</span>(path.absolute()),
+                title=path.name,
+                metadata={<span class="token-string">"file_type"</span>: <span class="token-string">"source_code"</span>, <span class="token-string">"language"</span>: <span class="token-string">"python"</span>}
+            ))
+        
+        <span class="token-keyword">return</span> docs</code></pre>
+
+            <!-- ===== OCR PARSER ===== -->
+            <h2>8. OCR Parser (Scanned Documents, Papers, Handwritten)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/ocr_parser.py</span>
+
+<span class="token-keyword">from</span> paddleocr <span class="token-keyword">import</span> PaddleOCR
+<span class="token-keyword">from</span> pathlib <span class="token-keyword">import</span> Path
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">import</span> fitz  <span class="token-comment"># PyMuPDF for converting PDF pages to images</span>
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">OCRParser</span>(BaseParser):
+    <span class="token-string">"""
+    OCR parser for scanned documents, images, and image-based PDFs.
+    Uses PaddleOCR (SOTA accuracy, 80+ languages).
+    Tesseract as fallback.
+    """</span>
+    
+    IMAGE_EXTENSIONS = {<span class="token-string">".png"</span>, <span class="token-string">".jpg"</span>, <span class="token-string">".jpeg"</span>, <span class="token-string">".tiff"</span>, <span class="token-string">".tif"</span>, <span class="token-string">".bmp"</span>}
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.ocr = PaddleOCR(
+            use_angle_cls=<span class="token-keyword">True</span>,  <span class="token-comment"># Detect rotated text</span>
+            lang=<span class="token-string">"en"</span>,             <span class="token-comment"># Default language</span>
+            show_log=<span class="token-keyword">False</span>
+        )
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        path = Path(source)
+        <span class="token-comment"># Handle images directly or PDFs that failed text extraction</span>
+        <span class="token-keyword">return</span> path.suffix.lower() <span class="token-keyword">in</span> self.IMAGE_EXTENSIONS <span class="token-keyword">or</span> (
+            path.suffix.lower() == <span class="token-string">".pdf"</span> <span class="token-keyword">and</span> self._is_scanned(path)
+        )
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        path = Path(source)
+        
+        <span class="token-keyword">if</span> path.suffix.lower() == <span class="token-string">".pdf"</span>:
+            <span class="token-keyword">return</span> self._ocr_pdf(path)
+        <span class="token-keyword">else</span>:
+            <span class="token-keyword">return</span> self._ocr_image(path)
+    
+    <span class="token-keyword">def</span> <span class="token-function">_ocr_image</span>(self, path: Path) -> List[ParsedDocument]:
+        <span class="token-string">"""OCR a single image file."""</span>
+        result = self.ocr.ocr(<span class="token-builtin">str</span>(path), cls=<span class="token-keyword">True</span>)
+        
+        <span class="token-comment"># Extract text with position ordering (top-to-bottom, left-to-right)</span>
+        lines = []
+        confidence_scores = []
+        
+        <span class="token-keyword">for</span> page_result <span class="token-keyword">in</span> result:
+            <span class="token-keyword">if</span> page_result:
+                <span class="token-comment"># Sort by y-coordinate (top to bottom), then x (left to right)</span>
+                sorted_results = sorted(page_result, key=<span class="token-keyword">lambda</span> x: (x[<span class="token-number">0</span>][<span class="token-number">0</span>][<span class="token-number">1</span>], x[<span class="token-number">0</span>][<span class="token-number">0</span>][<span class="token-number">0</span>]))
+                <span class="token-keyword">for</span> line_data <span class="token-keyword">in</span> sorted_results:
+                    text = line_data[<span class="token-number">1</span>][<span class="token-number">0</span>]
+                    confidence = line_data[<span class="token-number">1</span>][<span class="token-number">1</span>]
+                    lines.append(text)
+                    confidence_scores.append(confidence)
+        
+        content = <span class="token-string">"\n"</span>.join(lines)
+        avg_confidence = sum(confidence_scores) / <span class="token-builtin">len</span>(confidence_scores) <span class="token-keyword">if</span> confidence_scores <span class="token-keyword">else</span> <span class="token-number">0</span>
+        
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(<span class="token-builtin">str</span>(path), content),
+            content=content,
+            source_type=SourceType.OCR,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=path.stem,
+            created_at=datetime.fromtimestamp(path.stat().st_mtime),
+            confidence=avg_confidence,
+            metadata={
+                <span class="token-string">"ocr_engine"</span>: <span class="token-string">"PaddleOCR"</span>,
+                <span class="token-string">"avg_confidence"</span>: avg_confidence,
+                <span class="token-string">"line_count"</span>: <span class="token-builtin">len</span>(lines)
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_ocr_pdf</span>(self, path: Path) -> List[ParsedDocument]:
+        <span class="token-string">"""OCR a scanned PDF by converting pages to images first."""</span>
+        doc = fitz.open(<span class="token-builtin">str</span>(path))
+        all_text = []
+        total_confidence = []
+        
+        <span class="token-keyword">for</span> page_num <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-builtin">len</span>(doc)):
+            page = doc[page_num]
+            <span class="token-comment"># Render page as image (300 DPI for OCR quality)</span>
+            mat = fitz.Matrix(<span class="token-number">300</span>/<span class="token-number">72</span>, <span class="token-number">300</span>/<span class="token-number">72</span>)
+            pix = page.get_pixmap(matrix=mat)
+            img_path = <span class="token-string">f"/tmp/ocr_page_{page_num}.png"</span>
+            pix.save(img_path)
+            
+            <span class="token-comment"># OCR the page image</span>
+            result = self.ocr.ocr(img_path, cls=<span class="token-keyword">True</span>)
+            <span class="token-keyword">for</span> page_result <span class="token-keyword">in</span> result:
+                <span class="token-keyword">if</span> page_result:
+                    <span class="token-keyword">for</span> line_data <span class="token-keyword">in</span> page_result:
+                        all_text.append(line_data[<span class="token-number">1</span>][<span class="token-number">0</span>])
+                        total_confidence.append(line_data[<span class="token-number">1</span>][<span class="token-number">1</span>])
+            
+            all_text.append(<span class="token-string">f"\n--- Page {page_num + 1} ---\n"</span>)
+        
+        doc.close()
+        content = <span class="token-string">"\n"</span>.join(all_text)
+        avg_conf = sum(total_confidence) / <span class="token-builtin">len</span>(total_confidence) <span class="token-keyword">if</span> total_confidence <span class="token-keyword">else</span> <span class="token-number">0</span>
+        
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(<span class="token-builtin">str</span>(path), content),
+            content=content,
+            source_type=SourceType.OCR,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=path.stem,
+            page_count=<span class="token-builtin">len</span>(doc),
+            confidence=avg_conf,
+            metadata={
+                <span class="token-string">"ocr_engine"</span>: <span class="token-string">"PaddleOCR"</span>,
+                <span class="token-string">"avg_confidence"</span>: avg_conf,
+                <span class="token-string">"is_scanned_pdf"</span>: <span class="token-keyword">True</span>
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_is_scanned</span>(self, path: Path) -> <span class="token-builtin">bool</span>:
+        <span class="token-string">"""Check if a PDF is image-based."""</span>
+        <span class="token-keyword">try</span>:
+            doc = fitz.open(<span class="token-builtin">str</span>(path))
+            <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-builtin">min</span>(<span class="token-number">3</span>, <span class="token-builtin">len</span>(doc))):
+                <span class="token-keyword">if</span> <span class="token-builtin">len</span>(doc[i].get_text().strip()) > <span class="token-number">50</span>:
+                    doc.close()
+                    <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+            doc.close()
+            <span class="token-keyword">return</span> <span class="token-keyword">True</span>
+        <span class="token-keyword">except</span>:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span></code></pre>
+
+            <!-- ===== BILL PARSER ===== -->
+            <h2>9. Bill/Invoice Parser (Invoices, Receipts, Financial Documents)</h2>
+
+<pre><code><span class="token-comment"># src/parsers/bill_parser.py</span>
+
+<span class="token-keyword">import</span> re
+<span class="token-keyword">from</span> pathlib <span class="token-keyword">import</span> Path
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> List, Dict
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">import</span> pdfplumber
+<span class="token-keyword">from</span> .base <span class="token-keyword">import</span> BaseParser, ParsedDocument, SourceType
+
+<span class="token-keyword">class</span> <span class="token-class">BillParser</span>(BaseParser):
+    <span class="token-string">"""
+    Parse bills, invoices, and receipts.
+    Extracts structured data: vendor, amount, line items, dates.
+    Uses pdfplumber for precise table extraction + regex for key fields.
+    """</span>
+    
+    <span class="token-comment"># Keywords that identify a document as a bill/invoice</span>
+    BILL_KEYWORDS = {
+        <span class="token-string">"invoice"</span>, <span class="token-string">"receipt"</span>, <span class="token-string">"bill"</span>, <span class="token-string">"statement"</span>,
+        <span class="token-string">"amount due"</span>, <span class="token-string">"total"</span>, <span class="token-string">"payment"</span>, <span class="token-string">"purchase order"</span>
+    }
+    
+    <span class="token-keyword">def</span> <span class="token-function">can_handle</span>(self, source: <span class="token-builtin">str</span>) -> <span class="token-builtin">bool</span>:
+        path = Path(source)
+        <span class="token-keyword">if</span> path.suffix.lower() != <span class="token-string">".pdf"</span>:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        
+        <span class="token-comment"># Check filename for bill-related keywords</span>
+        name_lower = path.stem.lower()
+        <span class="token-keyword">return</span> <span class="token-builtin">any</span>(kw <span class="token-keyword">in</span> name_lower <span class="token-keyword">for</span> kw <span class="token-keyword">in</span> self.BILL_KEYWORDS)
+    
+    <span class="token-keyword">def</span> <span class="token-function">parse</span>(self, source: <span class="token-builtin">str</span>) -> List[ParsedDocument]:
+        path = Path(source)
+        
+        <span class="token-keyword">with</span> pdfplumber.open(source) <span class="token-keyword">as</span> pdf:
+            <span class="token-comment"># Extract all text</span>
+            full_text = <span class="token-string">""</span>
+            tables = []
+            
+            <span class="token-keyword">for</span> page <span class="token-keyword">in</span> pdf.pages:
+                full_text += page.extract_text() <span class="token-keyword">or</span> <span class="token-string">""</span>
+                full_text += <span class="token-string">"\n"</span>
+                
+                <span class="token-comment"># Extract tables (line items)</span>
+                page_tables = page.extract_tables()
+                <span class="token-keyword">for</span> table <span class="token-keyword">in</span> page_tables:
+                    <span class="token-keyword">if</span> table:
+                        tables.append({
+                            <span class="token-string">"headers"</span>: table[<span class="token-number">0</span>],
+                            <span class="token-string">"data"</span>: table[<span class="token-number">1</span>:]
+                        })
+        
+        <span class="token-comment"># Extract structured fields using regex</span>
+        extracted = self._extract_bill_fields(full_text)
+        
+        <span class="token-comment"># Create structured content</span>
+        structured_content = <span class="token-string">f"""Invoice/Bill Document
+Vendor: {extracted.get('vendor', 'Unknown')}
+Invoice Number: {extracted.get('invoice_number', 'N/A')}
+Date: {extracted.get('date', 'N/A')}
+Total Amount: {extracted.get('total', 'N/A')}
+Due Date: {extracted.get('due_date', 'N/A')}
+
+Full Content:
+{full_text}"""</span>
+        
+        <span class="token-keyword">return</span> [ParsedDocument(
+            id=self._generate_id(source, full_text),
+            content=structured_content,
+            source_type=SourceType.BILL,
+            source_path=<span class="token-builtin">str</span>(path.absolute()),
+            title=<span class="token-string">f"Invoice: {extracted.get('invoice_number', path.stem)}"</span>,
+            created_at=self._parse_date(extracted.get(<span class="token-string">"date"</span>)),
+            tables=tables,
+            metadata={
+                <span class="token-string">"vendor"</span>: extracted.get(<span class="token-string">"vendor"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"invoice_number"</span>: extracted.get(<span class="token-string">"invoice_number"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"total_amount"</span>: extracted.get(<span class="token-string">"total"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"due_date"</span>: extracted.get(<span class="token-string">"due_date"</span>, <span class="token-string">""</span>),
+                <span class="token-string">"line_items_count"</span>: sum(<span class="token-builtin">len</span>(t[<span class="token-string">"data"</span>]) <span class="token-keyword">for</span> t <span class="token-keyword">in</span> tables)
+            }
+        )]
+    
+    <span class="token-keyword">def</span> <span class="token-function">_extract_bill_fields</span>(self, text: <span class="token-builtin">str</span>) -> Dict:
+        <span class="token-string">"""Extract key fields from invoice text using regex."""</span>
+        fields = {}
+        
+        <span class="token-comment"># Invoice number</span>
+        inv_match = re.search(
+            r<span class="token-string">"(?:invoice|inv|receipt)\s*(?:#|no\.?|number)?\s*:?\s*([A-Z0-9\-]+)"</span>,
+            text, re.IGNORECASE
+        )
+        <span class="token-keyword">if</span> inv_match:
+            fields[<span class="token-string">"invoice_number"</span>] = inv_match.group(<span class="token-number">1</span>)
+        
+        <span class="token-comment"># Total amount</span>
+        total_match = re.search(
+            r<span class="token-string">"(?:total|amount due|grand total)\s*:?\s*\$?([\d,]+\.?\d*)"</span>,
+            text, re.IGNORECASE
+        )
+        <span class="token-keyword">if</span> total_match:
+            fields[<span class="token-string">"total"</span>] = <span class="token-string">f"${total_match.group(1)}"</span>
+        
+        <span class="token-comment"># Date</span>
+        date_match = re.search(
+            r<span class="token-string">"(?:date|issued)\s*:?\s*(\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4})"</span>,
+            text, re.IGNORECASE
+        )
+        <span class="token-keyword">if</span> date_match:
+            fields[<span class="token-string">"date"</span>] = date_match.group(<span class="token-number">1</span>)
+        
+        <span class="token-keyword">return</span> fields
+    
+    <span class="token-keyword">def</span> <span class="token-function">_parse_date</span>(self, date_str) -> datetime:
+        <span class="token-keyword">if not</span> date_str:
+            <span class="token-keyword">return</span> datetime.now()
+        <span class="token-keyword">for</span> fmt <span class="token-keyword">in</span> (<span class="token-string">"%m/%d/%Y"</span>, <span class="token-string">"%d/%m/%Y"</span>, <span class="token-string">"%Y-%m-%d"</span>, <span class="token-string">"%m-%d-%Y"</span>):
+            <span class="token-keyword">try</span>:
+                <span class="token-keyword">return</span> datetime.strptime(date_str, fmt)
+            <span class="token-keyword">except</span> ValueError:
+                <span class="token-keyword">continue</span>
+        <span class="token-keyword">return</span> datetime.now()</code></pre>
+
+            <!-- ===== PARSER COMPARISON ===== -->
+            <h2>Parser Comparison Summary</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Document Type</th>
+                        <th>Library</th>
+                        <th>Input</th>
+                        <th>Output Quality</th>
+                        <th>Speed (1000 docs)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>PDF (text-based)</td>
+                        <td>pymupdf4llm</td>
+                        <td>.pdf files</td>
+                        <td>Excellent (markdown)</td>
+                        <td>~30 seconds</td>
+                    </tr>
+                    <tr>
+                        <td>Word/DOCX</td>
+                        <td>python-docx</td>
+                        <td>.docx files</td>
+                        <td>Excellent (structure)</td>
+                        <td>~15 seconds</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>email + extract-msg</td>
+                        <td>.eml / .msg</td>
+                        <td>Good (threads)</td>
+                        <td>~10 seconds</td>
+                    </tr>
+                    <tr>
+                        <td>Web pages</td>
+                        <td>trafilatura</td>
+                        <td>URLs</td>
+                        <td>Good (clean text)</td>
+                        <td>~60 seconds (network)</td>
+                    </tr>
+                    <tr>
+                        <td>Database</td>
+                        <td>SQLAlchemy + Pandas</td>
+                        <td>Connection string</td>
+                        <td>Good (structured)</td>
+                        <td>~20 seconds</td>
+                    </tr>
+                    <tr>
+                        <td>Slack/Teams</td>
+                        <td>slack-sdk</td>
+                        <td>slack:// URI</td>
+                        <td>Good (threaded)</td>
+                        <td>~45 seconds (API)</td>
+                    </tr>
+                    <tr>
+                        <td>Code</td>
+                        <td>ast + tree-sitter</td>
+                        <td>Source files</td>
+                        <td>Excellent (AST)</td>
+                        <td>~5 seconds</td>
+                    </tr>
+                    <tr>
+                        <td>Scanned/OCR</td>
+                        <td>PaddleOCR</td>
+                        <td>Images, scanned PDFs</td>
+                        <td>Good (85-95% acc)</td>
+                        <td>~5 minutes (GPU)</td>
+                    </tr>
+                    <tr>
+                        <td>Bills/Invoices</td>
+                        <td>pdfplumber + regex</td>
+                        <td>.pdf bills</td>
+                        <td>Good (structured)</td>
+                        <td>~30 seconds</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="project-overview.html" class="prev">Project Overview</a>
+                <a href="project-ingestion.html" class="next">Ingestion Pipeline</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

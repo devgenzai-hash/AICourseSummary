@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthBridge — Product Blueprint & Consultant Strategy</title>
+  <style>
+    :root {
+      --primary:      #0D9488;   /* teal — clinical trust */
+      --primary-dark: #0F766E;
+      --primary-light:#CCFBF1;
+      --blue:         #3B82F6;
+      --blue-light:   #EFF6FF;
+      --amber:        #F59E0B;
+      --amber-light:  #FFFBEB;
+      --danger:       #EF4444;
+      --danger-light: #FEF2F2;
+      --success:      #22C55E;
+      --success-light:#F0FDF4;
+      --purple:       #8B5CF6;
+      --purple-light: #F5F3FF;
+      --gray:         #6B7280;
+      --light:        #F8FAFC;
+      --dark:         #0F172A;
+      --border:       #E2E8F0;
+      --text:         #1E293B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #F0F4F8;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0F766E 0%, #0D9488 50%, #14B8A6 100%);
+      color: white;
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    header .pill {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: .3rem 1.1rem;
+      font-size: .8rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: .5rem;
+      letter-spacing: -0.5px;
+    }
+    header .tagline {
+      font-size: 1.2rem;
+      opacity: .9;
+      max-width: 640px;
+      margin: 0 auto 1.5rem;
+    }
+    .header-meta {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      font-size: .82rem;
+      opacity: .75;
+      margin-top: 1rem;
+    }
+
+    /* ── STICKY NAV ── */
+    nav {
+      background: white;
+      border-bottom: 2px solid var(--border);
+      padding: .65rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+    nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: .8rem;
+      font-weight: 600;
+      padding: .25rem .75rem;
+      border-radius: 20px;
+      transition: all .2s;
+      border: 1px solid transparent;
+    }
+    nav a:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    /* ── LAYOUT ── */
+    main { max-width: 1260px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    section { margin-bottom: 3.5rem; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: .75rem;
+      border-bottom: 2px solid var(--primary-light);
+    }
+    .section-icon {
+      background: var(--primary);
+      color: white;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .section-header .sub {
+      font-size: .9rem;
+      color: var(--gray);
+      margin-top: .1rem;
+    }
+
+    /* ── CALLOUT BOX ── */
+    .callout {
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .callout.green  { background: var(--success-light); border-left: 5px solid var(--success); }
+    .callout.amber  { background: var(--amber-light);   border-left: 5px solid var(--amber); }
+    .callout.red    { background: var(--danger-light);  border-left: 5px solid var(--danger); }
+    .callout.blue   { background: var(--blue-light);    border-left: 5px solid var(--blue); }
+    .callout.teal   { background: var(--primary-light); border-left: 5px solid var(--primary); }
+    .callout.purple { background: var(--purple-light);  border-left: 5px solid var(--purple); }
+    .callout-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: .1rem; }
+    .callout-body strong { font-size: 1rem; display: block; margin-bottom: .25rem; color: var(--dark); }
+    .callout-body p, .callout-body ul { font-size: .9rem; color: #444; }
+    .callout-body ul { padding-left: 1.2rem; margin-top: .3rem; }
+    .callout-body li { margin-bottom: .2rem; }
+
+    /* ── CARD GRID ── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.2rem; }
+    .card-grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.1rem; }
+    .card-grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 1.2rem; }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
+    .card .card-tag {
+      display: inline-block;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: .15rem .55rem;
+      border-radius: 4px;
+      margin-bottom: .6rem;
+    }
+    .card h3 { font-size: 1.05rem; color: var(--dark); margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; }
+    .card p  { font-size: .88rem; color: #555; }
+    .card ul { padding-left: 1.1rem; margin-top: .5rem; }
+    .card ul li { font-size: .85rem; color: #555; margin-bottom: .25rem; }
+
+    /* ── PHASE CARDS ── */
+    .phase-card {
+      background: white;
+      border-radius: 14px;
+      padding: 1.75rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      padding-bottom: .8rem;
+      border-bottom: 2px dashed var(--border);
+    }
+    .phase-num {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+    .phase-info h3 { font-size: 1.2rem; font-weight: 700; color: var(--dark); }
+    .phase-info .phase-sub { font-size: .82rem; color: var(--gray); margin-top: .1rem; }
+    .phase-timeline {
+      display: inline-block;
+      background: #F1F5F9;
+      color: var(--gray);
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .2rem .6rem;
+      border-radius: 4px;
+      margin-left: .5rem;
+    }
+    .feature-list { list-style: none; padding: 0; }
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+      padding: .45rem 0;
+      border-bottom: 1px solid #F8FAFC;
+      font-size: .88rem;
+      color: #334155;
+    }
+    .feature-list li .fi { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+    .feature-list li strong { color: var(--dark); }
+    .priority-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: .55rem;
+    }
+
+    /* ── PERSONA CARDS ── */
+    .persona-card {
+      background: white;
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      border-top: 4px solid transparent;
+    }
+    .persona-card .persona-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: .8rem;
+    }
+    .persona-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .25rem; }
+    .persona-card .role { font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray); margin-bottom: .75rem; }
+    .persona-card .pain { font-size: .85rem; color: #555; margin-bottom: .5rem; }
+    .persona-card .need { font-size: .82rem; color: var(--primary-dark); font-weight: 600; }
+
+    /* ── BADGE / TAG ── */
+    .badge {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .15rem .55rem;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .badge.teal   { background: var(--primary-light); color: var(--primary-dark); }
+    .badge.amber  { background: var(--amber-light);   color: #92400E; }
+    .badge.blue   { background: var(--blue-light);    color: #1D4ED8; }
+    .badge.red    { background: var(--danger-light);  color: #991B1B; }
+    .badge.green  { background: var(--success-light); color: #166534; }
+    .badge.purple { background: var(--purple-light);  color: #5B21B6; }
+
+    /* ── COMPARISON TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07);
+      font-size: .88rem;
+    }
+    thead { background: var(--dark); color: white; }
+    thead th { padding: .9rem 1rem; text-align: left; font-weight: 600; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:hover { background: #F8FAFC; }
+    tbody td { padding: .8rem 1rem; vertical-align: top; }
+    .check { color: var(--success); font-size: 1rem; }
+    .cross { color: var(--danger);  font-size: 1rem; }
+    .partial { color: var(--amber); font-size: 1rem; }
+
+    /* ── ARCHITECTURE BLOCK ── */
+    .arch-layer {
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: .75rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .arch-layer .layer-label {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      min-width: 120px;
+      opacity: .75;
+    }
+    .arch-layer .layer-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      flex: 1;
+    }
+    .arch-chip {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: 8px;
+      padding: .3rem .8rem;
+      font-size: .82rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── UX PALETTE SWATCHES ── */
+    .swatch-row { display: flex; gap: .75rem; flex-wrap: wrap; margin-top: .5rem; }
+    .swatch {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      background: white;
+      border-radius: 10px;
+      padding: .6rem .9rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .swatch-dot { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; }
+
+    /* ── REVENUE MODEL ── */
+    .revenue-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.4rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      border-top: 3px solid var(--primary);
+    }
+    .revenue-card h4 { font-size: .95rem; font-weight: 700; color: var(--dark); margin-bottom: .4rem; }
+    .revenue-card .price { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+    .revenue-card .price span { font-size: .85rem; font-weight: 400; color: var(--gray); }
+    .revenue-card p { font-size: .83rem; color: #555; margin-top: .3rem; }
+
+    /* ── RISK TABLE ── */
+    .risk-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 1rem; padding: .75rem 0; border-bottom: 1px solid var(--border); }
+    .risk-row:last-child { border-bottom: none; }
+    .risk-badge { font-size: .72rem; font-weight: 700; padding: .15rem .5rem; border-radius: 4px; text-align: center; white-space: nowrap; }
+
+    footer {
+      background: var(--dark);
+      color: #94A3B8;
+      text-align: center;
+      padding: 2rem;
+      font-size: .85rem;
+    }
+    footer strong { color: white; }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 2rem; }
+      nav { padding: .5rem 1rem; }
+      main { padding: 1.5rem 1rem; }
+      .card-grid, .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     HEADER
+══════════════════════════════════════ -->
+<header>
+  <div class="pill">🩺 Product Blueprint · Consultant Review</div>
+  <h1>HealthBridge</h1>
+  <p class="tagline">AI-Powered Connected Care for Small Clinics, Hospitals & Patients — PWA-first · India-optimized</p>
+  <div class="header-meta">
+    <span>📅 Strategy Document · May 2026</span>
+    <span>🎯 Target: Tier-2/3 Clinics + Urban Patients</span>
+    <span>🚀 Platform: Web + PWA</span>
+    <span>🤖 AI-native from Day 1</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     STICKY NAV
+══════════════════════════════════════ -->
+<nav>
+  <a href="#verdict">Consultant Verdict</a>
+  <a href="#personas">Personas</a>
+  <a href="#product-name">Product Name</a>
+  <a href="#path">Which Path</a>
+  <a href="#ux-style">UX Style</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#phases">Roadmap</a>
+  <a href="#features">Feature Decisions</a>
+  <a href="#differentiators">Differentiators</a>
+  <a href="#risks">Risks</a>
+  <a href="#revenue">Revenue</a>
+  <a href="#competitor">Competitor Gap</a>
+</nav>
+
+<main>
+
+  <!-- ══════════════════════════════════════
+       SECTION 0: CONSULTANT VERDICT
+  ══════════════════════════════════════ -->
+  <section id="verdict">
+    <div class="section-header">
+      <div class="section-icon">⭐</div>
+      <div>
+        <h2>Consultant's Verdict on Your Idea</h2>
+        <div class="sub">The honest, unfiltered assessment before we build anything</div>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <strong>The core idea is genuinely strong — and the timing is right.</strong>
+        <p>India has ~65,000 private clinics and small hospitals that are running on WhatsApp groups, paper files, and spreadsheets. No Indian software product truly owns the <em>patient-clinic relationship layer</em> end-to-end. You're targeting a real gap. The AI angle — specifically using it to surface patient context <em>before</em> the doctor walks in — is the right wedge.</p>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <strong>The problem statement is too wide. You need a "sharp spear", not a Swiss Army knife.</strong>
+        <ul>
+          <li>You listed ~20 features. No team can build that in a first version that people actually use.</li>
+          <li>The best products solve <strong>one problem extraordinarily well</strong>, then expand.</li>
+          <li>Your sharpest, most defensible wedge: <strong>"AI-assisted doctor briefing + patient-owned health record + WhatsApp-native communication."</strong></li>
+          <li>Everything else (smartwatch, social determinants, medication reconciliation) is Phase 3+.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout teal">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <strong>One-line product thesis to anchor every decision:</strong>
+        <p style="font-size:1.05rem; font-weight:700; color:#0F766E; margin-top:.4rem;">
+          "HealthBridge ensures a doctor knows everything about their patient <em>before</em> the appointment — and the patient stays connected to their clinic between visits."
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 1: PERSONAS
+  ══════════════════════════════════════ -->
+  <section id="personas">
+    <div class="section-header">
+      <div class="section-icon">👥</div>
+      <div>
+        <h2>The 4 Core Personas</h2>
+        <div class="sub">Know your users before you design anything</div>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="persona-card" style="border-top-color:#0D9488;">
+        <div class="persona-avatar" style="background:#CCFBF1;">🧑‍⚕️</div>
+        <h3>Dr. Priya — The Busy GP</h3>
+        <div class="role">Primary Doctor · Urban Clinic</div>
+        <div class="pain">Sees 40+ patients/day. Spends the first 5 minutes of each consultation re-reading scattered notes. No time to remember what changed since the last visit.</div>
+        <div class="need">🎯 Needs: One-glance patient summary before walking in. Quick report viewer. Simple follow-up scheduling.</div>
+      </div>
+      <div class="persona-card" style="border-top-color:#3B82F6;">
+        <div class="persona-avatar" style="background:#EFF6FF;">🏥</div>
+        <h3>Ravi — The Clinic Owner / Admin</h3>
+        <div class="role">Clinic Administrator · 2–5 Doctors</div>
+        <div class="pain">Manages everything on WhatsApp. No idea which time slots are over-booked, which doctor earns most, or which patients haven't followed up. Flying blind financially.</div>
+        <div class="need">🎯 Needs: Patient communication automation, appointment visibility, basic revenue dashboard, WhatsApp alerts.</div>
+      </div>
+      <div class="persona-card" style="border-top-color:#F59E0B;">
+        <div class="persona-avatar" style="background:#FFFBEB;">🧑‍💼</div>
+        <h3>Meena — The Patient</h3>
+        <div class="role">Patient · Age 35–65 · Semi-digital</div>
+        <div class="pain">Loses physical lab reports. Doesn't understand medical jargon. Can't remember medication names. Misses follow-up appointments. Switches doctors and starts over each time.</div>
+        <div class="need">🎯 Needs: Portable health record, simple language summaries, medicine reminders, one-tap appointment booking, Hindi/regional language support.</div>
+      </div>
+      <div class="persona-card" style="border-top-color:#8B5CF6;">
+        <div class="persona-avatar" style="background:#F5F3FF;">👨‍👩‍👧</div>
+        <h3>Arjun — The Caregiver</h3>
+        <div class="role">Son/Daughter managing parent's health</div>
+        <div class="pain">Lives in another city. Doesn't know parent's current medications, last test results, or upcoming appointments. Gets panicked calls instead of proactive updates.</div>
+        <div class="need">🎯 Needs: Shared access to parent's records (with consent), proactive alerts from the clinic, medication visibility.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 2: PRODUCT NAME & POSITIONING
+  ══════════════════════════════════════ -->
+  <section id="product-name">
+    <div class="section-header">
+      <div class="section-icon">🏷️</div>
+      <div>
+        <h2>Product Name & Positioning</h2>
+        <div class="sub">Your brand is a promise</div>
+      </div>
+    </div>
+    <div class="callout blue">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-body">
+        <strong>Recommended Name: <span style="color:#1D4ED8; font-size:1.1rem;">HealthBridge</span></strong>
+        <ul>
+          <li>Communicates what the product does — <em>bridges</em> clinics and patients.</li>
+          <li>Works in English + translates well into Hindi (<em>Swasthya Setu</em> — same energy as Arogya Setu).</li>
+          <li>Short, memorable, not clinical-sounding, not doctor-centric.</li>
+          <li>Domain likely available. PWA icon works well.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-grid-3" style="margin-top:1rem;">
+      <div class="card">
+        <div class="card-tag badge teal">For Patients</div>
+        <h3>🏠 "Your health record, always with you"</h3>
+        <p>Patients own their data. Switch doctors without losing history. Access everything in your language.</p>
+      </div>
+      <div class="card">
+        <div class="card-tag badge blue">For Doctors</div>
+        <h3>📋 "Know your patient before they walk in"</h3>
+        <p>AI-summarized patient briefing. All reports in one place. Smart follow-up nudges. More care, less admin.</p>
+      </div>
+      <div class="card">
+        <div class="card-tag badge amber">For Clinics</div>
+        <h3>📊 "Run your clinic, not a WhatsApp group"</h3>
+        <p>Automated patient outreach. Appointment intelligence. Revenue visibility. WhatsApp chatbot built-in.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 3: WHICH PATH TO TAKE
+  ══════════════════════════════════════ -->
+  <section id="path">
+    <div class="section-header">
+      <div class="section-icon">🛤️</div>
+      <div>
+        <h2>Which Path to Take — Strategy Decision</h2>
+        <div class="sub">The most important decision you will make</div>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <strong>Recommendation: Enter from the CLINIC side, not the patient side.</strong>
+        <p>Clinics have purchasing power and willingness to pay. Patients are a growth outcome, not the entry point. Sign up one clinic → they onboard their 500 patients automatically. That's how you get density fast without spending on consumer marketing.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Approach</th>
+            <th>Go-to-Market</th>
+            <th>Revenue Speed</th>
+            <th>Retention</th>
+            <th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Patient-first (B2C)</strong><br><small>Sign up patients, hope clinics follow</small></td>
+            <td>High CAC, hard to monetize</td>
+            <td>Very slow</td>
+            <td>Low (no clinic lock-in)</td>
+            <td><span class="cross">✗</span> Avoid</td>
+          </tr>
+          <tr style="background:#F0FDF4;">
+            <td><strong>Clinic-first (B2B2C) ← Recommended</strong><br><small>Sign up clinics, they bring patients</small></td>
+            <td>Direct sales to clinic owners</td>
+            <td>Fast (SaaS subscription)</td>
+            <td>Very high (workflow lock-in)</td>
+            <td><span class="check">✓</span> <strong>Best path</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Hospital-first (B2B Enterprise)</strong><br><small>Target hospital chains</small></td>
+            <td>Long sales cycles, 6–12 months</td>
+            <td>High ACV but slow</td>
+            <td>High</td>
+            <td><span class="partial">~</span> Later (Phase 3)</td>
+          </tr>
+          <tr>
+            <td><strong>Insurance/pharma channel</strong><br><small>Let insurers subsidize</small></td>
+            <td>Complex partnerships</td>
+            <td>Unpredictable</td>
+            <td>Medium</td>
+            <td><span class="partial">~</span> Explore later</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout blue" style="margin-top:1.25rem;">
+      <div class="callout-icon">📌</div>
+      <div class="callout-body">
+        <strong>The GTM motion:</strong>
+        <ul>
+          <li><strong>Week 1–4:</strong> Sign 3 pilot clinics for free. Sit inside the clinic for a week. Watch the friction. Build for that friction.</li>
+          <li><strong>Month 2–3:</strong> First 10 paying clinics at ₹2,000–₹3,000/month. Each brings 100–500 patients automatically.</li>
+          <li><strong>Month 4+:</strong> Word-of-mouth among clinic owners is strong in Tier-2 cities — this is your growth flywheel.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 4: UX STYLE DIRECTION
+  ══════════════════════════════════════ -->
+  <section id="ux-style">
+    <div class="section-header">
+      <div class="section-icon">🎨</div>
+      <div>
+        <h2>UX & Design Style Direction</h2>
+        <div class="sub">Which visual language to speak — and why</div>
+      </div>
+    </div>
+
+    <div class="callout teal">
+      <div class="callout-icon">🎨</div>
+      <div class="callout-body">
+        <strong>Recommended Style: "Calm Clinical" — Clarity-first, not flashy</strong>
+        <p>Healthcare is not fintech or gaming. Your users include elderly patients, semi-literate admins, and time-pressured doctors. The design must feel <strong>trustworthy, readable, and fast</strong>. No glassmorphism. No dark mode by default. No animations that delay information.</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>🎨 Color System</h3>
+        <div class="swatch-row">
+          <div class="swatch"><div class="swatch-dot" style="background:#0D9488;"></div><div><div>Primary Teal</div><div style="font-size:.7rem;color:#888;">#0D9488 — Trust, health</div></div></div>
+          <div class="swatch"><div class="swatch-dot" style="background:#3B82F6;"></div><div><div>Action Blue</div><div style="font-size:.7rem;color:#888;">#3B82F6 — CTAs, links</div></div></div>
+          <div class="swatch"><div class="swatch-dot" style="background:#F59E0B;"></div><div><div>Alert Amber</div><div style="font-size:.7rem;color:#888;">#F59E0B — Warnings, reminders</div></div></div>
+          <div class="swatch"><div class="swatch-dot" style="background:#EF4444;"></div><div><div>Critical Red</div><div style="font-size:.7rem;color:#888;">#EF4444 — Urgent only</div></div></div>
+          <div class="swatch"><div class="swatch-dot" style="background:#F8FAFC; border:1px solid #E2E8F0;"></div><div><div>Background</div><div style="font-size:.7rem;color:#888;">#F8FAFC — Off-white</div></div></div>
+        </div>
+        <p style="margin-top:.8rem; font-size:.83rem; color:#666;">
+          Teal is the new "medical blue" — it's clinical without being cold. Avoids the clichéd hospital blue that every competitor uses.
+        </p>
+      </div>
+      <div class="card">
+        <h3>🔤 Typography</h3>
+        <ul>
+          <li><strong>Primary font:</strong> Noto Sans — covers Hindi, Tamil, Telugu, Bengali natively. Free.</li>
+          <li><strong>Heading weight:</strong> 700–800 for hierarchy, 400 for body.</li>
+          <li><strong>Minimum size:</strong> 14px body text — elderly patients use this app.</li>
+          <li><strong>Line height:</strong> 1.6–1.75 — medical information needs breathing room.</li>
+          <li><strong>Numbers:</strong> Use tabular-nums for values (₹, dates, metrics).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📱 Layout Principles</h3>
+        <ul>
+          <li><strong>Mobile-first, thumb-friendly.</strong> 90% of Indian clinic staff use Android phones.</li>
+          <li><strong>Bottom navigation bar</strong> (5 max items) on mobile — not hamburger menu.</li>
+          <li><strong>Card-based layout</strong> — each card = one task, one patient, one report.</li>
+          <li><strong>Minimum tap target: 44px.</strong> Fat-finger friendly.</li>
+          <li><strong>No modals for critical actions</strong> — use dedicated pages/drawers instead.</li>
+          <li><strong>Skeleton loading</strong> over spinners — feels faster on slow 4G.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🌐 Localization UX</h3>
+        <ul>
+          <li>Language switcher in the header — persistent, remembered per device.</li>
+          <li>All medical terms show in plain language + a "what does this mean?" tap.</li>
+          <li>AI report summaries always generated in the user's selected language.</li>
+          <li>RTL support for Urdu — plan for it from day 1 in CSS (use logical properties: <code>margin-inline-start</code> not <code>margin-left</code>).</li>
+          <li>Numbers: use Indian numbering (₹1,23,456) not Western (₹123,456).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🤖 AI Interface Design</h3>
+        <ul>
+          <li><strong>No chat bubble as the primary UI.</strong> AI surfaces insights inline — in the patient card, on the report view, next to the appointment.</li>
+          <li>The "AI assistant" chat is secondary — an escape hatch for complex queries.</li>
+          <li>AI outputs always show a confidence signal: "Based on 3 recent reports."</li>
+          <li>Never let AI speak in medical authority — always "This may indicate…" not "You have…"</li>
+          <li>Doctor AI view: Smart briefing card auto-generated before each appointment.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>♿ Accessibility & Trust Signals</h3>
+        <ul>
+          <li>WCAG 2.1 AA minimum — many patients are elderly with poor vision.</li>
+          <li>High contrast mode as a toggle (not just dark mode).</li>
+          <li>All icons must have text labels — don't assume icon literacy.</li>
+          <li>Show "🔒 Your data is private" on every report upload screen.</li>
+          <li>Patient data consent: explicit opt-in per feature, not one-time EULA.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout red" style="margin-top:1.25rem;">
+      <div class="callout-icon">🚫</div>
+      <div class="callout-body">
+        <strong>What NOT to do (common healthcare UI mistakes):</strong>
+        <ul>
+          <li>Do not use dark backgrounds — medical data needs readability over aesthetics.</li>
+          <li>Do not auto-play videos or sounds — clinics are often quiet environments.</li>
+          <li>Do not put "Book Appointment" behind 3 taps — it should be 1 tap from the home screen.</li>
+          <li>Do not design for a Pixel 7 — design for a ₹8,000 Redmi with a cracked screen.</li>
+          <li>Do not show all features on the dashboard — progressive disclosure is essential.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 5: ARCHITECTURE
+  ══════════════════════════════════════ -->
+  <section id="architecture">
+    <div class="section-header">
+      <div class="section-icon">🏗️</div>
+      <div>
+        <h2>Technical Architecture Recommendation</h2>
+        <div class="sub">PWA-first, offline-capable, AI-native</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:1.2rem;">
+      <div class="arch-layer" style="background:linear-gradient(135deg,#0D9488,#14B8A6); color:white;">
+        <div class="layer-label">USER LAYER</div>
+        <div class="layer-items">
+          <div class="arch-chip">PWA (installable)</div>
+          <div class="arch-chip">Next.js 14+ (App Router)</div>
+          <div class="arch-chip">React 19</div>
+          <div class="arch-chip">Service Workers (offline)</div>
+          <div class="arch-chip">WhatsApp Web Embed</div>
+        </div>
+      </div>
+      <div class="arch-layer" style="background:linear-gradient(135deg,#3B82F6,#60A5FA); color:white;">
+        <div class="layer-label">API LAYER</div>
+        <div class="layer-items">
+          <div class="arch-chip">Next.js API Routes / Node.js</div>
+          <div class="arch-chip">REST + WebSockets (real-time alerts)</div>
+          <div class="arch-chip">WhatsApp Business API</div>
+          <div class="arch-chip">UPI Payment Webhook</div>
+        </div>
+      </div>
+      <div class="arch-layer" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA); color:white;">
+        <div class="layer-label">AI LAYER</div>
+        <div class="layer-items">
+          <div class="arch-chip">OpenAI GPT-4o (reports + chat)</div>
+          <div class="arch-chip">Google Vision API (OCR from photos)</div>
+          <div class="arch-chip">LangChain (RAG pipeline)</div>
+          <div class="arch-chip">Vector DB: Pinecone / pgvector</div>
+          <div class="arch-chip">Whisper (voice input — later)</div>
+        </div>
+      </div>
+      <div class="arch-layer" style="background:linear-gradient(135deg,#F59E0B,#FCD34D); color:#1a1a2e;">
+        <div class="layer-label">DATA LAYER</div>
+        <div class="layer-items">
+          <div class="arch-chip">PostgreSQL (core data)</div>
+          <div class="arch-chip">Supabase (auth + realtime)</div>
+          <div class="arch-chip">AWS S3 / Cloudflare R2 (reports/images)</div>
+          <div class="arch-chip">Redis (caching + sessions)</div>
+        </div>
+      </div>
+      <div class="arch-layer" style="background:linear-gradient(135deg,#EF4444,#F87171); color:white;">
+        <div class="layer-label">INFRA</div>
+        <div class="layer-items">
+          <div class="arch-chip">Vercel (frontend + edge)</div>
+          <div class="arch-chip">Railway / Render (backend)</div>
+          <div class="arch-chip">Cloudflare CDN</div>
+          <div class="arch-chip">HIPAA-aware storage (encrypted at rest)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <strong>Why Next.js + PWA over React Native?</strong>
+        <ul>
+          <li>You want a <em>website</em> (SEO for "online clinic booking"), a <em>webapp</em>, and an <em>installable app</em> — Next.js + PWA delivers all three from one codebase.</li>
+          <li>No App Store review cycles. Push updates instantly.</li>
+          <li>Works on any phone with a browser — no "download the app" friction.</li>
+          <li>Service Workers give offline-first behavior (patient records load without internet).</li>
+          <li>If demand warrants a native app later, React Native shares components.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <div class="callout-icon">🔐</div>
+      <div class="callout-body">
+        <strong>Data Security is non-negotiable in healthcare:</strong>
+        <ul>
+          <li>All patient health data encrypted at rest (AES-256) and in transit (TLS 1.3).</li>
+          <li>Row-level security in PostgreSQL — a doctor in Clinic A can never see Clinic B's patients.</li>
+          <li>No patient data used for AI model training without explicit consent.</li>
+          <li>Audit log for every record access — required for medical data compliance.</li>
+          <li>India: Follow DPDP Act 2023 (Digital Personal Data Protection). This will be law.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 6: PHASED ROADMAP
+  ══════════════════════════════════════ -->
+  <section id="phases">
+    <div class="section-header">
+      <div class="section-icon">🗺️</div>
+      <div>
+        <h2>Phased Product Roadmap</h2>
+        <div class="sub">What to build when — ruthlessly prioritized</div>
+      </div>
+    </div>
+
+    <div class="callout red">
+      <div class="callout-icon">🚨</div>
+      <div class="callout-body">
+        <strong>The golden rule: Ship Phase 1 to 3 clinics before writing a single line of Phase 2 code.</strong>
+        <p>Your biggest risk is not "will this work technically" — it's "will doctors actually use this." Validate the core loop first.</p>
+      </div>
+    </div>
+
+    <div style="display:grid; gap:1.5rem; margin-top:1.25rem;">
+
+      <!-- PHASE 1 -->
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-num" style="background:#0D9488;">1</div>
+          <div class="phase-info">
+            <h3>Phase 1 — The Core Loop <span class="phase-timeline">Months 1–3</span></h3>
+            <div class="phase-sub">Goal: A doctor can see a patient summary + the patient can access their reports. One clinic is live.</div>
+          </div>
+        </div>
+        <div class="card-grid-2">
+          <div>
+            <strong style="font-size:.82rem; text-transform:uppercase; letter-spacing:.5px; color:#0D9488; display:block; margin-bottom:.6rem;">For Clinics / Doctors</strong>
+            <ul class="feature-list">
+              <li><span class="fi">🏥</span><div><strong>Clinic onboarding:</strong> Create clinic → departments → doctors. Simple 3-step setup.</div></li>
+              <li><span class="fi">👤</span><div><strong>Patient creation by clinic:</strong> Admin adds patient (name, phone, DOB). Patient gets WhatsApp invite.</div></li>
+              <li><span class="fi">📋</span><div><strong>Doctor briefing card:</strong> Before each appointment, AI-generated 3-line summary of the patient's recent visits + reports.</div></li>
+              <li><span class="fi">📅</span><div><strong>Appointment scheduler:</strong> Doctor views day's appointments. Simple queue view.</div></li>
+              <li><span class="fi">💬</span><div><strong>Clinic → Patient messaging:</strong> Send WhatsApp/SMS alerts for follow-ups, test results ready, reminders.</div></li>
+              <li><span class="fi">💳</span><div><strong>UPI screenshot payment:</strong> Patient uploads UPI screenshot → doctor marks as verified. Simple, no gateway needed in MVP.</div></li>
+            </ul>
+          </div>
+          <div>
+            <strong style="font-size:.82rem; text-transform:uppercase; letter-spacing:.5px; color:#3B82F6; display:block; margin-bottom:.6rem;">For Patients</strong>
+            <ul class="feature-list">
+              <li><span class="fi">🆓</span><div><strong>Self-registration:</strong> Patient can sign up independently — no clinic needed to start.</div></li>
+              <li><span class="fi">📁</span><div><strong>Report upload (photo/PDF):</strong> Patient snaps a photo of any lab report. OCR extracts text. Stored securely.</div></li>
+              <li><span class="fi">🔍</span><div><strong>Patient-level AI search:</strong> "What was my HbA1c last month?" — searches only their own reports.</div></li>
+              <li><span class="fi">📆</span><div><strong>Book appointment online:</strong> See available slots, book in 2 taps, get WhatsApp confirmation.</div></li>
+              <li><span class="fi">🌐</span><div><strong>Multi-language:</strong> English + Hindi at launch. All AI summaries in selected language.</div></li>
+              <li><span class="fi">🔒</span><div><strong>Record portability:</strong> Patient can share their records with a new doctor via a secure link (24-hr expiry).</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 2 -->
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-num" style="background:#3B82F6;">2</div>
+          <div class="phase-info">
+            <h3>Phase 2 — Engagement & Intelligence <span class="phase-timeline">Months 4–7</span></h3>
+            <div class="phase-sub">Goal: Clinics see measurable value (retained patients). Doctors love the briefing. Patients use it weekly.</div>
+          </div>
+        </div>
+        <div class="card-grid-2">
+          <div>
+            <ul class="feature-list">
+              <li><span class="fi">🤖</span><div><strong>Hospital-level AI assistant:</strong> Clinic admin asks "Who hasn't followed up in 30 days?" — AI surfaces the list.</div></li>
+              <li><span class="fi">📊</span><div><strong>Clinic analytics dashboard:</strong> Busiest days, revenue per doctor, appointment no-show rate, pending payments.</div></li>
+              <li><span class="fi">💊</span><div><strong>Medication management:</strong> Doctor prescribes medicines digitally. Patient sees it with plain-language instructions. Alternative generics suggested.</div></li>
+              <li><span class="fi">🔁</span><div><strong>Proactive care alerts:</strong> "Patient's HbA1c has trended up 3 quarters — auto-schedule follow-up."</div></li>
+              <li><span class="fi">📱</span><div><strong>WhatsApp chatbot for clinic:</strong> Patients can ask "What's my next appointment?" on WhatsApp. Bot replies instantly.</div></li>
+            </ul>
+          </div>
+          <div>
+            <ul class="feature-list">
+              <li><span class="fi">📈</span><div><strong>Daily habit tracker:</strong> Patient logs weight, blood sugar, BP, sleep. Doctor sees the trend chart in briefing card.</div></li>
+              <li><span class="fi">🌍</span><div><strong>Additional languages:</strong> Tamil, Telugu, Bengali, Marathi based on pilot clinic locations.</div></li>
+              <li><span class="fi">🔔</span><div><strong>Medicine reminders:</strong> PWA push notifications for medication times. Works offline.</div></li>
+              <li><span class="fi">🤝</span><div><strong>Caregiver access:</strong> Patient grants read-only access to a family member (son/daughter) with consent toggle.</div></li>
+              <li><span class="fi">📋</span><div><strong>Discharge summary:</strong> Doctor fills discharge checklist. Patient gets a WhatsApp-friendly plain-language version.</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-num" style="background:#8B5CF6;">3</div>
+          <div class="phase-info">
+            <h3>Phase 3 — Scale & Ecosystem <span class="phase-timeline">Months 8–14</span></h3>
+            <div class="phase-sub">Goal: 100+ clinics. Hospital chains. Third-party integrations. Revenue diversification.</div>
+          </div>
+        </div>
+        <ul class="feature-list">
+          <li><span class="fi">⌚</span><div><strong>Smartwatch / wearable integration:</strong> Google Fit, Apple Health, Fitbit data sync for heart rate, steps, sleep. Doctor sees it in briefing.</div></li>
+          <li><span class="fi">💊</span><div><strong>Medication reconciliation AI:</strong> Compares EHR medications, discharge prescription, and pharmacy records. Flags discrepancies for elderly patients.</div></li>
+          <li><span class="fi">🏘️</span><div><strong>Social determinants capture:</strong> Optional: patient logs housing, food security, transport access. Surfaced to doctor quietly as risk flags.</div></li>
+          <li><span class="fi">🏥</span><div><strong>Hospital chain / multi-branch:</strong> Central admin view across branches. Inter-doctor referral system.</div></li>
+          <li><span class="fi">💰</span><div><strong>Full payment gateway:</strong> Razorpay / PhonePe integration. Invoice generation. Insurance claim attachment.</div></li>
+          <li><span class="fi">🔌</span><div><strong>Lab integration API:</strong> Thyrocare, Dr. Lal PathLabs — reports auto-import when results are ready.</div></li>
+          <li><span class="fi">🗣️</span><div><strong>Voice input:</strong> Whisper-based voice note → auto-transcribed to patient notes (for doctors who won't type).</div></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 7: FEATURE DECISIONS (WHAT TO DO WITH EACH IDEA)
+  ══════════════════════════════════════ -->
+  <section id="features">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <div>
+        <h2>Feature-by-Feature Decisions</h2>
+        <div class="sub">Every idea you had — with a clear verdict and reasoning</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Your Feature Idea</th>
+            <th>Decision</th>
+            <th>Phase</th>
+            <th>Consultant's Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Clinic creates departments + doctors + patients</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>Core data model. The hierarchy is right.</td></tr>
+          <tr><td><strong>Patient can exist independently (no clinic)</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>Critical for organic growth. Patients come first, clinics follow.</td></tr>
+          <tr><td><strong>Report upload with photo + OCR text extraction</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>This is your core AI moat. Google Vision API + GPT-4o Vision handles this well.</td></tr>
+          <tr><td><strong>Patient-level AI (only their reports)</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>RAG over patient's own document store. Standard LangChain pattern.</td></tr>
+          <tr><td><strong>Hospital-level AI (all patients)</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge blue">Phase 2</span></td><td>Scoped RAG with clinic-level vector namespace. Do patient-level first.</td></tr>
+          <tr><td><strong>Schedule follow-up calls / appointments</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>Simple calendar + WhatsApp confirmation. Don't over-engineer with video calls yet.</td></tr>
+          <tr><td><strong>Daily habit tracking (weight, BP, sugar)</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge blue">Phase 2</span></td><td>Simple daily log + chart. Doctor sees last 30 days in briefing card.</td></tr>
+          <tr><td><strong>Doctor / anyone can add medicines for patient</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge blue">Phase 2</span></td><td>Digital prescription + patient-facing plain-language card.</td></tr>
+          <tr><td><strong>Suggest alternative / generic medicines</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge blue">Phase 2</span></td><td>Use OpenFDA or Indian drug DB. Show generic equivalent + cost comparison. Huge value for patients.</td></tr>
+          <tr><td><strong>UPI payment via screenshot</strong></td><td><span class="check">✓ Build (simplified)</span></td><td><span class="badge teal">Phase 1</span></td><td>Pragmatic for MVP. Doctor manually verifies. No gateway = no compliance overhead.</td></tr>
+          <tr><td><strong>Central patient record (doctor switching)</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>This is your biggest differentiator. "Your record moves with you" is a product promise no one else makes.</td></tr>
+          <tr><td><strong>Patient decides to give new doctor access</strong></td><td><span class="check">✓ Build (consent-first)</span></td><td><span class="badge teal">Phase 1</span></td><td>Not debatable — patient owns their data. Make it a secure timed share link. DPDP 2023 compliance requires it anyway.</td></tr>
+          <tr><td><strong>WhatsApp chatbot for clinics</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge blue">Phase 2</span></td><td>WhatsApp Business API. Start simple: appointment bot only. Expand later.</td></tr>
+          <tr><td><strong>Clinic sends email + WhatsApp to patients</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>WhatsApp first (highest open rate in India), email as fallback.</td></tr>
+          <tr><td><strong>Smartwatch / heart rate integration</strong></td><td><span class="partial">~ Later</span></td><td><span class="badge purple">Phase 3</span></td><td>The API is easy but the user behavior change is hard. Solve the records problem first.</td></tr>
+          <tr><td><strong>Multi-language for patients</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>Non-negotiable for India. Use i18next. AI summaries via GPT-4o with language parameter.</td></tr>
+          <tr><td><strong>Patient plugs in report and gets explanation</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>Core value prop for patients. "Upload this confusing report, I'll explain it." GPT-4o Vision.</td></tr>
+          <tr><td><strong>Clinic revenue / profitability analytics</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge blue">Phase 2</span></td><td>This alone justifies the subscription. "You're losing ₹40K/month to no-shows on Tuesday afternoons."</td></tr>
+          <tr><td><strong>HbA1c trending → auto-schedule</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge blue">Phase 2</span></td><td>A scheduled job that checks lab trends and triggers an alert to the doctor's dashboard. Powerful.</td></tr>
+          <tr><td><strong>Medication reconciliation (discharge vs EHR)</strong></td><td><span class="partial">~ Later</span></td><td><span class="badge purple">Phase 3</span></td><td>High complexity, high value. Needs lab + pharmacy integrations. Worth it but not for MVP.</td></tr>
+          <tr><td><strong>Social determinants of health capture</strong></td><td><span class="partial">~ Later</span></td><td><span class="badge purple">Phase 3</span></td><td>Brilliant insight. Very hard to get adoption. Start by building the habit tracker first.</td></tr>
+          <tr><td><strong>Offline-first clinic management</strong></td><td><span class="check">✓ Build</span></td><td><span class="badge teal">Phase 1</span></td><td>PWA Service Workers cache the patient list and today's appointments. Critical for areas with patchy 4G.</td></tr>
+          <tr><td><strong>Discharge planning coordination</strong></td><td><span class="check">✓ Build (simple)</span></td><td><span class="badge blue">Phase 2</span></td><td>Doctor fills a checklist → patient gets a plain-language WhatsApp message with "What to do next."</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 8: DIFFERENTIATORS
+  ══════════════════════════════════════ -->
+  <section id="differentiators">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <div>
+        <h2>Your 5 Unfair Advantages</h2>
+        <div class="sub">Why HealthBridge wins where Practo, mfine, and hospital EHRs fail</div>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card" style="border-top:3px solid #0D9488;">
+        <div class="card-tag badge teal">#1 Differentiator</div>
+        <h3>🧠 AI Briefing Before Every Appointment</h3>
+        <p>No other clinic software shows the doctor a 3-line AI-generated "Here's what changed with this patient since last visit" before they walk in. This is the feature doctors will talk about.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #3B82F6;">
+        <div class="card-tag badge blue">#2 Differentiator</div>
+        <h3>📱 WhatsApp-Native (not a separate app)</h3>
+        <p>Practo forces patients to download an app. You meet them on WhatsApp where they already live. The chatbot for appointment booking + report delivery via WhatsApp is a massive adoption advantage.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #F59E0B;">
+        <div class="card-tag badge amber">#3 Differentiator</div>
+        <h3>🔑 Patient-Owned Portable Health Record</h3>
+        <p>When a patient moves cities or switches doctors, their complete health history comes with them — via a secure share link. No incumbent offers this. This is your brand promise.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #8B5CF6;">
+        <div class="card-tag badge purple">#4 Differentiator</div>
+        <h3>📊 Proactive Care Management at Scale</h3>
+        <p>The system notices that Meena's HbA1c has been climbing for 3 quarters and auto-schedules her follow-up. No doctor has time to manually notice this across 400 patients. You do it automatically.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #22C55E;">
+        <div class="card-tag badge green">#5 Differentiator</div>
+        <h3>🌍 Genuinely Multi-Language, Not an Afterthought</h3>
+        <p>Not just a language switcher — the AI explains the patient's confusing CBC report in Telugu. The discharge instructions arrive in Hindi via WhatsApp. This market is 95% non-English at home.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 9: RISKS
+  ══════════════════════════════════════ -->
+  <section id="risks">
+    <div class="section-header">
+      <div class="section-icon">⚠️</div>
+      <div>
+        <h2>Risks & How to Mitigate Them</h2>
+        <div class="sub">What can kill this — and how to not let it</div>
+      </div>
+    </div>
+    <div class="card" style="padding:1.75rem;">
+      <div class="risk-row" style="font-weight:700; font-size:.8rem; text-transform:uppercase; color:var(--gray);">
+        <div>Risk</div><div>Severity</div><div>Mitigation</div>
+      </div>
+      <div class="risk-row">
+        <div><strong>Doctor adoption friction</strong> — They won't change habits mid-practice.</div>
+        <div><span class="risk-badge" style="background:#FEF2F2;color:#991B1B;">🔴 High</span></div>
+        <div style="font-size:.83rem;">Sit inside a clinic for 5 days. Observe workflows. The briefing card must appear in their existing flow, not require them to open a new app.</div>
+      </div>
+      <div class="risk-row">
+        <div><strong>Data privacy / DPDP compliance</strong> — Medical data is sensitive. A breach ends you.</div>
+        <div><span class="risk-badge" style="background:#FEF2F2;color:#991B1B;">🔴 High</span></div>
+        <div style="font-size:.83rem;">Encrypt all PII at rest. Row-level security from day 1. No patient data in logs. Hire a legal consultant for DPDP Act compliance before first paying clinic.</div>
+      </div>
+      <div class="risk-row">
+        <div><strong>Scope creep</strong> — 20 features become 40 and nothing ships.</div>
+        <div><span class="risk-badge" style="background:#FFFBEB;color:#92400E;">🟡 Medium</span></div>
+        <div style="font-size:.83rem;">Freeze Phase 1 scope in writing. A feature not in Phase 1 goes into a backlog. No exceptions until 3 clinics are live and engaged.</div>
+      </div>
+      <div class="risk-row">
+        <div><strong>WhatsApp API cost</strong> — Message costs can scale unexpectedly.</div>
+        <div><span class="risk-badge" style="background:#FFFBEB;color:#92400E;">🟡 Medium</span></div>
+        <div style="font-size:.83rem;">Budget ₹1–₹2 per conversation-opened session. Include in clinic's subscription pricing. Clinics sending 200 WhatsApp messages/day = ~₹200/day — acceptable.</div>
+      </div>
+      <div class="risk-row">
+        <div><strong>AI hallucination in medical context</strong> — Wrong report interpretation = liability.</div>
+        <div><span class="risk-badge" style="background:#FEF2F2;color:#991B1B;">🔴 High</span></div>
+        <div style="font-size:.83rem;">AI outputs always carry a disclaimer: "For reference only. Consult your doctor." Never let AI give a diagnosis. Always show source document snippet.</div>
+      </div>
+      <div class="risk-row">
+        <div><strong>OCR accuracy on handwritten reports</strong> — Indian labs often use printed + hand-annotated reports.</div>
+        <div><span class="risk-badge" style="background:#FFFBEB;color:#92400E;">🟡 Medium</span></div>
+        <div style="font-size:.83rem;">Use GPT-4o Vision (multimodal) — it handles mixed printed/handwritten significantly better than pure OCR. Show extracted text for patient to correct.</div>
+      </div>
+      <div class="risk-row">
+        <div><strong>Low-end device performance</strong> — Redmi 8A, 3G connection, ₹6,000 phone.</div>
+        <div><span class="risk-badge" style="background:#FFFBEB;color:#92400E;">🟡 Medium</span></div>
+        <div style="font-size:.83rem;">Test on real low-end hardware monthly. Use skeleton screens. Compress all report images to <200KB before upload. Cache aggressively with Service Workers.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 10: REVENUE MODEL
+  ══════════════════════════════════════ -->
+  <section id="revenue">
+    <div class="section-header">
+      <div class="section-icon">💰</div>
+      <div>
+        <h2>Revenue Model</h2>
+        <div class="sub">How this becomes a ₹10 Cr ARR business</div>
+      </div>
+    </div>
+
+    <div class="card-grid-3">
+      <div class="revenue-card">
+        <h4>🏥 Clinic SaaS — Core Revenue</h4>
+        <div class="price">₹2,500 <span>/ clinic / month</span></div>
+        <p>Up to 3 doctors, unlimited patients. Per-doctor pricing above 3: +₹800/doctor/month.</p>
+        <p style="margin-top:.5rem; color:var(--primary); font-weight:600;">100 clinics = ₹30L/month ARR</p>
+      </div>
+      <div class="revenue-card" style="border-top-color:#3B82F6;">
+        <h4>📊 Analytics Add-on</h4>
+        <div class="price" style="color:#3B82F6;">₹500 <span>/ month extra</span></div>
+        <p>Revenue dashboard, no-show analytics, proactive care alerts. Premium tier for clinic owners who want business intelligence.</p>
+      </div>
+      <div class="revenue-card" style="border-top-color:#F59E0B;">
+        <h4>💬 WhatsApp Chatbot Add-on</h4>
+        <div class="price" style="color:#F59E0B;">₹800 <span>/ month</span></div>
+        <p>Appointment bot + bulk messaging credits. WhatsApp message costs passed through at cost.</p>
+      </div>
+      <div class="revenue-card" style="border-top-color:#22C55E;">
+        <h4>🆓 Patient Account</h4>
+        <div class="price" style="color:#22C55E;">Free</div>
+        <p>Patients always free. This drives adoption and makes the clinic's subscription more valuable. Network effect.</p>
+      </div>
+      <div class="revenue-card" style="border-top-color:#8B5CF6;">
+        <h4>🏥 Hospital Chain License</h4>
+        <div class="price" style="color:#8B5CF6;">₹15K+ <span>/ month</span></div>
+        <p>Phase 3+. Custom contract. Multi-branch, advanced analytics, API access, dedicated support.</p>
+      </div>
+      <div class="revenue-card" style="border-top-color:#EF4444;">
+        <h4>💊 Generic Drug Referral (Future)</h4>
+        <div class="price" style="color:#EF4444;">CPA model</div>
+        <p>When you suggest a generic alternative, patient can order through a partner pharmacy. Revenue share. High ethical bar — only ethical generics, disclosed to user.</p>
+      </div>
+    </div>
+
+    <div class="callout green" style="margin-top:1.25rem;">
+      <div class="callout-icon">📈</div>
+      <div class="callout-body">
+        <strong>Path to ₹10 Cr ARR:</strong>
+        <ul>
+          <li>Year 1: 50 clinics × ₹2,500 = ₹15L MRR = <strong>₹1.8 Cr ARR</strong></li>
+          <li>Year 2: 250 clinics + 20% with add-ons = <strong>₹7–8 Cr ARR</strong></li>
+          <li>Year 3: 500 clinics + 10 hospital chains + analytics tier = <strong>₹15–20 Cr ARR</strong></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 11: COMPETITOR GAP
+  ══════════════════════════════════════ -->
+  <section id="competitor">
+    <div class="section-header">
+      <div class="section-icon">🔍</div>
+      <div>
+        <h2>Competitive Gap Analysis</h2>
+        <div class="sub">Why existing solutions leave room for you</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Practo</th>
+            <th>mfine</th>
+            <th>eka.care</th>
+            <th>Hospital EHRs</th>
+            <th>HealthBridge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Patient-owned portable record</strong></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>AI briefing for doctor pre-appointment</strong></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>WhatsApp-native patient communication</strong></td><td><span class="partial">~</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>OCR report upload + AI explanation</strong></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="partial">~</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>Multi-language AI (regional)</strong></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>Proactive care alerts (HbA1c trending)</strong></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>Small clinic analytics / revenue visibility</strong></td><td><span class="partial">~</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="partial">~</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>Works for small 1-doctor clinics</strong></td><td><span class="partial">~</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>Offline-first PWA</strong></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td><strong>UPI payment (simple, no gateway)</strong></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="check">✓ (MVP)</span></td></tr>
+          <tr><td><strong>Pricing accessible for small clinics</strong></td><td><span class="cross">✗ expensive</span></td><td><span class="cross">✗ B2C only</span></td><td><span class="check">✓</span></td><td><span class="cross">✗ ₹50K+</span></td><td><span class="check">✓ ₹2,500/mo</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout teal" style="margin-top:1.25rem;">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-body">
+        <strong>The gap you're filling:</strong>
+        <p>Practo is a marketplace (patient finds doctor). EHRs are for hospitals. mfine is telemedicine. eka.care is the closest — but has no AI briefing, no WhatsApp-native UX, and no proactive care. The "AI-native clinic management for small providers" category is genuinely unoccupied in India.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FINAL RECOMMENDATION SUMMARY
+  ══════════════════════════════════════ -->
+  <section>
+    <div class="section-header">
+      <div class="section-icon">🏁</div>
+      <div>
+        <h2>The 5 Decisions to Make This Week</h2>
+        <div class="sub">Stop planning. Start validating.</div>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card" style="border-left:4px solid #0D9488;">
+        <h3>1. 🤝 Find 3 pilot clinics this week</h3>
+        <p>Not customers — partners. Offer free for 3 months. Sit inside their clinic for a day. Watch the pain. The briefing card idea will evolve massively from what you see there.</p>
+      </div>
+      <div class="card" style="border-left:4px solid #3B82F6;">
+        <h3>2. 📋 Freeze Phase 1 scope in one page</h3>
+        <p>Write 10 features on a whiteboard. Cross out anything that's not needed for the first clinic to go live. Tape it above your monitor. New feature ideas go in a separate backlog — not in Phase 1.</p>
+      </div>
+      <div class="card" style="border-left:4px solid #F59E0B;">
+        <h3>3. 🧑‍💻 Pick your tech stack now (don't revisit)</h3>
+        <p>Next.js + Supabase + Vercel + OpenAI + WhatsApp Business API. This is a known, proven stack. Set it up once. Move fast. Don't architect for scale on day 1.</p>
+      </div>
+      <div class="card" style="border-left:4px solid #8B5CF6;">
+        <h3>4. 🔐 Get legal sorted before first patient record</h3>
+        <p>A simple privacy policy + DPDP-compliant data processing agreement. Talk to a healthcare-adjacent lawyer. This is not optional — one WhatsApp screenshot of a medical leak ends the company.</p>
+      </div>
+      <div class="card" style="border-left:4px solid #EF4444;">
+        <h3>5. 🎯 Build the AI briefing card first</h3>
+        <p>Before appointments, reports, payments — build the thing that makes a doctor's eyes light up. Upload 3 fake patient reports. Generate a briefing card. Show it to a real doctor. That reaction will tell you everything.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>HealthBridge Product Blueprint</strong> · Consultant Strategy Document · May 2026<br>
+  <span style="font-size:.78rem; margin-top:.4rem; display:block; opacity:.7;">
+    This document is a strategic framework. Validate every assumption with real clinic users before committing to implementation.
+  </span>
+</footer>
+
+</body>
+</html>

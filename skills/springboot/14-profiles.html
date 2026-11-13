@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Management - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html" class="active"><span class="nav-number">14</span> Profiles & Environment</a></li>
+            <li><a href="15-custom-starters.html"><span class="nav-number">15</span> Custom Starters</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Auto-Configuration → Profile Management</div>
+        <div class="topic-number">Topic 14 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Profile Management</h1>
+            <p class="subtitle-description">How Spring Boot switches between configurations for different environments — the activation mechanisms, profile-specific beans, and multi-profile strategies used in production.</p>
+
+            <div class="tags">
+                <span class="tag tag-intermediate">intermediate</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-production">production</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🎭 The Theater Stage Analogy</div>
+                <p>Profiles are like theater stage configurations. The same theater building (your application code) can host a comedy night, a rock concert, or an opera — each requiring different lighting, sound, and set pieces. When the director says "tonight is jazz night" (activating a profile), the stage crew loads the jazz lighting rig, the jazz sound board, and the jazz backdrop. Beans marked with <code>@Profile("jazz")</code> appear on stage; beans marked <code>@Profile("opera")</code> stay in storage. The "default" profile is what's on stage when no one has specified what show to run.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: What Profiles Are -->
+            <!-- ============================================ -->
+            <h2>1. What Profiles Are</h2>
+
+            <p>A profile is a named logical group of bean definitions and configuration properties that can be selectively activated. Profiles allow the same application to behave differently based on the deployment environment without changing code:</p>
+
+            <pre><code><span class="token-comment">// Profiles are just string labels attached to beans or config</span>
+<span class="token-comment">// They answer: "Should this bean/config exist in the current environment?"</span>
+
+<span class="token-comment">// A bean registered to the "dev" profile:</span>
+<span class="token-annotation">@Profile</span>(<span class="token-string">"dev"</span>)
+<span class="token-annotation">@Bean</span>
+<span class="token-keyword">public</span> <span class="token-type">DataSource</span> <span class="token-function">devDataSource</span>() {
+    <span class="token-keyword">return new</span> <span class="token-type">EmbeddedDatabaseBuilder</span>()
+        .<span class="token-function">setType</span>(<span class="token-type">EmbeddedDatabaseType</span>.H2)
+        .<span class="token-function">build</span>();
+}
+
+<span class="token-comment">// A bean registered to the "prod" profile:</span>
+<span class="token-annotation">@Profile</span>(<span class="token-string">"prod"</span>)
+<span class="token-annotation">@Bean</span>
+<span class="token-keyword">public</span> <span class="token-type">DataSource</span> <span class="token-function">prodDataSource</span>() {
+    <span class="token-type">HikariDataSource</span> ds = <span class="token-keyword">new</span> <span class="token-type">HikariDataSource</span>();
+    ds.<span class="token-function">setJdbcUrl</span>(<span class="token-string">"jdbc:postgresql://prod-host:5432/mydb"</span>);
+    ds.<span class="token-function">setMaximumPoolSize</span>(<span class="token-number">50</span>);
+    <span class="token-keyword">return</span> ds;
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: Activating Profiles -->
+            <!-- ============================================ -->
+            <h2>2. Activating Profiles</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Example</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Command-line argument</td>
+                        <td><code>--spring.profiles.active=prod,metrics</code></td>
+                        <td>Highest</td>
+                    </tr>
+                    <tr>
+                        <td>Environment variable</td>
+                        <td><code>SPRING_PROFILES_ACTIVE=prod,metrics</code></td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>System property</td>
+                        <td><code>-Dspring.profiles.active=prod</code></td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>application.properties</td>
+                        <td><code>spring.profiles.active=dev</code></td>
+                        <td>Low (easily overridden)</td>
+                    </tr>
+                    <tr>
+                        <td>Programmatic (SpringApplication)</td>
+                        <td><code>app.setAdditionalProfiles("metrics")</code></td>
+                        <td>Additive (merges)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><code><span class="token-comment">// Programmatic activation — adds profiles without removing active ones</span>
+<span class="token-keyword">public static void</span> <span class="token-function">main</span>(<span class="token-type">String</span>[] args) {
+    <span class="token-type">SpringApplication</span> app = <span class="token-keyword">new</span> <span class="token-type">SpringApplication</span>(<span class="token-class">MyApp</span>.<span class="token-keyword">class</span>);
+
+    <span class="token-comment">// These are ADDITIONAL — they merge with active profiles</span>
+    app.<span class="token-function">setAdditionalProfiles</span>(<span class="token-string">"metrics"</span>, <span class="token-string">"tracing"</span>);
+
+    app.<span class="token-function">run</span>(args);
+}
+
+<span class="token-comment">// Programmatic activation with ConfigurableEnvironment</span>
+<span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">DynamicProfileActivator</span>
+        <span class="token-keyword">implements</span> <span class="token-type">ApplicationContextInitializer</span>&lt;<span class="token-type">ConfigurableApplicationContext</span>&gt; {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">initialize</span>(<span class="token-type">ConfigurableApplicationContext</span> ctx) {
+        <span class="token-type">ConfigurableEnvironment</span> env = ctx.<span class="token-function">getEnvironment</span>();
+
+        <span class="token-comment">// Check external condition and activate profile</span>
+        <span class="token-keyword">if</span> (<span class="token-type">System</span>.<span class="token-function">getenv</span>(<span class="token-string">"KUBERNETES_SERVICE_HOST"</span>) != <span class="token-keyword">null</span>) {
+            env.<span class="token-function">addActiveProfile</span>(<span class="token-string">"kubernetes"</span>);
+        }
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: Default Profile -->
+            <!-- ============================================ -->
+            <h2>3. The Default Profile</h2>
+
+            <pre><code><span class="token-comment">// Beans with @Profile("default") are ONLY active when NO profiles are set</span>
+<span class="token-comment">// As soon as ANY profile is activated, "default" beans disappear</span>
+
+<span class="token-annotation">@Configuration</span>
+<span class="token-keyword">public class</span> <span class="token-class">DataSourceConfig</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@Profile</span>(<span class="token-string">"default"</span>)  <span class="token-comment">// Only when nothing is set</span>
+    <span class="token-keyword">public</span> <span class="token-type">DataSource</span> <span class="token-function">localDataSource</span>() {
+        <span class="token-comment">// H2 in-memory for local "just run it" development</span>
+        <span class="token-keyword">return new</span> <span class="token-type">EmbeddedDatabaseBuilder</span>()
+            .<span class="token-function">setType</span>(<span class="token-type">EmbeddedDatabaseType</span>.H2)
+            .<span class="token-function">build</span>();
+    }
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@Profile</span>(<span class="token-string">"prod"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">DataSource</span> <span class="token-function">productionDataSource</span>() {
+        <span class="token-comment">// Real database for production</span>
+        <span class="token-keyword">return</span> <span class="token-type">DataSourceBuilder</span>.<span class="token-function">create</span>()
+            .<span class="token-function">url</span>(<span class="token-string">"jdbc:postgresql://prod:5432/db"</span>)
+            .<span class="token-function">build</span>();
+    }
+}
+
+<span class="token-comment">// You can also change the default profile name:</span>
+<span class="token-comment">// spring.profiles.default=local</span>
+<span class="token-comment">// Now @Profile("local") activates when nothing is explicitly set</span></code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Common Mistake</div>
+                <p>Setting <code>spring.profiles.active=dev</code> DISABLES the "default" profile. If you have beans with <code>@Profile("default")</code> for local development AND set <code>spring.profiles.active</code> in your application.properties, those "default" beans will never load — even locally. Use <code>spring.profiles.default</code> to rename the fallback profile instead.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: @Profile on Configurations -->
+            <!-- ============================================ -->
+            <h2>4. @Profile on @Configuration Classes and @Bean Methods</h2>
+
+            <pre><code><span class="token-comment">// ═══ Class-level: entire configuration is conditional ═══</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-annotation">@Profile</span>(<span class="token-string">"dev"</span>)
+<span class="token-keyword">public class</span> <span class="token-class">DevToolsConfiguration</span> {
+
+    <span class="token-comment">// ALL beans in this class only exist when "dev" is active</span>
+    <span class="token-annotation">@Bean</span>
+    <span class="token-keyword">public</span> <span class="token-type">DataSeeder</span> <span class="token-function">dataSeeder</span>() { <span class="token-keyword">return new</span> <span class="token-type">DataSeeder</span>(); }
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-keyword">public</span> <span class="token-type">MockEmailService</span> <span class="token-function">emailService</span>() { <span class="token-keyword">return new</span> <span class="token-type">MockEmailService</span>(); }
+}
+
+<span class="token-comment">// ═══ Method-level: fine-grained per bean ═══</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-keyword">public class</span> <span class="token-class">EmailConfiguration</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@Profile</span>(<span class="token-string">"dev"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">EmailService</span> <span class="token-function">mockEmail</span>() {
+        <span class="token-keyword">return new</span> <span class="token-type">ConsoleEmailService</span>(); <span class="token-comment">// prints to stdout</span>
+    }
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@Profile</span>(<span class="token-string">"prod"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">EmailService</span> <span class="token-function">realEmail</span>() {
+        <span class="token-keyword">return new</span> <span class="token-type">SmtpEmailService</span>(); <span class="token-comment">// sends real emails</span>
+    }
+}
+
+<span class="token-comment">// How it works internally: ProfileCondition evaluates the annotation</span>
+<span class="token-keyword">class</span> <span class="token-class">ProfileCondition</span> <span class="token-keyword">implements</span> <span class="token-type">Condition</span> {
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public boolean</span> <span class="token-function">matches</span>(<span class="token-type">ConditionContext</span> context, <span class="token-type">AnnotatedTypeMetadata</span> metadata) {
+        <span class="token-type">MultiValueMap</span>&lt;<span class="token-type">String</span>, <span class="token-type">Object</span>&gt; attrs =
+            metadata.<span class="token-function">getAllAnnotationAttributes</span>(<span class="token-type">Profile</span>.<span class="token-keyword">class</span>.<span class="token-function">getName</span>());
+        <span class="token-type">String</span>[] profiles = (<span class="token-type">String</span>[]) attrs.<span class="token-function">getFirst</span>(<span class="token-string">"value"</span>);
+
+        <span class="token-keyword">for</span> (<span class="token-type">String</span> profile : profiles) {
+            <span class="token-keyword">if</span> (context.<span class="token-function">getEnvironment</span>().<span class="token-function">acceptsProfiles</span>(
+                    <span class="token-type">Profiles</span>.<span class="token-function">of</span>(profile))) {
+                <span class="token-keyword">return true</span>;
+            }
+        }
+        <span class="token-keyword">return false</span>;
+    }
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: Profile-Specific Property Files -->
+            <!-- ============================================ -->
+            <h2>5. Profile-Specific Property Files</h2>
+
+            <pre><code><span class="token-comment"># File naming convention: application-{profile}.yml</span>
+<span class="token-comment"># These files are automatically loaded when the profile is active</span>
+
+<span class="token-comment"># application.yml — always loaded (base config)</span>
+server:
+  port: 8080
+spring:
+  application:
+    name: order-service
+
+<span class="token-comment"># application-dev.yml — loaded when "dev" profile active</span>
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:h2:mem:devdb
+logging:
+  level:
+    com.company: DEBUG
+
+<span class="token-comment"># application-prod.yml — loaded when "prod" profile active</span>
+server:
+  port: 443
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-cluster:5432/orders
+    hikari:
+      maximum-pool-size: 50
+logging:
+  level:
+    root: WARN
+    com.company: INFO</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>Profile-specific files don't replace the base <code>application.yml</code> — they <strong>merge on top</strong>. Properties in <code>application-prod.yml</code> override the same keys in <code>application.yml</code>, but any keys only in the base file still apply. This means your base file holds common defaults, and profile files hold only the overrides.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Profile Groups -->
+            <!-- ============================================ -->
+            <h2>6. Profile Groups (Boot 2.4+)</h2>
+
+            <pre><code><span class="token-comment"># application.yml — defining profile groups</span>
+<span class="token-comment"># A single profile activation can trigger multiple sub-profiles</span>
+
+spring:
+  profiles:
+    group:
+      production:
+        - proddb
+        - prodmq
+        - prodmetrics
+      staging:
+        - stagingdb
+        - stagingmq
+        - prodmetrics   <span class="token-comment"># reuse production metrics config</span>
+      local:
+        - localdb
+        - devmq
+        - devmetrics
+
+<span class="token-comment"># Now activating just "production" also activates proddb, prodmq, prodmetrics</span>
+<span class="token-comment"># Command: java -jar app.jar --spring.profiles.active=production</span>
+<span class="token-comment"># Active profiles: production, proddb, prodmq, prodmetrics</span>
+
+<span class="token-comment"># Each sub-profile has its own config file:</span>
+<span class="token-comment"># application-proddb.yml    → PostgreSQL connection pool settings</span>
+<span class="token-comment"># application-prodmq.yml    → RabbitMQ production cluster config</span>
+<span class="token-comment"># application-prodmetrics.yml → Prometheus/Grafana endpoints</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>Profile groups solve the "profile explosion" problem. Before groups, teams would use <code>--spring.profiles.active=prod,proddb,prodmq,prodmetrics</code> everywhere — fragile and error-prone. With groups, a single <code>--spring.profiles.active=production</code> activates everything consistently. It's like defining "presets" for your environment.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Multi-Profile and Negative Profiles -->
+            <!-- ============================================ -->
+            <h2>7. Multi-Profile Beans and Negative Profiles</h2>
+
+            <pre><code><span class="token-comment">// ═══ Multi-profile: active in ANY of the listed profiles ═══</span>
+<span class="token-annotation">@Bean</span>
+<span class="token-annotation">@Profile</span>({<span class="token-string">"dev"</span>, <span class="token-string">"test"</span>})  <span class="token-comment">// Active in dev OR test (logical OR)</span>
+<span class="token-keyword">public</span> <span class="token-type">EmailService</span> <span class="token-function">mockEmailService</span>() {
+    <span class="token-keyword">return new</span> <span class="token-type">MockEmailService</span>();
+}
+
+<span class="token-comment">// ═══ Negative profiles: active when profile is NOT set ═══</span>
+<span class="token-annotation">@Bean</span>
+<span class="token-annotation">@Profile</span>(<span class="token-string">"!production"</span>)  <span class="token-comment">// Active in everything EXCEPT production</span>
+<span class="token-keyword">public</span> <span class="token-type">CorsFilter</span> <span class="token-function">permissiveCors</span>() {
+    <span class="token-comment">// Allow all origins in non-prod environments</span>
+    <span class="token-keyword">return new</span> <span class="token-type">CorsFilter</span>(<span class="token-type">CorsConfiguration</span>.<span class="token-function">applyPermitDefaultValues</span>());
+}
+
+<span class="token-comment">// ═══ Combining positive and negative ═══</span>
+<span class="token-annotation">@Bean</span>
+<span class="token-annotation">@Profile</span>({<span class="token-string">"cloud"</span>, <span class="token-string">"!local"</span>})  <span class="token-comment">// "cloud" OR "not local" — careful!</span>
+<span class="token-keyword">public</span> <span class="token-type">ServiceDiscovery</span> <span class="token-function">eurekaDiscovery</span>() {
+    <span class="token-keyword">return new</span> <span class="token-type">EurekaServiceDiscovery</span>();
+}
+
+<span class="token-comment">// ═══ Complex expressions with Profiles.of() (programmatic) ═══</span>
+<span class="token-comment">// For AND logic, you need nested conditions or custom Condition class</span>
+<span class="token-keyword">boolean</span> matches = environment.<span class="token-function">acceptsProfiles</span>(
+    <span class="token-type">Profiles</span>.<span class="token-function">of</span>(<span class="token-string">"prod & cloud"</span>)  <span class="token-comment">// AND logic (Boot 2.4+)</span>
+);
+
+<span class="token-keyword">boolean</span> matches2 = environment.<span class="token-function">acceptsProfiles</span>(
+    <span class="token-type">Profiles</span>.<span class="token-function">of</span>(<span class="token-string">"dev | test"</span>)  <span class="token-comment">// OR logic</span>
+);</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: Profiles vs Feature Flags -->
+            <!-- ============================================ -->
+            <h2>8. Why NOT to Use Profiles for Feature Flags</h2>
+
+            <pre><code><span class="token-comment">// ❌ WRONG: Using profiles as feature flags</span>
+<span class="token-annotation">@Profile</span>(<span class="token-string">"dark-mode-enabled"</span>)  <span class="token-comment">// Don't do this!</span>
+<span class="token-annotation">@Bean</span>
+<span class="token-keyword">public</span> <span class="token-type">ThemeService</span> <span class="token-function">darkModeTheme</span>() { ... }
+
+<span class="token-comment">// Problems:</span>
+<span class="token-comment">// 1. Requires restart to toggle features</span>
+<span class="token-comment">// 2. Profiles are for ENVIRONMENTS, not features</span>
+<span class="token-comment">// 3. Combinatorial explosion: dev+dark-mode+beta+new-checkout...</span>
+<span class="token-comment">// 4. Can't toggle per-user or gradually roll out</span>
+
+<span class="token-comment">// ✅ CORRECT: Use @ConditionalOnProperty for feature flags</span>
+<span class="token-annotation">@Bean</span>
+<span class="token-annotation">@ConditionalOnProperty</span>(
+    name = <span class="token-string">"app.features.dark-mode"</span>,
+    havingValue = <span class="token-string">"true"</span>,
+    matchIfMissing = <span class="token-keyword">false</span>
+)
+<span class="token-keyword">public</span> <span class="token-type">ThemeService</span> <span class="token-function">darkModeTheme</span>() { ... }
+
+<span class="token-comment">// Even better: use a feature flag library (LaunchDarkly, Unleash, Flagsmith)</span>
+<span class="token-comment">// that supports runtime toggling without restart</span></code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Profiles = Environments, Not Features</div>
+                <p>Profiles answer "WHERE is this running?" (dev/staging/prod). Feature flags answer "WHAT should be enabled?" These are orthogonal concerns. You might want dark-mode in prod but not staging, beta-checkout in staging but not dev — this requires a matrix that profiles can't cleanly express. Use <code>@ConditionalOnProperty</code> or a dedicated feature flag system.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 9: Industry Pattern -->
+            <!-- ============================================ -->
+            <h2>9. Industry Pattern: Docker + Profile Groups</h2>
+
+            <pre><code><span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+<span class="token-comment">// Production deployment with profile groups and Docker</span>
+<span class="token-comment">// ═══════════════════════════════════════════════════════════</span>
+
+<span class="token-comment"># application.yml — profile groups definition</span>
+spring:
+  profiles:
+    group:
+      production:
+        - proddb
+        - prodcache
+        - prodmq
+        - observability
+      staging:
+        - stagingdb
+        - stagingcache
+        - stagingmq
+        - observability
+      local:
+        - h2db
+        - localcache
+        - embedded-mq
+
+<span class="token-comment"># Dockerfile — activating via environment variable</span>
+FROM eclipse-temurin:21-jre
+COPY target/app.jar /app.jar
+ENV SPRING_PROFILES_ACTIVE=production
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+<span class="token-comment"># docker-compose.yml — override per service</span>
+services:
+  order-service:
+    image: company/order-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging
+      - DB_HOST=staging-postgres
+
+<span class="token-comment"># Kubernetes deployment.yaml — ConfigMap for profile</span>
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: order-service
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: active-profiles</code></pre>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>Profiles</strong> are named logical groups that control which beans and config are active in the current environment</li>
+                    <li><strong>Activation priority:</strong> CLI args > env vars > system properties > application.properties — higher sources override lower ones</li>
+                    <li><strong>Default profile</strong> is a fallback that activates ONLY when no explicit profiles are set</li>
+                    <li><strong>Profile-specific files</strong> (application-{profile}.yml) merge on top of the base config, not replace it</li>
+                    <li><strong>Profile groups</strong> (Boot 2.4+) let one profile activation trigger multiple sub-profiles — reducing deployment complexity</li>
+                    <li><strong>Negative profiles</strong> (<code>@Profile("!production")</code>) activate beans when a profile is NOT active</li>
+                    <li><strong>Don't use profiles for feature flags</strong> — use @ConditionalOnProperty or dedicated feature flag systems instead</li>
+                    <li><strong>Industry standard:</strong> Docker env vars + profile groups + Kubernetes ConfigMaps for clean environment switching</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>You have <code>spring.profiles.active=dev</code> in application.properties and <code>SPRING_PROFILES_ACTIVE=prod</code> as an env var. Which profile is active? What if you also pass <code>--spring.profiles.active=staging</code> on the CLI?</li>
+                    <li>A bean has <code>@Profile({"dev", "test"})</code>. Does this mean the bean is active when BOTH profiles are set, or when EITHER is set? How would you express AND logic?</li>
+                    <li>Explain why <code>@Profile("default")</code> beans disappear when you set <code>spring.profiles.active=dev</code>. How would you keep a fallback that works alongside active profiles?</li>
+                    <li>Design a profile strategy for an app deployed to: local dev, CI pipeline, staging, and 3 regional production clusters (us-east, eu-west, ap-south).</li>
+                    <li>Your team uses <code>@Profile("integration-test")</code> to mock external services in tests. Why is this problematic? What's a better approach?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"Your application needs to connect to different databases in dev, staging, and production, but also needs feature-specific config that's independent of the environment. How do you structure your profiles and properties?"</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Separate environment from feature:</strong> Use profiles (dev/staging/prod) for environment-specific config and <code>@ConditionalOnProperty</code> for feature toggles.</li>
+                    <li><strong>Profile groups:</strong> Group related sub-profiles — <code>production</code> activates <code>proddb</code>, <code>prodcache</code>, <code>prodmq</code> so each concern has its own file.</li>
+                    <li><strong>Feature properties in base config:</strong> <code>app.features.new-checkout=true</code> in application.yml, overrideable per environment in application-prod.yml if needed.</li>
+                    <li><strong>Never put secrets in profile files:</strong> Use environment variables or Vault for credentials — profile files should only contain non-sensitive config.</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 13 (Externalized Config)</strong> — Profiles determine which application-{profile} files are loaded from the property source stack</li>
+                    <li><strong>Topic 11 (Conditionals)</strong> — @Profile is implemented as a @Conditional that delegates to ProfileCondition</li>
+                    <li><strong>Topic 15 (Custom Starters)</strong> — Starters often use profiles to vary their behavior across environments</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="13-externalized-config.html" class="nav-btn nav-btn-prev">← Externalized Configuration</a>
+                <a href="15-custom-starters.html" class="nav-btn nav-btn-next">Custom Spring Boot Starters →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

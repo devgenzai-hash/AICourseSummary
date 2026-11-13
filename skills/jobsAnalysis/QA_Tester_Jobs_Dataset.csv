@@ -1,0 +1,106 @@
+Job_ID,Job_Title,Company,Location,Country,Salary_Min,Salary_Max,Salary_Currency,Experience_Level,Work_Mode,Source,Skills_Required,Job_Type,Industry
+1,QA Tester,CGI,Reston VA,USA,85000,121000,USD,Mid-Level,Hybrid,Glassdoor,"Jira;HP ALM;SQL;Unix;Windows;Agile;Scrum;Waterfall;DevOps;ETL;CI/CD;API Testing;Selenium;Cloud Testing",Full-Time,IT Services
+2,QA Tester,Cedent,Remote,USA,83200,124800,USD,Mid-Level,Remote,Glassdoor,"LoadRunner;Selenium;User Acceptance Testing;Scripting;Scrum;QTP;Automation",Full-Time,IT Consulting
+3,SDET 4 - Account & Security,Netflix,United States,USA,200000,300000,USD,Senior,Remote,Glassdoor,"iOS Development;Android;Java;JavaScript;Automated Testing;Scalability;Software Development",Full-Time,Entertainment/Tech
+4,SDET 5 - Plans and Pricing,Netflix,United States,USA,266000,442000,USD,Principal,Remote,Glassdoor,"iOS;Android;Java;JavaScript;A/B Testing;Mobile;Web;TV Platforms",Full-Time,Entertainment/Tech
+5,Game Test Analyst,PlayStation,San Diego CA,USA,36920,37440,USD,Entry-Level,On-Site,Glassdoor,"Research;Analysis;Computer Hardware;Networking;Software Testing;QA Experience",Full-Time,Gaming
+6,Senior QA Tester,CGI,Lafayette LA,USA,85000,108000,USD,Senior,Hybrid,Glassdoor,"Jira;HP ALM;Waterfall;Test Management Tools;Windows;SQL;API Testing",Full-Time,IT Services
+7,ServiceNow QA/Test Engineer,Emory Healthcare,Atlanta GA,USA,77438,96200,USD,Mid-Level,On-Site,Glassdoor,"Computer Science;Enterprise Software;Functional Testing;Regression;UAT;Performance Testing;Continuous Improvement",Full-Time,Healthcare
+8,Functional Tester,TCS,Oakland CA,USA,90000,120000,USD,Mid-Level,On-Site,Glassdoor,"Jira;HP ALM;Test Management;SQL;Writing Skills;Test Planning",Full-Time,IT Services
+9,QA Automation Tester,TCS,North Quincy MA,USA,90000,95000,USD,Mid-Level,On-Site,Glassdoor,"Selenium;Analysis Skills;Scripting;IT;Communication Skills;Selenium WebDriver",Full-Time,IT Services
+10,Selenium Automation Tester,TCS,Charlotte NC,USA,110000,125000,USD,Senior,On-Site,Glassdoor,"Jira;HP ALM;TestNG;Gradle;Selenium;ETL;Data Testing;SQL;QA Methodologies",Full-Time,IT Services
+11,Business Systems Analyst/Tester,CACI International,Washington DC,USA,73000,149000,USD,Mid-Level,On-Site,Glassdoor,"SQL;Functional Testing;Analysis;IT Systems;DoD Experience;Test Development",Full-Time,Defense/Government
+12,Appian Software QA Tester,KBR,Houston TX,USA,70000,110000,USD,Mid-Level,On-Site,Glassdoor,"Performance Testing;SQL;APIs;Business Requirements;Appian;Software Testing",Full-Time,Defense/Engineering
+13,Software Tester,KBR,Chantilly VA,USA,71000,123000,USD,Mid-Level,On-Site,Glassdoor,"Jira;Selenium;Windows;Java;JavaScript;Test Documentation;Customer Interface",Full-Time,Defense/Engineering
+14,Senior System Tester,Siemens,Chicago IL,USA,150000,230000,USD,Senior,On-Site,Glassdoor,"Analysis;PLCs;System Testing;CI;Scripting;Forward Deployment;Live Environments",Full-Time,Manufacturing/Tech
+15,System Tester,Siemens,Chicago IL,USA,113000,193000,USD,Mid-Level,On-Site,Glassdoor,"Computer Science;Analysis;System Testing;CI;Scripting;Embedded Systems",Full-Time,Manufacturing/Tech
+16,Peoplesoft Functional Tester,Software Technology,Remote,USA,60000,95000,USD,Mid-Level,Remote,Glassdoor,"HP ALM;Microsoft Office;SQL;Analysis;Test Planning;Test Scripts;Training",Full-Time,IT Services
+17,Quality Assurance Analyst/Tester,Software Technology,Nashville TN,USA,66000,103000,USD,Mid-Level,On-Site,Glassdoor,"Jira;Selenium;UAT;Scripting;ServiceNow;Zephyr;Postman;Tricentis Tosca",Full-Time,IT Services
+18,Software QA Engineer - Battery,General Motors,Milford MI,USA,61000,87000,USD,Entry-Level,On-Site,Glassdoor,"MATLAB;C;Embedded Software;Ethernet;Root Cause Analysis;Automation",Full-Time,Automotive
+19,Software Test Engineer,Motorola Solutions,Uxbridge MA,USA,85000,122000,USD,Mid-Level,On-Site,Glassdoor,"Mobile Applications;Computer Networking;APIs;Python;Testing;Creativity",Full-Time,Telecommunications
+20,QA Engineer (Automation),Photon,Dallas TX,USA,38000,133000,USD,Mid-Level,On-Site,Glassdoor,"Statistics;Selenium;SQL;CI;APIs;Autonomous Agent Testing;AI QA",Full-Time,IT Services
+21,UAT Tester,Intone Networks,Tampa FL,USA,48000,82000,USD,Mid-Level,On-Site,Glassdoor,"CI/CD;Test Management;SAP;DevOps;UAT;Tricentis;NeoLoad;qTest",Full-Time,IT Services
+22,QA Domain Tester,Katalyst Healthcare,Plano TX,USA,49000,83000,USD,Mid-Level,On-Site,Glassdoor,"Ansible;Selenium;Analysis;Scripting;CI/CD;GitLab;GitHub Actions",Full-Time,Healthcare IT
+23,Validation Engineer - Crash Safety,Tesla,Palo Alto CA,USA,140000,300000,USD,Senior,On-Site,Glassdoor,"Computer Science;Rust;FPGA;Firmware;Git;Embedded Controllers;Simulation",Full-Time,Automotive/Tech
+24,Software Validation Engineer - Steering,Tesla,Palo Alto CA,USA,120000,396000,USD,Senior,On-Site,Glassdoor,"Rust;Schematics;Firmware;Git;Docker;HIL Testing;Hardware Engineering",Full-Time,Automotive/Tech
+25,HIH Automation Engineer Lead Analyst,The Cigna Group,Andhra Pradesh,India,800000,1800000,INR,Senior,Hybrid,Glassdoor India,"CI/CD;Azure;Test Automation;Selenium;Java;Python;SQL;API Testing;STLC;SDLC;OOP",Full-Time,Healthcare/Insurance
+26,Junior Software Tester,PrimaFelicitas,Noida,India,276000,612000,INR,Entry-Level,On-Site,Glassdoor India,"Oracle;Relational Databases;ERP Systems;Microsoft SQL Server;Databases",Full-Time,IT Services
+27,QA Automation Tester - Selenium Java Cucumber,Forar Tech,Remote,India,600000,1200000,INR,Mid-Level,Remote,Glassdoor India,"CI/CD;Cucumber;Selenium;Git;Java;Code Reviews;BDD;Test Coverage",Contract,IT Services
+28,QA Tester,Barclays,Pune,India,300000,900000,INR,Mid-Level,On-Site,Glassdoor India,"Test Automation;Microsoft Office;Presentation Skills;Machine Learning;APIs",Full-Time,Banking/Finance
+29,QA Automation Tester,Ideal Tech Labs,Chennai,India,400000,800000,INR,Mid-Level,On-Site,Glassdoor India,"Jira;CI/CD;TestNG;Azure;Trello;Selenium;Test Automation Process",Full-Time,IT Services
+30,QA & Testing Lead Analyst,The Cigna Group,Andhra Pradesh,India,1000000,2000000,INR,Senior,Hybrid,Glassdoor India,"CI/CD;Azure;Test Automation;Selenium;Java;API Automation;SQL",Full-Time,Healthcare/Insurance
+31,Lead Consultant QA Manual Tester,Genpact,Pune,India,500000,600000,INR,Senior,On-Site,Glassdoor India,"Jira;Test Management Tools;Mobile Applications;Test Automation;Java;API Testing;Agile",Full-Time,IT Services/BPM
+32,Sr. QA / Tester,Xtrazcon,Pune,India,200000,600000,INR,Mid-Level,On-Site,Glassdoor India,"Manual Testing;Automation Testing;Web Testing;Database Testing;API Testing;Test Cases",Full-Time,IT Services
+33,QA Tester (Automation & Manual),Aadrika Enterprises,Ranchi,India,200000,600000,INR,Mid-Level,On-Site,Glassdoor India,"CI/CD;TestNG;C#;Test Automation;Selenium;Automated Test Scripts;Software Testing Methodologies",Full-Time,IT Services
+34,QA Automated Tester,Kryptos Technologies,Chennai,India,400000,800000,INR,Mid-Level,On-Site,Glassdoor India,"Cucumber;LoadRunner;Test Automation;Selenium;Git;Performance Testing;BDD",Full-Time,IT Services
+35,LIQ QA Automation Tester,Barclays,Chennai,India,400000,1000000,INR,Mid-Level,On-Site,Glassdoor India,"Jira;CI/CD;Cucumber;DevOps;Test Automation;Acceptance Criteria;Cross-Functional",Full-Time,Banking/Finance
+36,QA Tester,InUnity LLP,Mangalore,India,400000,500000,INR,Mid-Level,On-Site,Glassdoor India,"CI/CD;Selenium;SQL;PostgreSQL;Continuous Integration;QA Tools;Automation Frameworks",Full-Time,IT Services
+37,Senior QA Tester (MABL),totHR,Remote,India,1100000,1400000,INR,Senior,Remote,Glassdoor India,"CI/CD;Azure;Node.js;React;DevOps;Cloud-Native SaaS;MABL",Full-Time,HR Tech/SaaS
+38,QA Automation Tester GenAI,Citi,Chennai,India,500000,500000,INR,Mid-Level,On-Site,Glassdoor India,"Jira;CI/CD;Microsoft Excel;Oracle;Data Mining;GenAI;Automation Frameworks;Compliance",Full-Time,Banking/Finance
+39,QA Automation Tester (Immediate),Benthon Labs,Noida,India,1000000,1500000,INR,Mid-Level,On-Site,Glassdoor India,"Jira;CI/CD;TestNG;Azure;JUnit;Selenium;Java;Automation",Full-Time,IT Services
+40,QA Automation - Robot Framework Python,NTT DATA,Hyderabad,India,400000,900000,INR,Mid-Level,Hybrid,Glassdoor India,"TestNG;JUnit;Cucumber;Test Automation;Selenium;Robot Framework;Python",Full-Time,IT Services
+41,Manual QA Tester,DoveRunner,India,India,400000,800000,INR,Mid-Level,Remote,Glassdoor India,"Jira;Agile;Communication Skills;Mobile Security Testing;Manual Testing",Full-Time,Mobile Security
+42,QA Tester / Software Test Engineer,Force009,Jaipur,India,35000,35000,INR,Entry-Level,On-Site,Glassdoor India,"APIs;Software Testing;Web Applications;CRM Testing;Automation Workflows",Full-Time,IT Services
+43,Playwright Automation Tester,Expleo Group,Pune,India,100000,600000,INR,Mid-Level,On-Site,Glassdoor India,"CI/CD;Git;Continuous Integration;APIs;UI Automation;Playwright;TypeScript",Full-Time,IT Services/Consulting
+44,Senior QA Automation Tester,Foraysoft/Atos Syntel,Chennai,India,300000,400000,INR,Senior,On-Site,Glassdoor India,"Jira;TestNG;JUnit;Cucumber;Test Automation;Selenium;Test Planning;Test Case Design",Full-Time,IT Services
+45,QA Automation Engineer,Tuna Software Solutions,Kerala,India,400000,800000,INR,Mid-Level,On-Site,Glassdoor India,"CI/CD;Selenium;Performance Testing;Java;SQL;Development Ops",Full-Time,IT Services
+46,QA Tester,Enterslice,Noida,India,400000,700000,INR,Mid-Level,On-Site,Glassdoor India,"CSS;React;iOS;Selenium;TDD;Browser Automation;Robot Framework;Manual Testing;SDLC",Full-Time,Legal Tech
+47,Automation Tester,Unisys,Bengaluru,India,700000,1000000,INR,Mid-Level,On-Site,Glassdoor India,"SDLC;Software QA Engineering;Client Requirements;Functional Specifications",Full-Time,IT Services
+48,Automation Tester,TCS,Bengaluru,India,400000,400000,INR,Mid-Level,On-Site,Glassdoor India,"Selenium;REST;APIs;Test Cases;Python;Playwright;Cypress;API Testing",Full-Time,IT Services
+49,QA Tester,Kofuku Technologies,India,India,75000,90000,INR,Mid-Level,Remote,Glassdoor India,"Jira;CI/CD;HP ALM;LoadRunner;Test Automation;Manual Testing;Automation Scripts",Full-Time,IT Services
+50,Automation and Manual Tester,Next XR India,Remote,India,300000,600000,INR,Mid-Level,Remote,Glassdoor India,"Jira;Trello;Analysis;Scrum;Unity;Web Testing;Mobile Testing;Manual Testing",Full-Time,XR/Gaming
+51,Manual Tester (Basic Automation),Testvox,Cochin,India,35000,35000,INR,Entry-Level,On-Site,Glassdoor India,"Test Automation;Performance Testing;Software Development;Software Testing;Agile",Full-Time,IT Services
+52,QA Tester,Hexanika,Pune,India,200000,600000,INR,Mid-Level,On-Site,Glassdoor India,"Jira;Test Automation;Performance Testing;Java;SQL;QA Processes",Full-Time,Fintech
+53,Automation Tester - Selenium Java,Jade Global,Hyderabad,India,400000,700000,INR,Mid-Level,On-Site,Glassdoor India,"CI/CD;Azure;Cucumber;Selenium;Java;Rest API;Rest Assured;HTTP Client",Full-Time,IT Services
+54,QA Tester (Fresher),Webs Optimization,Ahmedabad,India,300000,400000,INR,Entry-Level,On-Site,Glassdoor India,"Jira;Java;APIs;Software Testing;Agile;Postman;Python",Full-Time,IT Services
+55,QA Tester,Accenture,Bengaluru,India,600000,1200000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;Python;API Testing;Agile;Jira;CI/CD;SQL;TestNG;BDD",Full-Time,IT Services
+56,Automation Test Engineer,Infosys,Hyderabad,India,500000,1000000,INR,Mid-Level,On-Site,Naukri,"Selenium;Java;TestNG;Maven;Jenkins;Git;REST API;Postman;Jira;Agile",Full-Time,IT Services
+57,SDET,Wipro,Bengaluru,India,600000,1400000,INR,Mid-Level,On-Site,Naukri,"Java;Selenium;TestNG;Jenkins;Git;REST API;Microservices;Docker;AWS;CI/CD",Full-Time,IT Services
+58,QA Automation Engineer,HCLTech,Pune,India,500000,1100000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;Python;Cucumber;Jenkins;Git;API Testing;Jira;Agile;SQL",Full-Time,IT Services
+59,Senior Test Engineer,Tech Mahindra,Chennai,India,800000,1600000,INR,Senior,Hybrid,Naukri,"Selenium;Java;Python;Cypress;Playwright;Jenkins;Docker;AWS;Azure;Performance Testing",Full-Time,IT Services
+60,Software Tester,Cognizant,Pune,India,400000,800000,INR,Mid-Level,On-Site,Naukri,"Manual Testing;Selenium;SQL;Jira;Agile;Regression;Functional Testing;API Testing",Full-Time,IT Services
+61,QA Lead,Capgemini,Mumbai,India,1200000,2200000,INR,Senior,Hybrid,Naukri,"Selenium;Java;CI/CD;Jenkins;Test Strategy;Team Management;Agile;Performance Testing;Azure DevOps",Full-Time,IT Services
+62,Automation Tester,Mindtree/LTIMindtree,Bengaluru,India,600000,1200000,INR,Mid-Level,On-Site,Naukri,"Selenium;Java;TestNG;REST API;Postman;Git;Jenkins;Docker;BDD;Cucumber",Full-Time,IT Services
+63,Test Analyst,Mphasis,Hyderabad,India,500000,900000,INR,Mid-Level,On-Site,Naukri,"Manual Testing;Selenium;SQL;API Testing;Jira;Agile;UAT;Performance Testing",Full-Time,IT Services
+64,QA Engineer,Flipkart,Bengaluru,India,1500000,3000000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;TestNG;REST API;AWS;CI/CD;Docker;Kubernetes;Performance Testing",Full-Time,E-Commerce
+65,SDET II,Amazon,Hyderabad,India,2000000,4000000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;AWS;Docker;Kubernetes;CI/CD;API Testing;Microservices;System Design",Full-Time,E-Commerce/Tech
+66,QA Automation Engineer,Paytm,Noida,India,800000,1600000,INR,Mid-Level,On-Site,Naukri,"Selenium;Java;Python;Appium;API Testing;Git;Jenkins;Agile;Mobile Testing;SQL",Full-Time,Fintech
+67,Senior QA Engineer,Razorpay,Bengaluru,India,1500000,2800000,INR,Senior,Hybrid,Naukri,"Java;Python;Selenium;Playwright;API Testing;CI/CD;Docker;AWS;Performance Testing;Security Testing",Full-Time,Fintech
+68,Software Tester,Zoho,Chennai,India,600000,1200000,INR,Mid-Level,On-Site,Naukri,"Manual Testing;Automation;Java;Selenium;API Testing;SQL;Performance Testing;Security Testing",Full-Time,SaaS/Product
+69,QA Engineer,Freshworks,Chennai,India,1000000,2000000,INR,Mid-Level,On-Site,Naukri,"Ruby;Python;Selenium;Cypress;API Testing;AWS;Docker;CI/CD;Agile;SQL",Full-Time,SaaS/Product
+70,Test Engineer,Samsung R&D,Bengaluru,India,800000,1500000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;Appium;Android Testing;Mobile Testing;CI/CD;Git;Jenkins",Full-Time,Electronics/Tech
+71,QA Automation,Microsoft IDC,Hyderabad,India,2000000,4500000,INR,Senior,Hybrid,Naukri,"C#;.NET;Selenium;Azure DevOps;PowerShell;CI/CD;API Testing;Performance Testing;Cloud Testing",Full-Time,Product/Tech
+72,SDET,Google India,Bengaluru,India,3000000,6000000,INR,Senior,On-Site,Naukri,"Java;Python;Go;Selenium;API Testing;CI/CD;Cloud;System Design;Performance Testing;Security",Full-Time,Product/Tech
+73,QA Tester,Deloitte,Hyderabad,India,700000,1400000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;API Testing;SQL;Jira;Agile;CI/CD;Cloud Testing;Azure;DevOps",Full-Time,Consulting
+74,Automation Test Lead,L&T Infotech,Mumbai,India,1200000,2000000,INR,Senior,Hybrid,Naukri,"Selenium;Java;TestNG;Jenkins;Maven;Git;CI/CD;API Testing;Performance Testing;Team Leadership",Full-Time,IT Services
+75,Software Tester,Persistent Systems,Pune,India,500000,1000000,INR,Mid-Level,On-Site,Naukri,"Selenium;Java;Python;Manual Testing;SQL;API Testing;Jira;Agile;CI/CD",Full-Time,IT Services
+76,QA Analyst,HSBC,Pune,India,800000,1600000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;Cucumber;BDD;API Testing;SQL;Jira;CI/CD;DevOps;Agile",Full-Time,Banking/Finance
+77,Test Engineer,Oracle India,Bengaluru,India,1200000,2500000,INR,Mid-Level,Hybrid,Naukri,"Java;Python;Selenium;OCI;Cloud Testing;API Testing;SQL;Performance Testing;CI/CD",Full-Time,Product/Tech
+78,Automation Tester,IBM India,Hyderabad,India,800000,1500000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;Python;API Testing;CI/CD;Docker;Cloud;Agile;Jira;Performance Testing",Full-Time,IT Services/Product
+79,QA Engineer,PhonePe,Bengaluru,India,1200000,2500000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;Appium;API Testing;AWS;CI/CD;Docker;Mobile Testing;Performance Testing",Full-Time,Fintech
+80,Senior Test Analyst,Wipro,Pune,India,700000,1300000,INR,Senior,Hybrid,Naukri,"Selenium;Java;UFT;ALM;SQL;API Testing;Performance Testing;Agile;CI/CD;Test Management",Full-Time,IT Services
+81,QA Automation Engineer,Walmart Labs,Bengaluru,India,2000000,3500000,INR,Senior,On-Site,Naukri,"Java;Python;Selenium;TestNG;REST API;AWS;CI/CD;Docker;Kubernetes;Microservices",Full-Time,Retail/E-Commerce
+82,Software Tester,Cyient,Hyderabad,India,400000,800000,INR,Mid-Level,On-Site,Naukri,"Manual Testing;Selenium;Java;SQL;API Testing;Jira;Agile;SDLC;Regression Testing",Full-Time,IT Services/Engineering
+83,Automation Test Engineer,Birlasoft,Noida,India,500000,1000000,INR,Mid-Level,On-Site,Naukri,"Selenium;Java;TestNG;Jenkins;Git;REST API;SQL;Jira;Agile;BDD",Full-Time,IT Services
+84,QA Engineer,Swiggy,Bengaluru,India,1200000,2200000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;Appium;API Testing;AWS;Docker;CI/CD;Performance Testing;Mobile Testing",Full-Time,Food Tech
+85,Test Lead,Infosys BPM,Bengaluru,India,1000000,1800000,INR,Senior,Hybrid,Naukri,"Selenium;Java;Cucumber;Jenkins;API Testing;SQL;Performance Testing;Test Strategy;Agile;Leadership",Full-Time,IT Services/BPM
+86,QA Analyst,Wells Fargo India,Hyderabad,India,900000,1800000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;Cucumber;BDD;API Testing;SQL;CI/CD;Agile;DevOps;Banking Domain",Full-Time,Banking/Finance
+87,SDET,Intuit India,Bengaluru,India,2000000,4000000,INR,Mid-Level,Hybrid,Naukri,"Java;Python;JavaScript;Selenium;Cypress;REST API;AWS;Docker;CI/CD;TDD",Full-Time,SaaS/Product
+88,QA Automation,Ola,Bengaluru,India,1000000,2000000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;Appium;REST API;AWS;Docker;CI/CD;Mobile Testing;Performance Testing",Full-Time,Mobility/Tech
+89,Manual Tester,Hexaware,Chennai,India,350000,700000,INR,Entry-Level,On-Site,Naukri,"Manual Testing;SQL;Jira;Agile;Functional Testing;Regression;UAT;SDLC;Test Cases;Defect Tracking",Full-Time,IT Services
+90,Senior SDET,JP Morgan Chase India,Hyderabad,India,2000000,4000000,INR,Senior,Hybrid,Naukri,"Java;Python;Selenium;Cucumber;API Testing;AWS;Docker;CI/CD;Microservices;Security Testing",Full-Time,Banking/Finance
+91,QA Automation Engineer,Epam Systems,Hyderabad,India,800000,1600000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;Cucumber;Jenkins;Git;API Testing;SQL;Performance Testing;Docker",Full-Time,IT Services
+92,Test Engineer,Qualcomm India,Hyderabad,India,1200000,2500000,INR,Mid-Level,On-Site,Naukri,"Python;C;C++;Embedded Testing;Mobile Testing;CI/CD;Git;Jenkins;Linux;Android",Full-Time,Semiconductor/Tech
+93,QA Engineer,Atlassian India,Bengaluru,India,2500000,5000000,INR,Senior,Hybrid,Naukri,"Java;Python;JavaScript;Selenium;Cypress;Playwright;AWS;CI/CD;Docker;API Testing",Full-Time,SaaS/Product
+94,Automation Tester,Synechron,Pune,India,600000,1200000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;Cucumber;REST API;Postman;Jenkins;Git;SQL;Agile;Banking Domain",Full-Time,Financial Services
+95,Software Tester,Zensar,Pune,India,500000,900000,INR,Mid-Level,On-Site,Naukri,"Manual Testing;Selenium;Java;SQL;API Testing;Jira;Agile;CI/CD;Performance Testing",Full-Time,IT Services
+96,QA Lead,Publicis Sapient,Bengaluru,India,1500000,2800000,INR,Senior,Hybrid,Naukri,"Selenium;Java;Python;Cypress;Playwright;CI/CD;Docker;AWS;API Testing;Test Strategy;Agile",Full-Time,Digital Consulting
+97,SDET,Myntra,Bengaluru,India,1500000,2800000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;TestNG;REST API;Docker;Kubernetes;AWS;CI/CD;Performance Testing",Full-Time,E-Commerce
+98,Test Analyst,DXC Technology,Chennai,India,400000,800000,INR,Mid-Level,On-Site,Naukri,"Manual Testing;Selenium;Java;SQL;API Testing;Jira;Agile;Regression;UAT;SDLC",Full-Time,IT Services
+99,QA Automation Engineer,Nagarro,Hyderabad,India,700000,1400000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;Python;Cypress;API Testing;CI/CD;Docker;Git;Agile;Cloud Testing",Full-Time,IT Services
+100,Performance Test Engineer,Amdocs,Pune,India,800000,1500000,INR,Mid-Level,On-Site,Naukri,"JMeter;LoadRunner;Gatling;Performance Testing;API Testing;SQL;CI/CD;Docker;Cloud;Monitoring",Full-Time,IT Services/Telecom
+101,QA Automation Engineer,Goldman Sachs India,Bengaluru,India,2500000,5000000,INR,Senior,Hybrid,Naukri,"Java;Python;Selenium;API Testing;CI/CD;AWS;Docker;Microservices;Security Testing;Performance",Full-Time,Banking/Finance
+102,Software Tester,Globant India,Pune,India,600000,1200000,INR,Mid-Level,Hybrid,Naukri,"Selenium;Java;Python;API Testing;CI/CD;Docker;Agile;Jira;SQL;Cloud Testing",Full-Time,IT Services/Product
+103,Test Engineer,ThoughtWorks India,Bengaluru,India,1000000,2200000,INR,Mid-Level,On-Site,Naukri,"Java;Python;Selenium;Cypress;Playwright;CI/CD;Docker;AWS;TDD;BDD;Agile;Pair Programming",Full-Time,IT Consulting
+104,QA Engineer,Freshworks India,Chennai,India,1000000,2000000,INR,Mid-Level,On-Site,Naukri,"Ruby;Python;Selenium;Cypress;API Testing;AWS;Docker;CI/CD;SQL;Agile",Full-Time,SaaS/Product
+105,Automation Test Engineer,Mphasis,Bengaluru,India,600000,1100000,INR,Mid-Level,On-Site,Naukri,"Selenium;Java;TestNG;API Testing;SQL;Jenkins;Git;Jira;Agile;Cucumber",Full-Time,IT Services

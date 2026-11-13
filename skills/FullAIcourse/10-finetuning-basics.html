@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning Basics — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 2</a> <span>›</span> Fine-Tuning Basics</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Fine-Tuning Basics & Continued Pre-Training</h1>
+                <p>Fine-tuning is how you adapt a general model to YOUR specific task. This is the most important skill for an LLM engineer. Learn the concepts, types, and when to use each approach.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Pre-training = General education (school K-12).</strong> You learn reading, math, science, history — broad knowledge.</p>
+                <p><strong>Fine-tuning = Specialized training (medical school).</strong> You already know general science, now you focus on becoming a doctor. You don't forget everything else — you just become specialized.</p>
+                <p><strong>Continued Pre-training = College before med school.</strong> You read medical textbooks to build domain knowledge, but haven't done hands-on practice yet.</p>
+            </div>
+
+            <h2 id="types">Types of Model Adaptation</h2>
+
+            <div class="comparison-table">
+                <table>
+                    <thead><tr><th>Method</th><th>What It Does</th><th>Data Needed</th><th>When to Use</th><th>Cost</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Prompting</strong></td><td>Tell model what to do in the prompt</td><td>None</td><td>Quick prototyping, simple tasks</td><td>Free</td></tr>
+                        <tr><td><strong>RAG</strong></td><td>Give model external knowledge at query time</td><td>Documents</td><td>When model needs current/private info</td><td>Low</td></tr>
+                        <tr><td><strong>Continued Pre-training (CPT)</strong></td><td>Feed domain text to build knowledge</td><td>100K+ raw texts</td><td>Model lacks domain knowledge</td><td>Medium</td></tr>
+                        <tr><td><strong>Supervised Fine-tuning (SFT)</strong></td><td>Teach model to follow specific patterns</td><td>1K-100K pairs</td><td>Need consistent format/behavior</td><td>Medium</td></tr>
+                        <tr><td><strong>Preference Alignment (DPO/RLHF)</strong></td><td>Teach model which answers are better</td><td>10K-100K pairs</td><td>After SFT, to improve quality</td><td>Medium-High</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 id="sft">Supervised Fine-Tuning (SFT) — Your Main Tool</h2>
+
+            <p>SFT is the most common type of fine-tuning. You show the model examples of ideal behavior and it learns to replicate them.</p>
+
+            <h3>When to Fine-Tune vs Just Prompt:</h3>
+            <table>
+                <thead><tr><th>Fine-Tune When...</th><th>Just Prompt When...</th></tr></thead>
+                <tbody>
+                    <tr><td>You need consistent output format</td><td>Format can vary a bit</td></tr>
+                    <tr><td>You have domain-specific knowledge</td><td>General knowledge is sufficient</td></tr>
+                    <tr><td>Prompting alone doesn't hit quality bar</td><td>A good prompt gets 90%+ accuracy</td></tr>
+                    <tr><td>You process 1000s of requests/day (save tokens)</td><td>Low volume (prompt is cheaper)</td></tr>
+                    <tr><td>You need specific tone/personality</td><td>Generic helpful assistant works</td></tr>
+                    <tr><td>Latency matters (shorter prompts = faster)</td><td>Latency isn't critical</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="cpt">Continued Pre-Training (CPT)</h2>
+
+            <p>When a model doesn't know enough about your domain (legal, medical, your company's products), you feed it raw text to build knowledge BEFORE fine-tuning.</p>
+
+            <pre><code><span class="token-comment"># Continued Pre-Training: Feed domain knowledge</span>
+<span class="token-comment"># This is like giving the model a textbook to read</span>
+
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer, TrainingArguments
+<span class="token-keyword">from</span> trl <span class="token-keyword">import</span> SFTTrainer
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> load_dataset
+
+<span class="token-comment"># Load base model (not instruct version!)</span>
+model_name = <span class="token-string">"meta-llama/Llama-3.1-8B"</span>  <span class="token-comment"># Base, not Instruct</span>
+model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=<span class="token-string">"auto"</span>, device_map=<span class="token-string">"auto"</span>)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+<span class="token-comment"># Your domain corpus — just raw text</span>
+<span class="token-comment"># Could be: medical papers, legal documents, your wiki, product docs</span>
+domain_data = load_dataset(<span class="token-string">"json"</span>, data_files=<span class="token-string">"domain_texts.jsonl"</span>, split=<span class="token-string">"train"</span>)
+<span class="token-comment"># Each example: {"text": "Full text of a document..."}</span>
+
+training_args = TrainingArguments(
+    output_dir=<span class="token-string">"./cpt-output"</span>,
+    num_train_epochs=<span class="token-number">2</span>,
+    per_device_train_batch_size=<span class="token-number">4</span>,
+    gradient_accumulation_steps=<span class="token-number">8</span>,
+    learning_rate=<span class="token-number">2e-5</span>,  <span class="token-comment"># Lower than SFT (we don't want to change too much)</span>
+    warmup_ratio=<span class="token-number">0.05</span>,
+    bf16=<span class="token-keyword">True</span>,
+    save_strategy=<span class="token-string">"steps"</span>,
+    save_steps=<span class="token-number">500</span>,
+)
+
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=domain_data,
+    dataset_text_field=<span class="token-string">"text"</span>,  <span class="token-comment"># Just raw text, no instruction format</span>
+    max_seq_length=<span class="token-number">2048</span>,
+    tokenizer=tokenizer,
+)
+
+trainer.train()
+trainer.save_model(<span class="token-string">"./my-domain-model"</span>)</code></pre>
+
+            <h2 id="sft-code">SFT with TRL (Industry Standard)</h2>
+
+            <pre><code><span class="token-comment"># Supervised Fine-Tuning — The method you'll use 90% of the time</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig
+<span class="token-keyword">from</span> trl <span class="token-keyword">import</span> SFTTrainer
+<span class="token-keyword">from</span> peft <span class="token-keyword">import</span> LoraConfig
+<span class="token-keyword">from</span> datasets <span class="token-keyword">import</span> load_dataset
+<span class="token-keyword">import</span> torch
+
+<span class="token-comment"># 1. Load model with QLoRA (fits on single GPU)</span>
+model_name = <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=<span class="token-keyword">True</span>,
+    bnb_4bit_quant_type=<span class="token-string">"nf4"</span>,
+    bnb_4bit_compute_dtype=torch.bfloat16,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    quantization_config=bnb_config,
+    device_map=<span class="token-string">"auto"</span>,
+)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer.pad_token = tokenizer.eos_token
+
+<span class="token-comment"># 2. LoRA configuration (train only 1-2% of parameters)</span>
+lora_config = LoraConfig(
+    r=<span class="token-number">16</span>,                  <span class="token-comment"># Rank — higher = more capacity but more VRAM</span>
+    lora_alpha=<span class="token-number">32</span>,          <span class="token-comment"># Scaling factor</span>
+    lora_dropout=<span class="token-number">0.05</span>,      <span class="token-comment"># Regularization</span>
+    target_modules=[<span class="token-string">"q_proj"</span>, <span class="token-string">"k_proj"</span>, <span class="token-string">"v_proj"</span>, <span class="token-string">"o_proj"</span>],  <span class="token-comment"># Which layers to train</span>
+    task_type=<span class="token-string">"CAUSAL_LM"</span>,
+)
+
+<span class="token-comment"># 3. Load your dataset (ChatML format)</span>
+dataset = load_dataset(<span class="token-string">"json"</span>, data_files=<span class="token-string">"my_dataset.jsonl"</span>, split=<span class="token-string">"train"</span>)
+
+<span class="token-comment"># 4. Training arguments</span>
+training_args = TrainingArguments(
+    output_dir=<span class="token-string">"./sft-output"</span>,
+    num_train_epochs=<span class="token-number">3</span>,
+    per_device_train_batch_size=<span class="token-number">4</span>,
+    gradient_accumulation_steps=<span class="token-number">4</span>,  <span class="token-comment"># Effective batch = 4 * 4 = 16</span>
+    learning_rate=<span class="token-number">2e-4</span>,
+    lr_scheduler_type=<span class="token-string">"cosine"</span>,
+    warmup_ratio=<span class="token-number">0.1</span>,
+    bf16=<span class="token-keyword">True</span>,
+    logging_steps=<span class="token-number">10</span>,
+    save_strategy=<span class="token-string">"epoch"</span>,
+    evaluation_strategy=<span class="token-string">"epoch"</span>,
+    push_to_hub=<span class="token-keyword">False</span>,
+)
+
+<span class="token-comment"># 5. Create trainer and train!</span>
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    peft_config=lora_config,
+    tokenizer=tokenizer,
+    max_seq_length=<span class="token-number">2048</span>,
+)
+
+<span class="token-builtin">print</span>(<span class="token-string">"🚀 Starting fine-tuning..."</span>)
+trainer.train()
+
+<span class="token-comment"># 6. Save the trained adapter</span>
+trainer.save_model(<span class="token-string">"./my-finetuned-model"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">"✅ Done! Model saved."</span>)</code></pre>
+
+            <h2 id="pipeline">The Complete Fine-Tuning Pipeline</h2>
+
+            <div class="mental-model">
+                <h4>🧠 The Full Picture</h4>
+                <div class="model-visual">
+                    1. Choose base model (Llama 3.1 8B Instruct)<br>
+                    2. Prepare dataset (clean → format → validate → split)<br>
+                    3. Configure training (LoRA + hyperparameters)<br>
+                    4. Train (monitor loss curve)<br>
+                    5. Evaluate (compare base vs fine-tuned)<br>
+                    6. Deploy (merge LoRA → quantize → serve)
+                </div>
+            </div>
+
+            <h3>Choosing Your Base Model:</h3>
+            <table>
+                <thead><tr><th>Your Constraint</th><th>Recommended Base</th><th>Why</th></tr></thead>
+                <tbody>
+                    <tr><td>Single consumer GPU (24GB)</td><td>Llama 3.1 8B / Qwen 2.5 7B</td><td>Fits in VRAM with QLoRA</td></tr>
+                    <tr><td>Cloud GPU (A100 80GB)</td><td>Llama 3.1 70B</td><td>Best quality at this scale</td></tr>
+                    <tr><td>Edge/mobile deployment</td><td>Phi-3 3.8B / Gemma 2 2B</td><td>Small enough for phones/laptops</td></tr>
+                    <tr><td>Code-focused</td><td>DeepSeek-Coder / CodeLlama</td><td>Pre-trained on code</td></tr>
+                    <tr><td>Multilingual</td><td>Qwen 2.5 / Aya</td><td>Strong non-English performance</td></tr>
+                </tbody>
+            </table>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>TRL (Transformer Reinforcement Learning)</strong> — HuggingFace's library. Industry standard for SFT, DPO, RLHF. Use <code>SFTTrainer</code>.</li>
+                    <li><strong>Axolotl</strong> — Popular config-driven training framework. Good for non-Python people (YAML config).</li>
+                    <li><strong>LLaMA-Factory</strong> — Chinese-origin, GUI-based fine-tuning. Very beginner-friendly.</li>
+                    <li><strong>QLoRA is the default</strong> — Unless you have 8×A100s, you're using QLoRA (4-bit quantized + LoRA adapters).</li>
+                    <li><strong>3 epochs is typical</strong> — For SFT, 2-4 epochs. More = overfitting risk.</li>
+                    <li><strong>Learning rate 2e-4</strong> — Standard for LoRA fine-tuning. Use cosine scheduler with warmup.</li>
+                    <li><strong>Always evaluate before and after</strong> — Run the same test prompts on base vs fine-tuned model.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Fine-tuning</strong> = taking a pre-trained model and adapting it to your specific task</li>
+                    <li><strong>CPT</strong> → domain knowledge, <strong>SFT</strong> → behavior/format, <strong>DPO</strong> → quality improvement</li>
+                    <li>Use QLoRA (4-bit + LoRA) to fine-tune on a single GPU</li>
+                    <li>TRL's SFTTrainer is the industry standard tool</li>
+                    <li>Start with prompting/RAG, only fine-tune when those aren't enough</li>
+                    <li>Pipeline: Choose model → Prepare data → Configure → Train → Evaluate → Deploy</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Fine-tuning when prompting would work</strong> — Try few-shot prompting first. Only fine-tune if quality/cost demands it.</li>
+                    <li><strong>Using base model when you should use Instruct</strong> — For SFT, start with the Instruct variant. For CPT, use base.</li>
+                    <li><strong>Training too many epochs</strong> — Watch your eval loss. If it starts going UP, you're overfitting. Stop.</li>
+                    <li><strong>Not comparing to baseline</strong> — Always test the original model first so you can measure improvement.</li>
+                    <li><strong>Skipping data quality</strong> — 80% of fine-tuning failures are data problems, not training problems.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Your First Fine-Tune</h4>
+                <ol>
+                    <li>Create a small dataset (20-50 examples) for a specific task (e.g., customer support bot for a pizza shop)</li>
+                    <li>Format it in ChatML (messages with system/user/assistant)</li>
+                    <li>If you have a GPU: Run the SFT code above with GPT-2 (small enough for any GPU)</li>
+                    <li>If no GPU: Use Google Colab free tier (T4 GPU) or sign up for a RunPod spot instance (~$0.50/hr)</li>
+                    <li>Compare outputs: base model vs fine-tuned on 5 test prompts</li>
+                    <li><strong>Bonus:</strong> Try OpenAI's fine-tuning API (no GPU needed, costs ~$5 for small datasets)</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="09-data-cleaning-formatting.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Cleaning & Formatting</span>
+                </a>
+                <a href="11-hallucination-reduction.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Hallucination Reduction</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

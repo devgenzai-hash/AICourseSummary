@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone: Project Overview - RAG Pipeline Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>RAG Pipeline</h2>
+            <div class="subtitle">10M Docs • Zero Hallucination</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Core Pipeline</li>
+            <li><a href="01-ingest-normalize.html"><span class="nav-number">1</span> Ingest &amp; Normalize</a></li>
+            <li><a href="02-hybrid-retrieval.html"><span class="nav-number">2</span> Hybrid Retrieval</a></li>
+            <li><a href="03-ann-reranking.html"><span class="nav-number">3</span> ANN &amp; Reranking</a></li>
+            <li class="module-label">Quality &amp; Safety</li>
+            <li><a href="04-source-confidence.html"><span class="nav-number">4</span> Source Confidence</a></li>
+            <li><a href="05-constrained-generation.html"><span class="nav-number">5</span> Constrained Generation</a></li>
+            <li><a href="06-citation-responses.html"><span class="nav-number">6</span> Citation Responses</a></li>
+            <li><a href="07-hallucination-fallback.html"><span class="nav-number">7</span> Hallucination Fallback</a></li>
+            <li class="module-label">Operations</li>
+            <li><a href="08-continuous-evals.html"><span class="nav-number">8</span> Continuous Evals</a></li>
+            <li><a href="09-caching-memory.html"><span class="nav-number">9</span> Caching &amp; Memory</a></li>
+            <li><a href="10-observability.html"><span class="nav-number">10</span> Observability</a></li>
+            <li class="module-label">🚀 Capstone Project</li>
+            <li><a href="project-overview.html"><span class="nav-number">P1</span> Project Overview</a></li>
+            <li><a href="project-parsing.html"><span class="nav-number">P2</span> Document Parsing</a></li>
+            <li><a href="project-ingestion.html"><span class="nav-number">P3</span> Ingestion Pipeline</a></li>
+            <li><a href="project-retrieval.html"><span class="nav-number">P4</span> Retrieval Engine</a></li>
+            <li><a href="project-generation.html"><span class="nav-number">P5</span> Generation &amp; Safety</a></li>
+            <li><a href="project-deployment.html"><span class="nav-number">P6</span> Deployment &amp; Ops</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/16 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">RAG Course</a>
+                <span>/</span> Capstone: Project Overview
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>🚀 Capstone: Production RAG System</h1>
+                <p class="subtitle">You're the agency owner. A Fortune 500 client just hired you to build a zero-hallucination RAG system for 10 million documents. Build and deliver it end-to-end.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span>
+                    <span class="tag tag-production">Production</span>
+                    <span class="tag tag-scale">10M Scale</span>
+                    <span class="tag tag-code">Full Code</span>
+                </div>
+            </div>
+
+            <!-- ===== THE BRIEF ===== -->
+            <div class="callout callout-info">
+                <div class="callout-title">📋 Client Brief</div>
+                <p><strong>Client:</strong> Enterprise X (10,000 employees, multiple offices worldwide)</p>
+                <p><strong>Request:</strong> "We have 10 million documents spread across PDFs, Word files, emails, Slack messages, web pages, databases, code repos, and scanned paper documents. Build us an AI system that can answer any question about our company's knowledge — with zero hallucination, full citations, and sub-3-second response time."</p>
+                <p><strong>Your role:</strong> Agency owner. You design, build, and deploy the entire system. No shortcuts. Production-ready.</p>
+            </div>
+
+            <!-- ===== ARCHITECTURE ===== -->
+            <h2>System Architecture</h2>
+
+            <div class="mental-model">
+                <h3>🏗️ High-Level Architecture</h3>
+                <div class="model-visual">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         CLIENT APPLICATIONS                              │
+│               (Web App, Slack Bot, Internal Tools, API)                   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │ REST API (FastAPI)
+┌────────────────────────────────▼────────────────────────────────────────┐
+│                          RAG ENGINE (Core)                                │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐ │
+│  │  Query   │→│ Retrieval│→│ Reranker │→│Generator │→│  Verifier    │ │
+│  │ Rewriter │ │ (Hybrid) │ │(Cohere)  │ │ (GPT-4o) │ │(NLI + Cite)  │ │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────────┘ │
+└───────┬──────────────┬──────────────┬──────────────────────────────────┘
+        │              │              │
+┌───────▼──────┐ ┌────▼─────┐ ┌─────▼──────┐   ┌─────────────────────┐
+│   Redis      │ │  Qdrant  │ │Elasticsearch│   │   Observability     │
+│ (Sem Cache)  │ │ (Vectors)│ │  (BM25)    │   │ (OTel + Jaeger)     │
+└──────────────┘ └──────────┘ └────────────┘   └─────────────────────┘
+                                                         │
+┌────────────────────────────────────────────────────────▼────────────────┐
+│                       INGESTION PIPELINE                                  │
+│  ┌─────────┐ ┌──────────┐ ┌─────────┐ ┌──────────┐ ┌───────────────┐  │
+│  │ Parsers │→│  Dedup   │→│ Chunker │→│Embedder  │→│ Dual Indexer  │  │
+│  │(9 types)│ │(Hash+LSH)│ │(Smart)  │ │(BGE-M3)  │ │(Qdrant + ES)  │  │
+│  └─────────┘ └──────────┘ └─────────┘ └──────────┘ └───────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
+        ▲
+        │  Connectors
+┌───────┴─────────────────────────────────────────────────────────────────┐
+│  📄 PDFs  │ 📝 Word │ ✉️ Email │ 🌐 Web │ 🗄️ DB │ 💬 Slack │ 💻 Code │ 📸 OCR │
+└─────────────────────────────────────────────────────────────────────────┘
+                </div>
+            </div>
+
+            <!-- ===== TECH STACK ===== -->
+            <h2>Tech Stack (State of the Art 2026)</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Technology</th>
+                        <th>Why This Choice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Vector Database</strong></td>
+                        <td>Qdrant 1.x</td>
+                        <td>Open-source, HNSW + scalar quantization, handles 10M+ vectors natively</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BM25 Search</strong></td>
+                        <td>Elasticsearch 8</td>
+                        <td>Industry-standard full-text search, mature, handles enterprise scale</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Embeddings</strong></td>
+                        <td>BAAI/bge-m3</td>
+                        <td>SOTA open-source, multilingual, 1024-dim, no API cost for vectors</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reranker</strong></td>
+                        <td>Cohere Rerank v3</td>
+                        <td>Best commercial reranker; cross-encoder/ms-marco as fallback</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LLM</strong></td>
+                        <td>GPT-4o</td>
+                        <td>Best quality/cost for constrained generation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NLI Verification</strong></td>
+                        <td>DeBERTa-v3-large-mnli</td>
+                        <td>Best open-source NLI model for hallucination detection</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PDF Parsing</strong></td>
+                        <td>pymupdf4llm</td>
+                        <td>Fast, preserves structure, markdown output, table extraction</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OCR</strong></td>
+                        <td>PaddleOCR</td>
+                        <td>SOTA open-source, 80+ languages, beats Tesseract on accuracy</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Code Parsing</strong></td>
+                        <td>tree-sitter</td>
+                        <td>AST-level parsing, 40+ languages, used by GitHub</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Caching</strong></td>
+                        <td>Redis 7+ (vector)</td>
+                        <td>Exact + semantic cache, sub-ms lookups, built-in TTL</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tracing</strong></td>
+                        <td>OpenTelemetry + Jaeger</td>
+                        <td>Industry-standard distributed tracing, vendor-neutral</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Metrics</strong></td>
+                        <td>Prometheus + Grafana</td>
+                        <td>Standard monitoring stack, alerting, dashboards</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Evaluation</strong></td>
+                        <td>RAGAS</td>
+                        <td>Standard RAG eval framework: faithfulness, relevance, recall</td>
+                    </tr>
+                    <tr>
+                        <td><strong>API</strong></td>
+                        <td>FastAPI</td>
+                        <td>Async, auto-docs, Pydantic v2 validation, production-grade</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deployment</strong></td>
+                        <td>Docker Compose</td>
+                        <td>One command to start entire stack. Kubernetes-ready.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ===== PROJECT STRUCTURE ===== -->
+            <h2>Project Structure</h2>
+
+<pre><code>enterprise-rag/
+├── docker-compose.yml          <span class="token-comment"># Full infrastructure</span>
+├── Dockerfile                  <span class="token-comment"># Multi-stage build</span>
+├── requirements.txt            <span class="token-comment"># Python dependencies</span>
+├── .env.example                <span class="token-comment"># Environment template</span>
+├── README.md
+│
+├── src/
+│   ├── __init__.py
+│   ├── config.py               <span class="token-comment"># Settings (Pydantic BaseSettings)</span>
+│   │
+│   ├── parsers/                <span class="token-comment"># Document parsing (9 types)</span>
+│   │   ├── __init__.py
+│   │   ├── base.py             <span class="token-comment"># BaseParser + Document schema</span>
+│   │   ├── router.py           <span class="token-comment"># DocumentRouter (auto-detect + route)</span>
+│   │   ├── pdf_parser.py       <span class="token-comment"># PDFs (pymupdf4llm)</span>
+│   │   ├── docx_parser.py      <span class="token-comment"># Word documents</span>
+│   │   ├── email_parser.py     <span class="token-comment"># .eml / .msg emails</span>
+│   │   ├── web_parser.py       <span class="token-comment"># Web page scraping</span>
+│   │   ├── db_parser.py        <span class="token-comment"># Database records</span>
+│   │   ├── slack_parser.py     <span class="token-comment"># Slack/Teams messages</span>
+│   │   ├── code_parser.py      <span class="token-comment"># Code repositories</span>
+│   │   ├── ocr_parser.py       <span class="token-comment"># Scanned docs (PaddleOCR)</span>
+│   │   └── bill_parser.py      <span class="token-comment"># Bills/invoices</span>
+│   │
+│   ├── ingestion/              <span class="token-comment"># Ingestion pipeline</span>
+│   │   ├── __init__.py
+│   │   ├── deduplicator.py     <span class="token-comment"># SHA256 + MinHash</span>
+│   │   ├── normalizer.py       <span class="token-comment"># Text normalization</span>
+│   │   ├── chunker.py          <span class="token-comment"># Smart chunking per doc type</span>
+│   │   ├── embedder.py         <span class="token-comment"># BGE-M3 batch embedding</span>
+│   │   ├── indexer.py          <span class="token-comment"># Dual index (Qdrant + ES)</span>
+│   │   └── pipeline.py         <span class="token-comment"># Full ingestion orchestrator</span>
+│   │
+│   ├── retrieval/              <span class="token-comment"># Retrieval engine</span>
+│   │   ├── __init__.py
+│   │   ├── bm25_retriever.py   <span class="token-comment"># Elasticsearch BM25</span>
+│   │   ├── vector_retriever.py <span class="token-comment"># Qdrant ANN search</span>
+│   │   ├── hybrid.py           <span class="token-comment"># RRF fusion</span>
+│   │   ├── reranker.py         <span class="token-comment"># Cohere + cross-encoder</span>
+│   │   ├── confidence.py       <span class="token-comment"># Source confidence scoring</span>
+│   │   └── pipeline.py         <span class="token-comment"># Full retrieval orchestrator</span>
+│   │
+│   ├── generation/             <span class="token-comment"># Generation + safety</span>
+│   │   ├── __init__.py
+│   │   ├── prompts.py          <span class="token-comment"># System prompts + templates</span>
+│   │   ├── generator.py        <span class="token-comment"># Constrained GPT-4o generation</span>
+│   │   ├── citations.py        <span class="token-comment"># Citation extraction + validation</span>
+│   │   ├── verifier.py         <span class="token-comment"># NLI hallucination detection</span>
+│   │   ├── fallback.py         <span class="token-comment"># Decision engine</span>
+│   │   └── pipeline.py         <span class="token-comment"># Full generation orchestrator</span>
+│   │
+│   ├── cache/                  <span class="token-comment"># Caching layer</span>
+│   │   ├── __init__.py
+│   │   ├── exact_cache.py      <span class="token-comment"># Redis exact match</span>
+│   │   ├── semantic_cache.py   <span class="token-comment"># Redis vector similarity</span>
+│   │   └── manager.py          <span class="token-comment"># Cache orchestrator + invalidation</span>
+│   │
+│   ├── observability/          <span class="token-comment"># Tracing + metrics</span>
+│   │   ├── __init__.py
+│   │   ├── tracing.py          <span class="token-comment"># OpenTelemetry setup</span>
+│   │   ├── metrics.py          <span class="token-comment"># Prometheus counters/histograms</span>
+│   │   └── failure_detector.py <span class="token-comment"># Root cause analysis</span>
+│   │
+│   ├── evaluation/             <span class="token-comment"># Continuous evals</span>
+│   │   ├── __init__.py
+│   │   ├── eval_runner.py      <span class="token-comment"># RAGAS pipeline</span>
+│   │   ├── adversarial.py      <span class="token-comment"># Adversarial test cases</span>
+│   │   └── dataset.py          <span class="token-comment"># Golden eval dataset</span>
+│   │
+│   ├── api/                    <span class="token-comment"># FastAPI application</span>
+│   │   ├── __init__.py
+│   │   ├── app.py              <span class="token-comment"># FastAPI app + middleware</span>
+│   │   ├── routes.py           <span class="token-comment"># API endpoints</span>
+│   │   └── models.py           <span class="token-comment"># Pydantic request/response</span>
+│   │
+│   └── rag_pipeline.py         <span class="token-comment"># Master orchestrator (all stages)</span>
+│
+├── tests/
+│   ├── test_parsers.py
+│   ├── test_ingestion.py
+│   ├── test_retrieval.py
+│   └── test_generation.py
+│
+└── eval_data/
+    ├── golden_dataset.json     <span class="token-comment"># Eval queries + expected answers</span>
+    └── adversarial_suite.json  <span class="token-comment"># Trick questions</span></code></pre>
+
+            <!-- ===== REQUIREMENTS ===== -->
+            <h2>Dependencies (requirements.txt)</h2>
+
+<pre><code><span class="token-comment"># === Core Framework ===</span>
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+pydantic==2.9.0
+pydantic-settings==2.5.0
+python-dotenv==1.1.0
+
+<span class="token-comment"># === Document Parsing ===</span>
+pymupdf4llm==0.0.17          <span class="token-comment"># PDF → markdown</span>
+python-docx==1.1.2           <span class="token-comment"># Word documents</span>
+extract-msg==0.50.0          <span class="token-comment"># Outlook .msg files</span>
+trafilatura==2.0.0           <span class="token-comment"># Web page extraction</span>
+beautifulsoup4==4.13.0       <span class="token-comment"># HTML parsing</span>
+httpx==0.28.0                <span class="token-comment"># Async HTTP client</span>
+slack-sdk==3.34.0            <span class="token-comment"># Slack API</span>
+gitpython==3.1.44            <span class="token-comment"># Git repo access</span>
+tree-sitter==0.23.0          <span class="token-comment"># Code AST parsing</span>
+paddleocr==2.9.0             <span class="token-comment"># OCR (scanned docs)</span>
+paddlepaddle==3.0.0          <span class="token-comment"># PaddleOCR backend</span>
+tabula-py==2.10.0            <span class="token-comment"># Table extraction from PDFs</span>
+pytesseract==0.3.13          <span class="token-comment"># Tesseract OCR fallback</span>
+
+<span class="token-comment"># === Embeddings & ML ===</span>
+sentence-transformers==3.3.0 <span class="token-comment"># BGE-M3 embeddings</span>
+torch==2.5.0                 <span class="token-comment"># PyTorch backend</span>
+transformers==4.46.0         <span class="token-comment"># DeBERTa NLI model</span>
+numpy==2.1.0
+
+<span class="token-comment"># === Vector & Search ===</span>
+qdrant-client==1.12.0        <span class="token-comment"># Qdrant vector DB</span>
+elasticsearch==8.16.0        <span class="token-comment"># Elasticsearch BM25</span>
+
+<span class="token-comment"># === LLM & Reranking ===</span>
+openai==1.55.0               <span class="token-comment"># GPT-4o API</span>
+cohere==5.11.0               <span class="token-comment"># Cohere Rerank v3</span>
+
+<span class="token-comment"># === Caching ===</span>
+redis==5.2.0                 <span class="token-comment"># Redis client</span>
+
+<span class="token-comment"># === Observability ===</span>
+opentelemetry-api==1.28.0
+opentelemetry-sdk==1.28.0
+opentelemetry-exporter-otlp==1.28.0
+prometheus-client==0.21.0
+
+<span class="token-comment"># === Evaluation ===</span>
+ragas==0.2.6                 <span class="token-comment"># RAG evaluation framework</span>
+
+<span class="token-comment"># === Utilities ===</span>
+datasketch==1.6.5            <span class="token-comment"># MinHash for deduplication</span>
+sqlalchemy==2.0.36           <span class="token-comment"># Database connector</span>
+pandas==2.2.3                <span class="token-comment"># Data manipulation</span></code></pre>
+
+            <!-- ===== DOCKER COMPOSE ===== -->
+            <h2>Infrastructure (docker-compose.yml)</h2>
+
+<pre><code><span class="token-keyword">version</span>: <span class="token-string">"3.9"</span>
+
+<span class="token-keyword">services</span>:
+  <span class="token-comment"># === Vector Database ===</span>
+  <span class="token-function">qdrant</span>:
+    image: qdrant/qdrant:v1.12.0
+    ports:
+      - <span class="token-string">"6333:6333"</span>   <span class="token-comment"># REST API</span>
+      - <span class="token-string">"6334:6334"</span>   <span class="token-comment"># gRPC</span>
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  <span class="token-comment"># === Full-Text Search ===</span>
+  <span class="token-function">elasticsearch</span>:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.0
+    ports:
+      - <span class="token-string">"9200:9200"</span>
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - <span class="token-string">"ES_JAVA_OPTS=-Xms2g -Xmx2g"</span>
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  <span class="token-comment"># === Caching ===</span>
+  <span class="token-function">redis</span>:
+    image: redis/redis-stack:7.4.0-v0
+    ports:
+      - <span class="token-string">"6379:6379"</span>
+      - <span class="token-string">"8001:8001"</span>   <span class="token-comment"># RedisInsight</span>
+    volumes:
+      - redis_data:/data
+
+  <span class="token-comment"># === Tracing ===</span>
+  <span class="token-function">jaeger</span>:
+    image: jaegertracing/all-in-one:1.62
+    ports:
+      - <span class="token-string">"16686:16686"</span> <span class="token-comment"># UI</span>
+      - <span class="token-string">"4317:4317"</span>   <span class="token-comment"># OTLP gRPC</span>
+      - <span class="token-string">"4318:4318"</span>   <span class="token-comment"># OTLP HTTP</span>
+    environment:
+      COLLECTOR_OTLP_ENABLED: <span class="token-string">"true"</span>
+
+  <span class="token-comment"># === Metrics ===</span>
+  <span class="token-function">prometheus</span>:
+    image: prom/prometheus:v2.54.0
+    ports:
+      - <span class="token-string">"9090:9090"</span>
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  <span class="token-comment"># === RAG Application ===</span>
+  <span class="token-function">rag-api</span>:
+    build: .
+    ports:
+      - <span class="token-string">"8000:8000"</span>
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - REDIS_URL=redis://redis:6379
+      - JAEGER_ENDPOINT=http://jaeger:4317
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - COHERE_API_KEY=${COHERE_API_KEY}
+    depends_on:
+      - qdrant
+      - elasticsearch
+      - redis
+      - jaeger
+    volumes:
+      - ./data:/app/data  <span class="token-comment"># Mount documents to ingest</span>
+
+<span class="token-keyword">volumes</span>:
+  qdrant_data:
+  es_data:
+  redis_data:</code></pre>
+
+            <!-- ===== ENV VARS ===== -->
+            <h2>Environment Configuration (.env.example)</h2>
+
+<pre><code><span class="token-comment"># === LLM & AI APIs ===</span>
+OPENAI_API_KEY=sk-your-openai-key-here
+COHERE_API_KEY=your-cohere-key-here
+
+<span class="token-comment"># === Infrastructure ===</span>
+QDRANT_URL=http://localhost:6333
+ELASTICSEARCH_URL=http://localhost:9200
+REDIS_URL=redis://localhost:6379
+JAEGER_ENDPOINT=http://localhost:4317
+
+<span class="token-comment"># === Embedding Model ===</span>
+EMBEDDING_MODEL=BAAI/bge-m3
+EMBEDDING_DIMENSION=1024
+EMBEDDING_BATCH_SIZE=64
+
+<span class="token-comment"># === Retrieval Config ===</span>
+BM25_WEIGHT=0.3
+VECTOR_WEIGHT=0.7
+RETRIEVAL_TOP_K=50
+RERANK_TOP_K=5
+SEMANTIC_CACHE_THRESHOLD=0.92
+
+<span class="token-comment"># === Generation Config ===</span>
+LLM_MODEL=gpt-4o
+LLM_TEMPERATURE=0.0
+MAX_OUTPUT_TOKENS=1024
+
+<span class="token-comment"># === Safety Thresholds ===</span>
+MIN_CONFIDENCE_THRESHOLD=0.7
+HALLUCINATION_THRESHOLD=0.15
+MAX_RETRY_ATTEMPTS=2
+
+<span class="token-comment"># === Slack (optional) ===</span>
+SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
+SLACK_WORKSPACE_ID=T0123456789</code></pre>
+
+            <!-- ===== CONFIG CLASS ===== -->
+            <h2>Configuration (src/config.py)</h2>
+
+<pre><code><span class="token-keyword">from</span> pydantic_settings <span class="token-keyword">import</span> BaseSettings
+<span class="token-keyword">from</span> pydantic <span class="token-keyword">import</span> Field
+
+<span class="token-keyword">class</span> <span class="token-class">Settings</span>(BaseSettings):
+    <span class="token-string">"""Application configuration loaded from environment variables."""</span>
+    
+    <span class="token-comment"># API Keys</span>
+    openai_api_key: <span class="token-builtin">str</span> = Field(..., env=<span class="token-string">"OPENAI_API_KEY"</span>)
+    cohere_api_key: <span class="token-builtin">str</span> = Field(..., env=<span class="token-string">"COHERE_API_KEY"</span>)
+    
+    <span class="token-comment"># Infrastructure</span>
+    qdrant_url: <span class="token-builtin">str</span> = Field(default=<span class="token-string">"http://localhost:6333"</span>)
+    elasticsearch_url: <span class="token-builtin">str</span> = Field(default=<span class="token-string">"http://localhost:9200"</span>)
+    redis_url: <span class="token-builtin">str</span> = Field(default=<span class="token-string">"redis://localhost:6379"</span>)
+    jaeger_endpoint: <span class="token-builtin">str</span> = Field(default=<span class="token-string">"http://localhost:4317"</span>)
+    
+    <span class="token-comment"># Embedding</span>
+    embedding_model: <span class="token-builtin">str</span> = Field(default=<span class="token-string">"BAAI/bge-m3"</span>)
+    embedding_dimension: <span class="token-builtin">int</span> = Field(default=<span class="token-number">1024</span>)
+    embedding_batch_size: <span class="token-builtin">int</span> = Field(default=<span class="token-number">64</span>)
+    
+    <span class="token-comment"># Retrieval</span>
+    bm25_weight: <span class="token-builtin">float</span> = Field(default=<span class="token-number">0.3</span>)
+    vector_weight: <span class="token-builtin">float</span> = Field(default=<span class="token-number">0.7</span>)
+    retrieval_top_k: <span class="token-builtin">int</span> = Field(default=<span class="token-number">50</span>)
+    rerank_top_k: <span class="token-builtin">int</span> = Field(default=<span class="token-number">5</span>)
+    semantic_cache_threshold: <span class="token-builtin">float</span> = Field(default=<span class="token-number">0.92</span>)
+    
+    <span class="token-comment"># Generation</span>
+    llm_model: <span class="token-builtin">str</span> = Field(default=<span class="token-string">"gpt-4o"</span>)
+    llm_temperature: <span class="token-builtin">float</span> = Field(default=<span class="token-number">0.0</span>)
+    max_output_tokens: <span class="token-builtin">int</span> = Field(default=<span class="token-number">1024</span>)
+    
+    <span class="token-comment"># Safety</span>
+    min_confidence_threshold: <span class="token-builtin">float</span> = Field(default=<span class="token-number">0.7</span>)
+    hallucination_threshold: <span class="token-builtin">float</span> = Field(default=<span class="token-number">0.15</span>)
+    max_retry_attempts: <span class="token-builtin">int</span> = Field(default=<span class="token-number">2</span>)
+    
+    <span class="token-keyword">class</span> <span class="token-class">Config</span>:
+        env_file = <span class="token-string">".env"</span>
+
+settings = Settings()</code></pre>
+
+            <!-- ===== SETUP COMMANDS ===== -->
+            <h2>Getting Started</h2>
+
+<pre><code><span class="token-comment"># 1. Clone and enter the project</span>
+git clone https://github.com/your-org/enterprise-rag.git
+cd enterprise-rag
+
+<span class="token-comment"># 2. Copy environment template and add your API keys</span>
+cp .env.example .env
+<span class="token-comment"># Edit .env with your OPENAI_API_KEY and COHERE_API_KEY</span>
+
+<span class="token-comment"># 3. Start all infrastructure (one command!)</span>
+docker compose up -d
+
+<span class="token-comment"># 4. Verify services are running</span>
+curl http://localhost:6333/health    <span class="token-comment"># Qdrant</span>
+curl http://localhost:9200/_cluster/health  <span class="token-comment"># Elasticsearch</span>
+curl http://localhost:6379/ping      <span class="token-comment"># Redis (via redis-cli)</span>
+open http://localhost:16686          <span class="token-comment"># Jaeger UI</span>
+
+<span class="token-comment"># 5. Install Python dependencies (for local dev)</span>
+python -m venv .venv
+source .venv/bin/activate  <span class="token-comment"># or .venv\Scripts\activate on Windows</span>
+pip install -r requirements.txt
+
+<span class="token-comment"># 6. Ingest documents</span>
+python -m src.ingestion.pipeline --input ./data/documents/
+
+<span class="token-comment"># 7. Start the API</span>
+uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --reload
+
+<span class="token-comment"># 8. Test a query</span>
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What is the company vacation policy?"}'</code></pre>
+
+            <!-- ===== WHAT'S NEXT ===== -->
+            <div class="callout callout-success">
+                <div class="callout-title">✅ What We'll Build Across the Next 5 Pages</div>
+                <ul>
+                    <li><strong>Page 2 (Parsing):</strong> Every document parser — PDFs, Word, emails, web pages, databases, Slack, code repos, scanned docs, bills</li>
+                    <li><strong>Page 3 (Ingestion):</strong> Dedup, normalize, chunk, embed, and dual-index into Qdrant + Elasticsearch</li>
+                    <li><strong>Page 4 (Retrieval):</strong> Hybrid BM25+vector search, RRF fusion, Cohere reranking, source confidence</li>
+                    <li><strong>Page 5 (Generation):</strong> Constrained generation, citation extraction, NLI verification, fallback engine</li>
+                    <li><strong>Page 6 (Deployment):</strong> FastAPI endpoints, Redis caching, OpenTelemetry, RAGAS evals, Docker production deployment</li>
+                </ul>
+                <p><strong>By the end:</strong> You'll have a complete, deployable, production-grade RAG system handling 10M documents with zero hallucination.</p>
+            </div>
+
+            <!-- ===== PAGE NAV ===== -->
+            <nav class="page-nav">
+                <a href="10-observability.html" class="prev">Observability</a>
+                <a href="project-parsing.html" class="next">Document Parsing</a>
+            </nav>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

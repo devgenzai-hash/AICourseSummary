@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSRF Protection - System Design Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>System Design</h2>
+            <p class="sidebar-subtitle">Beginner &rarr; Advanced &bull; 68 Topics</p>
+        </div>
+        <nav>
+            <ul>
+                <li class="module-label">Concurrency Foundations</li>
+                <li><a href="01-threads-vs-processes.html">01 &mdash; Threads vs Processes</a></li>
+                <li><a href="02-context-switching.html">02 &mdash; Context Switching</a></li>
+                <li><a href="03-race-conditions.html">03 &mdash; Race Conditions</a></li>
+                <li><a href="04-critical-sections.html">04 &mdash; Critical Sections</a></li>
+                <li><a href="05-mutex-locks.html">05 &mdash; Mutex Locks</a></li>
+                <li><a href="06-deadlocks.html">06 &mdash; Deadlocks</a></li>
+                <li><a href="07-livelocks-starvation.html">07 &mdash; Livelocks &amp; Starvation</a></li>
+                <li><a href="08-thread-safety.html">08 &mdash; Thread Safety</a></li>
+                <li class="module-label">Low-Level Concurrency</li>
+                <li><a href="09-atomic-operations-cas.html">09 &mdash; Atomic Operations &amp; CAS</a></li>
+                <li><a href="10-memory-visibility.html">10 &mdash; Memory Visibility</a></li>
+                <li><a href="11-happens-before.html">11 &mdash; Happens-Before</a></li>
+                <li><a href="12-volatile-vs-synchronized.html">12 &mdash; Volatile vs Synchronized</a></li>
+                <li><a href="13-false-sharing.html">13 &mdash; False Sharing</a></li>
+                <li class="module-label">Concurrency Patterns</li>
+                <li><a href="14-thread-pools.html">14 &mdash; Thread Pools</a></li>
+                <li><a href="15-futures-promises-async.html">15 &mdash; Futures, Promises &amp; Async</a></li>
+                <li><a href="16-producer-consumer.html">16 &mdash; Producer-Consumer</a></li>
+                <li><a href="17-blocking-vs-nonblocking.html">17 &mdash; Blocking vs Non-Blocking</a></li>
+                <li><a href="18-semaphores-barriers.html">18 &mdash; Semaphores &amp; Barriers</a></li>
+                <li><a href="19-readers-writers.html">19 &mdash; Readers-Writers</a></li>
+                <li><a href="20-actor-model.html">20 &mdash; Actor Model</a></li>
+                <li class="module-label">Distributed Systems Core</li>
+                <li><a href="21-distributed-basics.html">21 &mdash; Distributed Basics</a></li>
+                <li><a href="22-cap-theorem.html">22 &mdash; CAP Theorem</a></li>
+                <li><a href="23-consistency-models.html">23 &mdash; Consistency Models</a></li>
+                <li><a href="24-consensus-algorithms.html">24 &mdash; Consensus Algorithms</a></li>
+                <li><a href="25-replication.html">25 &mdash; Replication</a></li>
+                <li><a href="26-partitioning-sharding.html">26 &mdash; Partitioning &amp; Sharding</a></li>
+                <li><a href="27-consistent-hashing.html">27 &mdash; Consistent Hashing</a></li>
+                <li><a href="28-vector-clocks.html">28 &mdash; Vector Clocks</a></li>
+                <li><a href="29-gossip-protocols.html">29 &mdash; Gossip Protocols</a></li>
+                <li><a href="30-distributed-transactions.html">30 &mdash; Distributed Transactions</a></li>
+                <li><a href="31-saga-pattern.html">31 &mdash; Saga Pattern</a></li>
+                <li><a href="32-event-sourcing.html">32 &mdash; Event Sourcing</a></li>
+                <li class="module-label">Resilience Patterns</li>
+                <li><a href="33-circuit-breaker.html">33 &mdash; Circuit Breaker</a></li>
+                <li><a href="34-retry-backoff.html">34 &mdash; Retry &amp; Backoff</a></li>
+                <li><a href="35-bulkhead-pattern.html">35 &mdash; Bulkhead Pattern</a></li>
+                <li><a href="36-timeout-patterns.html">36 &mdash; Timeout Patterns</a></li>
+                <li><a href="37-health-checks.html">37 &mdash; Health Checks</a></li>
+                <li><a href="38-graceful-degradation.html">38 &mdash; Graceful Degradation</a></li>
+                <li><a href="39-chaos-engineering.html">39 &mdash; Chaos Engineering</a></li>
+                <li class="module-label">Database Engineering</li>
+                <li><a href="40-sql-vs-nosql.html">40 &mdash; SQL vs NoSQL</a></li>
+                <li><a href="41-indexing-strategies.html">41 &mdash; Indexing Strategies</a></li>
+                <li><a href="42-query-optimization.html">42 &mdash; Query Optimization</a></li>
+                <li><a href="43-connection-pooling.html">43 &mdash; Connection Pooling</a></li>
+                <li><a href="44-caching-strategies.html">44 &mdash; Caching Strategies</a></li>
+                <li><a href="45-write-ahead-log.html">45 &mdash; Write-Ahead Log</a></li>
+                <li><a href="46-mvcc.html">46 &mdash; MVCC</a></li>
+                <li><a href="47-database-scaling.html">47 &mdash; Database Scaling</a></li>
+                <li class="module-label">Architecture Patterns</li>
+                <li><a href="48-monolith-vs-microservices.html">48 &mdash; Monolith vs Microservices</a></li>
+                <li><a href="49-service-mesh.html">49 &mdash; Service Mesh</a></li>
+                <li class="module-label">Design Patterns</li>
+                <li><a href="50-load-balancing.html">50 &mdash; Load Balancing</a></li>
+                <li><a href="51-rate-limiting.html">51 &mdash; Rate Limiting</a></li>
+                <li><a href="52-cdn-design.html">52 &mdash; CDN Design</a></li>
+                <li><a href="53-message-queues.html">53 &mdash; Message Queues</a></li>
+                <li><a href="54-pub-sub.html">54 &mdash; Pub/Sub</a></li>
+                <li><a href="55-cqrs.html">55 &mdash; CQRS</a></li>
+                <li><a href="56-strangler-fig.html">56 &mdash; Strangler Fig</a></li>
+                <li><a href="57-sidecar-pattern.html">57 &mdash; Sidecar Pattern</a></li>
+                <li><a href="58-backend-for-frontend.html">58 &mdash; Backend for Frontend</a></li>
+                <li class="module-label">API &amp; Communication</li>
+                <li><a href="59-rest-design.html">59 &mdash; REST Design</a></li>
+                <li><a href="60-graphql.html">60 &mdash; GraphQL</a></li>
+                <li><a href="61-grpc.html">61 &mdash; gRPC</a></li>
+                <li><a href="62-websockets.html">62 &mdash; WebSockets</a></li>
+                <li><a href="63-api-gateway.html">63 &mdash; API Gateway</a></li>
+                <li><a href="64-api-versioning.html">64 &mdash; API Versioning</a></li>
+                <li class="module-label">Security</li>
+                <li><a href="65-authn-authz.html">65 &mdash; AuthN &amp; AuthZ</a></li>
+                <li><a href="66-oauth.html">66 &mdash; OAuth 2.0</a></li>
+                <li><a href="67-csrf.html" class="active">67 &mdash; CSRF Protection</a></li>
+                <li><a href="68-mtls.html">68 &mdash; mTLS</a></li>
+            </ul>
+        </nav>
+        <div class="progress-tracker">
+            <span>Progress: 67 / 68 topics</span>
+            <div class="progress-bar"><div class="progress-fill" style="width: 98.5%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">&#9776;</button>
+        <h1>CSRF Protection</h1>
+        <div class="topic-tags">
+            <span class="tag">Intermediate</span>
+            <span class="tag">Security</span>
+            <span class="tag">Pattern</span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <h1>CSRF Protection</h1>
+            <p class="hero-subtitle">Defending state-changing requests from unauthorized cross-origin exploitation</p>
+        </section>
+
+        <div class="analogy-box">
+            <h3>&#128161; Real-World Analogy</h3>
+            <p>A bank requiring you to show a unique ticket number they gave you before processing any transaction &mdash; proving you initiated the request from their counter, not a forged letter. Without that ticket, anyone could write a letter pretending to be you, and the bank would blindly execute it.</p>
+        </div>
+
+        <h2>What Is CSRF?</h2>
+        <p>Cross-Site Request Forgery (CSRF) is an attack where a malicious website tricks a user&rsquo;s browser into making an unwanted request to a trusted site where the user is already authenticated. Because browsers automatically attach cookies to requests, the trusted site cannot distinguish between a legitimate user action and a forged one.</p>
+
+        <h3>How the Attack Works</h3>
+        <p>The attacker exploits the browser&rsquo;s automatic cookie attachment &mdash; when a victim visits a malicious page, hidden forms or image tags fire requests to the target site, carrying the victim&rsquo;s session cookies along for the ride.</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Attack Vector</th>
+                        <th>Mechanism</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Hidden Form</td>
+                        <td>Auto-submitting form via JavaScript</td>
+                        <td>&lt;form action="bank.com/transfer" method="POST"&gt;</td>
+                    </tr>
+                    <tr>
+                        <td>Image Tag</td>
+                        <td>GET request via img src</td>
+                        <td>&lt;img src="bank.com/transfer?to=attacker&amp;amt=1000"&gt;</td>
+                    </tr>
+                    <tr>
+                        <td>Link Click</td>
+                        <td>Social engineering + GET side effects</td>
+                        <td>Disguised anchor tags in emails or forums</td>
+                    </tr>
+                    <tr>
+                        <td>XHR/Fetch</td>
+                        <td>Cross-origin request with credentials</td>
+                        <td>fetch("bank.com/api/transfer", {credentials: "include"})</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Protection Strategies</h2>
+
+        <h3>1. Synchronizer Token Pattern</h3>
+        <p>The server generates a unique, unpredictable token per session (or per request) and embeds it in forms. On submission, the server validates the token matches what it issued &mdash; an attacker cannot guess this value.</p>
+
+        <pre><code><span class="token-keyword">import</span> secrets
+<span class="token-keyword">import</span> hashlib
+<span class="token-keyword">from</span> functools <span class="token-keyword">import</span> wraps
+
+<span class="token-keyword">class</span> <span class="token-class">CSRFProtection</span>:
+    <span class="token-string">"""Synchronizer token pattern implementation."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, secret_key: <span class="token-class">str</span>):
+        self.secret_key = secret_key
+        self.token_store = {}  <span class="token-comment"># session_id -> token</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">generate_token</span>(self, session_id: <span class="token-class">str</span>) -> <span class="token-class">str</span>:
+        <span class="token-string">"""Generate a cryptographically secure CSRF token."""</span>
+        raw_token = secrets.<span class="token-function">token_hex</span>(<span class="token-number">32</span>)
+        <span class="token-comment"># Bind token to session to prevent token fixation</span>
+        bound_token = hashlib.<span class="token-function">sha256</span>(
+            f<span class="token-string">"{raw_token}:{session_id}:{self.secret_key}"</span>.<span class="token-function">encode</span>()
+        ).<span class="token-function">hexdigest</span>()
+        self.token_store[session_id] = bound_token
+        <span class="token-keyword">return</span> bound_token
+
+    <span class="token-keyword">def</span> <span class="token-function">validate_token</span>(self, session_id: <span class="token-class">str</span>, token: <span class="token-class">str</span>) -> <span class="token-class">bool</span>:
+        <span class="token-string">"""Validate submitted token against stored token."""</span>
+        stored = self.token_store.<span class="token-function">get</span>(session_id)
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> stored:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        <span class="token-comment"># Constant-time comparison prevents timing attacks</span>
+        <span class="token-keyword">return</span> secrets.<span class="token-function">compare_digest</span>(stored, token)</code></pre>
+
+        <h3>2. Double-Submit Cookie</h3>
+        <p>The server sets a random value in both a cookie and expects it as a request parameter. Since attackers cannot read cookies from another domain, they cannot replicate the value in the request body.</p>
+
+        <pre><code><span class="token-keyword">import</span> secrets
+<span class="token-keyword">from</span> http.cookies <span class="token-keyword">import</span> SimpleCookie
+
+<span class="token-keyword">class</span> <span class="token-class">DoubleSubmitCSRF</span>:
+    <span class="token-string">"""Double-submit cookie CSRF protection."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">set_csrf_cookie</span>(self, response) -> <span class="token-class">str</span>:
+        <span class="token-string">"""Set CSRF token in a cookie and return the value."""</span>
+        token = secrets.<span class="token-function">token_hex</span>(<span class="token-number">32</span>)
+        response.<span class="token-function">set_cookie</span>(
+            <span class="token-string">"csrf_token"</span>,
+            token,
+            httponly=<span class="token-keyword">False</span>,  <span class="token-comment"># JS must read this</span>
+            secure=<span class="token-keyword">True</span>,
+            samesite=<span class="token-string">"Strict"</span>,
+            max_age=<span class="token-number">3600</span>
+        )
+        <span class="token-keyword">return</span> token
+
+    <span class="token-keyword">def</span> <span class="token-function">validate_double_submit</span>(self, cookie_token: <span class="token-class">str</span>, header_token: <span class="token-class">str</span>) -> <span class="token-class">bool</span>:
+        <span class="token-string">"""Compare cookie value against header/body value."""</span>
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> cookie_token <span class="token-keyword">or</span> <span class="token-keyword">not</span> header_token:
+            <span class="token-keyword">return</span> <span class="token-keyword">False</span>
+        <span class="token-keyword">return</span> secrets.<span class="token-function">compare_digest</span>(cookie_token, header_token)</code></pre>
+
+        <h3>3. SameSite Cookie Attribute</h3>
+        <p>Modern browsers support the SameSite attribute, which controls whether cookies are sent with cross-origin requests &mdash; providing built-in CSRF mitigation at the browser level.</p>
+
+        <pre><code><span class="token-comment"># SameSite cookie configuration examples</span>
+
+<span class="token-keyword">def</span> <span class="token-function">configure_session_cookie</span>(app):
+    <span class="token-string">"""Configure session cookie with SameSite protection."""</span>
+    app.config[<span class="token-string">"SESSION_COOKIE_SAMESITE"</span>] = <span class="token-string">"Lax"</span>
+    app.config[<span class="token-string">"SESSION_COOKIE_SECURE"</span>] = <span class="token-keyword">True</span>
+    app.config[<span class="token-string">"SESSION_COOKIE_HTTPONLY"</span>] = <span class="token-keyword">True</span>
+
+<span class="token-comment"># SameSite values explained:</span>
+<span class="token-comment"># "Strict" &mdash; Cookie never sent on cross-site requests</span>
+<span class="token-comment">#            Best security, but breaks top-level navigations</span>
+<span class="token-comment"># "Lax"    &mdash; Cookie sent on top-level GET navigations only</span>
+<span class="token-comment">#            Good default, protects POST/PUT/DELETE</span>
+<span class="token-comment"># "None"   &mdash; Cookie always sent (requires Secure flag)</span>
+<span class="token-comment">#            Use only when cross-site access is needed</span>
+
+SAMESITE_COMPARISON = {
+    <span class="token-string">"Strict"</span>: {
+        <span class="token-string">"cross_site_link"</span>: <span class="token-keyword">False</span>,
+        <span class="token-string">"cross_site_form_get"</span>: <span class="token-keyword">False</span>,
+        <span class="token-string">"cross_site_form_post"</span>: <span class="token-keyword">False</span>,
+        <span class="token-string">"cross_site_xhr"</span>: <span class="token-keyword">False</span>,
+    },
+    <span class="token-string">"Lax"</span>: {
+        <span class="token-string">"cross_site_link"</span>: <span class="token-keyword">True</span>,
+        <span class="token-string">"cross_site_form_get"</span>: <span class="token-keyword">True</span>,
+        <span class="token-string">"cross_site_form_post"</span>: <span class="token-keyword">False</span>,
+        <span class="token-string">"cross_site_xhr"</span>: <span class="token-keyword">False</span>,
+    },
+}</code></pre>
+
+        <h3>4. Custom Request Headers</h3>
+        <p>Adding custom headers like <code>X-Requested-With</code> leverages CORS preflight &mdash; browsers block cross-origin requests with non-standard headers unless the server explicitly allows it.</p>
+
+        <pre><code><span class="token-keyword">class</span> <span class="token-class">CustomHeaderCSRF</span>:
+    <span class="token-string">"""CSRF protection via custom headers and CORS."""</span>
+
+    CSRF_HEADER = <span class="token-string">"X-CSRF-Token"</span>
+    SAFE_METHODS = {<span class="token-string">"GET"</span>, <span class="token-string">"HEAD"</span>, <span class="token-string">"OPTIONS"</span>}
+
+    <span class="token-keyword">def</span> <span class="token-function">csrf_middleware</span>(self, request, handler):
+        <span class="token-string">"""Middleware that enforces CSRF token on state-changing requests."""</span>
+        <span class="token-keyword">if</span> request.method <span class="token-keyword">in</span> self.SAFE_METHODS:
+            <span class="token-keyword">return</span> <span class="token-function">handler</span>(request)
+
+        <span class="token-comment"># Check Origin header against allowed origins</span>
+        origin = request.headers.<span class="token-function">get</span>(<span class="token-string">"Origin"</span>)
+        <span class="token-keyword">if</span> origin <span class="token-keyword">and</span> origin <span class="token-keyword">not</span> <span class="token-keyword">in</span> self.allowed_origins:
+            <span class="token-keyword">return</span> <span class="token-function">forbidden_response</span>(<span class="token-string">"Invalid origin"</span>)
+
+        <span class="token-comment"># Verify custom header presence</span>
+        csrf_token = request.headers.<span class="token-function">get</span>(self.CSRF_HEADER)
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> csrf_token:
+            <span class="token-keyword">return</span> <span class="token-function">forbidden_response</span>(<span class="token-string">"Missing CSRF token"</span>)
+
+        <span class="token-comment"># Validate token</span>
+        <span class="token-keyword">if</span> <span class="token-keyword">not</span> self.<span class="token-function">validate_token</span>(request.session_id, csrf_token):
+            <span class="token-keyword">return</span> <span class="token-function">forbidden_response</span>(<span class="token-string">"Invalid CSRF token"</span>)
+
+        <span class="token-keyword">return</span> <span class="token-function">handler</span>(request)</code></pre>
+
+        <h2>CORS and Its Role</h2>
+        <p>Cross-Origin Resource Sharing (CORS) complements CSRF protection by controlling which origins can make requests. However, CORS alone is not sufficient &mdash; simple requests (form submissions) bypass preflight checks entirely.</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Defense Layer</th>
+                        <th>What It Prevents</th>
+                        <th>Limitation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>CSRF Tokens</td>
+                        <td>Forged state-changing requests</td>
+                        <td>Requires server-side storage or crypto</td>
+                    </tr>
+                    <tr>
+                        <td>SameSite Cookies</td>
+                        <td>Cross-site cookie attachment</td>
+                        <td>Older browsers lack support</td>
+                    </tr>
+                    <tr>
+                        <td>CORS</td>
+                        <td>Unauthorized cross-origin reads</td>
+                        <td>Does not block simple POST requests</td>
+                    </tr>
+                    <tr>
+                        <td>Custom Headers</td>
+                        <td>Simple cross-origin requests</td>
+                        <td>Requires CORS preflight enforcement</td>
+                    </tr>
+                    <tr>
+                        <td>Origin/Referer Check</td>
+                        <td>Requests from unexpected sources</td>
+                        <td>Headers can be stripped by proxies</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="industry-box">
+            <h3>&#127981; Industry Implementations</h3>
+            <ul>
+                <li><strong>Django</strong> &mdash; Built-in CSRF middleware using synchronizer tokens; <code>{% csrf_token %}</code> template tag; cookie-to-header pattern for AJAX</li>
+                <li><strong>Spring Security</strong> &mdash; <code>CsrfFilter</code> with repository-based token storage; per-request or per-session tokens; integrates with Thymeleaf</li>
+                <li><strong>Express (csurf)</strong> &mdash; Double-submit cookie approach; token exposed via <code>req.csrfToken()</code>; middleware validates on non-safe methods</li>
+                <li><strong>Rails</strong> &mdash; <code>protect_from_forgery</code> with authenticity tokens; meta tag injection for JavaScript requests; per-form tokens since Rails 5</li>
+            </ul>
+        </div>
+
+        <div class="summary-box">
+            <h3>&#128203; Key Takeaways</h3>
+            <ul>
+                <li>CSRF exploits the browser&rsquo;s automatic cookie attachment to forge authenticated requests</li>
+                <li>Synchronizer tokens are the gold standard &mdash; unpredictable, session-bound, validated server-side</li>
+                <li>SameSite=Lax provides excellent default protection for modern browsers</li>
+                <li>Defense in depth: combine tokens + SameSite + Origin checks for robust protection</li>
+                <li>Never perform state-changing operations via GET requests</li>
+            </ul>
+        </div>
+
+        <div class="mental-model">
+            <h3>&#129504; Mental Model</h3>
+            <div class="model-visual">
+                <pre>
+    Legitimate Request Flow:
+    ┌──────────┐    GET /form     ┌──────────┐
+    │  Browser │ ──────────────&rarr; │  Server  │
+    │  (User)  │ &larr;────────────── │          │
+    └──────────┘  form + token    └──────────┘
+         │                              │
+         │  POST /transfer              │
+         │  Cookie: session=abc         │
+         │  Body: csrf_token=xyz123     │
+         │ ─────────────────────────&rarr;   │
+         │                         ✓ Token matches
+         │                         ✓ Process request
+
+    CSRF Attack (Blocked):
+    ┌──────────┐                  ┌──────────┐
+    │  Evil    │  POST /transfer  │  Server  │
+    │  Site    │ ──────────────&rarr; │          │
+    └──────────┘  Cookie: auto    └──────────┘
+                  Body: no token!   ✗ Token missing
+                                    ✗ Request rejected
+                </pre>
+            </div>
+        </div>
+
+        <div class="mistakes-box">
+            <h3>&#9888;&#65039; Common Mistakes</h3>
+            <ul>
+                <li><strong>Token in GET parameters</strong> &mdash; Tokens leak via Referer headers, browser history, and server logs; always use POST body or custom headers</li>
+                <li><strong>Global static token</strong> &mdash; Using the same token for all users or sessions defeats the purpose; tokens must be unique and unpredictable per session</li>
+                <li><strong>Relying solely on CORS</strong> &mdash; Simple requests (form POSTs) bypass preflight; CORS protects reads, not writes</li>
+                <li><strong>Skipping token validation on AJAX</strong> &mdash; Assuming JavaScript requests are safe because of same-origin policy; misconfigured CORS can expose your API</li>
+            </ul>
+        </div>
+
+        <div class="exercise-box">
+            <h3>&#128296; Hands-On Exercises</h3>
+            <ol>
+                <li><strong>Implement synchronizer tokens</strong> &mdash; Build a Flask app with login form that generates per-session CSRF tokens and validates them on form submission</li>
+                <li><strong>Double-submit cookie</strong> &mdash; Create a REST API that sets a CSRF cookie and requires the same value in <code>X-CSRF-Token</code> header for all POST requests</li>
+                <li><strong>SameSite audit</strong> &mdash; Inspect your application&rsquo;s cookies using browser DevTools; identify which cookies lack SameSite attributes and fix them</li>
+                <li><strong>Attack simulation</strong> &mdash; Create a malicious HTML page that attempts a CSRF attack against your protected app; verify the attack is blocked and review server logs</li>
+            </ol>
+        </div>
+
+        <nav class="page-nav">
+            <a href="66-oauth.html" class="prev">&larr; OAuth 2.0</a>
+            <a href="68-mtls.html" class="next">mTLS &rarr;</a>
+        </nav>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

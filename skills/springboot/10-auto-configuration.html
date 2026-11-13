@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Configuration Mechanism - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Auto-Configuration</li>
+            <li><a href="09-springboot-application.html"><span class="nav-number">9</span> @SpringBootApplication</a></li>
+            <li><a href="10-auto-configuration.html" class="active"><span class="nav-number">10</span> Auto-Configuration Mechanism</a></li>
+            <li><a href="11-conditional-annotations.html"><span class="nav-number">11</span> Conditional Annotations</a></li>
+            <li><a href="12-spring-factories.html"><span class="nav-number">12</span> spring.factories & META-INF</a></li>
+            <li><a href="13-externalized-config.html"><span class="nav-number">13</span> Externalized Configuration</a></li>
+            <li><a href="14-profiles.html"><span class="nav-number">14</span> Profiles & Environment</a></li>
+            <li><a href="15-custom-auto-configuration.html"><span class="nav-number">15</span> Custom Auto-Configuration</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Auto-Configuration → Auto-Configuration Mechanism</div>
+        <div class="topic-number">Topic 10 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Auto-Configuration Mechanism</h1>
+            <p class="subtitle-description">How Spring Boot configures hundreds of libraries automatically — the <code><span class="token-annotation">@Conditional</span></code> evaluation engine that decides what beans to create based on your classpath and properties.</p>
+
+            <div class="tags">
+                <span class="tag tag-advanced">advanced</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-internal">internal</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">🏨 The Smart Hotel Analogy</div>
+                <p>Imagine checking into a hotel that automatically configures your room based on what's in your luggage. Brought a laptop? A desk and ethernet cable appear. Packed swim trunks? Pool access is activated. Have a business card from a partner company? The conference room is reserved. You never fill out a preferences form — the hotel <strong>inspects what you brought</strong> (classpath) and <strong>what you've said</strong> (properties) to decide what services to enable. That's auto-configuration: conditional infrastructure provisioning based on classpath presence and declared preferences.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: AutoConfigurationImportSelector -->
+            <!-- ============================================ -->
+            <h2>1. AutoConfigurationImportSelector — The Entry Point</h2>
+
+            <p><code><span class="token-class">AutoConfigurationImportSelector</span></code> implements <code><span class="token-type">DeferredImportSelector</span></code>, which means it runs <strong>after</strong> all regular <code>@Configuration</code> classes have been processed. This is critical — it ensures user-defined beans exist before auto-config conditions are evaluated.</p>
+
+            <pre><code><span class="token-keyword">public class</span> <span class="token-class">AutoConfigurationImportSelector</span>
+        <span class="token-keyword">implements</span> <span class="token-type">DeferredImportSelector</span>, <span class="token-type">BeanClassLoaderAware</span>,
+                   <span class="token-type">ResourceLoaderAware</span>, <span class="token-type">BeanFactoryAware</span>, <span class="token-type">EnvironmentAware</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">String</span>[] <span class="token-function">selectImports</span>(<span class="token-type">AnnotationMetadata</span> annotationMetadata) {
+        <span class="token-keyword">if</span> (!<span class="token-function">isEnabled</span>(annotationMetadata)) {
+            <span class="token-keyword">return</span> NO_IMPORTS;
+        }
+        <span class="token-type">AutoConfigurationEntry</span> autoConfigurationEntry =
+            <span class="token-function">getAutoConfigurationEntry</span>(annotationMetadata);
+        <span class="token-keyword">return</span> <span class="token-type">StringUtils</span>.<span class="token-function">toStringArray</span>(
+            autoConfigurationEntry.<span class="token-function">getConfigurations</span>());
+    }
+
+    <span class="token-keyword">protected</span> <span class="token-type">AutoConfigurationEntry</span> <span class="token-function">getAutoConfigurationEntry</span>(
+            <span class="token-type">AnnotationMetadata</span> annotationMetadata) {
+
+        <span class="token-comment">// Step 1: Load ALL candidate configurations from factory files</span>
+        <span class="token-type">List</span>&lt;<span class="token-type">String</span>&gt; configurations = <span class="token-function">getCandidateConfigurations</span>(
+            annotationMetadata, attributes);
+        <span class="token-comment">// Boot 3.x: ~150 classes loaded from AutoConfiguration.imports</span>
+
+        <span class="token-comment">// Step 2: Remove duplicates</span>
+        configurations = <span class="token-function">removeDuplicates</span>(configurations);
+
+        <span class="token-comment">// Step 3: Apply exclusions (from annotation + properties)</span>
+        <span class="token-type">Set</span>&lt;<span class="token-type">String</span>&gt; exclusions = <span class="token-function">getExclusions</span>(annotationMetadata, attributes);
+        configurations.<span class="token-function">removeAll</span>(exclusions);
+
+        <span class="token-comment">// Step 4: Filter by AutoConfigurationImportFilter</span>
+        <span class="token-comment">// (fast pre-filter using OnBeanCondition, OnClassCondition, OnWebApplicationCondition)</span>
+        configurations = <span class="token-function">getConfigurationClassFilter</span>()
+            .<span class="token-function">filter</span>(configurations);
+
+        <span class="token-comment">// Step 5: Fire AutoConfigurationImportEvent</span>
+        <span class="token-function">fireAutoConfigurationImportEvents</span>(configurations, exclusions);
+
+        <span class="token-keyword">return new</span> <span class="token-type">AutoConfigurationEntry</span>(configurations, exclusions);
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>The <code>DeferredImportSelector</code> interface is the secret to auto-configuration working correctly. Regular <code>@Import</code> runs inline with parsing. Deferred imports run AFTER all user <code>@Configuration</code> classes are parsed — so when <code>@ConditionalOnMissingBean</code> checks execute, your custom beans are already registered in the BeanDefinitionRegistry.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: Factory Files -->
+            <!-- ============================================ -->
+            <h2>2. Where Auto-Configurations Are Registered</h2>
+
+            <h3>Spring Boot 3.x (Current)</h3>
+            <pre><code><span class="token-comment">// File: META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</span>
+<span class="token-comment">// One fully-qualified class name per line</span>
+org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration
+org.springframework.boot.autoconfigure.aop.AopAutoConfiguration
+org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration
+org.springframework.boot.autoconfigure.data.jdbc.JdbcRepositoriesAutoConfiguration
+org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration
+<span class="token-comment">// ... ~150 total entries in spring-boot-autoconfigure</span></code></pre>
+
+            <h3>Spring Boot 2.x (Legacy)</h3>
+            <pre><code><span class="token-comment">// File: META-INF/spring.factories</span>
+<span class="token-comment">// Key-value format, comma-separated</span>
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration,\
+  org.springframework.boot.autoconfigure.aop.AopAutoConfiguration,\
+  org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: Structure of an Auto-Config -->
+            <!-- ============================================ -->
+            <h2>3. Anatomy of an Auto-Configuration Class</h2>
+
+            <pre><code><span class="token-annotation">@AutoConfiguration</span>(after = <span class="token-type">DataSourceAutoConfiguration</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@ConditionalOnClass</span>({ <span class="token-type">DataSource</span>.<span class="token-keyword">class</span>, <span class="token-type">JdbcTemplate</span>.<span class="token-keyword">class</span> })
+<span class="token-annotation">@ConditionalOnSingleCandidate</span>(<span class="token-type">DataSource</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@EnableConfigurationProperties</span>(<span class="token-type">JdbcProperties</span>.<span class="token-keyword">class</span>)
+<span class="token-keyword">public class</span> <span class="token-class">JdbcTemplateAutoConfiguration</span> {
+
+    <span class="token-annotation">@Bean</span>
+    <span class="token-annotation">@Primary</span>
+    <span class="token-annotation">@ConditionalOnMissingBean</span>(<span class="token-type">JdbcOperations</span>.<span class="token-keyword">class</span>)
+    <span class="token-keyword">public</span> <span class="token-type">JdbcTemplate</span> <span class="token-function">jdbcTemplate</span>(
+            <span class="token-type">DataSource</span> dataSource, <span class="token-type">JdbcProperties</span> properties) {
+        <span class="token-type">JdbcTemplate</span> jdbcTemplate = <span class="token-keyword">new</span> <span class="token-type">JdbcTemplate</span>(dataSource);
+        <span class="token-type">JdbcProperties.Template</span> template = properties.<span class="token-function">getTemplate</span>();
+        jdbcTemplate.<span class="token-function">setFetchSize</span>(template.<span class="token-function">getFetchSize</span>());
+        jdbcTemplate.<span class="token-function">setMaxRows</span>(template.<span class="token-function">getMaxRows</span>());
+        <span class="token-keyword">return</span> jdbcTemplate;
+    }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>Notice the layered conditions: <code>@ConditionalOnClass</code> on the class level gates the entire config (if JdbcTemplate isn't on classpath, nothing loads). <code>@ConditionalOnMissingBean</code> on the method level means: "only create this bean if the user hasn't already defined one." This is why you can always override auto-configured beans.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: Ordering -->
+            <!-- ============================================ -->
+            <h2>4. Auto-Configuration Ordering</h2>
+
+            <p>Order matters — some auto-configs depend on beans created by others. Spring Boot provides ordering annotations:</p>
+
+            <pre><code><span class="token-annotation">@AutoConfiguration</span>(
+    before = <span class="token-type">WebMvcAutoConfiguration</span>.<span class="token-keyword">class</span>,
+    after = <span class="token-type">DataSourceAutoConfiguration</span>.<span class="token-keyword">class</span>
+)
+<span class="token-keyword">public class</span> <span class="token-class">MyAutoConfiguration</span> { }
+
+<span class="token-comment">// Legacy (Boot 2.x) — still supported but deprecated</span>
+<span class="token-annotation">@AutoConfigureBefore</span>(<span class="token-type">WebMvcAutoConfiguration</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@AutoConfigureAfter</span>(<span class="token-type">DataSourceAutoConfiguration</span>.<span class="token-keyword">class</span>)
+<span class="token-annotation">@AutoConfigureOrder</span>(<span class="token-type">Ordered</span>.HIGHEST_PRECEDENCE)
+<span class="token-keyword">public class</span> <span class="token-class">MyAutoConfiguration</span> { }</code></pre>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ordering Mechanism</th>
+                        <th>Scope</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>@AutoConfiguration(after=...)</code></td>
+                        <td>Between auto-configs only</td>
+                        <td>Ensure DataSource exists before JdbcTemplate config</td>
+                    </tr>
+                    <tr>
+                        <td><code>@AutoConfiguration(before=...)</code></td>
+                        <td>Between auto-configs only</td>
+                        <td>Register error handlers before WebMvc setup</td>
+                    </tr>
+                    <tr>
+                        <td><code>@AutoConfigureOrder</code></td>
+                        <td>Absolute ordering among auto-configs</td>
+                        <td>When relative before/after isn't sufficient</td>
+                    </tr>
+                    <tr>
+                        <td><code>@Order</code> / <code>@Priority</code></td>
+                        <td>Does NOT affect auto-config ordering</td>
+                        <td>Only for bean injection ordering</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Common Misconception</div>
+                <p><code>@Order</code> has NO effect on auto-configuration loading order. It only affects bean injection order (e.g., which filter comes first in a chain). Use <code>@AutoConfiguration(before/after)</code> exclusively for controlling auto-config sequence.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: Condition Evaluation -->
+            <!-- ============================================ -->
+            <h2>5. How Conditions Are Evaluated</h2>
+
+            <p>The <code><span class="token-class">ConditionEvaluator</span></code> processes <code>@Conditional</code> annotations at two phases:</p>
+
+            <pre><code><span class="token-comment">// Phase 1: Configuration class parsing (ConfigurationClassParser)</span>
+<span class="token-comment">// "Should I even parse this @Configuration class?"</span>
+<span class="token-keyword">if</span> (<span class="token-keyword">this</span>.conditionEvaluator.<span class="token-function">shouldSkip</span>(
+        configClass.<span class="token-function">getMetadata</span>(), <span class="token-type">ConfigurationPhase</span>.PARSE_CONFIGURATION)) {
+    <span class="token-keyword">return</span>; <span class="token-comment">// Skip entire class — no beans registered</span>
+}
+
+<span class="token-comment">// Phase 2: Bean registration (ConfigurationClassBeanDefinitionReader)</span>
+<span class="token-comment">// "Should I register this specific @Bean method?"</span>
+<span class="token-keyword">if</span> (<span class="token-keyword">this</span>.conditionEvaluator.<span class="token-function">shouldSkip</span>(
+        metadata, <span class="token-type">ConfigurationPhase</span>.REGISTER_BEAN)) {
+    <span class="token-keyword">return</span>; <span class="token-comment">// Skip this bean — but other beans in the class may register</span>
+}</code></pre>
+
+            <h3>The ConditionEvaluationReport</h3>
+
+            <p>Every condition evaluation is recorded in the <code><span class="token-class">ConditionEvaluationReport</span></code>, accessible via:</p>
+
+            <pre><code><span class="token-comment">// Programmatic access</span>
+<span class="token-type">ConditionEvaluationReport</span> report = <span class="token-type">ConditionEvaluationReport</span>
+    .<span class="token-function">get</span>(applicationContext.<span class="token-function">getBeanFactory</span>());
+
+<span class="token-comment">// Via Actuator endpoint (if spring-boot-actuator is on classpath)</span>
+<span class="token-comment">// GET /actuator/conditions</span>
+
+<span class="token-comment">// Via --debug flag on startup (ConditionEvaluationReportLogger)</span>
+<span class="token-comment">// Prints full positive/negative match report to console</span></code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Why Auto-Config Runs Last -->
+            <!-- ============================================ -->
+            <h2>6. Why Auto-Configuration Runs After User Beans</h2>
+
+            <p>The deferred import processing ensures this ordering:</p>
+
+            <div class="architecture-diagram">
+                <h3>📐 Processing Order</h3>
+                <pre class="diagram-ascii">
+┌─────────────────────────────────────────────────────────────────┐
+│                    ConfigurationClassParser                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  PHASE 1: Parse user @Configuration classes                      │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │ @Configuration UserConfig { @Bean myDataSource() {...} }    ││
+│  │ @Configuration SecurityConfig { @Bean myFilter() {...} }    ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                           ▼                                      │
+│  PHASE 2: Process DeferredImportSelector (auto-configs)          │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │ DataSourceAutoConfiguration                                  ││
+│  │   └── @ConditionalOnMissingBean(DataSource.class)           ││
+│  │       → SKIPPED: user already defined 'myDataSource'        ││
+│  │                                                              ││
+│  │ WebMvcAutoConfiguration                                      ││
+│  │   └── @ConditionalOnMissingBean(WebMvcConfigurer.class)     ││
+│  │       → MATCHED: no user WebMvcConfigurer → creates default ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘</pre>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 Key Insight</div>
+                <p>This is why <code>@ConditionalOnMissingBean</code> works reliably: by the time auto-configuration conditions are evaluated, ALL user-defined beans are already registered as BeanDefinitions. The condition can check "does this bean already exist?" with confidence.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Debugging Auto-Configuration -->
+            <!-- ============================================ -->
+            <h2>7. Debugging: "Why Is This Bean Being Created?"</h2>
+
+            <p>In industry, the most common auto-config debugging scenario is unexpected bean creation. Here's the diagnostic playbook:</p>
+
+            <pre><code><span class="token-comment">// Step 1: Enable the conditions report</span>
+<span class="token-comment">// application.properties</span>
+debug=<span class="token-keyword">true</span>
+
+<span class="token-comment">// Step 2: Search for the auto-config class in the report</span>
+<span class="token-comment">// Look for "Positive matches" — it tells you exactly which conditions passed</span>
+
+<span class="token-comment">// Step 3: Use actuator for runtime inspection</span>
+<span class="token-comment">// GET /actuator/conditions</span>
+{
+  <span class="token-string">"contexts"</span>: {
+    <span class="token-string">"application"</span>: {
+      <span class="token-string">"positiveMatches"</span>: {
+        <span class="token-string">"DataSourceAutoConfiguration"</span>: [{
+          <span class="token-string">"condition"</span>: <span class="token-string">"OnClassCondition"</span>,
+          <span class="token-string">"message"</span>: <span class="token-string">"@ConditionalOnClass found required classes 'javax.sql.DataSource'"</span>
+        }]
+      }
+    }
+  }
+}
+
+<span class="token-comment">// Step 4: If you want to prevent it</span>
+<span class="token-annotation">@SpringBootApplication</span>(exclude = <span class="token-type">DataSourceAutoConfiguration</span>.<span class="token-keyword">class</span>)</code></pre>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>AutoConfigurationImportSelector</strong> is a DeferredImportSelector — it runs AFTER user configs, making @ConditionalOnMissingBean reliable</li>
+                    <li><strong>Boot 3.x</strong> uses <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code> (one class per line)</li>
+                    <li><strong>Boot 2.x</strong> used <code>META-INF/spring.factories</code> with key-value format (still supported for backward compat)</li>
+                    <li><strong>Ordering</strong> uses @AutoConfiguration(before/after) — NOT @Order which is for bean injection only</li>
+                    <li><strong>Conditions are evaluated at two phases:</strong> class parsing (should I load this config?) and bean registration (should I create this bean?)</li>
+                    <li><strong>ConditionEvaluationReport</strong> records every decision — access via --debug, actuator /conditions, or programmatically</li>
+                    <li><strong>Import filtering</strong> provides a fast pre-filter before full condition evaluation (checks class presence via ASM)</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>Why does <code>AutoConfigurationImportSelector</code> implement <code>DeferredImportSelector</code> instead of regular <code>ImportSelector</code>?</li>
+                    <li>What's the difference between the pre-filter (AutoConfigurationImportFilter) and the full @Conditional evaluation?</li>
+                    <li>If two auto-configs both declare <code>@AutoConfiguration(before = X.class)</code> on each other, what happens?</li>
+                    <li>Explain why removing a dependency from your pom.xml can cause completely unrelated beans to disappear.</li>
+                    <li>How would you write a test that verifies a specific auto-configuration is NOT loaded in certain scenarios?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"Your microservice starts up and connects to a Redis instance you didn't configure. Other developers say 'it just works.' How do you trace where this behavior comes from and how to control it?"</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Diagnose</strong> — Run with <code>--debug</code> and search for "Redis" in the conditions report. Find <code>RedisAutoConfiguration</code> in "Positive matches." It matched because <code>spring-data-redis</code> is on the classpath (transitive dependency).</li>
+                    <li><strong>Trace</strong> — Check <code>@ConditionalOnClass(RedisConnectionFactory.class)</code> → present. Check <code>@ConditionalOnMissingBean(RedisConnectionFactory.class)</code> → no user bean found. So Boot creates a <code>LettuceConnectionFactory</code> with default localhost:6379.</li>
+                    <li><strong>Control</strong> — Either (a) exclude the auto-config, (b) set <code>spring.data.redis.host</code> in properties, (c) define your own <code>RedisConnectionFactory</code> bean, or (d) remove the transitive dependency if Redis isn't needed.</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 9 (@SpringBootApplication)</strong> — @EnableAutoConfiguration triggers this entire mechanism</li>
+                    <li><strong>Topic 11 (Conditional Annotations)</strong> — The @Conditional family that gates each auto-config class and bean</li>
+                    <li><strong>Topic 12 (spring.factories)</strong> — The file format where auto-configs are registered for discovery</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="09-springboot-application.html" class="nav-btn nav-btn-prev">← @SpringBootApplication</a>
+                <a href="11-conditional-annotations.html" class="nav-btn nav-btn-next">Conditional Annotations →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

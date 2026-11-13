@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Fundamentals — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 6</a> <span>›</span> RAG Fundamentals</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>RAG Fundamentals</h1>
+                <p>Retrieval-Augmented Generation (RAG) is how you make AI answer questions about YOUR data — your documents, your codebase, your company knowledge. The most important pattern in production AI.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>RAG = an open-book exam.</strong> The student (LLM) doesn't need to memorize everything. Instead, they can look up relevant pages (retrieve) before answering the question (generate). Much more accurate than relying on memory alone!</p>
+                <p><strong>Without RAG = a closed-book exam.</strong> The model can only use what it memorized during training. If the info isn't in training data (or is outdated), it either hallucinates or says "I don't know."</p>
+            </div>
+
+            <h2 id="how">How RAG Works</h2>
+
+            <div class="mental-model">
+                <h4>🧠 RAG Pipeline</h4>
+                <div class="model-visual">
+                    1. User asks: "What's our refund policy?"<br>
+                    2. RETRIEVE: Search your documents for relevant chunks<br>
+                    3. AUGMENT: Inject those chunks into the prompt<br>
+                    4. GENERATE: LLM answers using the provided context<br><br>
+                    Prompt = System instructions + Retrieved context + User question
+                </div>
+            </div>
+
+            <h3>Complete RAG System:</h3>
+            <pre><code><span class="token-comment"># Production-ready RAG system</span>
+<span class="token-comment"># pip install openai chromadb sentence-transformers</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> chromadb
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> SentenceTransformer
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional
+
+<span class="token-keyword">class</span> <span class="token-function">RAGSystem</span>:
+    <span class="token-string">"""Complete RAG system with embedding, retrieval, and generation."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(
+        self,
+        llm_base_url: str = <span class="token-string">"http://localhost:11434/v1"</span>,
+        llm_model: str = <span class="token-string">"llama3.1:8b"</span>,
+        embed_model: str = <span class="token-string">"all-MiniLM-L6-v2"</span>,
+        collection_name: str = <span class="token-string">"documents"</span>,
+    ):
+        <span class="token-comment"># LLM client (works with Ollama, vLLM, OpenAI)</span>
+        self.llm = OpenAI(base_url=llm_base_url, api_key=<span class="token-string">"local"</span>)
+        self.llm_model = llm_model
+        
+        <span class="token-comment"># Embedding model (runs locally)</span>
+        self.embedder = SentenceTransformer(embed_model)
+        
+        <span class="token-comment"># Vector database</span>
+        self.chroma = chromadb.PersistentClient(path=<span class="token-string">"./chroma_db"</span>)
+        self.collection = self.chroma.get_or_create_collection(
+            name=collection_name,
+            metadata={<span class="token-string">"hnsw:space"</span>: <span class="token-string">"cosine"</span>}
+        )
+    
+    <span class="token-keyword">def</span> <span class="token-function">add_documents</span>(self, texts: list[str], metadata: Optional[list[dict]] = <span class="token-keyword">None</span>):
+        <span class="token-string">"""Add documents to the vector store."""</span>
+        <span class="token-comment"># Generate embeddings</span>
+        embeddings = self.embedder.encode(texts).tolist()
+        
+        <span class="token-comment"># Store in ChromaDB</span>
+        ids = [<span class="token-string">f"doc_{i}"</span> <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-builtin">len</span>(texts))]
+        self.collection.add(
+            ids=ids,
+            embeddings=embeddings,
+            documents=texts,
+            metadatas=metadata <span class="token-keyword">or</span> [{} <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> texts],
+        )
+        <span class="token-builtin">print</span>(<span class="token-string">f"✅ Added {len(texts)} documents"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">retrieve</span>(self, query: str, top_k: int = <span class="token-number">3</span>) -> list[str]:
+        <span class="token-string">"""Retrieve most relevant documents for a query."""</span>
+        query_embedding = self.embedder.encode([query]).tolist()
+        
+        results = self.collection.query(
+            query_embeddings=query_embedding,
+            n_results=top_k,
+        )
+        <span class="token-keyword">return</span> results[<span class="token-string">"documents"</span>][<span class="token-number">0</span>]
+    
+    <span class="token-keyword">def</span> <span class="token-function">generate</span>(self, query: str, context: list[str]) -> str:
+        <span class="token-string">"""Generate answer using retrieved context."""</span>
+        context_text = <span class="token-string">"\n\n"</span>.join([<span class="token-string">f"[Document {i+1}]: {doc}"</span> <span class="token-keyword">for</span> i, doc <span class="token-keyword">in</span> <span class="token-builtin">enumerate</span>(context)])
+        
+        response = self.llm.chat.completions.create(
+            model=self.llm_model,
+            messages=[
+                {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">"""You are a helpful assistant. Answer questions based ONLY on the provided context. 
+If the context doesn't contain the answer, say "I don't have enough information to answer that."
+Always cite which document number you're referencing."""</span>},
+                {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"Context:\n{context_text}\n\nQuestion: {query}"</span>},
+            ],
+            temperature=<span class="token-number">0.3</span>,  <span class="token-comment"># Low temperature for factual answers</span>
+            max_tokens=<span class="token-number">500</span>,
+        )
+        <span class="token-keyword">return</span> response.choices[<span class="token-number">0</span>].message.content
+    
+    <span class="token-keyword">def</span> <span class="token-function">query</span>(self, question: str, top_k: int = <span class="token-number">3</span>) -> str:
+        <span class="token-string">"""Full RAG pipeline: retrieve + generate."""</span>
+        context = self.retrieve(question, top_k=top_k)
+        answer = self.generate(question, context)
+        <span class="token-keyword">return</span> answer
+
+<span class="token-comment"># Usage</span>
+rag = RAGSystem()
+
+<span class="token-comment"># Add your documents</span>
+rag.add_documents([
+    <span class="token-string">"Our refund policy allows returns within 30 days of purchase."</span>,
+    <span class="token-string">"Shipping is free for orders over $50."</span>,
+    <span class="token-string">"Premium members get 20% off all products."</span>,
+    <span class="token-string">"Contact support@company.com for order issues."</span>,
+])
+
+<span class="token-comment"># Query</span>
+answer = rag.query(<span class="token-string">"What's the refund policy?"</span>)
+<span class="token-builtin">print</span>(answer)</code></pre>
+
+            <h2 id="chunking">Document Chunking</h2>
+
+            <p>Large documents must be split into smaller chunks for effective retrieval. Chunk size is one of the most important decisions in RAG.</p>
+
+            <pre><code><span class="token-comment"># Smart document chunking strategies</span>
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Generator
+
+<span class="token-keyword">class</span> <span class="token-function">DocumentChunker</span>:
+    <span class="token-string">"""Multiple chunking strategies for RAG."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">fixed_size</span>(self, text: str, chunk_size: int = <span class="token-number">500</span>, overlap: int = <span class="token-number">50</span>) -> list[str]:
+        <span class="token-string">"""Simple fixed-size chunking with overlap."""</span>
+        chunks = []
+        start = <span class="token-number">0</span>
+        <span class="token-keyword">while</span> start < <span class="token-builtin">len</span>(text):
+            end = start + chunk_size
+            chunks.append(text[start:end])
+            start = end - overlap  <span class="token-comment"># Overlap prevents cutting mid-sentence</span>
+        <span class="token-keyword">return</span> chunks
+    
+    <span class="token-keyword">def</span> <span class="token-function">by_sentences</span>(self, text: str, sentences_per_chunk: int = <span class="token-number">5</span>) -> list[str]:
+        <span class="token-string">"""Chunk by sentence boundaries (better quality)."""</span>
+        sentences = text.replace(<span class="token-string">"? "</span>, <span class="token-string">"?|"</span>).replace(<span class="token-string">". "</span>, <span class="token-string">".|"</span>).replace(<span class="token-string">"! "</span>, <span class="token-string">"!|"</span>).split(<span class="token-string">"|"</span>)
+        chunks = []
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-builtin">range</span>(<span class="token-number">0</span>, <span class="token-builtin">len</span>(sentences), sentences_per_chunk):
+            chunk = <span class="token-string">" "</span>.join(sentences[i:i + sentences_per_chunk])
+            <span class="token-keyword">if</span> chunk.strip():
+                chunks.append(chunk.strip())
+        <span class="token-keyword">return</span> chunks
+    
+    <span class="token-keyword">def</span> <span class="token-function">by_markdown_headers</span>(self, text: str) -> list[str]:
+        <span class="token-string">"""Chunk by markdown headers (best for docs)."""</span>
+        chunks = []
+        current_chunk = <span class="token-string">""</span>
+        
+        <span class="token-keyword">for</span> line <span class="token-keyword">in</span> text.split(<span class="token-string">"\n"</span>):
+            <span class="token-keyword">if</span> line.startswith(<span class="token-string">"#"</span>) <span class="token-keyword">and</span> current_chunk:
+                chunks.append(current_chunk.strip())
+                current_chunk = line + <span class="token-string">"\n"</span>
+            <span class="token-keyword">else</span>:
+                current_chunk += line + <span class="token-string">"\n"</span>
+        
+        <span class="token-keyword">if</span> current_chunk.strip():
+            chunks.append(current_chunk.strip())
+        <span class="token-keyword">return</span> chunks
+
+<span class="token-comment"># Best practice: 200-500 tokens per chunk, with 10-20% overlap</span>
+chunker = DocumentChunker()
+document = open(<span class="token-string">"company_docs.md"</span>).read()
+chunks = chunker.by_sentences(document, sentences_per_chunk=<span class="token-number">5</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"Created {len(chunks)} chunks"</span>)</code></pre>
+
+            <h3>Chunking Guidelines:</h3>
+            <table>
+                <thead><tr><th>Chunk Size</th><th>Pros</th><th>Cons</th><th>Best For</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Small (100-200 tokens)</strong></td><td>Precise retrieval</td><td>May lack context</td><td>FAQ, definitions</td></tr>
+                    <tr><td><strong>Medium (200-500 tokens)</strong></td><td>Good balance</td><td>None major</td><td>Most use cases (recommended)</td></tr>
+                    <tr><td><strong>Large (500-1000 tokens)</strong></td><td>More context</td><td>Less precise, more noise</td><td>Long-form content, legal docs</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="advanced">Advanced RAG Techniques</h2>
+
+            <pre><code><span class="token-comment"># Advanced RAG: Hybrid search + Reranking</span>
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> CrossEncoder
+
+<span class="token-keyword">class</span> <span class="token-function">AdvancedRAG</span>(RAGSystem):
+    <span class="token-string">"""RAG with reranking for better results."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, **kwargs):
+        <span class="token-builtin">super</span>().__init__(**kwargs)
+        <span class="token-comment"># Reranker: re-scores retrieved docs for relevance</span>
+        self.reranker = CrossEncoder(<span class="token-string">"cross-encoder/ms-marco-MiniLM-L-6-v2"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">retrieve_and_rerank</span>(self, query: str, top_k: int = <span class="token-number">3</span>, initial_k: int = <span class="token-number">10</span>) -> list[str]:
+        <span class="token-string">"""Retrieve more, then rerank to find the truly relevant ones."""</span>
+        <span class="token-comment"># Step 1: Retrieve more candidates than needed</span>
+        candidates = self.retrieve(query, top_k=initial_k)
+        
+        <span class="token-comment"># Step 2: Rerank with cross-encoder (more accurate but slower)</span>
+        pairs = [[query, doc] <span class="token-keyword">for</span> doc <span class="token-keyword">in</span> candidates]
+        scores = self.reranker.predict(pairs)
+        
+        <span class="token-comment"># Step 3: Return top-k by reranker score</span>
+        ranked = sorted(<span class="token-builtin">zip</span>(scores, candidates), reverse=<span class="token-keyword">True</span>)
+        <span class="token-keyword">return</span> [doc <span class="token-keyword">for</span> _, doc <span class="token-keyword">in</span> ranked[:top_k]]
+    
+    <span class="token-keyword">def</span> <span class="token-function">query</span>(self, question: str, top_k: int = <span class="token-number">3</span>) -> str:
+        <span class="token-string">"""Full pipeline with reranking."""</span>
+        context = self.retrieve_and_rerank(question, top_k=top_k)
+        <span class="token-keyword">return</span> self.generate(question, context)</code></pre>
+
+            <div class="comparison-table">
+                <h3>RAG vs Fine-Tuning: When to Use What?</h3>
+                <table>
+                    <thead><tr><th>Approach</th><th>Best For</th><th>Pros</th><th>Cons</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>RAG</strong></td><td>Dynamic/changing data, company docs</td><td>No retraining, up-to-date, cites sources</td><td>Retrieval quality depends on chunking</td></tr>
+                        <tr><td><strong>Fine-tuning</strong></td><td>New behaviors, style, domain expertise</td><td>Faster inference, no retrieval step</td><td>Expensive, needs retraining for new data</td></tr>
+                        <tr><td><strong>RAG + Fine-tuning</strong></td><td>Best of both worlds</td><td>Domain expertise + grounded in data</td><td>Most complex to maintain</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>RAG is the #1 production pattern</strong> — 80%+ of enterprise AI apps use RAG.</li>
+                    <li><strong>Chunk size: 200-500 tokens</strong> — With 50-100 token overlap. Test what works for your data.</li>
+                    <li><strong>Retrieve 3-5 chunks</strong> — More than 5 often adds noise. Less than 3 may miss information.</li>
+                    <li><strong>Always rerank</strong> — Bi-encoder retrieval + cross-encoder reranking = significantly better accuracy.</li>
+                    <li><strong>Hybrid search</strong> — Combine semantic (embedding) + keyword (BM25) search for best results.</li>
+                    <li><strong>Low temperature for RAG answers</strong> — Use 0.1-0.3 to keep answers grounded in context.</li>
+                    <li><strong>Cite sources</strong> — Tell the model to reference which document it's using. Builds trust.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>RAG</strong> = Retrieve relevant docs → Put in prompt → Generate answer</li>
+                    <li>Solves: hallucination, outdated knowledge, private data access</li>
+                    <li><strong>Chunking</strong>: 200-500 tokens, with overlap, respecting boundaries</li>
+                    <li><strong>Embedding</strong>: Convert text to vectors for semantic search</li>
+                    <li><strong>Reranking</strong>: Use cross-encoder to re-score candidates for better quality</li>
+                    <li>RAG is preferred over fine-tuning for most knowledge-grounding tasks</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Chunks too large</strong> — 2000-token chunks bury the answer in noise. Keep under 500.</li>
+                    <li><strong>No overlap</strong> — Without overlap, you cut sentences in half and lose meaning.</li>
+                    <li><strong>Using only semantic search</strong> — Add keyword search (BM25) for names, numbers, codes that embeddings miss.</li>
+                    <li><strong>High temperature</strong> — For RAG, use temp 0.1-0.3. High temp causes the model to ignore context.</li>
+                    <li><strong>Not telling the model to cite sources</strong> — Without instructions, the model will hallucinate beyond the context.</li>
+                    <li><strong>Not evaluating retrieval quality</strong> — If you retrieve wrong chunks, even the best LLM gives wrong answers.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build Your First RAG</h4>
+                <ol>
+                    <li>Install: <code>pip install chromadb sentence-transformers openai</code></li>
+                    <li>Create a RAGSystem with 10+ document chunks from a topic you know</li>
+                    <li>Query it with 5 different questions. Check if answers are accurate.</li>
+                    <li>Try different chunk sizes (100, 300, 500 tokens) — which gives best answers?</li>
+                    <li>Add a reranker and compare quality with and without it</li>
+                    <li><strong>Bonus:</strong> Load a PDF, chunk it, and build RAG over it</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="21-huggingface-ecosystem.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">HuggingFace Ecosystem</span>
+                </a>
+                <a href="23-vector-databases.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Vector Databases</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

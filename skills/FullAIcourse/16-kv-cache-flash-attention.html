@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KV Cache & Flash Attention — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 4</a> <span>›</span> KV Cache & Flash Attention</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>KV Cache & Flash Attention</h1>
+                <p>Why does the model seem slow on the first token but fast after that? How does vLLM serve thousands of requests? The answer: clever memory tricks that changed how we run AI models.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>KV Cache = taking notes during a meeting.</strong> Instead of re-reading all previous meeting minutes every time someone asks a question, you keep running notes (Key-Value cache). For each new question, you just consult your notes + add the new info.</p>
+                <p><strong>Flash Attention = speed-reading a book in chunks.</strong> Instead of loading the entire book into your tiny desk (GPU memory), you read one chapter at a time, take notes, then move to the next chapter. Same result, way less desk space needed.</p>
+            </div>
+
+            <h2 id="kv-cache">Understanding KV Cache</h2>
+
+            <h3>The Problem Without KV Cache:</h3>
+            <p>When generating text token-by-token, the model needs to look at ALL previous tokens. Without caching:</p>
+            <ul>
+                <li>Token 1: Process 1 token</li>
+                <li>Token 2: Process tokens 1-2 (re-process token 1!)</li>
+                <li>Token 3: Process tokens 1-3 (re-process tokens 1-2!)</li>
+                <li>Token 100: Process all 100 tokens (re-process 99 tokens!)</li>
+            </ul>
+            <p>This is O(n²) — wastefully recomputing everything!</p>
+
+            <h3>With KV Cache:</h3>
+            <ul>
+                <li>Token 1: Compute attention → save K₁, V₁ to cache</li>
+                <li>Token 2: Use cached K₁,V₁ + compute new K₂,V₂ → save to cache</li>
+                <li>Token 100: Use cached K₁..K₉₉, V₁..V₉₉ + compute K₁₀₀,V₁₀₀</li>
+            </ul>
+            <p>Now each new token only does O(1) new computation (plus looking up the cache)!</p>
+
+            <pre><code><span class="token-comment"># How KV cache works conceptually</span>
+<span class="token-keyword">import</span> torch
+
+<span class="token-keyword">class</span> <span class="token-function">SimpleKVCache</span>:
+    <span class="token-string">"""Simplified KV Cache for understanding."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, num_layers, num_heads, head_dim, max_seq_len):
+        self.num_layers = num_layers
+        <span class="token-comment"># Pre-allocate memory for K and V for each layer</span>
+        self.key_cache = torch.zeros(num_layers, max_seq_len, num_heads, head_dim)
+        self.value_cache = torch.zeros(num_layers, max_seq_len, num_heads, head_dim)
+        self.seq_len = <span class="token-number">0</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">update</span>(self, layer_idx, new_keys, new_values):
+        <span class="token-string">"""Add new K,V to cache (called for each new token)."""</span>
+        self.key_cache[layer_idx, self.seq_len] = new_keys
+        self.value_cache[layer_idx, self.seq_len] = new_values
+        self.seq_len += <span class="token-number">1</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">get</span>(self, layer_idx):
+        <span class="token-string">"""Get all cached K,V up to current position."""</span>
+        <span class="token-keyword">return</span> (
+            self.key_cache[layer_idx, :self.seq_len],
+            self.value_cache[layer_idx, :self.seq_len]
+        )
+
+<span class="token-comment"># KV cache size calculation:</span>
+<span class="token-comment"># Size = 2 × num_layers × seq_len × num_heads × head_dim × bytes_per_param</span>
+<span class="token-comment"># For Llama-3.1-8B with 4096 context:</span>
+<span class="token-comment"># = 2 × 32 × 4096 × 32 × 128 × 2 bytes = ~2 GB per request!</span>
+<span class="token-builtin">print</span>(<span class="token-string">"KV cache for 8B model, 4K context ≈ 2 GB per request"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">"That's why long contexts are expensive!"</span>)</code></pre>
+
+            <h3>KV Cache Memory Usage:</h3>
+            <table>
+                <thead><tr><th>Model</th><th>Context Length</th><th>KV Cache per Request</th><th>100 Concurrent Users</th></tr></thead>
+                <tbody>
+                    <tr><td>Llama-3.1-8B</td><td>4,096</td><td>~2 GB</td><td>200 GB (!)</td></tr>
+                    <tr><td>Llama-3.1-8B</td><td>128,000</td><td>~64 GB</td><td>Not possible</td></tr>
+                    <tr><td>Llama-3.1-70B</td><td>4,096</td><td>~10 GB</td><td>1 TB</td></tr>
+                    <tr><td>GPT-4 scale</td><td>128,000</td><td>~200+ GB</td><td>Distributed only</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="flash-attention">Flash Attention</h2>
+
+            <p><strong>Flash Attention</strong> is a revolutionary algorithm that makes attention computation 2-4x faster and uses much less GPU memory. It's now used by default in all modern inference engines.</p>
+
+            <h3>The Key Insight:</h3>
+            <p>Standard attention loads the entire attention matrix into GPU HBM (High Bandwidth Memory). Flash Attention instead:</p>
+            <ol>
+                <li>Computes attention in small tiles/blocks</li>
+                <li>Keeps intermediate results in fast SRAM (like L1 cache)</li>
+                <li>Never materializes the full N×N attention matrix in memory</li>
+            </ol>
+
+            <pre><code><span class="token-comment"># Using Flash Attention in practice</span>
+<span class="token-keyword">from</span> transformers <span class="token-keyword">import</span> AutoModelForCausalLM
+
+<span class="token-comment"># Method 1: Enable Flash Attention 2 in transformers</span>
+model = AutoModelForCausalLM.from_pretrained(
+    <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    torch_dtype=<span class="token-string">"auto"</span>,
+    attn_implementation=<span class="token-string">"flash_attention_2"</span>,  <span class="token-comment"># ← This!</span>
+    device_map=<span class="token-string">"auto"</span>,
+)
+<span class="token-comment"># Requires: pip install flash-attn --no-build-isolation</span>
+<span class="token-comment"># Only works on NVIDIA GPUs (Ampere or newer: A100, 4090, etc.)</span>
+
+<span class="token-comment"># Method 2: SDPA (Scaled Dot-Product Attention) - works everywhere</span>
+model = AutoModelForCausalLM.from_pretrained(
+    <span class="token-string">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    torch_dtype=<span class="token-string">"auto"</span>,
+    attn_implementation=<span class="token-string">"sdpa"</span>,  <span class="token-comment"># PyTorch native, auto-selects best</span>
+    device_map=<span class="token-string">"auto"</span>,
+)
+<span class="token-comment"># SDPA automatically uses Flash Attention if available,</span>
+<span class="token-comment"># falls back to efficient alternatives if not</span></code></pre>
+
+            <h3>Flash Attention Impact:</h3>
+            <table>
+                <thead><tr><th>Metric</th><th>Standard Attention</th><th>Flash Attention 2</th><th>Improvement</th></tr></thead>
+                <tbody>
+                    <tr><td>Memory (4K context)</td><td>~16 GB</td><td>~8 GB</td><td>2x less</td></tr>
+                    <tr><td>Speed (4K context)</td><td>100 tok/s</td><td>200 tok/s</td><td>2x faster</td></tr>
+                    <tr><td>Memory (128K context)</td><td>OOM ❌</td><td>~48 GB ✅</td><td>Enables long context!</td></tr>
+                    <tr><td>Speed (128K context)</td><td>N/A (OOM)</td><td>50 tok/s</td><td>Makes it possible</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="paged-attention">PagedAttention (vLLM)</h2>
+
+            <p><strong>PagedAttention</strong> is what makes vLLM so fast for serving many users. It treats KV cache like virtual memory pages in an operating system.</p>
+
+            <h3>The Problem:</h3>
+            <p>Without PagedAttention, each request pre-allocates a full KV cache for the maximum sequence length, even if the response is short. This wastes 60-80% of GPU memory!</p>
+
+            <h3>The Solution:</h3>
+            <pre><code><span class="token-comment"># PagedAttention concept (how vLLM works internally)</span>
+<span class="token-comment"># Instead of: allocate 128K tokens of KV cache per request</span>
+<span class="token-comment"># PagedAttention: allocate in small "pages" (blocks of 16 tokens)</span>
+
+<span class="token-keyword">class</span> <span class="token-function">PagedKVCache</span>:
+    <span class="token-string">"""Simplified PagedAttention concept."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, block_size=<span class="token-number">16</span>, num_blocks=<span class="token-number">1000</span>):
+        self.block_size = block_size
+        <span class="token-comment"># Pool of memory blocks (like OS memory pages)</span>
+        self.block_pool = [torch.zeros(block_size, head_dim) <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> <span class="token-builtin">range</span>(num_blocks)]
+        self.free_blocks = <span class="token-builtin">list</span>(<span class="token-builtin">range</span>(num_blocks))
+        self.request_blocks = {}  <span class="token-comment"># request_id -> list of block indices</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">allocate</span>(self, request_id):
+        <span class="token-string">"""Allocate one new block for a request."""</span>
+        block_idx = self.free_blocks.pop()
+        <span class="token-keyword">if</span> request_id <span class="token-keyword">not in</span> self.request_blocks:
+            self.request_blocks[request_id] = []
+        self.request_blocks[request_id].append(block_idx)
+        <span class="token-keyword">return</span> block_idx
+    
+    <span class="token-keyword">def</span> <span class="token-function">free</span>(self, request_id):
+        <span class="token-string">"""Free all blocks when request completes."""</span>
+        blocks = self.request_blocks.pop(request_id)
+        self.free_blocks.extend(blocks)
+
+<span class="token-comment"># Benefits:</span>
+<span class="token-comment"># 1. No wasted memory (allocate only what's needed)</span>
+<span class="token-comment"># 2. Requests can share blocks (e.g., same system prompt)</span>
+<span class="token-comment"># 3. Can serve 2-4x more concurrent requests!</span></code></pre>
+
+            <h2 id="grouped-query">Grouped-Query Attention (GQA)</h2>
+
+            <p>Another optimization used in modern models (Llama 3, Mistral) to reduce KV cache size:</p>
+
+            <pre><code><span class="token-comment"># Multi-Head Attention (MHA) vs Grouped-Query Attention (GQA)</span>
+
+<span class="token-comment"># MHA: Each attention head has its own K and V</span>
+<span class="token-comment"># 32 heads → 32 K matrices + 32 V matrices in cache</span>
+
+<span class="token-comment"># GQA: Multiple heads SHARE K and V</span>
+<span class="token-comment"># 32 query heads, but only 8 KV heads (groups of 4 share KV)</span>
+<span class="token-comment"># Cache size: reduced by 4x!</span>
+
+<span class="token-comment"># Multi-Query Attention (MQA): Extreme version</span>
+<span class="token-comment"># 32 query heads, only 1 KV head (all share the same KV)</span>
+<span class="token-comment"># Cache size: reduced by 32x! (but slight quality loss)</span>
+
+<span class="token-comment"># Llama 3.1 uses GQA with 8 KV heads (32 query / 8 KV = 4:1 ratio)</span>
+<span class="token-builtin">print</span>(<span class="token-string">"GQA reduces KV cache by 4x in Llama 3.1"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">"This is why Llama 3 can handle 128K context!"</span>)</code></pre>
+
+            <div class="comparison-table">
+                <h3>Attention Variants Comparison:</h3>
+                <table>
+                    <thead><tr><th>Type</th><th>KV Heads</th><th>Cache Size</th><th>Quality</th><th>Used By</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>MHA</strong></td><td>Same as Q heads</td><td>Largest</td><td>Best</td><td>GPT-2, older models</td></tr>
+                        <tr><td><strong>GQA</strong></td><td>Fewer (grouped)</td><td>4-8x smaller</td><td>Near MHA</td><td>Llama 3, Mistral, Gemma</td></tr>
+                        <tr><td><strong>MQA</strong></td><td>1 KV head</td><td>Smallest</td><td>Slight loss</td><td>PaLM, Falcon</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Flash Attention 2 is mandatory</strong> — Every production system uses it. Without it, long contexts are impossible.</li>
+                    <li><strong>vLLM uses PagedAttention</strong> — Industry standard for serving. 2-4x more throughput than naive serving.</li>
+                    <li><strong>GQA is the standard architecture</strong> — All modern models (Llama 3, Mistral, Gemma 2) use GQA for efficient caching.</li>
+                    <li><strong>KV cache is THE bottleneck</strong> — For serving, memory is usually limited by KV cache, not model weights.</li>
+                    <li><strong>Prefix caching</strong> — vLLM and TGI cache common prefixes (system prompts) across requests to save memory.</li>
+                    <li><strong>Flash Attention 3</strong> — Coming for Hopper GPUs (H100). Even faster with FP8 support.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>KV Cache</strong> = stores computed Keys/Values so you don't recompute for every new token</li>
+                    <li><strong>Flash Attention</strong> = computes attention in tiles, 2-4x faster, enables long contexts</li>
+                    <li><strong>PagedAttention</strong> = allocates KV cache in pages (like OS memory), 2-4x more concurrent users</li>
+                    <li><strong>GQA</strong> = share KV heads across query heads, 4-8x smaller cache</li>
+                    <li>KV cache is the main memory bottleneck for serving at scale</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    Without KV Cache: "Read entire book for each new sentence" → Slow!<br>
+                    With KV Cache: "Keep running notes, add one line per token" → Fast!<br><br>
+                    Standard Attention: Load N×N matrix into slow memory → Memory hog<br>
+                    Flash Attention: Process in tiles, keep in fast SRAM → Memory efficient<br><br>
+                    Regular allocation: Reserve hotel room for a year, even if staying 1 night<br>
+                    PagedAttention: Book night-by-night, share rooms when empty
+                </div>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Ignoring KV cache in VRAM calculations</strong> — Model weights are only part of the memory. KV cache can be 2x the model size at long contexts!</li>
+                    <li><strong>Not enabling Flash Attention</strong> — If you're on an Ampere+ GPU and not using FA2, you're leaving free performance on the table.</li>
+                    <li><strong>Setting max_seq_len too high</strong> — Higher context = more KV cache memory. Set it to what you actually need.</li>
+                    <li><strong>Forgetting about concurrent users</strong> — Each user needs their own KV cache. 10 users = 10x the cache memory.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Measure the Impact</h4>
+                <ol>
+                    <li>Load a model with <code>attn_implementation="sdpa"</code> vs <code>"eager"</code>. Compare generation speed.</li>
+                    <li>Calculate KV cache size for your model: 2 × layers × seq_len × kv_heads × head_dim × 2 bytes</li>
+                    <li>Try generating text with context lengths 512, 2048, 8192 — observe speed differences</li>
+                    <li>Check <code>nvidia-smi</code> memory usage with different context lengths</li>
+                    <li>Install and test vLLM: <code>pip install vllm</code> — observe how it handles multiple requests efficiently</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="15-checkpoints-merging.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Checkpoints & Merging</span>
+                </a>
+                <a href="17-inference-optimization.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Inference Optimization</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

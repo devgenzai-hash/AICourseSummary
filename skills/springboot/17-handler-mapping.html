@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handler Mapping & Adapters - Spring Boot Mastery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🍃 Spring Boot Mastery</h2>
+            <div class="subtitle">Deep Internals • 72 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Web Layer (Spring MVC)</li>
+            <li><a href="16-dispatcher-servlet.html"><span class="nav-number">16</span> DispatcherServlet Internals</a></li>
+            <li><a href="17-handler-mapping.html" class="active"><span class="nav-number">17</span> Handler Mapping & Adapters</a></li>
+            <li><a href="18-request-lifecycle.html"><span class="nav-number">18</span> Request Lifecycle</a></li>
+            <li><a href="19-content-negotiation.html"><span class="nav-number">19</span> Content Negotiation</a></li>
+            <li><a href="20-exception-handling.html"><span class="nav-number">20</span> Exception Handling</a></li>
+            <li><a href="21-validation.html"><span class="nav-number">21</span> Validation Framework</a></li>
+            <li><a href="22-filters-interceptors.html"><span class="nav-number">22</span> Filters vs Interceptors</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/72 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="breadcrumb">Web Layer (Spring MVC) → Handler Mapping & Adapters</div>
+        <div class="topic-number">Topic 17 of 72</div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <h1>Handler Mapping & Adapters</h1>
+            <p class="subtitle-description">How Spring matches an incoming URL to the right controller method — the mapping registry, path matching algorithms, and the adapter pattern that invokes handlers.</p>
+
+            <div class="tags">
+                <span class="tag tag-intermediate">intermediate</span>
+                <span class="tag tag-spring">spring</span>
+                <span class="tag tag-internal">internal</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- ANALOGY BOX -->
+            <!-- ============================================ -->
+            <div class="analogy-box">
+                <div class="analogy-title">📞 The Call Center Routing Analogy</div>
+                <p>HandlerMapping is like the automated phone menu at a call center. When you dial in, the system matches your input ("Press 1 for billing, 2 for support") to the right department — that's the mapping. HandlerAdapter is the headset interface — it doesn't matter if the agent uses a desktop phone, mobile, or VoIP; the adapter normalizes how the call is connected. The call center (DispatcherServlet) doesn't need to know the internal workings of each department — it just needs the phone menu to route and the adapter to connect.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 1: HandlerMapping Interface -->
+            <!-- ============================================ -->
+            <h2>1. HandlerMapping Interface</h2>
+
+            <pre><code><span class="token-comment">// ═══ The core contract ═══</span>
+<span class="token-keyword">public interface</span> <span class="token-class">HandlerMapping</span> {
+
+    <span class="token-comment">/**
+     * Return a HandlerExecutionChain for this request,
+     * or null if no match found.
+     */</span>
+    <span class="token-annotation">@Nullable</span>
+    <span class="token-type">HandlerExecutionChain</span> <span class="token-function">getHandler</span>(<span class="token-type">HttpServletRequest</span> request)
+        <span class="token-keyword">throws</span> <span class="token-type">Exception</span>;
+}
+
+<span class="token-comment">// DispatcherServlet iterates ALL registered HandlerMappings in order:</span>
+<span class="token-keyword">for</span> (<span class="token-type">HandlerMapping</span> mapping : <span class="token-keyword">this</span>.handlerMappings) {
+    <span class="token-type">HandlerExecutionChain</span> handler = mapping.<span class="token-function">getHandler</span>(request);
+    <span class="token-keyword">if</span> (handler != <span class="token-keyword">null</span>) <span class="token-keyword">return</span> handler; <span class="token-comment">// First match wins!</span>
+}</code></pre>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>HandlerMapping Implementation</th>
+                        <th>What It Maps</th>
+                        <th>Priority (Order)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>RequestMappingHandlerMapping</code></td>
+                        <td>@RequestMapping / @GetMapping / @PostMapping methods</td>
+                        <td>0 (highest)</td>
+                    </tr>
+                    <tr>
+                        <td><code>WelcomePageHandlerMapping</code></td>
+                        <td>Maps "/" to index.html</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td><code>BeanNameUrlHandlerMapping</code></td>
+                        <td>Bean names starting with "/" (legacy)</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td><code>RouterFunctionMapping</code></td>
+                        <td>Functional endpoints (RouterFunction)</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td><code>SimpleUrlHandlerMapping</code></td>
+                        <td>Static resources (/static/**, /public/**)</td>
+                        <td>Ordered.LOWEST_PRECEDENCE - 1</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 2: RequestMappingHandlerMapping -->
+            <!-- ============================================ -->
+            <h2>2. RequestMappingHandlerMapping: The Primary Mapper</h2>
+
+            <pre><code><span class="token-comment">// ═══ At startup: scans all @Controller beans ═══</span>
+<span class="token-comment">// RequestMappingHandlerMapping implements InitializingBean</span>
+<span class="token-comment">// afterPropertiesSet() → initHandlerMethods()</span>
+
+<span class="token-keyword">protected void</span> <span class="token-function">initHandlerMethods</span>() {
+    <span class="token-comment">// Get ALL beans from the ApplicationContext</span>
+    <span class="token-keyword">for</span> (<span class="token-type">String</span> beanName : <span class="token-function">getCandidateBeanNames</span>()) {
+        <span class="token-type">Class</span>&lt;?&gt; beanType = <span class="token-function">obtainApplicationContext</span>()
+            .<span class="token-function">getType</span>(beanName);
+
+        <span class="token-comment">// Check if bean has @Controller or @RequestMapping at class level</span>
+        <span class="token-keyword">if</span> (<span class="token-function">isHandler</span>(beanType)) {
+            <span class="token-function">detectHandlerMethods</span>(beanName);
+        }
+    }
+}
+
+<span class="token-comment">// isHandler() checks for:</span>
+<span class="token-keyword">protected boolean</span> <span class="token-function">isHandler</span>(<span class="token-type">Class</span>&lt;?&gt; beanType) {
+    <span class="token-keyword">return</span> <span class="token-type">AnnotatedElementUtils</span>.<span class="token-function">hasAnnotation</span>(beanType, <span class="token-type">Controller</span>.<span class="token-keyword">class</span>) ||
+           <span class="token-type">AnnotatedElementUtils</span>.<span class="token-function">hasAnnotation</span>(beanType, <span class="token-type">RequestMapping</span>.<span class="token-keyword">class</span>);
+}
+
+<span class="token-comment">// For each handler method, builds a RequestMappingInfo:</span>
+<span class="token-keyword">protected void</span> <span class="token-function">detectHandlerMethods</span>(<span class="token-type">Object</span> handler) {
+    <span class="token-type">Class</span>&lt;?&gt; handlerType = (handler <span class="token-keyword">instanceof</span> <span class="token-type">String</span> beanName)
+        ? <span class="token-function">obtainApplicationContext</span>().<span class="token-function">getType</span>(beanName) : handler.<span class="token-function">getClass</span>();
+
+    <span class="token-type">Map</span>&lt;<span class="token-type">Method</span>, <span class="token-type">RequestMappingInfo</span>&gt; methods =
+        <span class="token-type">MethodIntrospector</span>.<span class="token-function">selectMethods</span>(handlerType,
+            (<span class="token-type">Method</span> method) -> <span class="token-function">getMappingForMethod</span>(method, handlerType));
+
+    methods.<span class="token-function">forEach</span>((method, mapping) -> {
+        <span class="token-function">registerHandlerMethod</span>(handler, method, mapping);
+        <span class="token-comment">// Stored in MappingRegistry as: RequestMappingInfo → HandlerMethod</span>
+    });
+}</code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 The MappingRegistry</div>
+                <p>All mappings are stored in an internal <code>MappingRegistry</code> — a thread-safe data structure that maps <code>RequestMappingInfo</code> objects to <code>HandlerMethod</code> instances. At runtime, matching is a lookup operation, not a scan. You can see all registered mappings at <code>/actuator/mappings</code> endpoint.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 3: RequestMappingInfo -->
+            <!-- ============================================ -->
+            <h2>3. RequestMappingInfo: All Conditions Must Match</h2>
+
+            <pre><code><span class="token-comment">// ═══ RequestMappingInfo combines multiple conditions ═══</span>
+<span class="token-comment">// ALL conditions must match for a request to map to this handler</span>
+
+<span class="token-annotation">@RequestMapping</span>(
+    path = <span class="token-string">"/api/users/{id}"</span>,        <span class="token-comment">// PatternsRequestCondition</span>
+    method = <span class="token-type">RequestMethod</span>.GET,       <span class="token-comment">// RequestMethodsRequestCondition</span>
+    params = <span class="token-string">"version=2"</span>,             <span class="token-comment">// ParamsRequestCondition</span>
+    headers = <span class="token-string">"X-API-VERSION=2"</span>,      <span class="token-comment">// HeadersRequestCondition</span>
+    consumes = <span class="token-string">"application/json"</span>,    <span class="token-comment">// ConsumesRequestCondition</span>
+    produces = <span class="token-string">"application/json"</span>     <span class="token-comment">// ProducesRequestCondition</span>
+)
+<span class="token-keyword">public</span> <span class="token-type">User</span> <span class="token-function">getUser</span>(<span class="token-annotation">@PathVariable</span> <span class="token-type">Long</span> id) { ... }
+
+<span class="token-comment">// ═══ RequestMappingInfo matching algorithm ═══</span>
+<span class="token-keyword">public</span> <span class="token-type">RequestMappingInfo</span> <span class="token-function">getMatchingCondition</span>(<span class="token-type">HttpServletRequest</span> request) {
+    <span class="token-type">RequestMethodsRequestCondition</span> methods =
+        <span class="token-keyword">this</span>.methodsCondition.<span class="token-function">getMatchingCondition</span>(request);
+    <span class="token-keyword">if</span> (methods == <span class="token-keyword">null</span>) <span class="token-keyword">return null</span>;  <span class="token-comment">// Method doesn't match → skip</span>
+
+    <span class="token-type">ParamsRequestCondition</span> params =
+        <span class="token-keyword">this</span>.paramsCondition.<span class="token-function">getMatchingCondition</span>(request);
+    <span class="token-keyword">if</span> (params == <span class="token-keyword">null</span>) <span class="token-keyword">return null</span>;  <span class="token-comment">// Params don't match → skip</span>
+
+    <span class="token-type">HeadersRequestCondition</span> headers =
+        <span class="token-keyword">this</span>.headersCondition.<span class="token-function">getMatchingCondition</span>(request);
+    <span class="token-keyword">if</span> (headers == <span class="token-keyword">null</span>) <span class="token-keyword">return null</span>;
+
+    <span class="token-type">ConsumesRequestCondition</span> consumes =
+        <span class="token-keyword">this</span>.consumesCondition.<span class="token-function">getMatchingCondition</span>(request);
+    <span class="token-keyword">if</span> (consumes == <span class="token-keyword">null</span>) <span class="token-keyword">return null</span>;
+
+    <span class="token-type">ProducesRequestCondition</span> produces =
+        <span class="token-keyword">this</span>.producesCondition.<span class="token-function">getMatchingCondition</span>(request);
+    <span class="token-keyword">if</span> (produces == <span class="token-keyword">null</span>) <span class="token-keyword">return null</span>;
+
+    <span class="token-type">PatternsRequestCondition</span> patterns =
+        <span class="token-keyword">this</span>.patternsCondition.<span class="token-function">getMatchingCondition</span>(request);
+    <span class="token-keyword">if</span> (patterns == <span class="token-keyword">null</span>) <span class="token-keyword">return null</span>;
+
+    <span class="token-comment">// ALL conditions passed → return matching info</span>
+    <span class="token-keyword">return new</span> <span class="token-type">RequestMappingInfo</span>(patterns, methods, params,
+        headers, consumes, produces, <span class="token-keyword">this</span>.customCondition);
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 4: Path Matching -->
+            <!-- ============================================ -->
+            <h2>4. Path Matching: AntPathMatcher vs PathPatternParser</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>AntPathMatcher (Legacy)</th>
+                        <th>PathPatternParser (Boot 3.x Default)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Algorithm</td>
+                        <td>String-based regex matching at runtime</td>
+                        <td>Pre-compiled pattern tree, segment-by-segment</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>Slower — pattern compiled on each request</td>
+                        <td>6-8x faster — compiled once at startup</td>
+                    </tr>
+                    <tr>
+                        <td>Wildcard patterns</td>
+                        <td><code>?</code> <code>*</code> <code>**</code></td>
+                        <td><code>?</code> <code>*</code> <code>**</code> <code>{*pathVariable}</code></td>
+                    </tr>
+                    <tr>
+                        <td>Suffix matching</td>
+                        <td>Supported (/users.json)</td>
+                        <td>Not supported (security risk)</td>
+                    </tr>
+                    <tr>
+                        <td>Trailing slash</td>
+                        <td>Matches with or without /</td>
+                        <td>Strict — /users ≠ /users/ by default</td>
+                    </tr>
+                    <tr>
+                        <td>Capture groups</td>
+                        <td><code>{name:regex}</code></td>
+                        <td><code>{name:regex}</code> + <code>{*rest}</code> for tail capture</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><code><span class="token-comment">// ═══ Pattern examples ═══</span>
+
+<span class="token-comment">// Basic path variable</span>
+<span class="token-annotation">@GetMapping</span>(<span class="token-string">"/users/{id}"</span>)       <span class="token-comment">// matches /users/42</span>
+
+<span class="token-comment">// Regex constraint on path variable</span>
+<span class="token-annotation">@GetMapping</span>(<span class="token-string">"/users/{id:\\d+}"</span>)  <span class="token-comment">// matches /users/42, NOT /users/abc</span>
+
+<span class="token-comment">// Single wildcard (one path segment)</span>
+<span class="token-annotation">@GetMapping</span>(<span class="token-string">"/users/*/orders"</span>)  <span class="token-comment">// matches /users/john/orders</span>
+
+<span class="token-comment">// Double wildcard (zero or more segments) — AntPathMatcher</span>
+<span class="token-annotation">@GetMapping</span>(<span class="token-string">"/api/**"</span>)           <span class="token-comment">// matches /api/anything/deep/nested</span>
+
+<span class="token-comment">// Tail capture (PathPatternParser) — captures rest of path</span>
+<span class="token-annotation">@GetMapping</span>(<span class="token-string">"/files/{*path}"</span>)    <span class="token-comment">// matches /files/a/b/c.txt → path="a/b/c.txt"</span>
+
+<span class="token-comment">// ═══ Switching to AntPathMatcher (if needed) ═══</span>
+<span class="token-comment">// application.properties:</span>
+<span class="token-comment">// spring.mvc.pathmatch.matching-strategy=ant_path_matcher</span></code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Boot 3.x Breaking Change</div>
+                <p>PathPatternParser does NOT support suffix pattern matching (e.g., <code>/users.json</code>) or trailing slash matching by default. If your API relied on these, you must either switch back to <code>ant_path_matcher</code> strategy or explicitly add route declarations. Suffix matching was removed because it caused security vulnerabilities (path traversal via <code>/api/users.json..%2F..%2Fetc/passwd</code>).</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- SECTION 5: HandlerAdapter -->
+            <!-- ============================================ -->
+            <h2>5. HandlerAdapter: The Adapter Pattern</h2>
+
+            <pre><code><span class="token-comment">// ═══ HandlerAdapter interface ═══</span>
+<span class="token-keyword">public interface</span> <span class="token-class">HandlerAdapter</span> {
+
+    <span class="token-comment">// Can this adapter handle this type of handler?</span>
+    <span class="token-keyword">boolean</span> <span class="token-function">supports</span>(<span class="token-type">Object</span> handler);
+
+    <span class="token-comment">// Invoke the handler and return ModelAndView</span>
+    <span class="token-annotation">@Nullable</span>
+    <span class="token-type">ModelAndView</span> <span class="token-function">handle</span>(<span class="token-type">HttpServletRequest</span> request,
+                        <span class="token-type">HttpServletResponse</span> response,
+                        <span class="token-type">Object</span> handler) <span class="token-keyword">throws</span> <span class="token-type">Exception</span>;
+}
+
+<span class="token-comment">// ═══ Why the adapter pattern? ═══</span>
+<span class="token-comment">// Handlers can be MANY different types:</span>
+<span class="token-comment">//   - HandlerMethod (annotated @RequestMapping methods)</span>
+<span class="token-comment">//   - Controller interface (legacy)</span>
+<span class="token-comment">//   - HttpRequestHandler (simple servlet-like)</span>
+<span class="token-comment">//   - RouterFunction (functional endpoints)</span>
+<span class="token-comment">// The adapter normalizes invocation to a single interface.</span>
+
+<span class="token-comment">// DispatcherServlet finds the right adapter:</span>
+<span class="token-keyword">protected</span> <span class="token-type">HandlerAdapter</span> <span class="token-function">getHandlerAdapter</span>(<span class="token-type">Object</span> handler) {
+    <span class="token-keyword">for</span> (<span class="token-type">HandlerAdapter</span> adapter : <span class="token-keyword">this</span>.handlerAdapters) {
+        <span class="token-keyword">if</span> (adapter.<span class="token-function">supports</span>(handler)) {
+            <span class="token-keyword">return</span> adapter;
+        }
+    }
+    <span class="token-keyword">throw new</span> <span class="token-type">ServletException</span>(<span class="token-string">"No adapter for handler"</span>);
+}</code></pre>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>HandlerAdapter</th>
+                        <th>Handles</th>
+                        <th>How It Invokes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>RequestMappingHandlerAdapter</code></td>
+                        <td>HandlerMethod (@RequestMapping methods)</td>
+                        <td>Resolves arguments, invokes via reflection, processes return value</td>
+                    </tr>
+                    <tr>
+                        <td><code>HandlerFunctionAdapter</code></td>
+                        <td>RouterFunction handlers</td>
+                        <td>Calls HandlerFunction.handle(ServerRequest)</td>
+                    </tr>
+                    <tr>
+                        <td><code>HttpRequestHandlerAdapter</code></td>
+                        <td>HttpRequestHandler (resource serving)</td>
+                        <td>Calls handleRequest(request, response)</td>
+                    </tr>
+                    <tr>
+                        <td><code>SimpleControllerHandlerAdapter</code></td>
+                        <td>Controller interface (legacy)</td>
+                        <td>Calls handleRequest(request, response)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ============================================ -->
+            <!-- SECTION 6: Argument Resolvers -->
+            <!-- ============================================ -->
+            <h2>6. HandlerMethodArgumentResolver: Populating Method Parameters</h2>
+
+            <pre><code><span class="token-comment">// ═══ How RequestMappingHandlerAdapter resolves method arguments ═══</span>
+<span class="token-comment">// Each annotation/type has a dedicated resolver:</span>
+
+<span class="token-keyword">public interface</span> <span class="token-class">HandlerMethodArgumentResolver</span> {
+    <span class="token-keyword">boolean</span> <span class="token-function">supportsParameter</span>(<span class="token-type">MethodParameter</span> parameter);
+    <span class="token-type">Object</span> <span class="token-function">resolveArgument</span>(<span class="token-type">MethodParameter</span> parameter,
+                           <span class="token-type">ModelAndViewContainer</span> mavContainer,
+                           <span class="token-type">NativeWebRequest</span> webRequest,
+                           <span class="token-type">WebDataBinderFactory</span> binderFactory);
+}
+
+<span class="token-comment">// ═══ Built-in resolvers (26+ registered by default) ═══</span>
+<span class="token-annotation">@GetMapping</span>(<span class="token-string">"/users/{id}"</span>)
+<span class="token-keyword">public</span> <span class="token-type">ResponseEntity</span>&lt;<span class="token-type">User</span>&gt; <span class="token-function">getUser</span>(
+    <span class="token-annotation">@PathVariable</span> <span class="token-type">Long</span> id,                <span class="token-comment">// PathVariableMethodArgumentResolver</span>
+    <span class="token-annotation">@RequestParam</span> <span class="token-type">String</span> fields,          <span class="token-comment">// RequestParamMethodArgumentResolver</span>
+    <span class="token-annotation">@RequestHeader</span>(<span class="token-string">"X-Tenant"</span>) <span class="token-type">String</span> tenant, <span class="token-comment">// RequestHeaderMethodArgumentResolver</span>
+    <span class="token-annotation">@CookieValue</span> <span class="token-type">String</span> session,          <span class="token-comment">// ServletCookieValueMethodArgumentResolver</span>
+    <span class="token-type">HttpServletRequest</span> request,           <span class="token-comment">// ServletRequestMethodArgumentResolver</span>
+    <span class="token-type">Principal</span> principal                   <span class="token-comment">// PrincipalMethodArgumentResolver</span>
+) { ... }
+
+<span class="token-annotation">@PostMapping</span>(<span class="token-string">"/users"</span>)
+<span class="token-keyword">public</span> <span class="token-type">User</span> <span class="token-function">createUser</span>(
+    <span class="token-annotation">@RequestBody</span> <span class="token-type">UserDto</span> dto,             <span class="token-comment">// RequestResponseBodyMethodProcessor</span>
+    <span class="token-annotation">@Valid</span> <span class="token-annotation">@ModelAttribute</span> <span class="token-type">UserForm</span> form  <span class="token-comment">// ModelAttributeMethodProcessor</span>
+) { ... }</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 7: Custom Argument Resolver -->
+            <!-- ============================================ -->
+            <h2>7. Custom HandlerMethodArgumentResolver</h2>
+
+            <pre><code><span class="token-comment">// ═══ Example: Resolve the current authenticated tenant ═══</span>
+
+<span class="token-comment">// Step 1: Create a custom annotation</span>
+<span class="token-annotation">@Target</span>(<span class="token-type">ElementType</span>.PARAMETER)
+<span class="token-annotation">@Retention</span>(<span class="token-type">RetentionPolicy</span>.RUNTIME)
+<span class="token-keyword">public @interface</span> <span class="token-class">CurrentTenant</span> {}
+
+<span class="token-comment">// Step 2: Implement the resolver</span>
+<span class="token-keyword">public class</span> <span class="token-class">CurrentTenantArgumentResolver</span>
+        <span class="token-keyword">implements</span> <span class="token-type">HandlerMethodArgumentResolver</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public boolean</span> <span class="token-function">supportsParameter</span>(<span class="token-type">MethodParameter</span> parameter) {
+        <span class="token-keyword">return</span> parameter.<span class="token-function">hasParameterAnnotation</span>(<span class="token-type">CurrentTenant</span>.<span class="token-keyword">class</span>);
+    }
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public</span> <span class="token-type">Object</span> <span class="token-function">resolveArgument</span>(
+            <span class="token-type">MethodParameter</span> parameter,
+            <span class="token-type">ModelAndViewContainer</span> mavContainer,
+            <span class="token-type">NativeWebRequest</span> webRequest,
+            <span class="token-type">WebDataBinderFactory</span> binderFactory) {
+
+        <span class="token-type">HttpServletRequest</span> request =
+            webRequest.<span class="token-function">getNativeRequest</span>(<span class="token-type">HttpServletRequest</span>.<span class="token-keyword">class</span>);
+        <span class="token-type">String</span> tenantId = request.<span class="token-function">getHeader</span>(<span class="token-string">"X-Tenant-ID"</span>);
+
+        <span class="token-keyword">if</span> (tenantId == <span class="token-keyword">null</span>) {
+            <span class="token-keyword">throw new</span> <span class="token-type">MissingTenantException</span>(<span class="token-string">"X-Tenant-ID header required"</span>);
+        }
+        <span class="token-keyword">return</span> tenantService.<span class="token-function">resolve</span>(tenantId);
+    }
+}
+
+<span class="token-comment">// Step 3: Register it</span>
+<span class="token-annotation">@Configuration</span>
+<span class="token-keyword">public class</span> <span class="token-class">WebConfig</span> <span class="token-keyword">implements</span> <span class="token-type">WebMvcConfigurer</span> {
+
+    <span class="token-annotation">@Override</span>
+    <span class="token-keyword">public void</span> <span class="token-function">addArgumentResolvers</span>(
+            <span class="token-type">List</span>&lt;<span class="token-type">HandlerMethodArgumentResolver</span>&gt; resolvers) {
+        resolvers.<span class="token-function">add</span>(<span class="token-keyword">new</span> <span class="token-type">CurrentTenantArgumentResolver</span>());
+    }
+}
+
+<span class="token-comment">// Step 4: Use it in controllers — clean and reusable</span>
+<span class="token-annotation">@GetMapping</span>(<span class="token-string">"/data"</span>)
+<span class="token-keyword">public</span> <span class="token-type">List</span>&lt;<span class="token-type">Data</span>&gt; <span class="token-function">getData</span>(<span class="token-annotation">@CurrentTenant</span> <span class="token-type">Tenant</span> tenant) {
+    <span class="token-keyword">return</span> dataService.<span class="token-function">findByTenant</span>(tenant);
+}</code></pre>
+
+            <!-- ============================================ -->
+            <!-- SECTION 8: Return Value Handlers -->
+            <!-- ============================================ -->
+            <h2>8. HandlerMethodReturnValueHandler: Processing Results</h2>
+
+            <pre><code><span class="token-comment">// ═══ After handler method executes, return value is processed ═══</span>
+<span class="token-keyword">public interface</span> <span class="token-class">HandlerMethodReturnValueHandler</span> {
+    <span class="token-keyword">boolean</span> <span class="token-function">supportsReturnType</span>(<span class="token-type">MethodParameter</span> returnType);
+    <span class="token-keyword">void</span> <span class="token-function">handleReturnValue</span>(<span class="token-type">Object</span> returnValue,
+                           <span class="token-type">MethodParameter</span> returnType,
+                           <span class="token-type">ModelAndViewContainer</span> mavContainer,
+                           <span class="token-type">NativeWebRequest</span> webRequest);
+}
+
+<span class="token-comment">// Common return value handlers:</span>
+<span class="token-comment">// ─────────────────────────────────────────────────────────</span>
+<span class="token-comment">// Return Type              → Handler</span>
+<span class="token-comment">// ─────────────────────────────────────────────────────────</span>
+<span class="token-comment">// @ResponseBody Object     → RequestResponseBodyMethodProcessor</span>
+<span class="token-comment">//                            (uses HttpMessageConverter → JSON)</span>
+<span class="token-comment">// ResponseEntity&lt;T&gt;       → HttpEntityMethodProcessor</span>
+<span class="token-comment">// String (view name)       → ViewNameMethodReturnValueHandler</span>
+<span class="token-comment">// ModelAndView             → ModelAndViewMethodReturnValueHandler</span>
+<span class="token-comment">// void                     → (response already written or 204)</span>
+<span class="token-comment">// DeferredResult&lt;T&gt;       → DeferredResultMethodReturnValueHandler</span>
+<span class="token-comment">// CompletableFuture&lt;T&gt;    → (handled as DeferredResult)</span></code></pre>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🔍 @ResponseBody Short-Circuit</div>
+                <p>When a handler method is annotated with <code>@ResponseBody</code> (or the class with <code>@RestController</code>), the <code>RequestResponseBodyMethodProcessor</code> writes directly to the response via <code>HttpMessageConverter</code> and sets <code>mavContainer.setRequestHandled(true)</code>. This tells DispatcherServlet to skip view resolution entirely — no ViewResolver is consulted.</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- UNDERSTANDING SECTION -->
+            <!-- ============================================ -->
+            <div class="understanding-section">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>HandlerMapping.getHandler()</strong> returns a HandlerExecutionChain (handler + interceptors) — first non-null result wins</li>
+                    <li><strong>RequestMappingHandlerMapping</strong> scans @Controller beans at startup, builds a registry of RequestMappingInfo → HandlerMethod</li>
+                    <li><strong>RequestMappingInfo</strong> combines 6 conditions (path, method, params, headers, consumes, produces) — ALL must match</li>
+                    <li><strong>PathPatternParser (Boot 3.x default)</strong> is 6-8x faster than AntPathMatcher — pre-compiled at startup, no suffix matching</li>
+                    <li><strong>HandlerAdapter</strong> decouples DispatcherServlet from handler types — adapter pattern allows different handler styles (annotated, functional, legacy)</li>
+                    <li><strong>ArgumentResolvers</strong> turn HTTP request data into method parameters — 26+ built-in, extensible via WebMvcConfigurer</li>
+                    <li><strong>ReturnValueHandlers</strong> process method return values — @ResponseBody bypasses view resolution entirely</li>
+                </ul>
+
+                <h3>🏋️ Mastery Check</h3>
+                <ol>
+                    <li>Two @GetMapping methods match the same URL but one has <code>params="version=1"</code>. How does Spring choose between them?</li>
+                    <li>Why does Spring Boot 3.x use PathPatternParser by default? What security issue did suffix matching cause?</li>
+                    <li>Explain the adapter pattern benefit: why doesn't HandlerMapping just return a directly-invokable object?</li>
+                    <li>You need to inject the current user's subscription plan into every controller method. Design a custom argument resolver.</li>
+                    <li>What happens if two HandlerMappings both return a match for the same request? Who wins and why?</li>
+                </ol>
+
+                <h3>💼 Interview Challenge</h3>
+                <p><em>"A developer adds @GetMapping('/users/{name}') and @GetMapping('/users/{id}') on different methods. What happens? How would you fix it?"</em></p>
+                <p><strong>Expert answer framework:</strong></p>
+                <ol>
+                    <li><strong>Ambiguous mapping error at startup:</strong> Both patterns are identical from a path-matching perspective — {name} and {id} are both single-segment wildcards. Spring cannot distinguish them.</li>
+                    <li><strong>Fix option 1:</strong> Use regex constraints: <code>/users/{id:\\d+}</code> vs <code>/users/{name:[a-zA-Z]+}</code> — now they're distinct patterns.</li>
+                    <li><strong>Fix option 2:</strong> Different path structure: <code>/users/by-id/{id}</code> vs <code>/users/by-name/{name}</code>.</li>
+                    <li><strong>Fix option 3:</strong> Single handler that inspects the variable: parse as Long, if it fails treat as name lookup.</li>
+                    <li><strong>Root cause understanding:</strong> Path variables are just "match one segment" — the variable name is irrelevant for matching. Only the pattern structure and constraints matter.</li>
+                </ol>
+
+                <h3>🔗 Connections</h3>
+                <ul>
+                    <li><strong>Topic 16 (DispatcherServlet)</strong> — getHandler() and getHandlerAdapter() are steps in doDispatch()</li>
+                    <li><strong>Topic 19 (Content Negotiation)</strong> — consumes/produces conditions in RequestMappingInfo feed into content negotiation</li>
+                    <li><strong>Topic 22 (Filters vs Interceptors)</strong> — Interceptors are part of HandlerExecutionChain returned by HandlerMapping</li>
+                </ul>
+            </div>
+
+            <div class="nav-footer">
+                <a href="16-dispatcher-servlet.html" class="nav-btn nav-btn-prev">← DispatcherServlet Internals</a>
+                <a href="18-request-lifecycle.html" class="nav-btn nav-btn-next">Request Lifecycle →</a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

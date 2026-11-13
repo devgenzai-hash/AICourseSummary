@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embeddings — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 1</a> <span>›</span> Embeddings</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Embeddings</h1>
+                <p>Embeddings are how AI understands meaning. They convert words, sentences, and documents into lists of numbers where similar things are close together. This is the foundation of search, RAG, and recommendation systems.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Embeddings are like GPS coordinates for meaning.</strong></p>
+                <p>Imagine a magical map where every word has a location. "King" and "Queen" are close together (both royalty). "Dog" and "Cat" are close (both pets). "Dog" and "Algebra" are far apart (unrelated). An embedding is essentially a GPS coordinate — but instead of 2 dimensions (latitude, longitude), it uses 768 or 1536 dimensions to capture every nuance of meaning.</p>
+            </div>
+
+            <h2 id="what-are-embeddings">What Are Embeddings?</h2>
+
+            <p>An <strong>embedding</strong> is a list of numbers (a vector) that represents the meaning of a piece of text. For example:</p>
+
+            <pre><code><span class="token-comment"># These aren't real values, but show the concept</span>
+<span class="token-string">"cat"</span>   → [<span class="token-number">0.2</span>, <span class="token-number">0.8</span>, <span class="token-number">-0.1</span>, <span class="token-number">0.5</span>, ...]  <span class="token-comment"># 1536 numbers</span>
+<span class="token-string">"dog"</span>   → [<span class="token-number">0.3</span>, <span class="token-number">0.7</span>, <span class="token-number">-0.2</span>, <span class="token-number">0.4</span>, ...]  <span class="token-comment"># very similar to "cat"!</span>
+<span class="token-string">"car"</span>   → [<span class="token-number">-0.5</span>, <span class="token-number">0.1</span>, <span class="token-number">0.9</span>, <span class="token-number">-0.3</span>, ...]  <span class="token-comment"># very different from "cat"</span></code></pre>
+
+            <p>The key property: <strong>similar meanings = similar numbers</strong>. We measure similarity using <strong>cosine similarity</strong> (a math formula that gives a score from -1 to 1, where 1 = identical meaning).</p>
+
+            <h3>Why Embeddings Matter:</h3>
+            <table>
+                <thead><tr><th>Use Case</th><th>How Embeddings Help</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Semantic Search</strong></td><td>Find documents by meaning, not just keywords</td></tr>
+                    <tr><td><strong>RAG</strong></td><td>Retrieve relevant context for AI to use</td></tr>
+                    <tr><td><strong>Recommendations</strong></td><td>"Users who liked X also liked Y" (similar embeddings)</td></tr>
+                    <tr><td><strong>Clustering</strong></td><td>Group similar documents/topics automatically</td></tr>
+                    <tr><td><strong>Deduplication</strong></td><td>Find near-duplicate content even if worded differently</td></tr>
+                    <tr><td><strong>Classification</strong></td><td>Categorize text by comparing to category embeddings</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="how-they-work">How Embeddings Work</h2>
+
+            <p>An embedding model is a neural network trained specifically to compress text meaning into a fixed-size vector. The training process:</p>
+
+            <ol>
+                <li><strong>Show similar text pairs:</strong> "The cat sat on the mat" ↔ "A feline rested on the rug"</li>
+                <li><strong>Train the model</strong> to give them similar vectors</li>
+                <li><strong>Show dissimilar pairs:</strong> "The cat sat on the mat" ↔ "Stock prices fell today"</li>
+                <li><strong>Train the model</strong> to give them different vectors</li>
+                <li><strong>After billions of examples,</strong> the model learns what "meaning" is</li>
+            </ol>
+
+            <h3>Popular Embedding Models:</h3>
+            <table>
+                <thead><tr><th>Model</th><th>Dimensions</th><th>Provider</th><th>Best For</th></tr></thead>
+                <tbody>
+                    <tr><td>text-embedding-3-large</td><td>3,072</td><td>OpenAI</td><td>Highest quality, production RAG</td></tr>
+                    <tr><td>text-embedding-3-small</td><td>1,536</td><td>OpenAI</td><td>Good quality, cheaper</td></tr>
+                    <tr><td>all-MiniLM-L6-v2</td><td>384</td><td>Sentence Transformers</td><td>Fast, free, local</td></tr>
+                    <tr><td>nomic-embed-text</td><td>768</td><td>Nomic AI</td><td>Open-source, great quality</td></tr>
+                    <tr><td>mxbai-embed-large</td><td>1,024</td><td>Mixedbread AI</td><td>Open-source, top quality</td></tr>
+                    <tr><td>Cohere embed-v3</td><td>1,024</td><td>Cohere</td><td>Multilingual, search-optimized</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="code">Production Code</h2>
+
+            <h3>OpenAI Embeddings (Industry Standard for Production)</h3>
+            <pre><code><span class="token-comment"># pip install openai numpy</span>
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+
+client = OpenAI()
+
+<span class="token-keyword">def</span> <span class="token-function">get_embedding</span>(text, model=<span class="token-string">"text-embedding-3-small"</span>):
+    <span class="token-string">"""Get embedding vector for a text string."""</span>
+    response = client.embeddings.create(
+        input=text,
+        model=model
+    )
+    <span class="token-keyword">return</span> response.data[<span class="token-number">0</span>].embedding
+
+<span class="token-keyword">def</span> <span class="token-function">cosine_similarity</span>(a, b):
+    <span class="token-string">"""Calculate similarity between two vectors (0 to 1)."""</span>
+    a, b = np.array(a), np.array(b)
+    <span class="token-keyword">return</span> np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+<span class="token-comment"># Compare sentences by meaning</span>
+sentences = [
+    <span class="token-string">"The cat sat on the mat"</span>,
+    <span class="token-string">"A feline rested on the rug"</span>,      <span class="token-comment"># Similar meaning!</span>
+    <span class="token-string">"Stock prices rose sharply today"</span>,  <span class="token-comment"># Different meaning</span>
+]
+
+embeddings = [get_embedding(s) <span class="token-keyword">for</span> s <span class="token-keyword">in</span> sentences]
+
+<span class="token-comment"># Compare similarities</span>
+<span class="token-builtin">print</span>(<span class="token-string">f"'cat/mat' vs 'feline/rug': {cosine_similarity(embeddings[0], embeddings[1]):.3f}"</span>)
+<span class="token-builtin">print</span>(<span class="token-string">f"'cat/mat' vs 'stocks':      {cosine_similarity(embeddings[0], embeddings[2]):.3f}"</span>)
+<span class="token-comment"># Output: ~0.85 (very similar) vs ~0.15 (very different)</span></code></pre>
+
+            <h3>Free Local Embeddings with Sentence Transformers</h3>
+            <pre><code><span class="token-comment"># pip install sentence-transformers</span>
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> SentenceTransformer
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+
+<span class="token-comment"># Load model (downloads ~90MB first time, then cached)</span>
+model = SentenceTransformer(<span class="token-string">"all-MiniLM-L6-v2"</span>)
+
+<span class="token-comment"># Embed multiple texts at once (much faster than one-by-one)</span>
+texts = [
+    <span class="token-string">"How to train a machine learning model"</span>,
+    <span class="token-string">"Steps for fine-tuning an AI system"</span>,
+    <span class="token-string">"Best Italian restaurants in New York"</span>,
+]
+
+embeddings = model.encode(texts)
+<span class="token-builtin">print</span>(<span class="token-string">f"Shape: {embeddings.shape}"</span>)  <span class="token-comment"># (3, 384) — 3 texts, 384 dimensions each</span>
+
+<span class="token-comment"># Semantic search: find most similar to a query</span>
+query = <span class="token-string">"How do I fine-tune an LLM?"</span>
+query_embedding = model.encode([query])
+
+<span class="token-comment"># Calculate similarities</span>
+similarities = np.dot(embeddings, query_embedding.T).flatten()
+<span class="token-keyword">for</span> text, score <span class="token-keyword">in</span> <span class="token-builtin">sorted</span>(<span class="token-builtin">zip</span>(texts, similarities), key=<span class="token-keyword">lambda</span> x: x[<span class="token-number">1</span>], reverse=<span class="token-keyword">True</span>):
+    <span class="token-builtin">print</span>(<span class="token-string">f"  {score:.3f} | {text}"</span>)
+<span class="token-comment"># "Steps for fine-tuning" will rank highest!</span></code></pre>
+
+            <h3>Production Semantic Search Engine</h3>
+            <pre><code><span class="token-comment"># A complete mini search engine using embeddings</span>
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> SentenceTransformer
+<span class="token-keyword">import</span> numpy <span class="token-keyword">as</span> np
+<span class="token-keyword">import</span> json
+
+<span class="token-keyword">class</span> <span class="token-class">SemanticSearchEngine</span>:
+    <span class="token-string">"""Simple but production-ready semantic search."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, model_name=<span class="token-string">"all-MiniLM-L6-v2"</span>):
+        self.model = SentenceTransformer(model_name)
+        self.documents = []
+        self.embeddings = <span class="token-keyword">None</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">add_documents</span>(self, docs: list[str]):
+        <span class="token-string">"""Index a list of documents."""</span>
+        self.documents.extend(docs)
+        <span class="token-comment"># Batch encode for speed</span>
+        self.embeddings = self.model.encode(
+            self.documents,
+            show_progress_bar=<span class="token-keyword">True</span>,
+            batch_size=<span class="token-number">32</span>,
+            normalize_embeddings=<span class="token-keyword">True</span>  <span class="token-comment"># For cosine similarity</span>
+        )
+
+    <span class="token-keyword">def</span> <span class="token-function">search</span>(self, query: str, top_k: int = <span class="token-number">5</span>) -> list[dict]:
+        <span class="token-string">"""Find top_k most relevant documents for a query."""</span>
+        query_emb = self.model.encode(
+            [query], normalize_embeddings=<span class="token-keyword">True</span>
+        )
+        <span class="token-comment"># Cosine similarity via dot product (embeddings are normalized)</span>
+        scores = np.dot(self.embeddings, query_emb.T).flatten()
+        top_indices = np.argsort(scores)[::-<span class="token-number">1</span>][:top_k]
+
+        results = []
+        <span class="token-keyword">for</span> idx <span class="token-keyword">in</span> top_indices:
+            results.append({
+                <span class="token-string">"document"</span>: self.documents[idx],
+                <span class="token-string">"score"</span>: <span class="token-builtin">float</span>(scores[idx]),
+                <span class="token-string">"index"</span>: <span class="token-builtin">int</span>(idx)
+            })
+        <span class="token-keyword">return</span> results
+
+<span class="token-comment"># Usage</span>
+engine = SemanticSearchEngine()
+engine.add_documents([
+    <span class="token-string">"Python is a programming language used for AI"</span>,
+    <span class="token-string">"JavaScript runs in web browsers"</span>,
+    <span class="token-string">"Fine-tuning adapts a pretrained model to new tasks"</span>,
+    <span class="token-string">"Docker containers package applications"</span>,
+    <span class="token-string">"Neural networks learn patterns from data"</span>,
+])
+
+results = engine.search(<span class="token-string">"How do I customize an AI model?"</span>)
+<span class="token-keyword">for</span> r <span class="token-keyword">in</span> results:
+    <span class="token-builtin">print</span>(<span class="token-string">f"  {r['score']:.3f} | {r['document']}"</span>)</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>OpenAI embeddings</strong> — Most companies start here for simplicity and quality ($0.02 per 1M tokens)</li>
+                    <li><strong>Normalize embeddings</strong> — Always normalize for cosine similarity; dot product on normalized vectors = cosine similarity</li>
+                    <li><strong>Batch processing</strong> — Never embed one document at a time in production; batch for 10-100x speedup</li>
+                    <li><strong>Vector databases</strong> — For >10K documents, use ChromaDB/Pinecone/Qdrant instead of numpy (covered in Chapter 23)</li>
+                    <li><strong>Embedding dimension tradeoff</strong> — Higher dimensions = better quality but more storage/compute cost</li>
+                    <li><strong>Cache embeddings</strong> — Store computed embeddings; never re-embed the same text twice</li>
+                    <li><strong>Chunk before embedding</strong> — Embed paragraphs/chunks, not entire documents (embeddings lose info for very long text)</li>
+                </ul>
+            </div>
+
+            <h2 id="king-queen">The Famous "King - Man + Woman = Queen" Example</h2>
+
+            <p>Embeddings capture relationships between concepts. The classic example:</p>
+
+            <pre><code><span class="token-comment"># Conceptually (actual vectors are more complex)</span>
+king   = [<span class="token-number">0.9</span>, <span class="token-number">0.8</span>, <span class="token-number">0.1</span>]  <span class="token-comment"># royalty + male</span>
+man    = [<span class="token-number">0.0</span>, <span class="token-number">0.8</span>, <span class="token-number">0.1</span>]  <span class="token-comment"># male</span>
+woman  = [<span class="token-number">0.0</span>, <span class="token-number">0.1</span>, <span class="token-number">0.8</span>]  <span class="token-comment"># female</span>
+
+result = king - man + woman
+<span class="token-comment"># result ≈ [0.9, 0.1, 0.8] ≈ "queen" (royalty + female)</span></code></pre>
+
+            <p>This shows that embeddings don't just memorize words — they learn <em>relationships</em> and <em>concepts</em>.</p>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Embeddings</strong> convert text → list of numbers representing meaning</li>
+                    <li>Similar meanings = similar number patterns (close in vector space)</li>
+                    <li>Measured with <strong>cosine similarity</strong> (1 = identical, 0 = unrelated)</li>
+                    <li>Used for: search, RAG, recommendations, clustering, deduplication</li>
+                    <li>Typical sizes: 384 (fast/free) to 3072 (highest quality) dimensions</li>
+                    <li>Production: OpenAI embeddings or open-source sentence-transformers</li>
+                </ul>
+            </div>
+
+            <div class="mental-model">
+                <h4>🧠 Mental Model</h4>
+                <div class="model-visual">
+                    "cat" → [0.2, 0.8, -0.1, ...] → 📍 (GPS coordinate in meaning-space)<br><br>
+                    Similar meaning = nearby coordinates<br>
+                    Different meaning = far-apart coordinates
+                </div>
+                <p><strong>Embedding = GPS for meaning.</strong> Just as GPS tells you two restaurants are near each other geographically, embeddings tell you two sentences are near each other in meaning.</p>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Embedding entire documents</strong> — Long text loses nuance. Chunk into paragraphs first.</li>
+                    <li><strong>Mixing embedding models</strong> — You can't compare embeddings from different models. They live in different "coordinate systems".</li>
+                    <li><strong>Not normalizing</strong> — If vectors aren't normalized, cosine similarity gives wrong results.</li>
+                    <li><strong>Re-embedding unchanged text</strong> — Same text always gives same embedding. Cache them!</li>
+                    <li><strong>Using word embeddings for sentences</strong> — Use sentence-transformers, not Word2Vec, for sentence/paragraph meaning.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build a Mini Search Engine</h4>
+                <ol>
+                    <li>Install: <code>pip install sentence-transformers numpy</code></li>
+                    <li>Create a list of 20 sentences about different topics (sports, cooking, programming, science)</li>
+                    <li>Build a semantic search using the code above</li>
+                    <li>Test with queries that use different words but same meaning:
+                        <ul>
+                            <li>Index: "Python is great for machine learning"</li>
+                            <li>Query: "What programming language should I use for AI?" (should find it!)</li>
+                        </ul>
+                    </li>
+                    <li>Compare: traditional keyword search (ctrl+F) would miss this, but embeddings find it</li>
+                    <li><strong>Bonus:</strong> Measure how similarity scores change as sentences become more/less related</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="02-tokens-tokenization.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Tokens & Tokenization</span>
+                </a>
+                <a href="04-transformers-attention.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Transformers & Attention</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

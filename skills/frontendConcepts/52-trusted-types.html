@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trusted Types - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+        </ul>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Trusted Types
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Trusted Types</h1>
+                <p class="subtitle">A browser API that eliminates DOM XSS by enforcing type safety on dangerous DOM sinks — making it impossible to pass raw strings to innerHTML, eval, or document.write.</p>
+                <div class="tag-row">
+                    <span class="tag tag-intermediate">Advanced</span> <span class="tag tag-concept">Security</span> <span class="tag tag-browser">Browser API</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">🔒 Analogy: Type-Checked Keys</div>
+                <p>Imagine a building where every door requires a <strong>specific shaped key</strong> — not just any piece of metal. Without Trusted Types, DOM sinks like <code>innerHTML</code> accept any string (any piece of metal). With Trusted Types, the browser requires a <strong>specially-crafted typed object</strong> that can only be created through your approved sanitization functions (the locksmith). Even if an attacker gets a string into your code, they can't open the door without going through your locksmith.</p>
+            </div>
+
+            <h2>The Problem: Why Output Encoding Isn't Enough</h2>
+            <p>The web platform has ~60 DOM sinks that interpret strings as code or markup:</p>
+            <ul>
+                <li><code>element.innerHTML</code>, <code>element.outerHTML</code></li>
+                <li><code>document.write()</code>, <code>document.writeln()</code></li>
+                <li><code>eval()</code>, <code>setTimeout(string)</code>, <code>setInterval(string)</code></li>
+                <li><code>new Function(string)</code></li>
+                <li><code>element.setAttribute('onclick', string)</code></li>
+                <li><code>location.href = 'javascript:' + string</code></li>
+            </ul>
+            <p>Any one of these, if passed attacker-controlled input, causes DOM XSS. Trusted Types solves this at the <strong>browser level</strong> — the sink itself refuses raw strings.</p>
+
+            <h2>How Trusted Types Works Internally</h2>
+
+<pre><code><span class="token-comment">// Step 1: Enable Trusted Types via CSP header</span>
+<span class="token-comment">// This tells the browser to REJECT raw strings at DOM sinks</span>
+Content-Security-Policy: require-trusted-types-for 'script';
+                         trusted-types my-sanitizer default;
+
+<span class="token-comment">// Step 2: Create a Trusted Types policy (your "locksmith")</span>
+<span class="token-keyword">const</span> sanitizerPolicy = trustedTypes.createPolicy(<span class="token-string">'my-sanitizer'</span>, {
+    <span class="token-comment">// This function is the ONLY way to create TrustedHTML in your app</span>
+    <span class="token-comment">// All innerHTML assignments must go through here</span>
+    createHTML: (input) =&gt; {
+        <span class="token-comment">// Use DOMPurify or similar battle-tested sanitizer</span>
+        <span class="token-keyword">return</span> DOMPurify.sanitize(input, {
+            ALLOWED_TAGS: [<span class="token-string">'b'</span>, <span class="token-string">'i'</span>, <span class="token-string">'em'</span>, <span class="token-string">'strong'</span>, <span class="token-string">'a'</span>],
+            ALLOWED_ATTR: [<span class="token-string">'href'</span>],
+        });
+    },
+    
+    <span class="token-comment">// Controls what can be passed to script URL sinks</span>
+    createScriptURL: (input) =&gt; {
+        <span class="token-keyword">const</span> url = <span class="token-keyword">new</span> URL(input, document.baseURI);
+        <span class="token-comment">// Only allow scripts from our own CDN</span>
+        <span class="token-keyword">if</span> (url.origin !== <span class="token-string">'https://cdn.myapp.com'</span>) {
+            <span class="token-keyword">throw</span> <span class="token-keyword">new</span> TypeError(<span class="token-string">`Blocked script URL: ${input}`</span>);
+        }
+        <span class="token-keyword">return</span> input;
+    },
+    
+    <span class="token-comment">// Controls what can be passed to eval-like sinks</span>
+    createScript: (input) =&gt; {
+        <span class="token-comment">// In production, you'd likely reject all eval usage</span>
+        <span class="token-keyword">throw</span> <span class="token-keyword">new</span> TypeError(<span class="token-string">'eval is not allowed'</span>);
+    }
+});
+
+<span class="token-comment">// Step 3: Use the policy to create trusted values</span>
+<span class="token-keyword">const</span> userContent = <span class="token-string">'&lt;b&gt;Hello&lt;/b&gt;&lt;script&gt;evil()&lt;/script&gt;'</span>;
+
+<span class="token-comment">// WITHOUT Trusted Types: browser happily executes the script</span>
+<span class="token-comment">// element.innerHTML = userContent;  ← XSS!</span>
+
+<span class="token-comment">// WITH Trusted Types: browser throws TypeError for raw strings</span>
+<span class="token-comment">// element.innerHTML = userContent;  ← TypeError: not a TrustedHTML</span>
+
+<span class="token-comment">// CORRECT: pass through your sanitization policy</span>
+element.innerHTML = sanitizerPolicy.createHTML(userContent);
+<span class="token-comment">// Result: "&lt;b&gt;Hello&lt;/b&gt;" — script tag stripped by DOMPurify</span>
+</code></pre>
+
+            <h3>The Default Policy</h3>
+<pre><code><span class="token-comment">// The "default" policy is special — it's a fallback for ALL untyped assignments</span>
+<span class="token-comment">// Useful for large legacy codebases where you can't refactor everything at once</span>
+
+trustedTypes.createPolicy(<span class="token-string">'default'</span>, {
+    createHTML: (input, sink) =&gt; {
+        <span class="token-comment">// Log violations to your monitoring (like CSP reports)</span>
+        console.warn(<span class="token-string">`Untyped innerHTML assignment to ${sink}`</span>, input);
+        
+        <span class="token-comment">// Sanitize as best-effort — in strict mode you'd throw here</span>
+        <span class="token-keyword">return</span> DOMPurify.sanitize(input);
+    },
+    createScriptURL: (input) =&gt; {
+        <span class="token-comment">// Block ALL dynamic script loading that bypasses your policy</span>
+        <span class="token-keyword">throw</span> <span class="token-keyword">new</span> TypeError(<span class="token-string">`Blocked dynamic script: ${input}`</span>);
+    }
+});
+
+<span class="token-comment">// Now EVERY innerHTML assignment in your app (including third-party libs)</span>
+<span class="token-comment">// goes through this default policy. No more unmonitored DOM sinks.</span>
+</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Third-Party Library Compatibility</div>
+                <p>Many libraries (jQuery, rich text editors, analytics scripts) use <code>innerHTML</code> internally. Enabling Trusted Types will break them unless you either: (1) use the default policy as a compatibility shim, (2) patch the library, or (3) use the library's Trusted Types-compatible version. This is the biggest adoption challenge.</p>
+            </div>
+
+            <h2>Browser Enforcement Flow</h2>
+<pre><code><span class="token-comment">// What happens internally when Trusted Types is enforced:</span>
+
+<span class="token-comment">// 1. Code attempts: element.innerHTML = someString</span>
+<span class="token-comment">// 2. Browser's innerHTML setter checks:</span>
+<span class="token-comment">//    - Is Trusted Types enforced? (CSP: require-trusted-types-for 'script')</span>
+<span class="token-comment">//    - Is the value a TrustedHTML object? (created by a policy)</span>
+<span class="token-comment">// 3. If raw string:</span>
+<span class="token-comment">//    a. Is there a "default" policy? → Route through it</span>
+<span class="token-comment">//    b. No default policy? → Throw TypeError, block assignment</span>
+<span class="token-comment">// 4. If TrustedHTML object → Allow assignment, use inner string value</span>
+
+<span class="token-comment">// The three trusted types:</span>
+<span class="token-comment">// TrustedHTML    → for innerHTML, outerHTML, insertAdjacentHTML</span>
+<span class="token-comment">// TrustedScript  → for eval(), setTimeout(string), inline event handlers</span>
+<span class="token-comment">// TrustedScriptURL → for script.src, import(), Worker constructor</span>
+</code></pre>
+
+            <h2>Where This Lives in Production</h2>
+            <ul>
+                <li><strong>Google</strong> — Deployed across Google apps (Gmail, Maps, etc.). Google authored the spec after finding that Trusted Types eliminated DOM XSS in their internal apps. Published research showing 0 DOM XSS vulnerabilities in teams that adopted it.</li>
+                <li><strong>Angular</strong> — Has built-in Trusted Types support. Angular's DomSanitizer produces Trusted Types when the API is available. <code>bypassSecurityTrustHtml()</code> returns a TrustedHTML-compatible value.</li>
+                <li><strong>Lit</strong> — Google's web component library is Trusted Types-compatible out of the box. Template literals are statically analyzed for safety.</li>
+            </ul>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Creating a policy that doesn't actually sanitize</strong> — <code>createHTML: (s) => s</code> defeats the entire purpose. The policy must sanitize or validate.</li>
+                <li><strong>Too many policies</strong> — Each policy is an attack surface. Minimize the number and audit each one. Google recommends 1-3 per application.</li>
+                <li><strong>Not testing with enforcement</strong> — Report-only mode catches violations but enforcement reveals real breakage. Test in CI with enforcement enabled.</li>
+                <li><strong>Forgetting script URLs</strong> — Trusted Types for script loading is critical. Dynamic <code>import()</code> and <code>Worker()</code> constructors are sinks too.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Trusted Types When...</h3>
+                <p>You can explain how Trusted Types makes DOM XSS a <em>compile-time-like</em> error (TypeError at assignment) instead of a runtime vulnerability, and why this is fundamentally better than scanning for dangerous patterns in code review.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Create a Trusted Types policy for a markdown editor that allows <code>&lt;h1&gt;</code>-<code>&lt;h6&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;code&gt;</code>, <code>&lt;a href&gt;</code> (only https: URLs), and nothing else. Verify that injecting <code>&lt;img onerror&gt;</code> is blocked at the policy level.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Connects to: <strong>CSP</strong> (Trusted Types is enforced via CSP header), <strong>DOM Clobbering</strong> (Trusted Types doesn't prevent clobbering — different attack), <strong>Shadow DOM</strong> (provides style isolation but not script isolation — Trusted Types fills that gap).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="51-content-security-policy.html" class="nav-btn nav-btn-prev">← Content Security Policy</a>
+                <a href="53-dom-clobbering.html" class="nav-btn nav-btn-next">DOM Clobbering →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

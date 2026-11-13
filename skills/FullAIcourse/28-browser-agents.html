@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Agents — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 7</a> <span>›</span> Browser Agents</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>Browser Agents</h1>
+                <p>AI agents that can browse the web, click buttons, fill forms, and extract data — like giving your AI robot hands to use a computer. This is the frontier of autonomous AI.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Browser agent = a virtual intern sitting at your computer.</strong> You tell them "Go to Amazon, search for wireless headphones under $50, and make a comparison table." They open the browser, navigate pages, read content, and bring you back the results.</p>
+                <p>They can see the page (screenshots or DOM), decide what to click, type in search boxes, and navigate — just like a human would.</p>
+            </div>
+
+            <h2 id="approaches">Browser Automation Approaches</h2>
+
+            <table>
+                <thead><tr><th>Approach</th><th>How AI Sees the Page</th><th>Best For</th><th>Tool</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>DOM-based</strong></td><td>Reads HTML elements</td><td>Structured scraping</td><td>Playwright, Puppeteer</td></tr>
+                    <tr><td><strong>Vision-based</strong></td><td>Screenshots → multimodal LLM</td><td>Complex UIs, visual tasks</td><td>GPT-4o, Claude Vision</td></tr>
+                    <tr><td><strong>Accessibility tree</strong></td><td>Screen reader data</td><td>Form filling, navigation</td><td>Playwright a11y</td></tr>
+                    <tr><td><strong>Hybrid</strong></td><td>DOM + screenshots combined</td><td>Production agents</td><td>Browser-use, Stagehand</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="playwright-basics">Playwright + AI: Basic Browser Agent</h2>
+
+            <pre><code><span class="token-comment"># pip install playwright openai</span>
+<span class="token-comment"># playwright install chromium</span>
+
+<span class="token-keyword">import</span> asyncio
+<span class="token-keyword">import</span> json
+<span class="token-keyword">from</span> playwright.async_api <span class="token-keyword">import</span> async_playwright
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+<span class="token-keyword">class</span> <span class="token-function">BrowserAgent</span>:
+    <span class="token-string">"""AI agent that can browse the web and extract information."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, model: str = <span class="token-string">"llama3.1:8b"</span>):
+        self.client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+        self.model = model
+        self.browser = <span class="token-keyword">None</span>
+        self.page = <span class="token-keyword">None</span>
+    
+    <span class="token-keyword">async def</span> <span class="token-function">start</span>(self, headless: bool = <span class="token-keyword">True</span>):
+        <span class="token-string">"""Launch the browser."""</span>
+        self.playwright = <span class="token-keyword">await</span> async_playwright().start()
+        self.browser = <span class="token-keyword">await</span> self.playwright.chromium.launch(headless=headless)
+        self.page = <span class="token-keyword">await</span> self.browser.new_page()
+    
+    <span class="token-keyword">async def</span> <span class="token-function">stop</span>(self):
+        <span class="token-string">"""Close the browser."""</span>
+        <span class="token-keyword">if</span> self.browser:
+            <span class="token-keyword">await</span> self.browser.close()
+        <span class="token-keyword">if</span> self.playwright:
+            <span class="token-keyword">await</span> self.playwright.stop()
+    
+    <span class="token-keyword">async def</span> <span class="token-function">get_page_content</span>(self) -> str:
+        <span class="token-string">"""Get readable page content (simplified DOM)."""</span>
+        <span class="token-comment"># Extract text content and key interactive elements</span>
+        content = <span class="token-keyword">await</span> self.page.evaluate(<span class="token-string">"""() => {
+            const elements = [];
+            // Get all text
+            const text = document.body.innerText.substring(0, 3000);
+            // Get all links
+            const links = [...document.querySelectorAll('a[href]')]
+                .slice(0, 20)
+                .map((a, i) => `[link ${i}] ${a.innerText.trim()} → ${a.href}`);
+            // Get all buttons
+            const buttons = [...document.querySelectorAll('button, input[type="submit"]')]
+                .slice(0, 10)
+                .map((b, i) => `[button ${i}] ${b.innerText || b.value}`);
+            // Get all inputs
+            const inputs = [...document.querySelectorAll('input, textarea, select')]
+                .slice(0, 10)
+                .map((inp, i) => `[input ${i}] type=${inp.type} name=${inp.name} placeholder=${inp.placeholder}`);
+            
+            return { text, links: links.join('\\n'), buttons: buttons.join('\\n'), inputs: inputs.join('\\n') };
+        }"</span>)
+        
+        <span class="token-keyword">return</span> <span class="token-string">f"""URL: {self.page.url}
+Title: {<span class="token-keyword">await</span> self.page.title()}
+
+TEXT CONTENT:
+{content['text'][:2000]}
+
+LINKS:
+{content['links']}
+
+BUTTONS:
+{content['buttons']}
+
+INPUTS:
+{content['inputs']}"""</span>
+    
+    <span class="token-keyword">async def</span> <span class="token-function">execute_action</span>(self, action: dict) -> str:
+        <span class="token-string">"""Execute a browser action decided by the AI."""</span>
+        action_type = action.get(<span class="token-string">"action"</span>)
+        
+        <span class="token-keyword">try</span>:
+            <span class="token-keyword">if</span> action_type == <span class="token-string">"navigate"</span>:
+                <span class="token-keyword">await</span> self.page.goto(action[<span class="token-string">"url"</span>], wait_until=<span class="token-string">"domcontentloaded"</span>)
+                <span class="token-keyword">return</span> <span class="token-string">f"Navigated to {action['url']}"</span>
+            
+            <span class="token-keyword">elif</span> action_type == <span class="token-string">"click"</span>:
+                <span class="token-keyword">await</span> self.page.click(action[<span class="token-string">"selector"</span>])
+                <span class="token-keyword">await</span> self.page.wait_for_load_state(<span class="token-string">"domcontentloaded"</span>)
+                <span class="token-keyword">return</span> <span class="token-string">f"Clicked: {action['selector']}"</span>
+            
+            <span class="token-keyword">elif</span> action_type == <span class="token-string">"type"</span>:
+                <span class="token-keyword">await</span> self.page.fill(action[<span class="token-string">"selector"</span>], action[<span class="token-string">"text"</span>])
+                <span class="token-keyword">return</span> <span class="token-string">f"Typed '{action['text']}' into {action['selector']}"</span>
+            
+            <span class="token-keyword">elif</span> action_type == <span class="token-string">"extract"</span>:
+                content = <span class="token-keyword">await</span> self.get_page_content()
+                <span class="token-keyword">return</span> content
+            
+            <span class="token-keyword">elif</span> action_type == <span class="token-string">"scroll"</span>:
+                <span class="token-keyword">await</span> self.page.evaluate(<span class="token-string">"window.scrollBy(0, 500)"</span>)
+                <span class="token-keyword">return</span> <span class="token-string">"Scrolled down"</span>
+            
+            <span class="token-keyword">elif</span> action_type == <span class="token-string">"done"</span>:
+                <span class="token-keyword">return</span> <span class="token-string">"TASK_COMPLETE"</span>
+            
+            <span class="token-keyword">else</span>:
+                <span class="token-keyword">return</span> <span class="token-string">f"Unknown action: {action_type}"</span>
+        <span class="token-keyword">except</span> Exception <span class="token-keyword">as</span> e:
+            <span class="token-keyword">return</span> <span class="token-string">f"Error: {str(e)}"</span>
+    
+    <span class="token-keyword">async def</span> <span class="token-function">run_task</span>(self, task: str, max_steps: int = <span class="token-number">10</span>) -> str:
+        <span class="token-string">"""Run a browsing task autonomously."""</span>
+        system = <span class="token-string">"""You are a browser automation agent. You can:
+- navigate: Go to a URL
+- click: Click an element (use CSS selectors)
+- type: Type text into an input field
+- extract: Read the current page content
+- scroll: Scroll down the page
+- done: Task is complete
+
+Respond with a JSON action:
+{"action": "navigate", "url": "https://..."}
+{"action": "click", "selector": "button.submit"}
+{"action": "type", "selector": "input[name='q']", "text": "search query"}
+{"action": "extract"}
+{"action": "done", "result": "summary of what you found"}"""</span>
+        
+        messages = [
+            {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system},
+            {<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"Task: {task}"</span>}
+        ]
+        
+        <span class="token-keyword">for</span> step <span class="token-keyword">in</span> <span class="token-builtin">range</span>(max_steps):
+            <span class="token-builtin">print</span>(<span class="token-string">f"\n--- Step {step + 1} ---"</span>)
+            
+            <span class="token-comment"># Ask AI what to do</span>
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=<span class="token-number">0</span>,
+            )
+            
+            ai_response = response.choices[<span class="token-number">0</span>].message.content
+            messages.append({<span class="token-string">"role"</span>: <span class="token-string">"assistant"</span>, <span class="token-string">"content"</span>: ai_response})
+            
+            <span class="token-comment"># Parse the action</span>
+            <span class="token-keyword">try</span>:
+                action = json.loads(ai_response)
+            <span class="token-keyword">except</span> json.JSONDecodeError:
+                messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">"Invalid JSON. Please respond with a valid JSON action."</span>})
+                <span class="token-keyword">continue</span>
+            
+            <span class="token-builtin">print</span>(<span class="token-string">f"Action: {action}"</span>)
+            
+            <span class="token-comment"># Execute the action</span>
+            result = <span class="token-keyword">await</span> self.execute_action(action)
+            
+            <span class="token-keyword">if</span> result == <span class="token-string">"TASK_COMPLETE"</span>:
+                <span class="token-keyword">return</span> action.get(<span class="token-string">"result"</span>, <span class="token-string">"Task completed"</span>)
+            
+            <span class="token-builtin">print</span>(<span class="token-string">f"Result: {result[:200]}"</span>)
+            messages.append({<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"Action result:\n{result}"</span>})
+        
+        <span class="token-keyword">return</span> <span class="token-string">"Max steps reached"</span>
+
+<span class="token-comment"># ====== Usage ======</span>
+<span class="token-keyword">async def</span> <span class="token-function">main</span>():
+    agent = BrowserAgent()
+    <span class="token-keyword">await</span> agent.start(headless=<span class="token-keyword">False</span>)  <span class="token-comment"># Set True for no visible browser</span>
+    
+    <span class="token-keyword">try</span>:
+        result = <span class="token-keyword">await</span> agent.run_task(
+            <span class="token-string">"Go to Hacker News, get the titles of the top 5 stories"</span>
+        )
+        <span class="token-builtin">print</span>(<span class="token-string">f"\n✅ Result: {result}"</span>)
+    <span class="token-keyword">finally</span>:
+        <span class="token-keyword">await</span> agent.stop()
+
+asyncio.run(main())</code></pre>
+
+            <h2 id="scraping-agent">AI-Powered Web Scraping Agent</h2>
+
+            <pre><code><span class="token-comment"># Intelligent web scraper that adapts to any website</span>
+<span class="token-keyword">import</span> asyncio
+<span class="token-keyword">from</span> playwright.async_api <span class="token-keyword">import</span> async_playwright
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+
+<span class="token-keyword">class</span> <span class="token-function">SmartScraper</span>:
+    <span class="token-string">"""AI-powered scraper that understands page structure."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self):
+        self.client = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+    
+    <span class="token-keyword">async def</span> <span class="token-function">scrape</span>(self, url: str, instruction: str) -> dict:
+        <span class="token-string">"""Scrape a URL based on natural language instructions."""</span>
+        <span class="token-keyword">async with</span> async_playwright() <span class="token-keyword">as</span> p:
+            browser = <span class="token-keyword">await</span> p.chromium.launch(headless=<span class="token-keyword">True</span>)
+            page = <span class="token-keyword">await</span> browser.new_page()
+            <span class="token-keyword">await</span> page.goto(url, wait_until=<span class="token-string">"domcontentloaded"</span>)
+            
+            <span class="token-comment"># Get page HTML (simplified)</span>
+            html = <span class="token-keyword">await</span> page.content()
+            text = <span class="token-keyword">await</span> page.inner_text(<span class="token-string">"body"</span>)
+            
+            <span class="token-keyword">await</span> browser.close()
+        
+        <span class="token-comment"># Use AI to extract structured data</span>
+        prompt = <span class="token-string">f"""Extract data from this webpage based on the instruction.
+
+Instruction: {instruction}
+
+Page text (first 4000 chars):
+{text[:4000]}
+
+Return the extracted data as a JSON object. Use appropriate keys based on the instruction."""</span>
+        
+        response = self.client.chat.completions.create(
+            model=<span class="token-string">"llama3.1:8b"</span>,
+            messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: prompt}],
+            temperature=<span class="token-number">0</span>,
+        )
+        
+        <span class="token-keyword">try</span>:
+            <span class="token-keyword">return</span> json.loads(response.choices[<span class="token-number">0</span>].message.content)
+        <span class="token-keyword">except</span>:
+            <span class="token-keyword">return</span> {<span class="token-string">"raw"</span>: response.choices[<span class="token-number">0</span>].message.content}
+
+<span class="token-comment"># Usage</span>
+scraper = SmartScraper()
+data = asyncio.run(scraper.scrape(
+    url=<span class="token-string">"https://news.ycombinator.com"</span>,
+    instruction=<span class="token-string">"Extract the top 5 story titles with their point counts and comment counts"</span>
+))
+<span class="token-builtin">print</span>(json.dumps(data, indent=<span class="token-number">2</span>))</code></pre>
+
+            <h2 id="frameworks">Browser Agent Frameworks</h2>
+
+            <table>
+                <thead><tr><th>Framework</th><th>Approach</th><th>Key Feature</th><th>Best For</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>browser-use</strong></td><td>DOM + Vision</td><td>Natural language browser control</td><td>General browsing tasks</td></tr>
+                    <tr><td><strong>Stagehand (Browserbase)</strong></td><td>Accessibility tree</td><td>act(), extract(), observe()</td><td>Structured extraction</td></tr>
+                    <tr><td><strong>Playwright + AI</strong></td><td>DOM-based</td><td>Full control, custom logic</td><td>Custom automation</td></tr>
+                    <tr><td><strong>Skyvern</strong></td><td>Vision + DOM</td><td>Anti-detection, cloud infra</td><td>Enterprise scraping</td></tr>
+                    <tr><td><strong>AgentQL</strong></td><td>Query language</td><td>Natural language selectors</td><td>Data extraction</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="anti-detection">Anti-Detection & Best Practices</h2>
+
+            <pre><code><span class="token-comment"># Making browser agents harder to detect</span>
+<span class="token-keyword">from</span> playwright.async_api <span class="token-keyword">import</span> async_playwright
+
+<span class="token-keyword">async def</span> <span class="token-function">stealth_browser</span>():
+    <span class="token-keyword">async with</span> async_playwright() <span class="token-keyword">as</span> p:
+        browser = <span class="token-keyword">await</span> p.chromium.launch(
+            headless=<span class="token-keyword">False</span>,
+            args=[
+                <span class="token-string">"--disable-blink-features=AutomationControlled"</span>,
+                <span class="token-string">"--no-sandbox"</span>,
+            ]
+        )
+        
+        context = <span class="token-keyword">await</span> browser.new_context(
+            viewport={<span class="token-string">"width"</span>: <span class="token-number">1920</span>, <span class="token-string">"height"</span>: <span class="token-number">1080</span>},
+            user_agent=<span class="token-string">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"</span>,
+            locale=<span class="token-string">"en-US"</span>,
+        )
+        
+        page = <span class="token-keyword">await</span> context.new_page()
+        
+        <span class="token-comment"># Remove automation indicators</span>
+        <span class="token-keyword">await</span> page.add_init_script(<span class="token-string">"""
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+        """</span>)
+        
+        <span class="token-comment"># Add random delays (human-like behavior)</span>
+        <span class="token-keyword">import</span> random
+        <span class="token-keyword">await</span> asyncio.sleep(random.uniform(<span class="token-number">1</span>, <span class="token-number">3</span>))
+        
+        <span class="token-keyword">return</span> browser, page</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>Respect robots.txt</strong> — Check if the website allows automated access. Scraping prohibited sites is risky.</li>
+                    <li><strong>Rate limiting</strong> — Add delays between requests (1-3 seconds minimum). Never DDoS a site.</li>
+                    <li><strong>browser-use is the hot framework</strong> — Open-source, works with any LLM, natural language control.</li>
+                    <li><strong>Vision models for complex UIs</strong> — When DOM is too messy (dynamic SPAs), screenshot + GPT-4o works better.</li>
+                    <li><strong>Headless for production</strong> — Run browsers without GUI in containers (Docker + Playwright).</li>
+                    <li><strong>Session management</strong> — Store cookies/state to avoid re-logging in every time.</li>
+                    <li><strong>Error recovery</strong> — Pages fail to load, selectors break, popups appear. Build retry logic.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Browser agents</strong> = AI + browser automation (Playwright/Puppeteer)</li>
+                    <li>AI sees pages via: DOM text, accessibility tree, or screenshots</li>
+                    <li>The agent loop: Observe page → Decide action → Execute → Repeat</li>
+                    <li>Actions: navigate, click, type, scroll, extract, wait</li>
+                    <li>Frameworks: browser-use, Stagehand, Skyvern, custom Playwright</li>
+                    <li>Always: rate limit, respect robots.txt, handle errors, add anti-detection</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>No rate limiting</strong> — Hammering a site with requests gets you IP-banned instantly.</li>
+                    <li><strong>Fragile selectors</strong> — Using classes like ".css-1a2b3c" that change every deploy. Use semantic selectors.</li>
+                    <li><strong>No error recovery</strong> — Pages timeout, elements disappear, popups block. Always wrap in try/except.</li>
+                    <li><strong>Ignoring robots.txt</strong> — Legal risk. Always check what's allowed before scraping.</li>
+                    <li><strong>Sending full page HTML to LLM</strong> — Way too many tokens. Extract just the text/relevant elements.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build a Browser Agent</h4>
+                <ol>
+                    <li>Install Playwright: <code>pip install playwright && playwright install chromium</code></li>
+                    <li>Build a basic scraper that goes to Hacker News and extracts top 10 titles</li>
+                    <li>Add AI decision-making: agent decides what to click/extract</li>
+                    <li>Make it navigate multiple pages (click "More" to get page 2)</li>
+                    <li>Build a "price comparison agent" that checks 3 sites for a product</li>
+                    <li><strong>Bonus:</strong> Add screenshot-based navigation using a vision model (GPT-4o)</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="27-ai-agents.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">AI Agents</span>
+                </a>
+                <a href="29-model-types.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">All Model Types</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

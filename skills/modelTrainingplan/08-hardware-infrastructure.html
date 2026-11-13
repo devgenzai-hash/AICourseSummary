@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 8: Hardware & Infrastructure — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Fine-Tuning Guide</span><h2>🙏 Gemma × Hindu Scriptures</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+            <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+            <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+            <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+            <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+            <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+            <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+            <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+            <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+            <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+            <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Guide</a><span>›</span> Hardware & Infrastructure</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 8: Hardware & Infrastructure</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">Complete GPU requirements, cloud provider comparison, cost estimation, and distributed training setup for every stage of the pipeline.</p>
+
+            <h2 id="gpu-requirements">🖥️ GPU Requirements by Method</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model Size</th>
+                        <th>Method</th>
+                        <th>Min VRAM</th>
+                        <th>Recommended</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="4"><strong>Gemma 4B</strong></td>
+                        <td>QLoRA SFT</td>
+                        <td>12 GB</td>
+                        <td>1× RTX 4070</td>
+                        <td>Fits on consumer GPUs</td>
+                    </tr>
+                    <tr>
+                        <td>QLoRA DPO</td>
+                        <td>16 GB</td>
+                        <td>1× RTX 4080</td>
+                        <td>Needs ref model in memory</td>
+                    </tr>
+                    <tr>
+                        <td>Full Fine-tune</td>
+                        <td>32 GB</td>
+                        <td>1× A100 40GB</td>
+                        <td>With gradient checkpointing</td>
+                    </tr>
+                    <tr>
+                        <td>GRPO</td>
+                        <td>24 GB</td>
+                        <td>1× RTX 4090</td>
+                        <td>Multiple generations per prompt</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4"><strong>Gemma 12B</strong></td>
+                        <td>QLoRA SFT</td>
+                        <td>16 GB</td>
+                        <td>1× RTX 4090 24GB</td>
+                        <td>Sweet spot for quality/cost</td>
+                    </tr>
+                    <tr>
+                        <td>QLoRA DPO</td>
+                        <td>24 GB</td>
+                        <td>1× A100 40GB</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Full Fine-tune</td>
+                        <td>80 GB</td>
+                        <td>2× A100 40GB</td>
+                        <td>DeepSpeed ZeRO-3</td>
+                    </tr>
+                    <tr>
+                        <td>GRPO</td>
+                        <td>40 GB</td>
+                        <td>1× A100 40GB</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4"><strong>Gemma 27B</strong></td>
+                        <td>QLoRA SFT</td>
+                        <td>24 GB</td>
+                        <td>1× A100 40GB</td>
+                        <td>Recommended model size</td>
+                    </tr>
+                    <tr>
+                        <td>QLoRA DPO</td>
+                        <td>40 GB</td>
+                        <td>1× A100 80GB</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Full Fine-tune</td>
+                        <td>160 GB</td>
+                        <td>4× A100 40GB</td>
+                        <td>DeepSpeed ZeRO-3 mandatory</td>
+                    </tr>
+                    <tr>
+                        <td>GRPO</td>
+                        <td>80 GB</td>
+                        <td>2× A100 40GB</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="cloud-providers">☁️ Cloud Provider Comparison</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>GPU</th>
+                        <th>$/hour</th>
+                        <th>Best For</th>
+                        <th>Pros</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>RunPod</strong></td>
+                        <td>A100 80GB</td>
+                        <td>$1.64</td>
+                        <td>Budget training</td>
+                        <td>Cheapest, spot instances, community templates</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lambda Labs</strong></td>
+                        <td>A100 80GB</td>
+                        <td>$1.99</td>
+                        <td>Reliable training</td>
+                        <td>Pre-installed ML stack, persistent storage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vast.ai</strong></td>
+                        <td>A100 40GB</td>
+                        <td>$0.80</td>
+                        <td>Maximum savings</td>
+                        <td>Marketplace (variable pricing), very cheap</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Google Cloud</strong></td>
+                        <td>A100 40GB</td>
+                        <td>$3.67</td>
+                        <td>Gemma integration</td>
+                        <td>Native GCP support, TPU option, Vertex AI</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AWS</strong></td>
+                        <td>A100 40GB</td>
+                        <td>$4.10</td>
+                        <td>Enterprise</td>
+                        <td>SageMaker integration, reliability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Azure</strong></td>
+                        <td>A100 80GB</td>
+                        <td>$3.40</td>
+                        <td>Enterprise</td>
+                        <td>Azure ML, spot VMs available</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Modal</strong></td>
+                        <td>A100 40GB</td>
+                        <td>$2.78</td>
+                        <td>Serverless training</td>
+                        <td>Pay per second, no setup, Python-native</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Cost-Effective Strategy</div>
+                <p>For the full pipeline (CPT + SFT + DPO) with Gemma 27B QLoRA:</p>
+                <ul>
+                    <li><strong>RunPod spot A100 80GB</strong>: ~$1.10/hr spot pricing</li>
+                    <li>CPT: ~12 hours = $13</li>
+                    <li>SFT: ~8 hours = $9</li>
+                    <li>DPO: ~6 hours = $7</li>
+                    <li><strong>Total: ~$30-50</strong> for the entire training pipeline</li>
+                </ul>
+            </div>
+
+            <h2 id="deepspeed">⚡ DeepSpeed Configuration</h2>
+            
+            <h3>ZeRO Stage 2 (Multi-GPU, Same Node)</h3>
+            <pre><code>// ds_zero2.json — For QLoRA with multiple GPUs
+{
+    "bf16": {
+        "enabled": true
+    },
+    "zero_optimization": {
+        "stage": 2,
+        "offload_optimizer": {
+            "device": "cpu",
+            "pin_memory": true
+        },
+        "allgather_partitions": true,
+        "allgather_bucket_size": 2e8,
+        "overlap_comm": true,
+        "reduce_scatter": true,
+        "reduce_bucket_size": 2e8,
+        "contiguous_gradients": true
+    },
+    "gradient_accumulation_steps": "auto",
+    "gradient_clipping": "auto",
+    "train_batch_size": "auto",
+    "train_micro_batch_size_per_gpu": "auto"
+}</code></pre>
+
+            <h3>ZeRO Stage 3 (Full Fine-Tune, Multi-Node)</h3>
+            <pre><code>// ds_zero3.json — For full fine-tuning across multiple GPUs
+{
+    "bf16": {
+        "enabled": true
+    },
+    "zero_optimization": {
+        "stage": 3,
+        "offload_optimizer": {
+            "device": "cpu",
+            "pin_memory": true
+        },
+        "offload_param": {
+            "device": "cpu",
+            "pin_memory": true
+        },
+        "overlap_comm": true,
+        "contiguous_gradients": true,
+        "sub_group_size": 1e9,
+        "reduce_bucket_size": "auto",
+        "stage3_prefetch_bucket_size": "auto",
+        "stage3_param_persistence_threshold": "auto",
+        "stage3_max_live_parameters": 1e9,
+        "stage3_max_reuse_distance": 1e9,
+        "stage3_gather_16bit_weights_on_model_save": true
+    },
+    "gradient_accumulation_steps": "auto",
+    "gradient_clipping": "auto",
+    "steps_per_print": 10,
+    "train_batch_size": "auto",
+    "train_micro_batch_size_per_gpu": "auto",
+    "wall_clock_breakdown": false
+}</code></pre>
+
+            <h2 id="accelerate">🚀 Accelerate Configuration</h2>
+            <pre><code># accelerate_config.yaml
+# Generate with: accelerate config
+compute_environment: LOCAL_MACHINE
+distributed_type: DEEPSPEED
+deepspeed_config:
+  deepspeed_config_file: ds_zero2.json
+  zero3_init_flag: false
+machine_rank: 0
+main_training_function: main
+mixed_precision: bf16
+num_machines: 1
+num_processes: 2              # Number of GPUs
+rdzv_backend: static
+same_network: true
+tpu_env: []
+tpu_use_cluster: false
+tpu_use_sudo: false
+use_cpu: false</code></pre>
+
+            <h3>Launch Command</h3>
+            <pre><code># Single GPU (QLoRA)
+python sft_train.py
+
+# Multi-GPU with accelerate
+accelerate launch --config_file accelerate_config.yaml sft_train.py
+
+# Multi-GPU with DeepSpeed directly
+deepspeed --num_gpus=4 sft_train.py --deepspeed ds_zero3.json
+
+# Multi-Node (2 nodes, 4 GPUs each)
+# Node 0 (master):
+deepspeed --num_gpus=4 --num_nodes=2 --master_addr=node0_ip \
+    --master_port=29500 --hostfile=hostfile sft_train.py
+
+# hostfile format:
+# node0_ip slots=4
+# node1_ip slots=4</code></pre>
+
+            <h2 id="memory-optimization">🧮 Memory Optimization Techniques</h2>
+            
+            <pre><code>"""
+Memory optimization strategies — ranked by effectiveness.
+Apply from top to bottom until your model fits in memory.
+"""
+
+# ============================================
+# Level 1: QLoRA (reduces model memory by ~4x)
+# ============================================
+# Already covered in training chapters
+# Base: 27B × 2 bytes (BF16) = 54 GB
+# QLoRA: 27B × 0.5 bytes (NF4) + LoRA params = ~14 GB
+
+# ============================================
+# Level 2: Gradient Checkpointing (reduces activation memory by ~60%)
+# ============================================
+# In training args:
+# gradient_checkpointing=True
+# Trades compute (20-30% slower) for memory
+
+# ============================================
+# Level 3: Reduce Batch Size + Increase Gradient Accumulation
+# ============================================
+# Memory ∝ batch_size × seq_length²
+# Instead of batch=8, use batch=1 with grad_accum=8
+# Same effective batch, 8x less memory
+
+# ============================================
+# Level 4: Reduce Sequence Length
+# ============================================
+# Memory scales with seq_length² (attention)
+# 4096 tokens = 4× the memory of 2048 tokens
+# Use dynamic padding + shorter sequences during early training
+
+# ============================================
+# Level 5: Flash Attention 2 (reduces attention memory)
+# ============================================
+# attn_implementation="flash_attention_2"  # in model loading
+# Reduces O(n²) memory to O(n) for attention
+# FREE performance gain — always use it
+
+# ============================================
+# Level 6: CPU Offloading (DeepSpeed ZeRO-Offload)
+# ============================================
+# Moves optimizer states and/or parameters to CPU RAM
+# Massive memory savings at cost of speed (30-50% slower)
+# Good if you have lots of CPU RAM (>128GB)
+
+# ============================================
+# Level 7: Smaller LoRA Rank
+# ============================================
+# r=64 → r=16: reduces trainable params by 4×
+# Each LoRA layer: 2 × hidden_dim × r parameters
+# For 27B model: r=64 ~= 200M params, r=16 ~= 50M params
+
+# ============================================
+# MEMORY ESTIMATION FORMULA
+# ============================================
+def estimate_memory_gb(
+    model_params_B: float,  # in billions
+    precision: str = "4bit",  # "4bit", "8bit", "bf16", "fp32"
+    lora_rank: int = 32,
+    batch_size: int = 2,
+    seq_length: int = 2048,
+    gradient_checkpointing: bool = True,
+) -> dict:
+    """Estimate GPU memory requirements."""
+    
+    # Model weights
+    bytes_per_param = {
+        "4bit": 0.5, "8bit": 1.0, "bf16": 2.0, "fp32": 4.0
+    }[precision]
+    model_memory = model_params_B * bytes_per_param
+    
+    # LoRA parameters (in BF16)
+    # Rough: 2 × hidden_dim × rank × num_layers × num_target_modules
+    # For 27B: hidden=5120, layers=46, targets=7
+    hidden_dim = int(model_params_B * 190)  # rough scaling
+    num_layers = int(model_params_B * 1.7)
+    lora_params = 2 * hidden_dim * lora_rank * num_layers * 7
+    lora_memory = lora_params * 2 / 1e9  # BF16
+    
+    # Optimizer states (AdamW: 2× params for momentum + variance)
+    optimizer_memory = lora_memory * 2  # Only for LoRA params
+    
+    # Activations (rough estimate)
+    activation_factor = 0.4 if gradient_checkpointing else 1.0
+    activation_memory = (
+        batch_size * seq_length * hidden_dim * num_layers * 2 / 1e9
+        * activation_factor
+    )
+    
+    total = model_memory + lora_memory + optimizer_memory + activation_memory
+    
+    return {
+        "model_weights_gb": round(model_memory, 1),
+        "lora_params_gb": round(lora_memory, 1),
+        "optimizer_gb": round(optimizer_memory, 1),
+        "activations_gb": round(activation_memory, 1),
+        "total_estimated_gb": round(total * 1.1, 1),  # 10% overhead
+        "recommended_gpu": (
+            "RTX 4090 24GB" if total < 20 else
+            "A100 40GB" if total < 35 else
+            "A100 80GB" if total < 70 else
+            f"{int(total/40)+1}× A100 40GB"
+        )
+    }
+
+# Example usage:
+print(estimate_memory_gb(27, "4bit", lora_rank=32, batch_size=2, seq_length=4096))
+# {'model_weights_gb': 13.5, 'lora_params_gb': 1.2, 'optimizer_gb': 2.4,
+#  'activations_gb': 4.8, 'total_estimated_gb': 24.1, 'recommended_gpu': 'A100 40GB'}</code></pre>
+
+            <h2 id="setup-scripts">📜 Environment Setup Scripts</h2>
+            
+            <pre><code># ============================================
+# setup.sh — Complete environment setup
+# Run on fresh GPU instance (Ubuntu 22.04 + CUDA 12.1+)
+# ============================================
+
+#!/bin/bash
+set -e
+
+echo "🔧 Setting up Gemma fine-tuning environment..."
+
+# 1. System packages
+sudo apt-get update && sudo apt-get install -y \
+    python3.11 python3.11-venv python3-pip \
+    git git-lfs htop nvtop tmux
+
+# 2. Create virtual environment
+python3.11 -m venv ~/gemma-env
+source ~/gemma-env/bin/activate
+
+# 3. Install PyTorch (CUDA 12.1)
+pip install torch==2.3.0 torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cu121
+
+# 4. Install training stack
+pip install \
+    transformers>=4.50.0 \
+    trl>=0.15.0 \
+    peft>=0.14.0 \
+    bitsandbytes>=0.43.0 \
+    accelerate>=0.30.0 \
+    datasets>=2.19.0 \
+    wandb \
+    flash-attn --no-build-isolation \
+    deepspeed>=0.14.0 \
+    sentencepiece \
+    protobuf
+
+# 5. Login to Hugging Face (for Gemma access)
+huggingface-cli login --token $HF_TOKEN
+
+# 6. Login to Weights & Biases
+wandb login $WANDB_API_KEY
+
+# 7. Verify installation
+python -c "
+import torch
+print(f'PyTorch: {torch.__version__}')
+print(f'CUDA available: {torch.cuda.is_available()}')
+print(f'GPU: {torch.cuda.get_device_name(0)}')
+print(f'VRAM: {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB')
+
+import transformers, trl, peft, bitsandbytes
+print(f'Transformers: {transformers.__version__}')
+print(f'TRL: {trl.__version__}')
+print(f'PEFT: {peft.__version__}')
+print(f'BitsAndBytes: {bitsandbytes.__version__}')
+print('✅ All packages installed successfully!')
+"
+
+echo "✅ Environment ready! Activate with: source ~/gemma-env/bin/activate"</code></pre>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Common Setup Issues</div>
+                <ul>
+                    <li><strong>flash-attn fails to install</strong>: Needs CUDA toolkit matching your PyTorch CUDA version. Try <code>pip install flash-attn --no-build-isolation</code></li>
+                    <li><strong>bitsandbytes errors on Windows</strong>: Use WSL2 or Linux. BnB has limited Windows support.</li>
+                    <li><strong>OOM immediately</strong>: Reduce batch_size to 1, enable gradient_checkpointing, reduce seq_length</li>
+                    <li><strong>Gemma access denied</strong>: Accept Gemma license on HuggingFace model card first</li>
+                </ul>
+            </div>
+
+            <nav class="page-nav">
+                <a href="07-reinforcement-learning.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Reinforcement Learning</span>
+                </a>
+                <a href="09-evaluation.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Evaluation</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

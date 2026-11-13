@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimistic UI Rollback Strategy - Frontend Concepts Deep Dive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Frontend Concepts</h2>
+            <div class="subtitle">Deep Dives &bull; 88 Topics</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html"><span class="nav-number">🏠</span> Course Overview</a></li>
+            <li class="module-label">Rendering & Hydration</li>
+            <li><a href="01-hydration.html"><span class="nav-number">1</span> Hydration</a></li>
+            <li><a href="02-partial-hydration.html"><span class="nav-number">2</span> Partial Hydration</a></li>
+            <li><a href="03-islands-architecture.html"><span class="nav-number">3</span> Islands Architecture</a></li>
+            <li><a href="04-streaming-ssr.html"><span class="nav-number">4</span> Streaming SSR</a></li>
+            <li><a href="05-concurrent-rendering.html"><span class="nav-number">5</span> Concurrent Rendering</a></li>
+            <li><a href="06-time-slicing.html"><span class="nav-number">6</span> Time Slicing</a></li>
+            <li class="module-label">React Internals</li>
+            <li><a href="07-reconciliation-algorithm.html"><span class="nav-number">7</span> Reconciliation Algorithm</a></li>
+            <li><a href="08-fiber-architecture.html"><span class="nav-number">8</span> Fiber Architecture</a></li>
+            <li><a href="09-virtual-dom-diffing.html"><span class="nav-number">9</span> Virtual DOM Diffing Complexity</a></li>
+            <li><a href="10-structural-sharing.html"><span class="nav-number">10</span> Structural Sharing</a></li>
+            <li class="module-label">Data & State Patterns</li>
+            <li><a href="11-immutable-data-patterns.html"><span class="nav-number">11</span> Immutable Data Patterns</a></li>
+            <li><a href="12-referential-equality.html"><span class="nav-number">12</span> Referential Equality</a></li>
+            <li><a href="13-memoization-pitfalls.html"><span class="nav-number">13</span> Memoization Pitfalls</a></li>
+            <li><a href="14-stale-closure-problem.html"><span class="nav-number">14</span> Stale Closure Problem</a></li>
+            <li class="module-label">Event Loop & Scheduling</li>
+            <li><a href="15-event-loop.html"><span class="nav-number">15</span> Event Loop (Macro vs Microta…</a></li>
+            <li><a href="16-task-starvation.html"><span class="nav-number">16</span> Task Starvation</a></li>
+            <li class="module-label">Browser Rendering Pipeline</li>
+            <li><a href="17-layout-thrashing.html"><span class="nav-number">17</span> Layout Thrashing</a></li>
+            <li><a href="18-critical-rendering-path.html"><span class="nav-number">18</span> Critical Rendering Path</a></li>
+            <li><a href="19-render-blocking-resources.html"><span class="nav-number">19</span> Render Blocking Resources</a></li>
+            <li class="module-label">Bundling & Code Delivery</li>
+            <li><a href="20-tree-shaking-internals.html"><span class="nav-number">20</span> Tree Shaking Internals</a></li>
+            <li><a href="21-code-splitting-strategies.html"><span class="nav-number">21</span> Code Splitting Strategies</a></li>
+            <li><a href="22-dynamic-import-chunking.html"><span class="nav-number">22</span> Dynamic Import Chunking</a></li>
+            <li><a href="23-module-federation.html"><span class="nav-number">23</span> Module Federation</a></li>
+            <li class="module-label">Web Components</li>
+            <li><a href="24-shadow-dom.html"><span class="nav-number">24</span> Shadow DOM</a></li>
+            <li><a href="25-custom-elements-lifecycle.html"><span class="nav-number">25</span> Custom Elements Lifecycle</a></li>
+            <li><a href="26-web-components-interop.html"><span class="nav-number">26</span> Web Components Interoperabil…</a></li>
+            <li class="module-label">Workers & Threading</li>
+            <li><a href="27-web-workers-vs-service-workers.html"><span class="nav-number">27</span> Web Workers vs Service Workers</a></li>
+            <li><a href="28-sharedarraybuffer.html"><span class="nav-number">28</span> SharedArrayBuffer</a></li>
+            <li><a href="29-transferable-objects.html"><span class="nav-number">29</span> Transferable Objects</a></li>
+            <li><a href="30-offscreencanvas.html"><span class="nav-number">30</span> OffscreenCanvas</a></li>
+            <li><a href="31-webassembly-integration.html"><span class="nav-number">31</span> WebAssembly Integration</a></li>
+            <li class="module-label">Compositing & GPU</li>
+            <li><a href="32-browser-compositing-layers.html"><span class="nav-number">32</span> Browser Compositing Layers</a></li>
+            <li><a href="33-paint-composite-layout.html"><span class="nav-number">33</span> Paint vs Composite vs Layout</a></li>
+            <li><a href="34-gpu-acceleration-css.html"><span class="nav-number">34</span> GPU Acceleration in CSS</a></li>
+            <li><a href="35-css-containment.html"><span class="nav-number">35</span> CSS Containment</a></li>
+            <li><a href="36-subpixel-rendering.html"><span class="nav-number">36</span> Subpixel Rendering</a></li>
+            <li class="module-label">Observer APIs</li>
+            <li><a href="37-intersection-observer.html"><span class="nav-number">37</span> IntersectionObserver Internals</a></li>
+            <li><a href="38-resize-observer.html"><span class="nav-number">38</span> ResizeObserver Loop Limits</a></li>
+            <li><a href="39-mutation-observer.html"><span class="nav-number">39</span> MutationObserver Cost</a></li>
+            <li class="module-label">Storage & Caching</li>
+            <li><a href="40-indexeddb.html"><span class="nav-number">40</span> IndexedDB</a></li>
+            <li><a href="41-service-worker-lifecycle.html"><span class="nav-number">41</span> Service Worker Lifecycle Traps</a></li>
+            <li><a href="42-cache-invalidation.html"><span class="nav-number">42</span> Cache Invalidation Strategies</a></li>
+            <li><a href="43-stale-while-revalidate.html"><span class="nav-number">43</span> Stale-While-Revalidate</a></li>
+            <li><a href="44-etag-vs-cache-control.html"><span class="nav-number">44</span> ETag vs Cache-Control</a></li>
+            <li class="module-label">Network & Protocols</li>
+            <li><a href="45-http3-quic.html"><span class="nav-number">45</span> HTTP/3 and QUIC</a></li>
+            <li><a href="46-priority-hints.html"><span class="nav-number">46</span> Priority Hints</a></li>
+            <li><a href="47-preload-prefetch-preconnect.html"><span class="nav-number">47</span> Preload vs Prefetch vs Preco…</a></li>
+            <li><a href="48-cors-preflight.html"><span class="nav-number">48</span> CORS Preflight</a></li>
+            <li class="module-label">Security</li>
+            <li><a href="49-samesite-cookies.html"><span class="nav-number">49</span> SameSite Cookie Modes</a></li>
+            <li><a href="50-csrf-vs-xss.html"><span class="nav-number">50</span> CSRF vs XSS Mitigation</a></li>
+            <li><a href="51-content-security-policy.html"><span class="nav-number">51</span> Content Security Policy (CSP)</a></li>
+            <li><a href="52-trusted-types.html"><span class="nav-number">52</span> Trusted Types</a></li>
+            <li><a href="53-dom-clobbering.html"><span class="nav-number">53</span> DOM Clobbering</a></li>
+            <li><a href="54-prototype-pollution.html"><span class="nav-number">54</span> Prototype Pollution</a></li>
+            <li class="module-label">Concurrent UI Patterns</li>
+            <li><a href="55-race-conditions-ui.html"><span class="nav-number">55</span> Race Conditions in UI State</a></li>
+            <li><a href="56-tearing-concurrent-ui.html"><span class="nav-number">56</span> Tearing in Concurrent UI</a></li>
+            <li><a href="57-scheduler-priorities.html"><span class="nav-number">57</span> Scheduler Priorities</a></li>
+            <li><a href="58-render-waterfalls.html"><span class="nav-number">58</span> Render Waterfalls</a></li>
+            <li><a href="59-suspense-boundaries.html"><span class="nav-number">59</span> Suspense Boundaries</a></li>
+            <li><a href="60-selective-hydration.html"><span class="nav-number">60</span> Selective Hydration</a></li>
+            <li><a href="61-server-components.html"><span class="nav-number">61</span> Server Components</a></li>
+            <li><a href="62-edge-rendering.html"><span class="nav-number">62</span> Edge Rendering</a></li>
+            <li class="module-label">Architecture & State Machines</li>
+            <li><a href="63-micro-frontend-orchestration.html"><span class="nav-number">63</span> Micro-Frontend Orchestration</a></li>
+            <li><a href="64-finite-state-modeling.html"><span class="nav-number">64</span> Finite State Modeling</a></li>
+            <li><a href="65-event-sourcing-frontend.html"><span class="nav-number">65</span> Event Sourcing in Frontend</a></li>
+            <li><a href="66-optimistic-ui-rollback.html"><span class="nav-number">66</span> Optimistic UI Rollback Strat…</a></li>
+            <li class="module-label">Offline & Collaboration</li>
+            <li><a href="67-offline-conflict-resolution.html"><span class="nav-number">67</span> Offline Conflict Resolution</a></li>
+            <li><a href="68-crdt-basics.html"><span class="nav-number">68</span> CRDT Basics for Collaboration</a></li>
+            <li><a href="69-webrtc.html"><span class="nav-number">69</span> WebRTC</a></li>
+            <li class="module-label">Streams & Async Patterns</li>
+            <li><a href="70-backpressure-streams.html"><span class="nav-number">70</span> Backpressure in Streams API</a></li>
+            <li><a href="71-abort-controller.html"><span class="nav-number">71</span> AbortController</a></li>
+            <li><a href="72-streaming-fetch.html"><span class="nav-number">72</span> Streaming Fetch Response Han…</a></li>
+            <li class="module-label">Memory & GC</li>
+            <li><a href="73-memory-leak-detection.html"><span class="nav-number">73</span> Browser Memory Leak Detection</a></li>
+            <li><a href="74-detached-dom-nodes.html"><span class="nav-number">74</span> Detached DOM Nodes</a></li>
+            <li><a href="75-garbage-collection-timing.html"><span class="nav-number">75</span> Garbage Collection Timing</a></li>
+            <li class="module-label">Performance APIs & Metrics</li>
+            <li><a href="76-performance-observer.html"><span class="nav-number">76</span> PerformanceObserver API</a></li>
+            <li><a href="77-long-tasks-api.html"><span class="nav-number">77</span> Long Tasks API</a></li>
+            <li><a href="78-first-input-delay.html"><span class="nav-number">78</span> First Input Delay (FID)</a></li>
+            <li><a href="79-interaction-next-paint.html"><span class="nav-number">79</span> Interaction to Next Paint (I…</a></li>
+            <li><a href="80-cumulative-layout-shift.html"><span class="nav-number">80</span> Cumulative Layout Shift (CLS)</a></li>
+            <li><a href="81-largest-contentful-paint.html"><span class="nav-number">81</span> Largest Contentful Paint (LCP)</a></li>
+            <li class="module-label">Advanced Patterns</li>
+            <li><a href="82-speculative-prerendering.html"><span class="nav-number">82</span> Speculative Prerendering</a></li>
+            <li><a href="83-priority-inversion-async.html"><span class="nav-number">83</span> Priority Inversion in Async …</a></li>
+            <li><a href="84-deterministic-rendering.html"><span class="nav-number">84</span> Deterministic Rendering</a></li>
+            <li><a href="85-idempotent-ui-actions.html"><span class="nav-number">85</span> Idempotent UI Actions</a></li>
+            <li class="module-label">Accessibility Internals</li>
+            <li><a href="86-accessibility-tree.html"><span class="nav-number">86</span> Accessibility Tree</a></li>
+            <li><a href="87-aria-live-regions.html"><span class="nav-number">87</span> ARIA Live Regions Internals</a></li>
+            <li><a href="88-pointer-events.html"><span class="nav-number">88</span> Pointer Events</a></li>
+        </ul>
+        <div class="progress-tracker">
+            <div class="progress-label">Progress: 0/88 topics completed</div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+    </aside>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="hamburger">☰</button>
+            <div class="breadcrumb">
+                <a href="index.html">Frontend Concepts</a>
+                <span>/</span> Optimistic UI Rollback Strategy
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="hero">
+                <h1>Optimistic UI Rollback Strategy</h1>
+                <p class="subtitle">Show the user the result of their action immediately — before the server confirms — then gracefully revert if the server rejects it. The technique behind instant-feeling apps like Twitter likes, Slack messages, and Notion edits.</p>
+                <div class="tag-row">
+                    <span class="tag tag-advanced">Advanced</span> <span class="tag tag-concept">UX Pattern</span> <span class="tag tag-performance">Perceived Performance</span>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="analogy-title">📚 Analogy: Writing a Check</div>
+                <p>When you write a check at a store, the cashier hands you your purchase <strong>immediately</strong> — they don't wait for the bank to confirm funds. If the check bounces days later, the store calls you back to return the items. Optimistic UI works the same way: show the result now, reconcile with the server later, and roll back only if something goes wrong. 95%+ of the time, the "check clears" and the user never knows about the async dance happening behind the scenes.</p>
+            </div>
+
+            <h2>The Problem: Waiting for the Server Feels Slow</h2>
+<pre><code><span class="token-comment">// Pessimistic approach: wait for server before updating UI</span>
+<span class="token-keyword">async function</span> <span class="token-function">handleLike</span>(postId) {
+  setIsLoading(<span class="token-keyword">true</span>);            <span class="token-comment">// Show spinner</span>
+  <span class="token-keyword">const</span> response = <span class="token-keyword">await</span> api.likePost(postId);  <span class="token-comment">// 200-2000ms network wait</span>
+  setIsLoading(<span class="token-keyword">false</span>);
+  <span class="token-keyword">if</span> (response.ok) {
+    setLiked(<span class="token-keyword">true</span>);              <span class="token-comment">// FINALLY update UI — user waited 200ms+</span>
+    setLikeCount(prev => prev + 1);
+  }
+}
+
+<span class="token-comment">// The user experience:</span>
+<span class="token-comment">// 1. Click heart → nothing happens for 200ms → heart fills</span>
+<span class="token-comment">// 2. On slow 3G: click → 2 second spinner → heart fills</span>
+<span class="token-comment">// 3. User thinks: "Is this app broken? Did my click register?"</span>
+
+<span class="token-comment">// Optimistic approach: update UI IMMEDIATELY, reconcile later</span>
+<span class="token-keyword">async function</span> <span class="token-function">handleLikeOptimistic</span>(postId) {
+  <span class="token-comment">// Step 1: Update UI instantly (assume success)</span>
+  setLiked(<span class="token-keyword">true</span>);
+  setLikeCount(prev => prev + 1);
+
+  <span class="token-keyword">try</span> {
+    <span class="token-comment">// Step 2: Send to server in background</span>
+    <span class="token-keyword">await</span> api.likePost(postId);
+    <span class="token-comment">// Step 3a: Server confirmed — nothing to do, UI is already correct</span>
+  } <span class="token-keyword">catch</span> (error) {
+    <span class="token-comment">// Step 3b: Server rejected — ROLLBACK to previous state</span>
+    setLiked(<span class="token-keyword">false</span>);
+    setLikeCount(prev => prev - 1);
+    showToast(<span class="token-string">'Could not like post. Please try again.'</span>);
+  }
+}
+</code></pre>
+
+            <h2>How It Works: The Rollback Strategy</h2>
+            <p>Every optimistic update follows a three-phase protocol:</p>
+            <ol>
+                <li><strong>Snapshot</strong> — Save current state before modification (the rollback target)</li>
+                <li><strong>Apply</strong> — Mutate local state as if the operation succeeded</li>
+                <li><strong>Reconcile</strong> — When server responds: confirm (no-op) or rollback (restore snapshot)</li>
+            </ol>
+
+<pre><code><span class="token-comment">// Production-grade optimistic update manager</span>
+<span class="token-comment">// Handles multiple concurrent optimistic operations with proper ordering</span>
+
+<span class="token-keyword">class</span> <span class="token-function">OptimisticManager</span> {
+  <span class="token-keyword">constructor</span>() {
+    <span class="token-comment">// Queue of pending optimistic operations — ordered by time</span>
+    <span class="token-comment">// Each entry stores: what we changed + how to undo it</span>
+    <span class="token-keyword">this</span>.pendingOps = <span class="token-keyword">new</span> Map();
+  }
+
+  <span class="token-comment">// Execute an optimistic operation with automatic rollback on failure</span>
+  <span class="token-keyword">async</span> <span class="token-function">execute</span>({ id, optimisticUpdate, serverRequest, rollback, onError }) {
+    <span class="token-comment">// Phase 1: Apply optimistic update immediately</span>
+    <span class="token-keyword">const</span> snapshot = optimisticUpdate();
+
+    <span class="token-comment">// Track this pending operation</span>
+    <span class="token-keyword">this</span>.pendingOps.set(id, { snapshot, rollback, timestamp: Date.now() });
+
+    <span class="token-keyword">try</span> {
+      <span class="token-comment">// Phase 2: Send to server (may take 50ms-5s)</span>
+      <span class="token-keyword">const</span> serverResult = <span class="token-keyword">await</span> serverRequest();
+
+      <span class="token-comment">// Phase 3a: Success — remove from pending, apply server corrections</span>
+      <span class="token-keyword">this</span>.pendingOps.delete(id);
+
+      <span class="token-comment">// Server may return slightly different data than our optimistic guess</span>
+      <span class="token-comment">// e.g., server-generated ID, normalized timestamp, computed fields</span>
+      <span class="token-keyword">return</span> serverResult;
+
+    } <span class="token-keyword">catch</span> (error) {
+      <span class="token-comment">// Phase 3b: FAILURE — rollback to snapshot</span>
+      <span class="token-keyword">this</span>.pendingOps.delete(id);
+      rollback(snapshot);
+
+      <span class="token-comment">// Notify user gracefully — not a crash, just a gentle correction</span>
+      <span class="token-keyword">if</span> (onError) onError(error);
+      <span class="token-keyword">throw</span> error;
+    }
+  }
+
+  <span class="token-comment">// Handle the HARD case: multiple overlapping optimistic updates</span>
+  <span class="token-comment">// If op2 depends on op1's result, and op1 fails, op2 must also rollback</span>
+  <span class="token-keyword">async</span> <span class="token-function">rollbackCascade</span>(failedId) {
+    <span class="token-keyword">const</span> failedOp = <span class="token-keyword">this</span>.pendingOps.get(failedId);
+    <span class="token-keyword">if</span> (!failedOp) <span class="token-keyword">return</span>;
+
+    <span class="token-comment">// Find all operations that happened AFTER the failed one</span>
+    <span class="token-keyword">const</span> laterOps = [...<span class="token-keyword">this</span>.pendingOps.entries()]
+      .filter(([id, op]) => op.timestamp > failedOp.timestamp)
+      .sort((a, b) => b[1].timestamp - a[1].timestamp); <span class="token-comment">// Reverse chronological</span>
+
+    <span class="token-comment">// Rollback in reverse order (most recent first)</span>
+    <span class="token-keyword">for</span> (<span class="token-keyword">const</span> [id, op] <span class="token-keyword">of</span> laterOps) {
+      op.rollback(op.snapshot);
+      <span class="token-keyword">this</span>.pendingOps.delete(id);
+    }
+
+    <span class="token-comment">// Finally rollback the failed operation itself</span>
+    failedOp.rollback(failedOp.snapshot);
+    <span class="token-keyword">this</span>.pendingOps.delete(failedId);
+  }
+}
+</code></pre>
+
+            <h2>React Implementation: useOptimistic Pattern</h2>
+<pre><code><span class="token-comment">// React 19's useOptimistic hook formalizes this pattern</span>
+<span class="token-comment">// Here's how it works internally and how to use it</span>
+
+<span class="token-keyword">import</span> { useOptimistic, useTransition } <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+
+<span class="token-keyword">function</span> <span class="token-function">MessageThread</span>({ messages, sendMessage }) {
+  <span class="token-comment">// useOptimistic: show pending messages IMMEDIATELY with a "sending" flag</span>
+  <span class="token-comment">// First arg: server-confirmed state (source of truth)</span>
+  <span class="token-comment">// Second arg: reducer that produces optimistic state</span>
+  <span class="token-keyword">const</span> [optimisticMessages, addOptimistic] = useOptimistic(
+    messages,
+    (currentMessages, newMessage) => [
+      ...currentMessages,
+      { ...newMessage, sending: <span class="token-keyword">true</span> } <span class="token-comment">// Mark as unconfirmed</span>
+    ]
+  );
+
+  <span class="token-keyword">const</span> [isPending, startTransition] = useTransition();
+
+  <span class="token-keyword">async function</span> <span class="token-function">handleSend</span>(text) {
+    <span class="token-keyword">const</span> optimisticMsg = {
+      id: crypto.randomUUID(), <span class="token-comment">// Temporary client-side ID</span>
+      text,
+      author: <span class="token-string">'me'</span>,
+      timestamp: Date.now()
+    };
+
+    startTransition(<span class="token-keyword">async</span> () => {
+      <span class="token-comment">// Show message immediately with "sending" indicator</span>
+      addOptimistic(optimisticMsg);
+
+      <span class="token-comment">// Send to server — if this throws, React auto-reverts</span>
+      <span class="token-comment">// the optimistic state back to the `messages` prop</span>
+      <span class="token-keyword">await</span> sendMessage(optimisticMsg);
+    });
+  }
+
+  <span class="token-keyword">return</span> (
+    &lt;div&gt;
+      {optimisticMessages.map(msg =&gt; (
+        &lt;Message
+          key={msg.id}
+          text={msg.text}
+          <span class="token-comment">// Visual indicator: faded opacity while sending</span>
+          style={{ opacity: msg.sending ? 0.6 : 1 }}
+        /&gt;
+      ))}
+      &lt;input onSubmit={handleSend} /&gt;
+    &lt;/div&gt;
+  );
+}
+
+<span class="token-comment">// MANUAL IMPLEMENTATION (for pre-React 19 or non-React frameworks)</span>
+<span class="token-keyword">function</span> <span class="token-function">useManualOptimistic</span>(confirmedState, reducer) {
+  <span class="token-keyword">const</span> [pendingOps, setPendingOps] = useState([]);
+
+  <span class="token-comment">// Optimistic state = confirmed state + all pending operations applied</span>
+  <span class="token-keyword">const</span> optimisticState = pendingOps.reduce(
+    (state, op) => reducer(state, op),
+    confirmedState
+  );
+
+  <span class="token-keyword">function</span> <span class="token-function">addOptimistic</span>(operation) {
+    <span class="token-keyword">const</span> opId = crypto.randomUUID();
+    setPendingOps(prev => [...prev, { ...operation, _opId: opId }]);
+    <span class="token-keyword">return</span> opId;
+  }
+
+  <span class="token-keyword">function</span> <span class="token-function">confirmOp</span>(opId) {
+    <span class="token-comment">// Server confirmed — remove from pending (confirmed state will include it)</span>
+    setPendingOps(prev => prev.filter(op => op._opId !== opId));
+  }
+
+  <span class="token-keyword">function</span> <span class="token-function">rejectOp</span>(opId) {
+    <span class="token-comment">// Server rejected — remove from pending (state reverts automatically</span>
+    <span class="token-comment">// because optimisticState is derived from confirmedState + pendingOps)</span>
+    setPendingOps(prev => prev.filter(op => op._opId !== opId));
+  }
+
+  <span class="token-keyword">return</span> { optimisticState, addOptimistic, confirmOp, rejectOp, pendingOps };
+}
+</code></pre>
+
+            <h2>The Conflict Problem: Concurrent Optimistic Updates</h2>
+<pre><code><span class="token-comment">// The HARD problem: what happens when multiple optimistic ops overlap?</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Timeline:</span>
+<span class="token-comment">// t=0: User adds item A (optimistic) → request sent</span>
+<span class="token-comment">// t=1: User adds item B (optimistic) → request sent</span>
+<span class="token-comment">// t=2: Server REJECTS item A (e.g., validation failed)</span>
+<span class="token-comment">// t=3: Server CONFIRMS item B</span>
+<span class="token-comment">//</span>
+<span class="token-comment">// Naive rollback of A would also remove B (if B depended on list index)</span>
+<span class="token-comment">// Solution: replay-based rollback</span>
+
+<span class="token-keyword">function</span> <span class="token-function">useReplayOptimistic</span>(serverState, reducer) {
+  <span class="token-keyword">const</span> [pendingOps, setPendingOps] = useState([]);
+
+  <span class="token-comment">// KEY INSIGHT: optimistic state is always derived fresh</span>
+  <span class="token-comment">// by replaying ALL pending ops on top of confirmed server state.</span>
+  <span class="token-comment">// When one op is rejected, we just remove it and re-derive.</span>
+  <span class="token-comment">// The remaining ops are replayed cleanly.</span>
+  <span class="token-keyword">const</span> optimisticState = useMemo(() => {
+    <span class="token-keyword">return</span> pendingOps.reduce(
+      (state, op) => reducer(state, op.action),
+      serverState  <span class="token-comment">// Always start from server-confirmed truth</span>
+    );
+  }, [serverState, pendingOps, reducer]);
+
+  <span class="token-keyword">async function</span> <span class="token-function">dispatch</span>(action, serverFn) {
+    <span class="token-keyword">const</span> opId = crypto.randomUUID();
+    setPendingOps(prev => [...prev, { id: opId, action }]);
+
+    <span class="token-keyword">try</span> {
+      <span class="token-keyword">await</span> serverFn();
+      <span class="token-comment">// Success: pending op will be removed when serverState updates</span>
+      <span class="token-comment">// (the confirmed data now includes this operation's effect)</span>
+      setPendingOps(prev => prev.filter(op => op.id !== opId));
+    } <span class="token-keyword">catch</span> (e) {
+      <span class="token-comment">// Failure: remove this op — remaining ops auto-reapply on next render</span>
+      setPendingOps(prev => prev.filter(op => op.id !== opId));
+      showRollbackToast(action);
+    }
+  }
+
+  <span class="token-keyword">return</span> { state: optimisticState, dispatch, hasPending: pendingOps.length > 0 };
+}
+</code></pre>
+
+            <h2>Real-World Usage</h2>
+            <ul>
+                <li><strong>Twitter/X</strong> — Likes and retweets are optimistic. The heart fills immediately. If the server rejects (rate limit, deleted post), it unfills after ~500ms with a subtle animation.</li>
+                <li><strong>Slack</strong> — Messages appear instantly in the channel with a subtle "sending" indicator (faded text). If delivery fails, the message turns red with a "retry" button.</li>
+                <li><strong>Notion</strong> — Every edit is optimistic. Type a character → it appears instantly. The page syncs to the server in the background. Conflict resolution handles simultaneous editors.</li>
+                <li><strong>TanStack Query (React Query)</strong> — Built-in <code>onMutate</code> → <code>onError</code> → <code>onSettled</code> lifecycle designed explicitly for optimistic updates with automatic cache rollback.</li>
+                <li><strong>Linear</strong> — Issue status changes, assignments, and priority updates are all optimistic. The entire board reflows instantly. Server rejection causes a toast notification and revert.</li>
+            </ul>
+
+            <h2>Trade-offs & Alternatives</h2>
+            <table>
+                <thead><tr><th>Approach</th><th>Strengths</th><th>Weaknesses</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Optimistic UI</td>
+                        <td>Instant perceived performance; feels native; 0ms feedback</td>
+                        <td>Rollback complexity; potential confusion on failure; stale data risk</td>
+                    </tr>
+                    <tr>
+                        <td>Pessimistic (wait for server)</td>
+                        <td>Always consistent; simple logic; no rollback needed</td>
+                        <td>Feels slow (200ms+); requires spinners; bad on slow networks</td>
+                    </tr>
+                    <tr>
+                        <td>Skeleton/Loading states</td>
+                        <td>User knows something is happening; no false positives</td>
+                        <td>Still feels slow; content jumps when data arrives (CLS)</td>
+                    </tr>
+                    <tr>
+                        <td>Background sync (offline-first)</td>
+                        <td>Works offline; eventual consistency; best perceived perf</td>
+                        <td>Complex conflict resolution; user may see outdated data longer</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Common Mistakes</h2>
+            <ul>
+                <li><strong>Not saving the rollback snapshot</strong> — If you only store "what changed," you can't roll back reliably when multiple mutations overlap. Always save the full pre-mutation state slice.</li>
+                <li><strong>Silent rollbacks</strong> — Users who saw their action "succeed" then have it silently disappear are MORE frustrated than if they'd waited for a spinner. Always notify on rollback (toast, animation, inline error).</li>
+                <li><strong>Optimistic updates on destructive actions</strong> — Don't optimistically delete a user's draft or remove payment methods. Irreversible actions should be pessimistic with confirmation.</li>
+                <li><strong>Not handling the race: fast user + slow server</strong> — User likes, unlikes, likes again — three optimistic updates. If the first "like" request is still in-flight when the "unlike" arrives at the server, ordering matters. Use sequence numbers or timestamps to resolve.</li>
+                <li><strong>Ignoring server-generated data</strong> — The server often returns different data than the client predicted (auto-generated IDs, server timestamps, computed fields). After confirmation, reconcile the optimistic data with server reality.</li>
+            </ul>
+
+            <div class="understanding-section">
+                <h3>✅ You Truly Understand Optimistic UI Rollback When...</h3>
+                <p>You can implement a todo list where adding, editing, completing, and deleting are all optimistic — with multiple operations in flight simultaneously — and a failure of operation #2 correctly rolls back #2 without affecting the already-confirmed #1 or the still-pending #3. And you provide appropriate user feedback for every rollback scenario.</p>
+                <h3>🧪 Try This Challenge</h3>
+                <p>Build a Kanban board with drag-and-drop card movement between columns. Each move is optimistic. Implement: (1) instant visual feedback on drag, (2) server confirmation with artificial 1-second delay, (3) graceful rollback with animation if the server rejects (e.g., column is at max capacity), and (4) handle the case where a user moves card A, then moves card B to where A was — and then A's move gets rejected.</p>
+                <h3>🔗 Connect It</h3>
+                <p>Optimistic UI connects to: <strong>Event Sourcing</strong> (optimistic ops are "pending events" that may be removed from the log), <strong>Offline Conflict Resolution</strong> (offline-first apps are essentially ALL optimistic), and <strong>CRDT Basics</strong> (CRDTs eliminate the need for rollback by making all operations commutative).</p>
+            </div>
+
+            <div class="nav-footer">
+                <a href="65-event-sourcing-frontend.html" class="nav-btn nav-btn-prev">← Event Sourcing in Frontend</a>
+                <a href="67-offline-conflict-resolution.html" class="nav-btn nav-btn-next">Offline Conflict Resolution →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Memory Systems — AI/LLM Engineering Course</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><span>Complete Course</span><h2>🧠 AI/LLM Engineering</h2></div>
+        <nav><ul>
+            <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+            <li><span class="module-label">Module 1: Foundations</span></li>
+            <li><a href="01-llm-basics.html"><span class="nav-number">1</span> LLM Basics</a></li>
+            <li><a href="02-tokens-tokenization.html"><span class="nav-number">2</span> Tokens & Tokenization</a></li>
+            <li><a href="03-embeddings.html"><span class="nav-number">3</span> Embeddings</a></li>
+            <li><a href="04-transformers-attention.html"><span class="nav-number">4</span> Transformers & Attention</a></li>
+            <li><a href="05-parameters-training.html"><span class="nav-number">5</span> Parameters & Training</a></li>
+            <li><a href="06-open-vs-closed-models.html"><span class="nav-number">6</span> Open vs Closed Models</a></li>
+            <li><span class="module-label">Module 2: Datasets</span></li>
+            <li><a href="07-datasets-overview.html"><span class="nav-number">7</span> Dataset Types</a></li>
+            <li><a href="08-synthetic-data.html"><span class="nav-number">8</span> Synthetic Data</a></li>
+            <li><a href="09-data-cleaning-formatting.html"><span class="nav-number">9</span> Cleaning & Formatting</a></li>
+            <li><a href="10-finetuning-basics.html"><span class="nav-number">10</span> Fine-Tuning Basics</a></li>
+            <li><a href="11-hallucination-reduction.html"><span class="nav-number">11</span> Hallucination Reduction</a></li>
+            <li><span class="module-label">Module 3: Fine-Tuning</span></li>
+            <li><a href="12-lora-qlora.html"><span class="nav-number">12</span> LoRA & QLoRA</a></li>
+            <li><a href="13-dpo-rlhf.html"><span class="nav-number">13</span> DPO & RLHF</a></li>
+            <li><a href="14-quantization.html"><span class="nav-number">14</span> Quantization & GGUF</a></li>
+            <li><a href="15-checkpoints-merging.html"><span class="nav-number">15</span> Checkpoints & Merging</a></li>
+            <li><span class="module-label">Module 4: Inference</span></li>
+            <li><a href="16-kv-cache-flash-attention.html"><span class="nav-number">16</span> KV Cache & Flash Attention</a></li>
+            <li><a href="17-inference-optimization.html"><span class="nav-number">17</span> Inference Optimization</a></li>
+            <li><a href="18-gpu-vram-basics.html"><span class="nav-number">18</span> GPU & VRAM</a></li>
+            <li><span class="module-label">Module 5: Local AI</span></li>
+            <li><a href="19-llamacpp-ollama.html"><span class="nav-number">19</span> llama.cpp & Ollama</a></li>
+            <li><a href="20-vllm-mlx.html"><span class="nav-number">20</span> vLLM & MLX</a></li>
+            <li><a href="21-huggingface-ecosystem.html"><span class="nav-number">21</span> HuggingFace Ecosystem</a></li>
+            <li><span class="module-label">Module 6: RAG & Memory</span></li>
+            <li><a href="22-rag-fundamentals.html"><span class="nav-number">22</span> RAG Fundamentals</a></li>
+            <li><a href="23-vector-databases.html"><span class="nav-number">23</span> Vector Databases</a></li>
+            <li><a href="24-ai-memory-systems.html"><span class="nav-number">24</span> AI Memory Systems</a></li>
+            <li><span class="module-label">Module 7: Agents</span></li>
+            <li><a href="25-prompt-engineering.html"><span class="nav-number">25</span> Prompt Engineering</a></li>
+            <li><a href="26-tool-function-calling.html"><span class="nav-number">26</span> Tool & Function Calling</a></li>
+            <li><a href="27-ai-agents.html"><span class="nav-number">27</span> AI Agents</a></li>
+            <li><a href="28-browser-agents.html"><span class="nav-number">28</span> Browser Agents</a></li>
+            <li><span class="module-label">Module 8: Models</span></li>
+            <li><a href="29-model-types.html"><span class="nav-number">29</span> All Model Types</a></li>
+            <li><span class="module-label">Module 9: Deployment</span></li>
+            <li><a href="30-deployment.html"><span class="nav-number">30</span> Deployment & Serving</a></li>
+            <li><span class="module-label">Module 10: Evaluation</span></li>
+            <li><a href="31-evaluation-benchmarks.html"><span class="nav-number">31</span> Benchmarks & Evals</a></li>
+            <li><span class="module-label">Module 11: Real World</span></li>
+            <li><a href="32-building-chatbots.html"><span class="nav-number">32</span> Chatbots & Copilots</a></li>
+            <li><a href="33-ai-automation-saas.html"><span class="nav-number">33</span> AI Automation & SaaS</a></li>
+            <li><a href="34-ai-orchestration.html"><span class="nav-number">34</span> AI Orchestration</a></li>
+            <li><a href="35-capstone-project.html"><span class="nav-number">35</span> Capstone Project</a></li>
+        </ul></nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb"><a href="index.html">Course</a> <span>›</span> <a href="index.html">Module 6</a> <span>›</span> AI Memory Systems</div>
+        <div class="topbar-actions"><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero">
+                <h1>AI Memory Systems</h1>
+                <p>How does ChatGPT remember your name across conversations? How do AI agents recall past interactions? Memory systems — short-term, long-term, and episodic — make AI truly personal and useful.</p>
+            </section>
+
+            <div class="analogy-box">
+                <h4>🏠 Daily Life Analogy</h4>
+                <p><strong>Short-term memory = your notepad during a phone call.</strong> You write down what the person says right now. When the call ends, you tear off the sheet.</p>
+                <p><strong>Long-term memory = your personal diary.</strong> Key facts and important events are stored permanently. You can look things up from months ago.</p>
+                <p><strong>Episodic memory = photo albums.</strong> Full snapshots of past events. "Remember that trip to Paris?" — you recall the whole experience, not just facts.</p>
+            </div>
+
+            <h2 id="types">Memory Types for AI</h2>
+
+            <table>
+                <thead><tr><th>Memory Type</th><th>Scope</th><th>Storage</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Conversation (short-term)</strong></td><td>Current chat session</td><td>Message list</td><td>"You said your name is Alex 3 messages ago"</td></tr>
+                    <tr><td><strong>Summary memory</strong></td><td>Current session, compressed</td><td>Summarized text</td><td>"User is asking about Python deployment"</td></tr>
+                    <tr><td><strong>Long-term facts</strong></td><td>Across all sessions</td><td>Vector DB + structured</td><td>"User prefers TypeScript, works at Acme Inc"</td></tr>
+                    <tr><td><strong>Episodic</strong></td><td>Past conversations</td><td>Vector DB</td><td>"In March, we debugged a Redis issue together"</td></tr>
+                    <tr><td><strong>Semantic (RAG)</strong></td><td>External knowledge</td><td>Vector DB</td><td>"Company docs say the API rate limit is 100/min"</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="implementation">Production Memory System</h2>
+
+            <pre><code><span class="token-comment"># Complete AI memory system with multiple memory types</span>
+<span class="token-keyword">import</span> json
+<span class="token-keyword">import</span> time
+<span class="token-keyword">from</span> datetime <span class="token-keyword">import</span> datetime
+<span class="token-keyword">from</span> typing <span class="token-keyword">import</span> Optional
+<span class="token-keyword">from</span> openai <span class="token-keyword">import</span> OpenAI
+<span class="token-keyword">import</span> chromadb
+<span class="token-keyword">from</span> sentence_transformers <span class="token-keyword">import</span> SentenceTransformer
+
+<span class="token-keyword">class</span> <span class="token-function">AIMemorySystem</span>:
+    <span class="token-string">"""Multi-layer memory system for AI assistants."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(self, user_id: str):
+        self.user_id = user_id
+        self.llm = OpenAI(base_url=<span class="token-string">"http://localhost:11434/v1"</span>, api_key=<span class="token-string">"local"</span>)
+        self.embedder = SentenceTransformer(<span class="token-string">"all-MiniLM-L6-v2"</span>)
+        
+        <span class="token-comment"># Short-term: current conversation</span>
+        self.conversation_history = []
+        self.max_history = <span class="token-number">20</span>  <span class="token-comment"># Keep last 20 messages</span>
+        
+        <span class="token-comment"># Long-term: persistent facts about the user</span>
+        self.chroma = chromadb.PersistentClient(path=<span class="token-string">f"./memory_{user_id}"</span>)
+        self.facts_collection = self.chroma.get_or_create_collection(<span class="token-string">"user_facts"</span>)
+        self.episodes_collection = self.chroma.get_or_create_collection(<span class="token-string">"episodes"</span>)
+    
+    <span class="token-keyword">def</span> <span class="token-function">add_message</span>(self, role: str, content: str):
+        <span class="token-string">"""Add message to conversation history."""</span>
+        self.conversation_history.append({
+            <span class="token-string">"role"</span>: role,
+            <span class="token-string">"content"</span>: content,
+            <span class="token-string">"timestamp"</span>: datetime.now().isoformat()
+        })
+        
+        <span class="token-comment"># Trim if too long</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(self.conversation_history) > self.max_history:
+            <span class="token-comment"># Summarize old messages before removing them</span>
+            self._summarize_and_store()
+            self.conversation_history = self.conversation_history[-<span class="token-number">10</span>:]
+    
+    <span class="token-keyword">def</span> <span class="token-function">extract_and_store_facts</span>(self, message: str):
+        <span class="token-string">"""Extract facts from user messages and store long-term."""</span>
+        extraction_prompt = <span class="token-string">f"""Extract any personal facts from this user message.
+Return JSON array of facts, or empty array if none found.
+Examples of facts: name, job, preferences, tech stack, company, goals.
+
+Message: "{message}"
+
+Return ONLY a JSON array like: ["fact 1", "fact 2"] or []"""</span>
+        
+        response = self.llm.chat.completions.create(
+            model=<span class="token-string">"llama3.1:8b"</span>,
+            messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: extraction_prompt}],
+            temperature=<span class="token-number">0</span>,
+        )
+        
+        <span class="token-keyword">try</span>:
+            facts = json.loads(response.choices[<span class="token-number">0</span>].message.content)
+            <span class="token-keyword">for</span> fact <span class="token-keyword">in</span> facts:
+                embedding = self.embedder.encode(fact).tolist()
+                self.facts_collection.add(
+                    ids=[<span class="token-string">f"fact_{int(time.time()*1000)}"</span>],
+                    embeddings=[embedding],
+                    documents=[fact],
+                    metadatas=[{<span class="token-string">"timestamp"</span>: datetime.now().isoformat()}]
+                )
+        <span class="token-keyword">except</span> json.JSONDecodeError:
+            <span class="token-keyword">pass</span>  <span class="token-comment"># Model didn't return valid JSON</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">recall_relevant_memories</span>(self, query: str, top_k: int = <span class="token-number">3</span>) -> str:
+        <span class="token-string">"""Recall relevant long-term memories for current context."""</span>
+        memories = []
+        
+        <span class="token-comment"># Search user facts</span>
+        <span class="token-keyword">if</span> self.facts_collection.count() > <span class="token-number">0</span>:
+            facts = self.facts_collection.query(
+                query_texts=[query], n_results=<span class="token-builtin">min</span>(top_k, self.facts_collection.count())
+            )
+            memories.extend(facts[<span class="token-string">"documents"</span>][<span class="token-number">0</span>])
+        
+        <span class="token-comment"># Search past episodes</span>
+        <span class="token-keyword">if</span> self.episodes_collection.count() > <span class="token-number">0</span>:
+            episodes = self.episodes_collection.query(
+                query_texts=[query], n_results=<span class="token-builtin">min</span>(<span class="token-number">2</span>, self.episodes_collection.count())
+            )
+            memories.extend(episodes[<span class="token-string">"documents"</span>][<span class="token-number">0</span>])
+        
+        <span class="token-keyword">if not</span> memories:
+            <span class="token-keyword">return</span> <span class="token-string">""</span>
+        
+        <span class="token-keyword">return</span> <span class="token-string">"Relevant memories:\n"</span> + <span class="token-string">"\n"</span>.join([<span class="token-string">f"- {m}"</span> <span class="token-keyword">for</span> m <span class="token-keyword">in</span> memories])
+    
+    <span class="token-keyword">def</span> <span class="token-function">chat</span>(self, user_message: str) -> str:
+        <span class="token-string">"""Full memory-augmented chat."""</span>
+        <span class="token-comment"># Store the message</span>
+        self.add_message(<span class="token-string">"user"</span>, user_message)
+        
+        <span class="token-comment"># Extract facts (async in production)</span>
+        self.extract_and_store_facts(user_message)
+        
+        <span class="token-comment"># Recall relevant memories</span>
+        memories = self.recall_relevant_memories(user_message)
+        
+        <span class="token-comment"># Build context-rich prompt</span>
+        system = <span class="token-string">f"""You are a helpful AI assistant with memory.
+You remember things about the user from past conversations.
+
+{memories}
+
+Use these memories naturally in conversation. Don't announce "I remember..."
+unless directly relevant."""</span>
+        
+        messages = [{<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: system}]
+        messages.extend([{<span class="token-string">"role"</span>: m[<span class="token-string">"role"</span>], <span class="token-string">"content"</span>: m[<span class="token-string">"content"</span>]} <span class="token-keyword">for</span> m <span class="token-keyword">in</span> self.conversation_history])
+        
+        response = self.llm.chat.completions.create(
+            model=<span class="token-string">"llama3.1:8b"</span>,
+            messages=messages,
+            temperature=<span class="token-number">0.7</span>,
+        )
+        
+        assistant_msg = response.choices[<span class="token-number">0</span>].message.content
+        self.add_message(<span class="token-string">"assistant"</span>, assistant_msg)
+        <span class="token-keyword">return</span> assistant_msg
+
+<span class="token-comment"># Usage</span>
+memory = AIMemorySystem(user_id=<span class="token-string">"user_123"</span>)
+
+<span class="token-comment"># First conversation</span>
+<span class="token-builtin">print</span>(memory.chat(<span class="token-string">"Hi! I'm Alex, I work at Google as a Python developer."</span>))
+<span class="token-builtin">print</span>(memory.chat(<span class="token-string">"I'm building a RAG system for internal docs."</span>))
+
+<span class="token-comment"># ... days later, new conversation ...</span>
+memory2 = AIMemorySystem(user_id=<span class="token-string">"user_123"</span>)  <span class="token-comment"># Same user, new session</span>
+<span class="token-builtin">print</span>(memory2.chat(<span class="token-string">"How should I handle authentication in my project?"</span>))
+<span class="token-comment"># AI remembers: "user works at Google", "building RAG system"</span></code></pre>
+
+            <h2 id="conversation-management">Conversation Window Management</h2>
+
+            <pre><code><span class="token-comment"># Strategies for managing conversation history within context limits</span>
+
+<span class="token-keyword">class</span> <span class="token-function">ConversationManager</span>:
+    <span class="token-string">"""Manage conversation history within token limits."""</span>
+    
+    <span class="token-keyword">def</span> <span class="token-function">sliding_window</span>(self, messages: list, max_messages: int = <span class="token-number">20</span>) -> list:
+        <span class="token-string">"""Keep only the last N messages (simplest)."""</span>
+        <span class="token-keyword">return</span> messages[-max_messages:]
+    
+    <span class="token-keyword">def</span> <span class="token-function">summarize_and_keep_recent</span>(self, messages: list, llm) -> list:
+        <span class="token-string">"""Summarize old messages, keep recent ones verbatim."""</span>
+        <span class="token-keyword">if</span> <span class="token-builtin">len</span>(messages) <= <span class="token-number">10</span>:
+            <span class="token-keyword">return</span> messages
+        
+        <span class="token-comment"># Summarize older messages</span>
+        old_messages = messages[:-<span class="token-number">10</span>]
+        recent_messages = messages[-<span class="token-number">10</span>:]
+        
+        summary_prompt = <span class="token-string">"Summarize this conversation so far in 2-3 sentences:\n"</span>
+        summary_prompt += <span class="token-string">"\n"</span>.join([<span class="token-string">f"{m['role']}: {m['content']}"</span> <span class="token-keyword">for</span> m <span class="token-keyword">in</span> old_messages])
+        
+        summary = llm.chat.completions.create(
+            model=<span class="token-string">"llama3.1:8b"</span>,
+            messages=[{<span class="token-string">"role"</span>: <span class="token-string">"user"</span>, <span class="token-string">"content"</span>: summary_prompt}],
+            max_tokens=<span class="token-number">150</span>,
+        ).choices[<span class="token-number">0</span>].message.content
+        
+        <span class="token-comment"># Return: summary + recent messages</span>
+        <span class="token-keyword">return</span> [
+            {<span class="token-string">"role"</span>: <span class="token-string">"system"</span>, <span class="token-string">"content"</span>: <span class="token-string">f"Previous conversation summary: {summary}"</span>}
+        ] + recent_messages
+    
+    <span class="token-keyword">def</span> <span class="token-function">token_budget</span>(self, messages: list, max_tokens: int = <span class="token-number">3000</span>) -> list:
+        <span class="token-string">"""Keep messages that fit within token budget (most accurate)."""</span>
+        result = []
+        token_count = <span class="token-number">0</span>
+        
+        <span class="token-comment"># Work backwards from most recent</span>
+        <span class="token-keyword">for</span> msg <span class="token-keyword">in</span> <span class="token-builtin">reversed</span>(messages):
+            msg_tokens = <span class="token-builtin">len</span>(msg[<span class="token-string">"content"</span>]) // <span class="token-number">4</span>  <span class="token-comment"># Rough estimate</span>
+            <span class="token-keyword">if</span> token_count + msg_tokens > max_tokens:
+                <span class="token-keyword">break</span>
+            result.insert(<span class="token-number">0</span>, msg)
+            token_count += msg_tokens
+        
+        <span class="token-keyword">return</span> result</code></pre>
+
+            <div class="industry-box">
+                <h4>🏭 Industry Standards</h4>
+                <ul>
+                    <li><strong>ChatGPT uses all three memory types</strong> — Conversation window, summary compression, and persistent user memory.</li>
+                    <li><strong>mem0 (MemGPT) for production memory</strong> — Open-source library specifically for AI memory management.</li>
+                    <li><strong>Always ask before storing personal info</strong> — Privacy compliance (GDPR). Let users delete their memories.</li>
+                    <li><strong>Summarization for long conversations</strong> — Don't just truncate. Summarize old messages to preserve context.</li>
+                    <li><strong>Separate facts from episodes</strong> — "User likes Python" (fact) vs "We debugged Redis together on March 5" (episode).</li>
+                    <li><strong>Token budget management</strong> — Reserve tokens for: system prompt + memories + conversation + model response.</li>
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h4>📝 Summary</h4>
+                <ul>
+                    <li><strong>Short-term memory</strong> = current conversation history (sliding window)</li>
+                    <li><strong>Long-term memory</strong> = extracted facts stored in vector DB (persistent)</li>
+                    <li><strong>Episodic memory</strong> = past conversation summaries (searchable)</li>
+                    <li>Use LLM to <strong>extract facts</strong> from messages automatically</li>
+                    <li>Use vector search to <strong>recall relevant memories</strong> for current context</li>
+                    <li>Manage context window with summarization or token budgets</li>
+                </ul>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>❌ Beginner Mistakes to Avoid</h4>
+                <ul>
+                    <li><strong>Sending entire conversation history every time</strong> — Exceeds context limit fast. Use sliding window + summarization.</li>
+                    <li><strong>Storing everything as memory</strong> — Not every message is worth remembering. Extract only key facts.</li>
+                    <li><strong>No memory expiry</strong> — Old facts become stale. "User uses Python 3.8" may be outdated. Add timestamps.</li>
+                    <li><strong>Ignoring privacy</strong> — Users must be able to view and delete stored memories. Required by law (GDPR).</li>
+                    <li><strong>Memory retrieval in the critical path</strong> — If vector search is slow, the whole response is delayed. Cache frequently accessed memories.</li>
+                </ul>
+            </div>
+
+            <div class="exercise-box">
+                <h4>🏋️ Exercise: Build AI with Memory</h4>
+                <ol>
+                    <li>Implement the AIMemorySystem class above</li>
+                    <li>Have a conversation where you share personal facts (name, job, preferences)</li>
+                    <li>Start a NEW session (same user_id) and verify the AI remembers you</li>
+                    <li>Implement conversation summarization for long chats</li>
+                    <li>Add a "forget" command that deletes all stored memories</li>
+                    <li><strong>Bonus:</strong> Implement memory with different priority levels (important vs casual)</li>
+                </ol>
+            </div>
+
+            <div class="page-nav">
+                <a href="23-vector-databases.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Vector Databases</span>
+                </a>
+                <a href="25-prompt-engineering.html">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Prompt Engineering</span>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

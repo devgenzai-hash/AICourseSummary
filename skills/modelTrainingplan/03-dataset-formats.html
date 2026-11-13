@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Dataset Format Requirements — Gemma Fine-Tuning Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span>Fine-Tuning Guide</span>
+            <h2>🙏 Gemma × Hindu Scriptures</h2>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html"><span class="nav-number">🏠</span> Home</a></li>
+                <li><a href="01-introduction.html"><span class="nav-number">1</span> Introduction</a></li>
+                <li><a href="02-data-collection.html"><span class="nav-number">2</span> Data Collection</a></li>
+                <li><a href="03-dataset-formats.html"><span class="nav-number">3</span> Dataset Formats</a></li>
+                <li><a href="04-continued-pretraining.html"><span class="nav-number">4</span> Pre-Training (CPT)</a></li>
+                <li><a href="05-supervised-finetuning.html"><span class="nav-number">5</span> Fine-Tuning (SFT)</a></li>
+                <li><a href="06-preference-alignment.html"><span class="nav-number">6</span> Preference (DPO)</a></li>
+                <li><a href="07-reinforcement-learning.html"><span class="nav-number">7</span> RL (GRPO/PPO)</a></li>
+                <li><a href="08-hardware-infrastructure.html"><span class="nav-number">8</span> Hardware & Infra</a></li>
+                <li><a href="09-evaluation.html"><span class="nav-number">9</span> Evaluation</a></li>
+                <li><a href="10-deployment.html"><span class="nav-number">10</span> Deployment</a></li>
+                <li><a href="11-troubleshooting.html"><span class="nav-number">11</span> Troubleshooting</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <header class="topbar">
+        <button class="hamburger">☰</button>
+        <div class="breadcrumb">
+            <a href="index.html">Guide</a><span>›</span> Dataset Format Requirements
+        </div>
+        <div class="topbar-actions">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>Chapter 3: Dataset Format Requirements</h1>
+            <p class="lead" style="font-size: 1.2rem; color: var(--text-secondary);">The exact data formats needed for each training stage — CPT, SFT, and DPO — with scripture-specific examples and code to create them.</p>
+
+            <!-- SECTION: Overview -->
+            <h2 id="overview">📋 Format Overview</h2>
+            
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Three Different Formats for Three Different Stages</div>
+                <p>Each training stage requires data in a different format. Think of it as: raw reading material (CPT), textbook exercises (SFT), and graded essays (DPO).</p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Format</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>CPT</strong></td>
+                        <td>Plain text / JSONL with "text" field</td>
+                        <td>Teach domain vocabulary & knowledge</td>
+                        <td><code>{"text": "The Bhagavad Gita..."}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>SFT</strong></td>
+                        <td>Conversational messages</td>
+                        <td>Teach instruction-following</td>
+                        <td><code>{"messages": [{"role": "user"...}]}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>DPO</strong></td>
+                        <td>Prompt + chosen + rejected</td>
+                        <td>Align with quality preferences</td>
+                        <td><code>{"prompt":..., "chosen":..., "rejected":...}</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- SECTION: CPT Format -->
+            <h2 id="cpt-format">📄 CPT (Continued Pre-Training) Format</h2>
+            
+            <h3>What It Is</h3>
+            <p>For continued pre-training, you need raw text — just the scripture content as-is. The model reads this text and learns the domain vocabulary, writing patterns, factual knowledge, and the structure of Hindu philosophical discourse.</p>
+
+            <h3>Format Specification</h3>
+            <pre><code># Format: JSONL (JSON Lines) — one document per line
+# Each line is a JSON object with a "text" field
+
+# Example file: corpus_cpt.jsonl
+{"text": "अथ प्रथमोऽध्यायः। धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः। मामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय॥१॥ धृतराष्ट्र उवाच — हे सञ्जय! धर्मभूमि कुरुक्षेत्र में एकत्र हुए युद्ध की इच्छावाले मेरे और पाण्डु के पुत्रों ने क्या किया?"}
+{"text": "The Bhagavad Gita, often referred to as the Gita, is a 700-verse Hindu scripture that is part of the epic Mahabharata. It is a dialogue between Prince Arjuna and Lord Krishna, who serves as his charioteer. The discourse takes place on the battlefield of Kurukshetra."}
+{"text": "ईशावास्यमिदं सर्वं यत्किञ्च जगत्यां जगत्। तेन त्यक्तेन भुञ्जीथा मा गृधः कस्यस्विद्धनम्॥ Isha Upanishad begins with the profound declaration that everything in this universe is pervaded by the Lord."}</code></pre>
+
+            <h3>Best Practices for CPT Data</h3>
+            <ul>
+                <li><strong>Chunk size:</strong> Each document should be 512-4096 tokens. Too short = wasted padding. Too long = truncated.</li>
+                <li><strong>Include all languages:</strong> Mix Hindi, Sanskrit, and English in the corpus (proportional to your target use case)</li>
+                <li><strong>Include both original and translations:</strong> Sanskrit verses with Hindi/English translations helps the model learn cross-lingual connections</li>
+                <li><strong>Include commentaries:</strong> Shankaracharya's bhashya, Ramanuja's commentary — these teach interpretive patterns</li>
+            </ul>
+
+            <h3>Code: Create CPT Dataset from Raw Text</h3>
+            <pre><code>"""
+Convert cleaned text files into CPT-ready JSONL format.
+Handles chunking long documents into optimal training segments.
+"""
+import json
+from pathlib import Path
+from transformers import AutoTokenizer
+
+def create_cpt_dataset(
+    input_dir: str,
+    output_path: str,
+    model_name: str = "google/gemma-3-27b-it",
+    max_tokens: int = 2048,
+    overlap_tokens: int = 128
+):
+    """
+    Create CPT dataset with intelligent chunking.
+    
+    Args:
+        input_dir: Directory with cleaned .txt files
+        output_path: Output JSONL file path
+        model_name: Model tokenizer to use for token counting
+        max_tokens: Maximum tokens per chunk
+        overlap_tokens: Overlap between chunks (for context continuity)
+    """
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    
+    chunks_created = 0
+    
+    with open(output_path, 'w', encoding='utf-8') as out_file:
+        for txt_file in sorted(Path(input_dir).glob("*.txt")):
+            text = txt_file.read_text(encoding='utf-8')
+            
+            # Tokenize the full document
+            tokens = tokenizer.encode(text)
+            
+            # Split into chunks with overlap
+            start = 0
+            while start < len(tokens):
+                end = start + max_tokens
+                chunk_tokens = tokens[start:end]
+                
+                # Decode back to text
+                chunk_text = tokenizer.decode(chunk_tokens, skip_special_tokens=True)
+                
+                # Write as JSONL
+                record = {
+                    "text": chunk_text,
+                    "source": txt_file.name,
+                    "chunk_id": chunks_created
+                }
+                out_file.write(json.dumps(record, ensure_ascii=False) + '\n')
+                chunks_created += 1
+                
+                # Move forward with overlap
+                start = end - overlap_tokens
+    
+    print(f"✓ Created {chunks_created} chunks → {output_path}")
+    return chunks_created
+
+
+# Usage
+create_cpt_dataset(
+    input_dir="./processed_corpus/",
+    output_path="./datasets/cpt_corpus.jsonl",
+    max_tokens=2048
+)</code></pre>
+
+            <!-- SECTION: SFT Format -->
+            <h2 id="sft-format">💬 SFT (Supervised Fine-Tuning) Format</h2>
+            
+            <h3>What It Is</h3>
+            <p>SFT data teaches the model to <strong>follow instructions</strong>. Each example is a conversation between a user asking a question about Hindu scriptures and an assistant providing a helpful, accurate answer.</p>
+
+            <h3>Format Specification</h3>
+            <pre><code># Format 1: Conversational (RECOMMENDED for chat models)
+# Each example is a list of messages with roles
+
+{
+  "messages": [
+    {"role": "system", "content": "You are a knowledgeable scholar of Hindu scriptures..."},
+    {"role": "user", "content": "What does the Bhagavad Gita say about duty?"},
+    {"role": "assistant", "content": "The Bhagavad Gita extensively discusses..."}
+  ]
+}
+
+# Format 2: Prompt-Completion (simpler, also supported)
+{
+  "prompt": "Explain the concept of Dharma in the Mahabharata.",
+  "completion": "Dharma in the Mahabharata is a multifaceted concept..."
+}</code></pre>
+
+            <h3>Example: Scripture-Specific SFT Data</h3>
+            <pre><code># Example 1: Sanskrit verse explanation (multilingual)
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an expert scholar of Hindu scriptures. You can explain verses in Sanskrit, Hindi, and English. Always provide accurate references and respectful interpretations."
+    },
+    {
+      "role": "user",
+      "content": "भगवद्गीता के अध्याय 2, श्लोक 47 का अर्थ समझाइए।"
+    },
+    {
+      "role": "assistant",
+      "content": "भगवद्गीता अध्याय 2, श्लोक 47:\n\n**मूल श्लोक (Sanskrit):**\nकर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥\n\n**हिंदी अर्थ:**\nतुम्हारा अधिकार केवल कर्म करने में है, उसके फलों में कभी नहीं। तुम कर्मफल के हेतु मत बनो और अकर्म (कर्म न करने) में भी तुम्हारी आसक्ति न हो।\n\n**English Translation:**\nYou have the right to perform your duty, but never to its fruits. Let not the fruits of action be your motive, nor let your attachment be to inaction.\n\n**व्याख्या (Commentary):**\nयह श्लोक निष्काम कर्म योग का सार है। श्री कृष्ण अर्जुन को सिखा रहे हैं कि कर्म करना मनुष्य का कर्तव्य है, लेकिन फल की चिंता नहीं करनी चाहिए। यह स्थितप्रज्ञ (steady wisdom) की अवस्था है।"
+    }
+  ]
+}
+
+# Example 2: Philosophical discussion (English)
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an expert scholar of Hindu scriptures."
+    },
+    {
+      "role": "user",
+      "content": "What is the difference between Atman and Brahman according to the Upanishads?"
+    },
+    {
+      "role": "assistant",
+      "content": "The relationship between Atman and Brahman is one of the most profound topics in Upanishadic philosophy:\n\n**Atman (आत्मन्):**\n- The individual self or soul\n- The innermost essence of each being\n- Described in Katha Upanishad as 'smaller than the smallest, greater than the greatest'\n\n**Brahman (ब्रह्मन्):**\n- The ultimate reality, the absolute\n- The universal cosmic principle\n- Described in Taittiriya Upanishad as 'satyam jnanam anantam' (truth, knowledge, infinite)\n\n**The Core Teaching (Mahavakyas):**\nThe principal Upanishads declare their identity:\n1. 'Tat Tvam Asi' (तत् त्वम् असि) — 'That thou art' (Chandogya Upanishad 6.8.7)\n2. 'Aham Brahmasmi' (अहम् ब्रह्मास्मि) — 'I am Brahman' (Brihadaranyaka Upanishad 1.4.10)\n3. 'Ayam Atma Brahma' (अयम् आत्मा ब्रह्म) — 'This Self is Brahman' (Mandukya Upanishad 2)\n\n**Different Schools' Interpretations:**\n- **Advaita (Shankaracharya):** Atman and Brahman are absolutely identical. The appearance of difference is maya (illusion).\n- **Vishishtadvaita (Ramanuja):** Atman is a real part of Brahman, like a wave in the ocean.\n- **Dvaita (Madhvacharya):** Atman and Brahman are eternally distinct, though Atman depends on Brahman."
+    }
+  ]
+}
+
+# Example 3: Multi-turn conversation
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an expert scholar of Hindu scriptures."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about the Yoga Sutras of Patanjali."
+    },
+    {
+      "role": "assistant",
+      "content": "The Yoga Sutras of Patanjali (पातञ्जल योगसूत्र) is a foundational text of Yoga philosophy, composed around 200 BCE-200 CE. It consists of 196 sutras (aphorisms) divided into 4 chapters (padas):\n\n1. **Samadhi Pada** (51 sutras) — Defines yoga and describes states of absorption\n2. **Sadhana Pada** (55 sutras) — Practice methods including Ashtanga (8 limbs)\n3. **Vibhuti Pada** (56 sutras) — Supernatural powers from advanced practice\n4. **Kaivalya Pada** (34 sutras) — Liberation and the nature of consciousness"
+    },
+    {
+      "role": "user",
+      "content": "What are the 8 limbs (Ashtanga)?"
+    },
+    {
+      "role": "assistant",
+      "content": "The Ashtanga (अष्टाङ्ग) or Eight Limbs of Yoga are described in Sadhana Pada, Sutra 2.29:\n\n**यम-नियम-आसन-प्राणायाम-प्रत्याहार-धारणा-ध्यान-समाधयोऽष्टावङ्गानि॥**\n\n1. **यम (Yama)** — Ethical restraints: non-violence (ahimsa), truthfulness (satya), non-stealing (asteya), continence (brahmacharya), non-possessiveness (aparigraha)\n\n2. **नियम (Niyama)** — Personal observances: cleanliness (shaucha), contentment (santosha), austerity (tapas), self-study (svadhyaya), surrender to God (ishvara pranidhana)\n\n3. **आसन (Asana)** — Physical postures for stability and comfort\n\n4. **प्राणायाम (Pranayama)** — Breath control and regulation of vital energy\n\n5. **प्रत्याहार (Pratyahara)** — Withdrawal of senses from external objects\n\n6. **धारणा (Dharana)** — Concentration, fixing the mind on one point\n\n7. **ध्यान (Dhyana)** — Meditation, unbroken flow of awareness\n\n8. **समाधि (Samadhi)** — Complete absorption, union with the object of meditation\n\nThese are progressive stages — each builds on the previous. The first five are 'external' (bahiranga) practices, while the last three are 'internal' (antaranga) and collectively called **Samyama** (संयम)."
+    }
+  ]
+}</code></pre>
+
+            <h3>Types of SFT Data to Create</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Example Prompts</th>
+                        <th>Target Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Verse Explanation</strong></td>
+                        <td>"Explain Gita 4.7", "इस श्लोक का अर्थ बताइए"</td>
+                        <td>5,000-10,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Philosophy Q&A</strong></td>
+                        <td>"What is Maya?", "कर्म और भाग्य में क्या संबंध है?"</td>
+                        <td>5,000-10,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Story Narration</strong></td>
+                        <td>"Tell the story of Rama's exile", "द्रौपदी के वस्त्रहरण की कथा"</td>
+                        <td>2,000-5,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Comparison</strong></td>
+                        <td>"Compare Advaita and Dvaita", "योग और सांख्य में अंतर"</td>
+                        <td>2,000-3,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Translation</strong></td>
+                        <td>"Translate this Sanskrit verse", "इसका अंग्रेजी अनुवाद दीजिए"</td>
+                        <td>3,000-5,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Practical Application</strong></td>
+                        <td>"How to apply Gita's teachings in modern life?"</td>
+                        <td>2,000-3,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ritual & Practice</strong></td>
+                        <td>"Explain the significance of Gayatri Mantra"</td>
+                        <td>1,000-2,000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Code: Generate SFT Data using a Stronger Model</h3>
+            <pre><code>"""
+Generate high-quality SFT training data using a stronger model (Self-Instruct method).
+Uses an existing powerful model to create instruction-response pairs from raw text.
+"""
+import json
+import openai  # or any API-compatible provider
+from typing import List, Dict
+
+# Configure your API (Claude, GPT-4, or similar)
+client = openai.OpenAI(
+    api_key="your-api-key",
+    base_url="https://api.openai.com/v1"  # or your provider
+)
+
+SYSTEM_PROMPT = """You are a Hindu scripture expert helping create training data.
+Given a passage from a Hindu scripture, generate 3-5 diverse question-answer pairs.
+
+Rules:
+1. Questions should be in a mix of Hindi and English
+2. Answers must be accurate, detailed, and cite specific references
+3. Include Sanskrit terms with translations
+4. Vary question complexity (simple factual → deep philosophical)
+5. Format answers with clear structure (bullet points, numbered lists where appropriate)
+
+Output as JSON array:
+[{"question": "...", "answer": "..."}]
+"""
+
+def generate_sft_pairs(passage: str, source: str) -> List[Dict]:
+    """Generate instruction-response pairs from a scripture passage."""
+    
+    response = client.chat.completions.create(
+        model="gpt-4o",  # Use the best available model
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"Source: {source}\n\nPassage:\n{passage}"}
+        ],
+        temperature=0.7,
+        max_tokens=4096,
+        response_format={"type": "json_object"}
+    )
+    
+    try:
+        pairs = json.loads(response.choices[0].message.content)
+        if isinstance(pairs, dict) and "pairs" in pairs:
+            pairs = pairs["pairs"]
+        return pairs
+    except json.JSONDecodeError:
+        return []
+
+
+def create_sft_dataset(
+    corpus_path: str,
+    output_path: str,
+    max_passages: int = 5000,
+    system_message: str = "You are a knowledgeable scholar of Hindu scriptures."
+):
+    """
+    Create full SFT dataset from corpus using synthetic generation.
+    """
+    sft_data = []
+    
+    with open(corpus_path, 'r', encoding='utf-8') as f:
+        for i, line in enumerate(f):
+            if i >= max_passages:
+                break
+            
+            doc = json.loads(line)
+            passage = doc['text'][:2000]  # Limit passage length for API
+            source = doc.get('source', 'unknown')
+            
+            print(f"Processing passage {i+1}/{max_passages}...", end='\r')
+            
+            # Generate Q&A pairs
+            pairs = generate_sft_pairs(passage, source)
+            
+            for pair in pairs:
+                sft_example = {
+                    "messages": [
+                        {"role": "system", "content": system_message},
+                        {"role": "user", "content": pair["question"]},
+                        {"role": "assistant", "content": pair["answer"]}
+                    ]
+                }
+                sft_data.append(sft_example)
+    
+    # Save dataset
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for example in sft_data:
+            f.write(json.dumps(example, ensure_ascii=False) + '\n')
+    
+    print(f"\n✓ Generated {len(sft_data)} SFT examples → {output_path}")
+
+
+# Alternative: Template-based generation (cheaper, faster)
+def template_based_sft(verse_data: List[Dict]) -> List[Dict]:
+    """
+    Generate SFT data from structured verse data using templates.
+    No API calls needed — uses predefined question templates.
+    """
+    templates = [
+        "Explain the meaning of this verse: {verse}",
+        "What is the significance of {verse_ref} in {scripture}?",
+        "{verse_ref} का अर्थ समझाइए।",
+        "What philosophical concept does {verse_ref} teach?",
+        "इस श्लोक का हिंदी अनुवाद दीजिए: {verse}",
+        "How does {verse_ref} relate to daily life?",
+    ]
+    
+    sft_data = []
+    
+    for verse in verse_data:
+        import random
+        template = random.choice(templates)
+        
+        question = template.format(
+            verse=verse.get('sanskrit', ''),
+            verse_ref=verse.get('reference', ''),
+            scripture=verse.get('scripture', '')
+        )
+        
+        answer = f"""**{verse.get('reference', '')}**
+
+**Sanskrit:** {verse.get('sanskrit', '')}
+
+**Translation:** {verse.get('translation', '')}
+
+**Commentary:** {verse.get('commentary', '')}"""
+        
+        sft_data.append({
+            "messages": [
+                {"role": "system", "content": "You are a knowledgeable scholar of Hindu scriptures."},
+                {"role": "user", "content": question},
+                {"role": "assistant", "content": answer}
+            ]
+        })
+    
+    return sft_data</code></pre>
+
+            <!-- SECTION: DPO Format -->
+            <h2 id="dpo-format">⚖️ DPO (Preference Alignment) Format</h2>
+            
+            <h3>What It Is</h3>
+            <p>DPO data teaches the model which responses are <strong>better</strong> than others. Each example has a prompt, a <strong>chosen</strong> (good) response, and a <strong>rejected</strong> (bad) response. The model learns to generate responses more like "chosen" and less like "rejected".</p>
+
+            <h3>Format Specification</h3>
+            <pre><code># Format: Explicit prompt with chosen/rejected responses
+
+# Standard format
+{
+  "prompt": "What is Karma according to Hindu philosophy?",
+  "chosen": "Karma (कर्म) in Hindu philosophy refers to...[detailed, accurate answer]",
+  "rejected": "Karma is just about fate and destiny...[oversimplified or inaccurate]"
+}
+
+# Conversational format (recommended for chat models)
+{
+  "prompt": [
+    {"role": "user", "content": "What is Karma according to Hindu philosophy?"}
+  ],
+  "chosen": [
+    {"role": "assistant", "content": "Karma (कर्म) in Hindu philosophy is a profound concept..."}
+  ],
+  "rejected": [
+    {"role": "assistant", "content": "Karma basically means what goes around comes around..."}
+  ]
+}</code></pre>
+
+            <h3>Example: Scripture-Specific DPO Data</h3>
+            <pre><code># Example 1: Accuracy preference
+{
+  "prompt": [
+    {"role": "user", "content": "Who wrote the Bhagavad Gita?"}
+  ],
+  "chosen": [
+    {"role": "assistant", "content": "The Bhagavad Gita is traditionally attributed to Vyasa (वेदव्यास), the sage who is also credited with compiling the Vedas and composing the Mahabharata, of which the Gita is a part (chapters 25-42 of the Bhishma Parva). Historically, scholars date its composition between the 5th and 2nd century BCE. It's important to note that 'author' in the context of Hindu scriptures differs from the modern concept — Vyasa is considered a compiler/revealer rather than an inventor of the teachings, which are considered eternal (sanatana)."}
+  ],
+  "rejected": [
+    {"role": "assistant", "content": "The Bhagavad Gita was written by Lord Krishna. He told it to Arjuna on the battlefield."}
+  ]
+}
+
+# Example 2: Depth and nuance preference
+{
+  "prompt": [
+    {"role": "user", "content": "Is Hinduism polytheistic or monotheistic?"}
+  ],
+  "chosen": [
+    {"role": "assistant", "content": "This is one of the most nuanced questions in Hindu theology, and the answer depends on the philosophical school:\n\n**Multiple Valid Perspectives:**\n\n1. **Advaita Vedanta (Non-dual):** Neither — there is only one reality (Brahman). All deities are manifestations of this single absolute. 'एकं सद्विप्रा बहुधा वदन्ति' (Rigveda 1.164.46) — 'Truth is one, the wise call it by many names.'\n\n2. **Vaishnavism/Shaivism:** Effectively monotheistic — one Supreme God (Vishnu/Shiva) with other deities as subordinate.\n\n3. **Popular Practice:** Appears polytheistic with worship of multiple deities, but most practitioners understand these as aspects of one divine reality.\n\n4. **Henotheistic:** Some scholars prefer this term — worship of one God while acknowledging others exist.\n\nThe Rig Veda (1.164.46) provides the foundational answer: the ultimate reality is one, but expressed in many forms. This is fundamentally different from both strict monotheism and polytheism as understood in Abrahamic traditions."}
+  ],
+  "rejected": [
+    {"role": "assistant", "content": "Hinduism is polytheistic because Hindus worship many gods like Brahma, Vishnu, Shiva, Lakshmi, Saraswati, Ganesha, Hanuman, etc. Each god has different powers and responsibilities."}
+  ]
+}
+
+# Example 3: Respectfulness preference (Hindi)
+{
+  "prompt": [
+    {"role": "user", "content": "क्या वेदों में विज्ञान है?"}
+  ],
+  "chosen": [
+    {"role": "assistant", "content": "वेदों और आधुनिक विज्ञान के संबंध पर विद्वानों में विभिन्न मत हैं:\n\n**समर्थक दृष्टिकोण:**\n- वेदों में प्रकृति के नियमों का वर्णन मिलता है (सूर्य की गति, जल चक्र, etc.)\n- कुछ सूक्तों की व्याख्या वैज्ञानिक सिद्धांतों से मिलती-जुलती है\n- आयुर्वेद और ज्योतिष शास्त्र का मूल वैदिक है\n\n**आलोचनात्मक दृष्टिकोण:**\n- वेदों का मुख्य उद्देश्य आध्यात्मिक ज्ञान है, वैज्ञानिक शोध नहीं\n- पूर्वाग्रही व्याख्या (confirmation bias) से बचना चाहिए\n- आधुनिक विज्ञान प्रायोगिक पद्धति पर आधारित है जो वैदिक काल में नहीं थी\n\n**संतुलित दृष्टि:**\nवेद ज्ञान के भंडार हैं जिनमें प्रकृति का सूक्ष्म अवलोकन है। परंतु उन्हें आधुनिक विज्ञान की पाठ्यपुस्तक मानना उचित नहीं। दोनों अपने-अपने क्षेत्र में महत्वपूर्ण हैं।"}
+  ],
+  "rejected": [
+    {"role": "assistant", "content": "हाँ, वेदों में सब कुछ है — परमाणु बम, हवाई जहाज, इंटरनेट सब का वर्णन है। पश्चिमी विज्ञान ने वेदों से चुराया है।"}
+  ]
+}</code></pre>
+
+            <h3>How to Create DPO Data</h3>
+            <div class="callout callout-info">
+                <div class="callout-title">💡 Four Methods to Create Preference Data</div>
+                <ol>
+                    <li><strong>Human Annotation:</strong> Experts rate pairs of responses (gold standard, expensive)</li>
+                    <li><strong>Model-as-Judge:</strong> Use a stronger model (GPT-4, Claude) to evaluate responses</li>
+                    <li><strong>Rejection Sampling:</strong> Generate multiple responses, pick best/worst based on criteria</li>
+                    <li><strong>Contrastive Pairs:</strong> Intentionally create good vs flawed responses</li>
+                </ol>
+            </div>
+
+            <pre><code>"""
+Generate DPO preference data using rejection sampling + model-as-judge.
+"""
+import json
+from typing import List, Dict, Tuple
+
+def generate_dpo_via_rejection_sampling(
+    prompts: List[str],
+    model_name: str = "google/gemma-3-27b-it",
+    judge_model: str = "gpt-4o",
+    num_samples: int = 4
+) -> List[Dict]:
+    """
+    Generate DPO pairs using rejection sampling:
+    1. For each prompt, generate N responses from the model
+    2. Use a judge model to rank them
+    3. Take best as 'chosen', worst as 'rejected'
+    """
+    from transformers import pipeline
+    
+    # Load your fine-tuned model (after SFT stage)
+    generator = pipeline("text-generation", model=model_name, device="cuda")
+    
+    dpo_data = []
+    
+    for prompt in prompts:
+        # Generate multiple responses
+        responses = []
+        for _ in range(num_samples):
+            output = generator(
+                prompt,
+                max_new_tokens=1024,
+                temperature=0.8,  # Higher temp for diversity
+                do_sample=True,
+                top_p=0.9
+            )
+            responses.append(output[0]['generated_text'])
+        
+        # Judge responses (using stronger model)
+        best, worst = judge_responses(prompt, responses, judge_model)
+        
+        if best and worst and best != worst:
+            dpo_data.append({
+                "prompt": [{"role": "user", "content": prompt}],
+                "chosen": [{"role": "assistant", "content": best}],
+                "rejected": [{"role": "assistant", "content": worst}]
+            })
+    
+    return dpo_data
+
+
+def judge_responses(prompt: str, responses: List[str], judge_model: str) -> Tuple[str, str]:
+    """Use a stronger model to identify best and worst responses."""
+    
+    judge_prompt = f"""Rate these responses to the question about Hindu scriptures.
+    
+Question: {prompt}
+
+Responses:
+{chr(10).join(f'{i+1}. {r[:500]}' for i, r in enumerate(responses))}
+
+Criteria:
+- Accuracy (factual correctness about scriptures)
+- Depth (comprehensive explanation)
+- Respectfulness (culturally sensitive)
+- Clarity (well-structured, easy to understand)
+- References (cites specific texts/verses)
+
+Return JSON: {{"best": <number>, "worst": <number>, "reasoning": "..."}}
+"""
+    
+    # Call judge model
+    response = client.chat.completions.create(
+        model=judge_model,
+        messages=[{"role": "user", "content": judge_prompt}],
+        temperature=0.1,
+        response_format={"type": "json_object"}
+    )
+    
+    result = json.loads(response.choices[0].message.content)
+    best_idx = result["best"] - 1
+    worst_idx = result["worst"] - 1
+    
+    return responses[best_idx], responses[worst_idx]
+
+
+# Method 2: Contrastive pair generation (no API needed)
+def create_contrastive_dpo(good_answers: List[Dict]) -> List[Dict]:
+    """
+    Create DPO pairs by degrading good answers into bad ones.
+    Degradation strategies:
+    - Remove citations/references
+    - Oversimplify
+    - Add factual errors
+    - Make culturally insensitive
+    """
+    import random
+    
+    degradation_strategies = [
+        lambda a: a.split('\n')[0],  # Only keep first line (oversimplify)
+        lambda a: a.replace('॥', '').replace('।', ''),  # Remove Sanskrit markers
+        lambda a: ' '.join(a.split()[:50]),  # Truncate severely
+    ]
+    
+    dpo_data = []
+    
+    for item in good_answers:
+        strategy = random.choice(degradation_strategies)
+        rejected = strategy(item['answer'])
+        
+        dpo_data.append({
+            "prompt": [{"role": "user", "content": item['question']}],
+            "chosen": [{"role": "assistant", "content": item['answer']}],
+            "rejected": [{"role": "assistant", "content": rejected}]
+        })
+    
+    return dpo_data</code></pre>
+
+            <!-- SECTION: Dataset Loading -->
+            <h2 id="loading">🔌 Loading Datasets for Training</h2>
+            <pre><code>"""
+Load your custom datasets using HuggingFace datasets library.
+This is how you'll pass data to the trainers in later chapters.
+"""
+from datasets import load_dataset, Dataset
+import json
+
+# Method 1: Load from local JSONL file
+def load_sft_dataset(path: str):
+    """Load SFT dataset from local JSONL."""
+    dataset = load_dataset("json", data_files=path, split="train")
+    print(f"Loaded {len(dataset)} examples")
+    print(f"Columns: {dataset.column_names}")
+    print(f"Example: {dataset[0]}")
+    return dataset
+
+# Method 2: Load and split into train/test
+def load_and_split(path: str, test_size: float = 0.1):
+    """Load dataset and create train/test split."""
+    dataset = load_dataset("json", data_files=path, split="train")
+    split = dataset.train_test_split(test_size=test_size, seed=42)
+    print(f"Train: {len(split['train'])}, Test: {len(split['test'])}")
+    return split
+
+# Method 3: Load DPO dataset
+def load_dpo_dataset(path: str):
+    """Load DPO preference dataset."""
+    dataset = load_dataset("json", data_files=path, split="train")
+    
+    # Verify format
+    required_cols = {'prompt', 'chosen', 'rejected'}
+    assert required_cols.issubset(set(dataset.column_names)), \
+        f"Missing columns. Found: {dataset.column_names}, Need: {required_cols}"
+    
+    return dataset
+
+# Method 4: Combine multiple dataset files
+def combine_datasets(paths: list):
+    """Combine multiple JSONL files into one dataset."""
+    from datasets import concatenate_datasets
+    
+    datasets = []
+    for path in paths:
+        ds = load_dataset("json", data_files=path, split="train")
+        datasets.append(ds)
+    
+    combined = concatenate_datasets(datasets)
+    combined = combined.shuffle(seed=42)
+    print(f"Combined dataset: {len(combined)} examples")
+    return combined
+
+
+# Usage
+sft_dataset = load_sft_dataset("./datasets/sft_scripture_data.jsonl")
+dpo_dataset = load_dpo_dataset("./datasets/dpo_preference_data.jsonl")
+cpt_dataset = load_sft_dataset("./datasets/cpt_corpus.jsonl")</code></pre>
+
+            <!-- SECTION: Validation -->
+            <h2 id="validation">✅ Dataset Validation</h2>
+            <pre><code>"""
+Validate your datasets before training to catch format issues early.
+"""
+import json
+from typing import List, Dict
+
+def validate_sft_dataset(path: str) -> Dict:
+    """Validate SFT dataset format and quality."""
+    errors = []
+    warnings = []
+    stats = {"total": 0, "valid": 0, "languages": {"hi": 0, "en": 0, "sa": 0}}
+    
+    with open(path, 'r', encoding='utf-8') as f:
+        for line_num, line in enumerate(f, 1):
+            stats["total"] += 1
+            
+            try:
+                example = json.loads(line)
+            except json.JSONDecodeError:
+                errors.append(f"Line {line_num}: Invalid JSON")
+                continue
+            
+            # Check required structure
+            if "messages" not in example:
+                errors.append(f"Line {line_num}: Missing 'messages' field")
+                continue
+            
+            messages = example["messages"]
+            
+            # Check message structure
+            for msg in messages:
+                if "role" not in msg or "content" not in msg:
+                    errors.append(f"Line {line_num}: Message missing role/content")
+                    break
+                if msg["role"] not in ("system", "user", "assistant"):
+                    errors.append(f"Line {line_num}: Invalid role '{msg['role']}'")
+                    break
+            
+            # Check there's at least one user and one assistant message
+            roles = [m["role"] for m in messages]
+            if "user" not in roles:
+                errors.append(f"Line {line_num}: No user message")
+            if "assistant" not in roles:
+                errors.append(f"Line {line_num}: No assistant message")
+            
+            # Check for empty content
+            for msg in messages:
+                if not msg["content"].strip():
+                    warnings.append(f"Line {line_num}: Empty content for {msg['role']}")
+            
+            # Check response length
+            assistant_msgs = [m for m in messages if m["role"] == "assistant"]
+            for am in assistant_msgs:
+                if len(am["content"]) < 20:
+                    warnings.append(f"Line {line_num}: Very short assistant response")
+            
+            stats["valid"] += 1
+    
+    # Print report
+    print(f"{'='*50}")
+    print(f"Dataset Validation Report: {path}")
+    print(f"{'='*50}")
+    print(f"Total examples: {stats['total']}")
+    print(f"Valid examples: {stats['valid']}")
+    print(f"Errors: {len(errors)}")
+    print(f"Warnings: {len(warnings)}")
+    
+    if errors:
+        print(f"\n❌ First 5 errors:")
+        for e in errors[:5]:
+            print(f"  {e}")
+    
+    if warnings:
+        print(f"\n⚠️  First 5 warnings:")
+        for w in warnings[:5]:
+            print(f"  {w}")
+    
+    return {"errors": errors, "warnings": warnings, "stats": stats}
+
+
+# Run validation
+validate_sft_dataset("./datasets/sft_scripture_data.jsonl")</code></pre>
+
+            <div class="callout callout-success">
+                <div class="callout-title">✅ Summary</div>
+                <p>You now understand the three dataset formats needed:</p>
+                <ul>
+                    <li><strong>CPT:</strong> Raw text in JSONL (<code>{"text": "..."}</code>)</li>
+                    <li><strong>SFT:</strong> Conversations (<code>{"messages": [...]}</code>)</li>
+                    <li><strong>DPO:</strong> Preferences (<code>{"prompt":..., "chosen":..., "rejected":...}</code>)</li>
+                </ul>
+                <p>Next chapter: Using the CPT dataset for continued pre-training.</p>
+            </div>
+
+            <!-- Page Navigation -->
+            <nav class="page-nav">
+                <a href="02-data-collection.html">
+                    <span class="nav-label">← Previous</span>
+                    <span class="nav-title">Data Collection & Preparation</span>
+                </a>
+                <a href="04-continued-pretraining.html" style="text-align: right;">
+                    <span class="nav-label">Next →</span>
+                    <span class="nav-title">Continued Pre-Training (CPT)</span>
+                </a>
+            </nav>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
